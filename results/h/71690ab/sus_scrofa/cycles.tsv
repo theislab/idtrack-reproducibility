@@ -1,0 +1,4 @@
+rep	kind	n	conversions_leaving_cycles	unreachable_objects_total	per_conversion_median	per_conversion_max	freed_total_mb	freed_max_mb
+1	default	2000	1110	89574	31	8019	23.73	1.332
+1	symbol	2000	1109	131695	46	15027	28.36	1.854
+1	all_explain	2000	1110	89574	31	8019	27.14	1.386

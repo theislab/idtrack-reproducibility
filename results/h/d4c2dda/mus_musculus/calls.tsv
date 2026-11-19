@@ -1,0 +1,29 @@
+rep	measurement	n	wall_s	total_s	p50_ms	p90_ms	p99_ms	p999_ms	max_ms	mean_ms	gc_s	errors
+1	one_call_cold	7924	19.1215	19.12	0.212	1.34	36.6	101.7	462.7	2.412	1.945	0
+1	batch_warm	7924	15.488								1.171	
+1	batch_symbols	7924	17.4361								2.005	
+1	best_and_all_explained	7924	31.3553									
+1	threads_4	7924	18.1882									
+1	serial_again	7924	15.3438									
+1	corpus_calls	19112	42.94	42.94	0.132	1.03	38.5	125.5	793.5	2.247	3.69	298
+2	one_call_cold	7924	19.2441	19.24	0.211	1.36	36.5	100.5	455.7	2.428	1.944	0
+2	batch_warm	7924	15.5487								1.179	
+2	batch_symbols	7924	17.2989								2.048	
+2	best_and_all_explained	7924	31.3672									
+2	threads_4	7924	18.338									
+2	serial_again	7924	15.4803									
+2	corpus_calls	19112	41.54	41.54	0.129	0.95	37.4	93.8	793.4	2.173	3.689	298
+3	one_call_cold	7924	18.9578	18.95	0.21	1.37	35.8	100.8	452.2	2.392	1.922	0
+3	batch_warm	7924	15.2245								1.163	
+3	batch_symbols	7924	17.0238								2.027	
+3	best_and_all_explained	7924	30.623									
+3	threads_4	7924	17.0917									
+3	serial_again	7924	14.2768									
+3	corpus_calls	19112	38.6	38.6	0.127	0.94	34.2	91.7	830.8	2.02	3.427	298
+median	one_call_cold	7924	19.1215	19.12	0.211	1.36	36.5	100.8	455.7	2.412	1.944	0
+median	batch_warm	7924	15.488								1.171	
+median	batch_symbols	7924	17.2989								2.027	
+median	best_and_all_explained	7924	31.3553									
+median	threads_4	7924	18.1882									
+median	serial_again	7924	15.3438									
+median	corpus_calls	19112	41.54	41.54	0.129	0.95	37.4	93.8	793.5	2.173	3.689	298

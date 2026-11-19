@@ -1,0 +1,11 @@
+stratum	cause	class	rule	answers	units
+backward	external_bridge	b	rule `external_bridge`	39	13
+backward	unexplained	?	-	3927	13
+backward_handoff	external_bridge	b	rule `external_bridge`	69	23
+backward_handoff	unexplained	?	-	17841	23
+default	external_bridge	b	rule `external_bridge`	174	58
+default	unexplained	?	-	2858	58
+forward	external_bridge	b	rule `external_bridge`	99	33
+forward	unexplained	?	-	15973	33
+forward_handoff	external_bridge	b	rule `external_bridge`	3	1
+forward_handoff	unexplained	?	-	459	1

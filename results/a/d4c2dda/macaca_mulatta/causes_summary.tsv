@@ -1,0 +1,5 @@
+stratum	cause	class	rule	answers	units
+A3_-1	external_bridge	b	rule `external_bridge`	78	39
+A3_-2	external_bridge	b	rule `external_bridge`	156	39
+A3_first	external_bridge	b	rule `external_bridge`	2046	35
+A6_backward	external_bridge	b	rule `external_bridge`	8072	19

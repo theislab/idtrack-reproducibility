@@ -1,0 +1,2 @@
+rep	kind	profiled	cpu_model	build_s	peak_gb	bytes_received_mb	repo_mb	graph_file_mb	same_content_as_configured
+1	warm	false	Intel(R) Xeon(R) Gold 6248R CPU @ 3.00GHz	124.7	1.1708	0.1	649.4	85.2	true

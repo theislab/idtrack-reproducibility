@@ -1,0 +1,237 @@
+# The registry of the results (docs/adding.md, "Layout"): for each benchmark, tree and organism, the scored folder of
+# the data root and the tables taken from it into results/<family>/<tree>/<organism>/. `index` names the tables whose
+# rows go into results/index.tsv (`report`: the common report.tsv; `scores`: the harness's scores.tsv). Only the
+# current scoring of each tree is named here; regenerating (`idtrack-repro results`) replaces the files.
+# `scope` is `exhaustive` (default: every line of the family's sets) or `panel` (a development stage measured by the
+# family's panel; docs/methods.md, "Measurement design").
+
+# The content digests of the graphs each tree was run on (as idtrack computes them; the runs record them).
+[graphs.d4c2dda]
+sus_scrofa = "c1fe33f8aa64301df847edc08521dfba0cbe49b95757d4ec5b4a65e966a092a6"
+mus_musculus = "a8cae22ef59bc86b99f6915080111c5d9b24da879e3c5e257d49d6263bfeba1b"
+homo_sapiens = "79589a163c15d5ab20158e64653910a16a15a4bd8bd7ffad7800db8ae50b51b4"
+macaca_mulatta = "dcc52e8cc707cafa06872daf65c70a2b3946f52827644537c241ada42c2f991c"
+macaca_fascicularis = "466151e05e731fc0e6a7a92ac0bc786aaadce8362d55a6597cad20cfc6cb98c4"
+
+# the graphs of snapshot 110 (family A's A8), built by d4c2dda
+[graphs.d4c2dda_s110]
+sus_scrofa = "50478cbfe559920f5bbe2aa975509a2bff998c9711d77afb6c5f50dab2ac455f"
+homo_sapiens = "50e06366c27378cc8687e64f734e0b9b8a883408c6d9e5ba6b253c904a695c85"
+
+# ---------------- the accuracy harness ----------------
+[[run]]
+family = "harness"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "harness/runs/d4c2dda/{organism}"
+scored = ["kinds/run.json", "travel/run.json"]
+generator = "idtrack-repro harness-score --merge; idtrack-repro travel-report"
+files = { "kinds_scores.tsv" = "kinds/scores.tsv", "travel_scores.tsv" = "travel/scores.tsv", "travel_report.tsv" = "travel/travel_report.tsv", "travel_report.md" = "travel/travel_report.md" }
+index = { "kinds_scores.tsv" = "scores", "travel_scores.tsv" = "scores" }
+
+# ---------------- F0: the harness's sets through the common machinery ----------------
+[[run]]
+family = "f0"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/f0/runs/check_d4c2dda/{organism}"
+generator = "idtrack-repro score --family harness; idtrack-repro causes"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+# the causes of the current scoring: classified for pig and rhesus (their stored check runs used the current sets) and
+# cynomolgus; not for mouse and human (docs/verification.md)
+optional = ["causes_summary.tsv"]
+
+[[run]]
+family = "f0"
+tree = "71690ab"
+commit = "71690abe044f19afcc97f146d5e6c35cf4873962"
+graphs = "d4c2dda"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/f0/runs/check_71690ab/{organism}"
+generator = "idtrack-repro score --family harness"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+# ---------------- A*: the hardest lineages ----------------
+[[run]]
+family = "astar"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/astar/runs/d4c2dda/{organism}"
+generator = "idtrack-repro score --family astar; idtrack-repro causes; idtrack-repro family astar report_astar"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "per_pattern.tsv" = "astar/per_pattern.tsv", "per_pattern_stratum.tsv" = "astar/per_pattern_stratum.tsv", "open.tsv" = "astar/open.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (cynomolgus)
+
+[[run]]
+family = "astar"
+tree = "d4c2dda_tx"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+graphs = "d4c2dda"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/astar/runs/d4c2dda_tx/{organism}"
+generator = "idtrack-repro score --family astar"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+# ---------------- A: history travel, exhaustive ----------------
+[[run]]
+family = "a"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/a/runs/d4c2dda/{organism}"
+generator = "idtrack-repro score --family a; idtrack-repro causes --plugin families/a/causes_a.py; idtrack-repro family a report_a"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "axes.tsv" = "axes.tsv", "patterns.tsv" = "patterns.tsv", "wrong_units.tsv" = "wrong_units.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "a"
+tree = "d4c2dda_s110"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+graphs = "d4c2dda_s110"
+organisms = ["sus_scrofa", "homo_sapiens"]
+folder = "families/a/runs/d4c2dda_s110/{organism}"
+generator = "idtrack-repro score --family a; idtrack-repro causes --plugin families/a/causes_a.py"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+
+# A0 (graph fidelity) comes into results/ when it is run again by this package (its stored table names the
+# earlier working notes' decision numbers in its by-design reasons); until then: <families>/a/a0/d4c2dda/<organism>/summary.tsv
+
+# ---------------- E: robustness ----------------
+[[run]]
+family = "e"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/e/runs/d4c2dda/{organism}"
+scored = ["scores_now/run.json", "scores_decided/run.json"]
+generator = "idtrack-repro family e score_e; idtrack-repro family e causes_e; family e det / relations_e (e7, e8)"
+files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "now_causes_summary.tsv" = "scores_now/causes_summary.tsv", "decided_causes_summary.tsv" = "scores_decided/causes_summary.tsv", "e_summary.tsv" = "e_summary.tsv", "e7_report.tsv" = "e7_report.tsv", "e8_report.tsv" = "e8_report.tsv" }
+index = { "now_report.tsv" = "report" }
+
+[[run]]
+family = "e"
+tree = "71690ab"
+commit = "71690abe044f19afcc97f146d5e6c35cf4873962"
+graphs = "d4c2dda"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/e/runs/71690ab/{organism}"
+scored = ["scores_now/run.json", "scores_decided/run.json"]
+generator = "idtrack-repro family e score_e; idtrack-repro family e causes_e; family e budget / det / relations_e / harm_e (e6, e7, e8, harm)"
+files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "now_causes_summary.tsv" = "scores_now/causes_summary.tsv", "decided_causes_summary.tsv" = "scores_decided/causes_summary.tsv", "e_summary.tsv" = "e_summary.tsv", "e6_report.tsv" = "e6_report.tsv", "e7_report.tsv" = "e7_report.tsv", "e8_report.tsv" = "e8_report.tsv", "compare_vs_d4c2dda_now.tsv" = "compare_vs_d4c2dda_now.tsv", "compare_vs_d4c2dda_decided.tsv" = "compare_vs_d4c2dda_decided.tsv", "harm_report.tsv" = "harm/report.tsv" }
+optional = ["harm_report.tsv"]
+index = { "now_report.tsv" = "report" }
+
+[[run]]
+family = "e"
+tree = "71690ab"
+commit = "71690abe044f19afcc97f146d5e6c35cf4873962"
+graphs = "d4c2dda"
+organisms = ["web"]
+folder = "families/e/runs/71690ab_web/e9"
+scored = []
+generator = "idtrack-repro family e web_e"
+files = { "e9_report.tsv" = "report.tsv" }
+
+# ---------------- the known limitations (generated straight into results/) ----------------
+[[generated]]
+family = "limitations"
+generated_by = "idtrack-repro known-limitations"
+files = ["results/limitations/*.tsv"]
+
+# ---------------- H: performance (tables written by the family's own generator) ----------------
+[[generated]]
+family = "h"
+generated_by = "python -m idtrack_reproducibility.families.h.tables"
+files = ["results/h/71690ab/all/server.tsv", "results/h/71690ab/homo_sapiens/load.tsv", "results/h/71690ab/homo_sapiens/calls.tsv", "results/h/71690ab/homo_sapiens/calls_by_stratum.tsv", "results/h/71690ab/homo_sapiens/batch_scaling.tsv", "results/h/71690ab/homo_sapiens/harmonize.tsv", "results/h/71690ab/macaca_fascicularis/load.tsv", "results/h/71690ab/macaca_fascicularis/calls.tsv", "results/h/71690ab/macaca_fascicularis/calls_by_stratum.tsv", "results/h/71690ab/macaca_fascicularis/batch_scaling.tsv", "results/h/71690ab/macaca_fascicularis/harmonize.tsv", "results/h/71690ab/macaca_fascicularis/build.tsv", "results/h/71690ab/macaca_mulatta/load.tsv", "results/h/71690ab/macaca_mulatta/calls.tsv", "results/h/71690ab/macaca_mulatta/calls_by_stratum.tsv", "results/h/71690ab/macaca_mulatta/batch_scaling.tsv", "results/h/71690ab/macaca_mulatta/harmonize.tsv", "results/h/71690ab/mus_musculus/load.tsv", "results/h/71690ab/mus_musculus/calls.tsv", "results/h/71690ab/mus_musculus/calls_by_stratum.tsv", "results/h/71690ab/mus_musculus/batch_scaling.tsv", "results/h/71690ab/mus_musculus/harmonize.tsv", "results/h/71690ab/sus_scrofa/load.tsv", "results/h/71690ab/sus_scrofa/calls.tsv", "results/h/71690ab/sus_scrofa/calls_by_stratum.tsv", "results/h/71690ab/sus_scrofa/batch_scaling.tsv", "results/h/71690ab/sus_scrofa/harmonize.tsv", "results/h/71690ab/sus_scrofa/cycles.tsv", "results/h/71690ab/sus_scrofa/build.tsv", "results/h/d4c2dda/all/server.tsv", "results/h/d4c2dda/homo_sapiens/load.tsv", "results/h/d4c2dda/homo_sapiens/calls.tsv", "results/h/d4c2dda/homo_sapiens/calls_by_stratum.tsv", "results/h/d4c2dda/homo_sapiens/batch_scaling.tsv", "results/h/d4c2dda/homo_sapiens/harmonize.tsv", "results/h/d4c2dda/macaca_fascicularis/load.tsv", "results/h/d4c2dda/macaca_fascicularis/calls.tsv", "results/h/d4c2dda/macaca_fascicularis/calls_by_stratum.tsv", "results/h/d4c2dda/macaca_fascicularis/batch_scaling.tsv", "results/h/d4c2dda/macaca_fascicularis/harmonize.tsv", "results/h/d4c2dda/macaca_fascicularis/build.tsv", "results/h/d4c2dda/macaca_mulatta/load.tsv", "results/h/d4c2dda/macaca_mulatta/calls.tsv", "results/h/d4c2dda/macaca_mulatta/calls_by_stratum.tsv", "results/h/d4c2dda/macaca_mulatta/batch_scaling.tsv", "results/h/d4c2dda/macaca_mulatta/harmonize.tsv", "results/h/d4c2dda/mus_musculus/load.tsv", "results/h/d4c2dda/mus_musculus/calls.tsv", "results/h/d4c2dda/mus_musculus/calls_by_stratum.tsv", "results/h/d4c2dda/mus_musculus/batch_scaling.tsv", "results/h/d4c2dda/mus_musculus/harmonize.tsv", "results/h/d4c2dda/sus_scrofa/load.tsv", "results/h/d4c2dda/sus_scrofa/calls.tsv", "results/h/d4c2dda/sus_scrofa/calls_by_stratum.tsv", "results/h/d4c2dda/sus_scrofa/batch_scaling.tsv", "results/h/d4c2dda/sus_scrofa/harmonize.tsv", "results/h/d4c2dda/sus_scrofa/cycles.tsv", "results/h/d4c2dda/sus_scrofa/build.tsv"
+]
+
+# ---------------- B: names over time (the organisms whose runs were scored; the judge `now` only) ----------------
+[[run]]
+family = "b"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["macaca_mulatta", "macaca_fascicularis"]
+folder = "families/b/runs/d4c2dda/{organism}"
+scored = ["scores_now/run.json"]
+generator = "idtrack-repro score --family b (the judge now: the sets without their _dec revisions)"
+files = { "now_report.tsv" = "scores_now/report.tsv", "now_scores.tsv" = "scores_now/scores.tsv" }
+index = { "now_report.tsv" = "report" }
+
+# ---------------- C: external identifiers (pig, rhesus, cynomolgus; causes where classified) ----------------
+[[run]]
+family = "c"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/c/runs/d4c2dda/{organism}"
+generator = "idtrack-repro score --family c; idtrack-repro causes --plugin families/c/causes_c.py; family c authority_c"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "authority.tsv" = "authority.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv", "authority.tsv"]  # pig's wrong answers were explained, not classified
+
+# ---------------- D: real-world inputs (D1 rosetta's matrices; D2 source inference; D3 marker lists; D4 mixed lists) ----------------
+[[run]]
+family = "d"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/d4c2dda/{organism}"
+generator = "family d run_d; idtrack-repro score --family d; idtrack-repro causes --plugin families/d/causes_d.py; family d report_d1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]
+
+[[run]]
+family = "d"
+tree = "d4c2dda_d2"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+graphs = "d4c2dda"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/d4c2dda_d2/{organism}"
+generator = "family d run_d; idtrack-repro score --family d; family d report_d2"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (pig)
+
+[[run]]
+family = "d"
+tree = "d4c2dda_d3"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+graphs = "d4c2dda"
+organisms = ["mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/d4c2dda_d3/{organism}"
+generator = "family d run_d; idtrack-repro score --family d; family d report_d3"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]
+
+[[run]]
+family = "d"
+tree = "d4c2dda_d4"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+graphs = "d4c2dda"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/d/runs/d4c2dda_d4/{organism}"
+generator = "family d run_d; idtrack-repro score --family d; family d causes_d4_from_single; family d report_d4"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (cynomolgus)
+
+[[run]]
+family = "d"
+tree = "71690ab_d2"
+commit = "71690abe044f19afcc97f146d5e6c35cf4873962"
+graphs = "d4c2dda"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/71690ab_d2/{organism}"
+generator = "family d run_d; idtrack-repro score --family d; family d report_d2"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]

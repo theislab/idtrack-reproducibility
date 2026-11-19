@@ -1,0 +1,2 @@
+file	sha256	generated_by	source	source_sha256	scored_at	commit	graph_digest	generated_at
+results/h/71690ab/sus_scrofa/build.tsv	15b5d9c97a37b506c8765edb5d4333c44ea992c0aac92dd7950770e44e689714	python -m idtrack_reproducibility.families.h.tables	performance/runs/71690ab/sus_scrofa/build_warm_rep1.json	161139ce2b8ed135258172f1c7ae0c8be8db139fbc452d03ee6cc1c01793d4a1	2026-11-19 09:38:46	71690abe044f19afcc97f146d5e6c35cf4873962	c1fe33f8aa64301df847edc08521dfba0cbe49b95757d4ec5b4a65e966a092a6	2026-11-19T10:12:26

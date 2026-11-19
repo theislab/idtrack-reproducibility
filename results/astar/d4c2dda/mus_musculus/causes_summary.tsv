@@ -1,0 +1,12 @@
+stratum	cause	class	rule	answers	units
+backward	external_bridge	b	rule `external_bridge`	603	201
+backward	unexplained	?	-	80737	201
+backward_handoff	external_bridge	b	rule `external_bridge`	732	244
+backward_handoff	unexplained	?	-	348117	244
+default	external_bridge	b	rule `external_bridge`	1109	370
+default	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	3	1
+default	unexplained	?	-	43514	370
+forward	external_bridge	b	rule `external_bridge`	129	43
+forward	unexplained	?	-	22083	43
+forward_handoff	external_bridge	b	rule `external_bridge`	558	186
+forward_handoff	unexplained	?	-	218161	186

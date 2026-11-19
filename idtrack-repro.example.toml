@@ -1,0 +1,58 @@
+# The configuration of the benchmarks (README, "Configuration"). Copy it to `idtrack-repro.toml` (read from the working
+# directory) or point IDTRACK_REPRO_CONFIG at it. Relative paths are read from this file's folder.
+
+[data]
+# The data root: every location below defaults to a folder of it (docs/data.md, "Layout").
+root = "data"
+# truth = "data/truth"
+# harness = "data/harness"
+# families = "data/families"
+# corpus = "data/corpus"
+# hunts = "data/hunts"
+# performance = "data/performance"
+# graphs = "data/graphs"
+# cache = "data/cache"
+
+# The idtrack trees the benchmarks measure: a checkout of github.com/theislab/idtrack at the commit, the Python that
+# runs it (an environment with idtrack's dependencies; default: the Python running this package) and its graphs.
+[trees.d4c2dda]
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+source = "trees/d4c2dda"
+python = "python"
+[trees.d4c2dda.graphs]
+sus_scrofa = "data/graphs/sus_scrofa/graph_sus_scrofa_assembly111_min56_max115_narrow.npz"
+mus_musculus = "data/graphs/mus_musculus/graph_mus_musculus_assembly39_min48_max115_narrow.npz"
+homo_sapiens = "data/graphs/homo_sapiens/graph_homo_sapiens_assembly38_min48_max115_narrow.npz"
+macaca_mulatta = "data/graphs/macaca_mulatta/graph_macaca_mulatta_assembly10_min48_max115_narrow.npz"
+macaca_fascicularis = "data/graphs/macaca_fascicularis/graph_macaca_fascicularis_assembly6_min91_max115_narrow.npz"
+
+[trees.71690ab]
+commit = "71690abe044f19afcc97f146d5e6c35cf4873962"
+source = "trees/71690ab"
+python = "python"
+[trees.71690ab.graphs]
+sus_scrofa = "data/graphs/sus_scrofa/graph_sus_scrofa_assembly111_min56_max115_narrow.npz"
+mus_musculus = "data/graphs/mus_musculus/graph_mus_musculus_assembly39_min48_max115_narrow.npz"
+homo_sapiens = "data/graphs/homo_sapiens/graph_homo_sapiens_assembly38_min48_max115_narrow.npz"
+macaca_mulatta = "data/graphs/macaca_mulatta/graph_macaca_mulatta_assembly10_min48_max115_narrow.npz"
+macaca_fascicularis = "data/graphs/macaca_fascicularis/graph_macaca_fascicularis_assembly6_min91_max115_narrow.npz"
+
+[jobs]
+# `local` runs every job at once in this process's environment; `slurm` submits it with sbatch.
+runner = "local"
+name_prefix = "idtrack_repro_"
+[jobs.slurm]
+partition = "cpu_p"
+qos = "cpu_normal"
+extra = []
+# Memory (GB) of a job that holds a graph of the reference tree and asks it, per organism.
+[jobs.memory_gb]
+homo_sapiens = 90
+mus_musculus = 50
+sus_scrofa = 24
+macaca_mulatta = 24
+macaca_fascicularis = 20
+
+[tools]
+# The idtrack-web command for family E's web-layer checks (E9).
+idtrack_web = "idtrack-web"

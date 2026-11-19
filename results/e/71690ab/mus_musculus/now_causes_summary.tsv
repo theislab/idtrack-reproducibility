@@ -1,0 +1,16 @@
+stratum	cause	class	rule	answers	units
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	28	11
+e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	5	5
+e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	493	489
+e2_case_lower_competing	docs_case_rule_judge_short	e	-	2	2
+e2_case_upper_competing	docs_case_rule_judge_short	e	-	10	10
+e2_internal_name	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	9	9
+e2_internal_syn	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	1	1
+e2_junk_wild	nonalnum_name_in_graph	a	rule `missing_values`, builder part (decided)	1	1
+e2_longversion	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
+e2_punct_name	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	2	2
+e2_punct_syn	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	3	3
+e4_symbol_exact	mouse_hgnc_projection	d	harness_lib.EXCLUDED (mouse HGNC Symbol); the corrected judge	2	2
+e8_infer_duplicates	infer_duplicates_counted	a	docs/methods.md E8 (the relation); docs: 'each identifier counts once'	1	1
+hunt_IN-11	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	1	1
+hunt_IN-7	source_inference_reads_names_at_snapshot	a	rule `inference_per_release` (finding IN-7; decided)	2	2

@@ -1,0 +1,170 @@
+"""The one configuration of the benchmarks: where the data are, which idtrack trees are measured, how jobs run.
+
+Read from a TOML file and environment variables (README, "Configuration"). The file is the first of:
+`$IDTRACK_REPRO_CONFIG`, `./idtrack-repro.toml`; without one, every default below applies. Relative paths in the
+file are read from the file's folder; relative paths in variables from the working directory.
+
+Locations (each a folder; defaults under the data root):
+
+    [data]
+    root = "data"                  # IDTRACK_REPRO_DATA_ROOT
+    truth = "<root>/truth"         # IDTRACK_REPRO_TRUTH        Ensembl's and the authorities' files, per organism
+    harness = "<root>/harness"     # IDTRACK_REPRO_HARNESS      the accuracy harness: queries/<organism>/, runs/
+    families = "<root>/families"   # IDTRACK_REPRO_FAMILIES     the benchmark families: <family>/queries, runs, ...
+    corpus = "<root>/corpus"       # IDTRACK_REPRO_CORPUS       the regression corpus, its references and runs
+    hunts = "<root>/hunts"         # IDTRACK_REPRO_HUNTS        the weakness hunts' outputs
+    performance = "<root>/performance"  # IDTRACK_REPRO_PERFORMANCE
+    graphs = "<root>/graphs"       # IDTRACK_REPRO_GRAPHS       graph files built by the trees
+    cache = "<root>/cache"         # IDTRACK_REPRO_CACHE        caches of truth readers (rebuilt when missing)
+
+Trees (an idtrack checkout at a commit, the Python that runs it, its graphs per organism):
+
+    [trees.d4c2dda]
+    commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+    source = "trees/d4c2dda"       # a checkout of github.com/theislab/idtrack at that commit
+    python = "python"              # default: the Python running this package
+    [trees.d4c2dda.graphs]
+    sus_scrofa = "graphs/d4c2dda/sus_scrofa/graph_sus_scrofa_assembly11_min56_max115_narrow.npz"
+
+External inputs a family reads (family D: the atlas project's checkout and its per-feature tables):
+
+    [sources]
+    rosetta = "<checkout of the atlas project>"
+    rosetta_m02 = "<its per-feature locus tables (m02)>"
+
+Jobs (`runner` is `slurm` or `local`; IDTRACK_REPRO_RUNNER):
+
+    [jobs]
+    runner = "local"
+    name_prefix = "idtrack_repro_"
+    [jobs.slurm]
+    partition = "cpu_p"            # IDTRACK_REPRO_SLURM_PARTITION
+    qos = "cpu_normal"             # IDTRACK_REPRO_SLURM_QOS
+    extra = []                     # further sbatch arguments
+    [jobs.memory_gb]               # memory of a job that loads a graph, per organism
+    homo_sapiens = 90
+
+The module reads no idtrack and runs on Python 3.11 too (the Python of an older tree imports it).
+"""
+import os
+import sys
+import tomllib
+
+ORGANISMS = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+LOCATIONS = ["truth", "harness", "families", "corpus", "hunts", "performance", "graphs", "cache"]
+# Memory of one job that holds a graph of the reference tree (d4c2dda) and asks it, with room for the run (GB).
+MEMORY_GB = {"homo_sapiens": 90, "mus_musculus": 50, "sus_scrofa": 24, "macaca_mulatta": 24, "macaca_fascicularis": 20}
+SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # the folder holding the package (src/)
+
+
+class Config:
+    def __init__(self, path=None):
+        self.path = path
+        raw = {}
+        if path:
+            with open(path, "rb") as fh:
+                raw = tomllib.load(fh)
+        self.raw = raw
+        base = os.path.dirname(os.path.abspath(path)) if path else os.getcwd()
+        data = raw.get("data", {})
+
+        def where(value, rel_to):
+            return os.path.normpath(os.path.join(rel_to, os.path.expanduser(value)))
+
+        env_root = os.environ.get("IDTRACK_REPRO_DATA_ROOT")
+        self.root = where(env_root, os.getcwd()) if env_root else where(data.get("root", "data"), base)
+        for loc in LOCATIONS:
+            env = os.environ.get(f"IDTRACK_REPRO_{loc.upper()}")
+            if env:
+                val = where(env, os.getcwd())
+            elif loc in data:
+                val = where(data[loc], base)
+            else:
+                val = os.path.join(self.root, loc)
+            setattr(self, loc, val)
+        self.trees = {}
+        for name, t in raw.get("trees", {}).items():
+            self.trees[name] = dict(
+                name=name, commit=t.get("commit", ""),
+                source=where(t["source"], base) if t.get("source") else None,
+                python=t.get("python") or sys.executable,
+                graphs={o: where(g, base) for o, g in (t.get("graphs") or {}).items()})
+        jobs = raw.get("jobs", {})
+        self.runner = os.environ.get("IDTRACK_REPRO_RUNNER") or jobs.get("runner", "local")
+        if self.runner not in ("local", "slurm"):
+            raise SystemExit(f"jobs.runner must be `local` or `slurm`, not {self.runner!r}")
+        self.name_prefix = jobs.get("name_prefix", "idtrack_repro_")
+        sl = jobs.get("slurm", {})
+        self.slurm = dict(partition=os.environ.get("IDTRACK_REPRO_SLURM_PARTITION") or sl.get("partition", "cpu_p"),
+                          qos=os.environ.get("IDTRACK_REPRO_SLURM_QOS") or sl.get("qos"),
+                          extra=list(sl.get("extra", [])))
+        self.memory_gb = dict(MEMORY_GB, **jobs.get("memory_gb", {}))
+        self.python = jobs.get("python") or sys.executable  # the Python of this package in jobs
+
+    def source(self, name):
+        """An external input named in `[sources]` (e.g. the atlas project's checkout and its feature tables that family D
+        reads), or an error that says how to configure it."""
+        s = self.raw.get("sources", {})
+        if name not in s:
+            raise SystemExit(f"external input {name!r} is not configured: add [sources] {name} = <path> to "
+                             f"{self.path or 'idtrack-repro.toml'}")
+        base = os.path.dirname(os.path.abspath(self.path)) if self.path else os.getcwd()
+        return os.path.normpath(os.path.join(base, os.path.expanduser(s[name])))
+
+    def tree(self, name):
+        if name not in self.trees:
+            raise SystemExit(f"tree {name!r} is not in the configuration ({self.path or 'no file'}): add [trees.{name}]")
+        return self.trees[name]
+
+    def tree_of_source(self, source):
+        """The configured tree whose checkout is `source`, or None."""
+        real = os.path.realpath(source)
+        for t in self.trees.values():
+            if t["source"] and os.path.realpath(t["source"]) == real:
+                return t
+        return None
+
+    def python_for(self, source):
+        """The Python command that runs the tree checked out at `source` (the configured tree's, else this one)."""
+        t = self.tree_of_source(source)
+        return t["python"] if t else sys.executable
+
+    def graph(self, tree, organism):
+        t = self.tree(tree)
+        if organism not in t["graphs"]:
+            raise SystemExit(f"no graph of {organism} for tree {tree}: add [trees.{tree}.graphs] {organism} = ...")
+        return t["graphs"][organism]
+
+    def describe(self):
+        out = dict(config=self.path, root=self.root, **{loc: getattr(self, loc) for loc in LOCATIONS},
+                   runner=self.runner, slurm=self.slurm, name_prefix=self.name_prefix,
+                   trees={n: {k: v for k, v in t.items()} for n, t in self.trees.items()})
+        return out
+
+
+_CONFIG = None
+
+
+def find_file():
+    p = os.environ.get("IDTRACK_REPRO_CONFIG")
+    if p:
+        if not os.path.exists(p):
+            raise SystemExit(f"IDTRACK_REPRO_CONFIG={p}: no such file")
+        return os.path.abspath(p)
+    if os.path.exists("idtrack-repro.toml"):
+        return os.path.abspath("idtrack-repro.toml")
+    return None
+
+
+def get():
+    """The configuration of this process (read once)."""
+    global _CONFIG
+    if _CONFIG is None:
+        _CONFIG = Config(find_file())
+    return _CONFIG
+
+
+def reset():
+    """Read the configuration again at the next `get()` (tests)."""
+    global _CONFIG
+    _CONFIG = None

@@ -1,0 +1,11 @@
+stratum	cause	class	rule	answers	units
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	84	36
+e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	24	24
+e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	26	26
+e2_internal_name	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	14	14
+e2_longversion	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
+e2_makeunique_name	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	3	1
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	4	2
+e2_makeunique_syn	suffix_form_is_name_at_unread_release	e	-	2	2
+e2_punct_syn	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	1	1
+hunt_IN-2	lowercase_exact_synonym_other_organism	b	IN-2's residual (rule `single_case_symbols` covers organisms with mixed-case symbols only)	2	1

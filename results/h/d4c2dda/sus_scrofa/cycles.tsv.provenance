@@ -1,0 +1,2 @@
+file	sha256	generated_by	source	source_sha256	scored_at	commit	graph_digest	generated_at
+results/h/d4c2dda/sus_scrofa/cycles.tsv	08571858479819cbc8d191a441d08d142b1433f1495f35e81bebf6416021364d	python -m idtrack_reproducibility.families.h.tables	performance/runs/d4c2dda/sus_scrofa/cycles_rep1.json	ada6a6e297a4e5047a4c2db4a073d6af8151a77e177420a15a9b29d0c573604e	2026-11-19 09:35:51	d4c2dda25b61cf0b33b0a178bed22f745de676d6	c1fe33f8aa64301df847edc08521dfba0cbe49b95757d4ec5b4a65e966a092a6	2026-11-19T10:12:26

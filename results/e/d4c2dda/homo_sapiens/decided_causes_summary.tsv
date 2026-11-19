@@ -1,0 +1,60 @@
+stratum	cause	class	rule	answers	units
+e1_batch_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	54	18
+e1_batch_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	69	23
+e1_batch_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	36	12
+e1_single_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	18	18
+e1_single_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	23	23
+e1_single_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	12	12
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	29	13
+e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	10	10
+e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	175	171
+e2_all_punct	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	98070	38082
+e2_dash_name	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	392	49
+e2_dash_syn	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	168	21
+e2_fullwidth_gu	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	150	150
+e2_fullwidth_gv	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	150	150
+e2_fullwidth_name	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	400	400
+e2_fullwidth_ncbi	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	200	200
+e2_fullwidth_refseq	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	100	100
+e2_fullwidth_syn	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	150	150
+e2_fullwidth_tl	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	150	148
+e2_fullwidth_tx	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	150	148
+e2_fullwidth_uniprot	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	100	100
+e2_internal_name	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	25	25
+e2_internal_syn	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	150	150
+e2_long	long_input_not_refused	a	rule `bounded_arguments` (finding IN-8; decided)	6	6
+e2_longversion	long_input_not_refused	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
+e2_longversion	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	2	1
+e2_punct_gu	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	1050	150
+e2_punct_gv	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	900	150
+e2_punct_name	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	2	2
+e2_punct_name	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	2617	400
+e2_punct_ncbi	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	1400	200
+e2_punct_refseq	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	600	100
+e2_punct_syn	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	2	2
+e2_punct_syn	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	1041	150
+e2_punct_tl	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	1050	148
+e2_punct_tx	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	1050	148
+e2_punct_uniprot	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	600	100
+e2_txcase_tl_unversioned	unversioned_tx_case_not_found	a	rule `one_case_schemes` (finding IN-5; decided)	140	70
+e2_txcase_tx_unversioned	unversioned_tx_case_not_found	a	rule `one_case_schemes` (finding IN-5; decided)	156	78
+e2_zw_gu	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	1050	150
+e2_zw_gv	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	1050	150
+e2_zw_name	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	2800	400
+e2_zw_ncbi	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	1400	200
+e2_zw_refseq	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	700	100
+e2_zw_syn	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	1050	150
+e2_zw_tl	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	1050	148
+e2_zw_tx	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	1050	148
+e2_zw_uniprot	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	700	100
+e5_database_synonym	synonym_database_offered	a	rule `no_synonym_target` (decided)	1	1
+e8_identity_unversioned_primary	lrg_gene_version_form	d	-	11	11
+e8_infer_duplicates	infer_duplicates_counted	a	docs/methods.md E8 (the relation); docs: 'each identifier counts once'	1	1
+hunt_IN-1	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	4	1
+hunt_IN-11	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	1	1
+hunt_IN-3	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	3	1
+hunt_IN-4	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	4	1
+hunt_IN-5	unversioned_tx_case_not_found	a	rule `one_case_schemes` (finding IN-5; decided)	1	1
+hunt_IN-6	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	3	1
+hunt_IN-8	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	1	1

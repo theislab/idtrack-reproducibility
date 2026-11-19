@@ -1,0 +1,74 @@
+stratum	cause	class	rule	answers	units
+d1_id_cross_dominant	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	1	1
+d1_id_cross_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	350	175
+d1_id_cross_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	44	22
+d1_id_cross_dominant	external_bridge	b	rule `external_bridge`	102	55
+d1_id_cross_one	d1_history_part_not_place	b	ranking among Ensembl's successors	23	23
+d1_id_cross_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	44	44
+d1_id_cross_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	68	35
+d1_id_cross_one	d1_no_successor_nothing	b	rule `bridge_same_place`	942	471
+d1_id_cross_one	external_bridge	b	rule `external_bridge`	175	98
+d1_id_cross_open	d1_open_follows_history	b	rule `place_moves_marked`	24	12
+d1_id_cross_open	external_bridge	b	rule `external_bridge`	70	37
+d1_id_same_dominant	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	2	2
+d1_id_same_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	3708	706
+d1_id_same_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	206	27
+d1_id_same_dominant	external_bridge	b	rule `external_bridge`	234	54
+d1_id_same_one	d1_history_part_not_place	b	ranking among Ensembl's successors	32	7
+d1_id_same_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	150	19
+d1_id_same_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	296	32
+d1_id_same_one	d1_no_successor_nothing	b	rule `bridge_same_place`	3126	341
+d1_id_same_one	external_bridge	b	rule `external_bridge`	418	67
+d1_id_same_open	d1_open_follows_history	b	rule `place_moves_marked`	18	4
+d1_id_same_open	external_bridge	b	rule `external_bridge`	280	50
+d1_id_versioned_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	1332	666
+d1_id_versioned_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	30	15
+d1_id_versioned_dominant	external_bridge	b	rule `external_bridge`	28	16
+d1_id_versioned_one	d1_history_part_not_place	b	ranking among Ensembl's successors	2	2
+d1_id_versioned_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	12	11
+d1_id_versioned_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	36	18
+d1_id_versioned_one	d1_no_successor_nothing	b	rule `bridge_same_place`	404	202
+d1_id_versioned_one	external_bridge	b	rule `external_bridge`	40	22
+d1_id_versioned_open	d1_open_follows_history	b	rule `place_moves_marked`	2	1
+d1_id_versioned_open	external_bridge	b	rule `external_bridge`	56	29
+d1_symbol_cross_dominant	d1_name_history_to_another_place	b	rule `place_moves_marked`	1610	406
+d1_symbol_cross_dominant	d1_name_in_other_source	e	rule `names_before_synonyms`	681	350
+d1_symbol_cross_dominant	d1_name_no_successor_nothing	b	rule `bridge_same_place`	106	22
+d1_symbol_cross_dominant	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	2	1
+d1_symbol_cross_dominant	name_in_other_source	e	rule `names_before_synonyms`	716	280
+d1_symbol_cross_dominant	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	2	1
+d1_symbol_cross_dominant	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	8	2
+d1_symbol_cross_dominant	unexplained	?	-	3	3
+d1_symbol_cross_one	d1_name_history_to_another_place	b	rule `place_moves_marked`	232	53
+d1_symbol_cross_one	d1_name_in_other_source	e	rule `names_before_synonyms`	745	382
+d1_symbol_cross_one	d1_name_no_successor_nothing	b	rule `bridge_same_place`	2448	501
+d1_symbol_cross_one	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	26	22
+d1_symbol_cross_one	d1_name_several_part	c	rule `mirbase_genes`	26	15
+d1_symbol_cross_one	mirbase_not_in_graph	c	rule `mirbase_genes`	14	3
+d1_symbol_cross_one	name_in_other_source	e	rule `names_before_synonyms`	1301	483
+d1_symbol_cross_one	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	22	9
+d1_symbol_cross_one	unexplained	?	-	5	3
+d1_symbol_cross_open	d1_name_history_to_another_place	b	rule `place_moves_marked`	135	42
+d1_symbol_cross_open	d1_name_in_other_source	e	rule `names_before_synonyms`	402	125
+d1_symbol_cross_open	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	2	2
+d1_symbol_cross_open	mirbase_not_in_graph	c	rule `mirbase_genes`	6	1
+d1_symbol_cross_open	name_in_other_source	e	rule `names_before_synonyms`	219	77
+d1_symbol_cross_open	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	32	8
+d1_symbol_same_dominant	d1_name_history_to_another_place	b	rule `place_moves_marked`	2177	723
+d1_symbol_same_dominant	d1_name_in_other_source	e	rule `names_before_synonyms`	1058	577
+d1_symbol_same_dominant	d1_name_no_successor_nothing	b	rule `bridge_same_place`	44	19
+d1_symbol_same_dominant	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+d1_symbol_same_dominant	unexplained	?	-	1	1
+d1_symbol_same_one	d1_name_history_to_another_place	b	rule `place_moves_marked`	76	35
+d1_symbol_same_one	d1_name_in_other_source	e	rule `names_before_synonyms`	818	484
+d1_symbol_same_one	d1_name_no_successor_nothing	b	rule `bridge_same_place`	844	303
+d1_symbol_same_one	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	56	24
+d1_symbol_same_one	d1_name_several_part	c	rule `mirbase_genes`	27	24
+d1_symbol_same_one	name_in_db_not_in_truth	d	-	4	2
+d1_symbol_same_one	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	20	13
+d1_symbol_same_one	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+d1_symbol_same_one	unexplained	?	-	18	9
+d1_symbol_same_open	d1_name_history_to_another_place	b	rule `place_moves_marked`	26	16
+d1_symbol_same_open	d1_name_in_other_source	e	rule `names_before_synonyms`	134	74
+d1_symbol_same_open	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	2	1
+d1_symbol_same_open	unexplained	?	-	10	10

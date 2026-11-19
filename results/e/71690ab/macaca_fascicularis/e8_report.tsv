@@ -1,0 +1,37 @@
+relation	organism	count	value
+composition	macaca_fascicularis	by_history	46
+composition	macaca_fascicularis	holds	2954
+composition	macaca_fascicularis	not_one_gene	1056
+composition	macaca_fascicularis	triples	3000
+return	macaca_fascicularis	holds	3000
+return	macaca_fascicularis	pairs	3000
+roundtrip	macaca_fascicularis	EntrezGene|holds	357
+roundtrip	macaca_fascicularis	EntrezGene|ids	357
+roundtrip	macaca_fascicularis	EntrezGene|no_id	663
+roundtrip	macaca_fascicularis	HGNC Symbol|holds	20
+roundtrip	macaca_fascicularis	HGNC Symbol|ids	20
+roundtrip	macaca_fascicularis	HGNC Symbol|no_id	980
+roundtrip	macaca_fascicularis	NCBI gene (formerly Entrezgene)|holds	357
+roundtrip	macaca_fascicularis	NCBI gene (formerly Entrezgene)|ids	357
+roundtrip	macaca_fascicularis	NCBI gene (formerly Entrezgene)|no_id	663
+roundtrip	macaca_fascicularis	RefSeq_mRNA|no_id	1000
+roundtrip	macaca_fascicularis	UniProtKB Gene Name|holds	372
+roundtrip	macaca_fascicularis	UniProtKB Gene Name|ids	372
+roundtrip	macaca_fascicularis	UniProtKB Gene Name|no_id	628
+roundtrip	macaca_fascicularis	Uniprot/SWISSPROT|holds	9
+roundtrip	macaca_fascicularis	Uniprot/SWISSPROT|ids	9
+roundtrip	macaca_fascicularis	Uniprot/SWISSPROT|no_id	991
+roundtrip	macaca_fascicularis	VGNC Symbol|holds	2
+roundtrip	macaca_fascicularis	VGNC Symbol|ids	2
+roundtrip	macaca_fascicularis	VGNC Symbol|no_id	998
+path	macaca_fascicularis	bridge_far_steps	95
+path	macaca_fascicularis	bridge_far_undetermined	95
+path	macaca_fascicularis	bridge_near_steps	95
+path	macaca_fascicularis	bridge_near_undetermined	95
+path	macaca_fascicularis	candidates	4083
+path	macaca_fascicularis	final_held	5
+path	macaca_fascicularis	final_steps	5
+path	macaca_fascicularis	history_event	2765
+path	macaca_fascicularis	history_event_versions_equal	2765
+path	macaca_fascicularis	history_steps	2765
+path	macaca_fascicularis	lines	3000

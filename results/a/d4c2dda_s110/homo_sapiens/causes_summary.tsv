@@ -1,0 +1,3 @@
+stratum	cause	class	rule	answers	units
+A8	event_version_contradicts_tables	c	rule `event_version`	84	1
+A8	external_bridge	b	rule `external_bridge`	31266	1545

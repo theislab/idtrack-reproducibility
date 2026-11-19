@@ -1,0 +1,3 @@
+stratum	cause	class	rule	answers	units
+d4_id_old	external_bridge	b	rule `external_bridge`	165	67
+d4_symbol	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	7	4

@@ -1,0 +1,12 @@
+stratum	cause	class	rule	answers	units
+case_variant	mirbase_not_in_graph	c	rule `mirbase_genes`	17	17
+name_ambiguous_to_set	mirbase_not_in_graph	c	rule `mirbase_genes`	17	6
+name_ambiguous_to_set	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	10	5
+name_changed_gene	mirbase_not_in_graph	c	rule `mirbase_genes`	5	4
+name_old_to_current	mirbase_not_in_graph	c	rule `mirbase_genes`	4	2
+name_old_to_current	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	1	1
+name_unique_to_gene	mirbase_not_in_graph	c	rule `mirbase_genes`	223	107
+nonexistent_version	decision14_reverses_kind	d	rule `version_newer_than_graph`	1000	1000
+old_gene_to_db	entrezgene_label_rows	a	rule `one_kind_per_database`	327	326
+separator_variant	mirbase_not_in_graph	c	rule `mirbase_genes`	108	108
+synonym_to_gene	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	6	2

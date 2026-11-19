@@ -1,0 +1,2 @@
+file	sha256	generated_by	source	source_sha256	scored_at	commit	graph_digest	generated_at
+results/h/d4c2dda/macaca_fascicularis/build.tsv	e5826f8764722a67a85b420c0bf0a62dd0404ffbcc39b9cfc471d7ecce23c02e	python -m idtrack_reproducibility.families.h.tables	performance/runs/d4c2dda/macaca_fascicularis/build_warm_rep1.json	e01bb8cddf1873bca21409cc973719f391328bcb5442cafd2e43109e009a3e1e	2026-11-19 09:38:23	d4c2dda25b61cf0b33b0a178bed22f745de676d6	466151e05e731fc0e6a7a92ac0bc786aaadce8362d55a6597cad20cfc6cb98c4	2026-11-19T10:12:26

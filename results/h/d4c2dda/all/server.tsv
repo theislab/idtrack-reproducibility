@@ -1,0 +1,5 @@
+rep	cpu_model	freeze	workers	per_worker	import_s	start_s	load_s_sus_scrofa	load_s_macaca_fascicularis	load_s_macaca_mulatta	load_s_mus_musculus	load_s_homo_sapiens	rss_after_load_gb	parent_pss_gb	pss_total_gb	worker_private_gb_min	worker_private_gb_max	worker_pss_gb_min	worker_pss_gb_max	worker_wall_s_min	worker_wall_s_max	worker_p50_ms_min	worker_p50_ms_max	worker_p99_ms_min	worker_p99_ms_max	worker_max_ms	errors
+1	Intel(R) Xeon(R) Gold 6248R CPU @ 3.00GHz	true	4	4000	0.168	13.073	5.504	0.398	0.633	2.242	4.128	2.3999	1.0882	5.713	0.808	0.819	1.1501	1.1604	7.36	9.43	0.265	0.352	32.6	35.5	759.4	442
+2	Intel(R) Xeon(R) Gold 6248R CPU @ 3.00GHz	true	4	4000	0.043	9.026	2.003	0.381	0.566	2.162	3.872	2.4037	1.0889	5.716	0.808	0.819	1.1509	1.1611	7.36	9.45	0.264	0.359	32.6	36.2	756.4	442
+3	Intel(R) Xeon(R) Gold 6248R CPU @ 3.00GHz	true	4	4000	0.042	8.797	1.847	0.341	0.554	2.114	3.899	2.3999	1.0832	5.707	0.808	0.819	1.1501	1.1603	7.39	10.05	0.266	0.397	33.3	38.5	750.9	442
+median		true	4	4000	0.043	9.026	2.003	0.381	0.566	2.162	3.899	2.3999	1.0882	5.713	0.808	0.819	1.1501	1.1604	7.36	9.45	0.265	0.359	32.6	36.2	756.4	442

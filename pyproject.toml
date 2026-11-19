@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idtrack-reproducibility"
+version = "0.1.0"
+description = "Benchmarks of idtrack against independent truth: the accuracy harness, the benchmark families, the regression corpus, the weakness hunts and the performance measurements."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.3",
+    "pyarrow>=20",
+    "requests>=2.32",
+    "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+# The idtrack the benchmarks measure by default (the installed package; other trees are configured in
+# idtrack-repro.toml, see README "Trees"). Pinned to a commit of github.com/theislab/idtrack.
+idtrack = ["idtrack[harmonize] @ git+https://github.com/theislab/idtrack@71690abe044f19afcc97f146d5e6c35cf4873962"]
+test = ["pytest>=8"]
+
+[project.scripts]
+idtrack-repro = "idtrack_reproducibility.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+idtrack_reproducibility = ["py.typed", "families/*/*.tsv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"

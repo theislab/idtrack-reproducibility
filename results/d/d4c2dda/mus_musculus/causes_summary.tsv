@@ -1,0 +1,35 @@
+stratum	cause	class	rule	answers	units
+d1_id_cross_dominant	d1_history_part_not_place	b	ranking among Ensembl's successors	46	23
+d1_id_cross_dominant	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	85	35
+d1_id_cross_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	804	204
+d1_id_cross_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	638	202
+d1_id_cross_dominant	external_bridge	b	rule `external_bridge`	288	85
+d1_id_cross_one	d1_history_part_not_place	b	ranking among Ensembl's successors	1413	729
+d1_id_cross_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	2072	940
+d1_id_cross_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	630	186
+d1_id_cross_one	d1_no_successor_nothing	b	rule `bridge_same_place`	6460	1727
+d1_id_cross_one	external_bridge	b	rule `external_bridge`	423	148
+d1_id_cross_one	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	3	1
+d1_id_cross_one	unexplained	?	-	3	1
+d1_id_cross_open	d1_open_follows_history	b	rule `place_moves_marked`	166	59
+d1_id_cross_open	external_bridge	b	rule `external_bridge`	429	123
+d1_symbol_cross_dominant	d1_name_history_to_another_place	b	rule `place_moves_marked`	478	145
+d1_symbol_cross_dominant	d1_name_in_other_source	e	rule `names_before_synonyms`	258	118
+d1_symbol_cross_dominant	d1_name_no_successor_nothing	b	rule `bridge_same_place`	38	17
+d1_symbol_cross_dominant	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	30	15
+d1_symbol_cross_dominant	name_in_db_not_in_truth	d	-	1	1
+d1_symbol_cross_dominant	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	22	19
+d1_symbol_cross_one	d1_name_history_to_another_place	b	rule `place_moves_marked`	109	60
+d1_symbol_cross_one	d1_name_in_other_source	e	rule `names_before_synonyms`	980	526
+d1_symbol_cross_one	d1_name_no_successor_nothing	b	rule `bridge_same_place`	384	155
+d1_symbol_cross_one	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	213	114
+d1_symbol_cross_one	d1_name_not_found	c	-	4	2
+d1_symbol_cross_one	d1_name_several_part	c	rule `mirbase_genes`	16	10
+d1_symbol_cross_one	name_in_db_not_in_truth	d	-	24	16
+d1_symbol_cross_one	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	4	1
+d1_symbol_cross_one	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	66	59
+d1_symbol_cross_one	unexplained	?	-	5	4
+d1_symbol_cross_open	d1_name_history_to_another_place	b	rule `place_moves_marked`	26	11
+d1_symbol_cross_open	d1_name_in_other_source	e	rule `names_before_synonyms`	100	31
+d1_symbol_cross_open	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	2	2
+d1_symbol_cross_open	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	1	1

@@ -1,0 +1,52 @@
+table	a	b	c	d	n	right	wrong	undetermined	timeout	error	rate	ci95
+all					193596	187497	0	6099	0	0	100.00	100.0-100.0
+direction	backward				93073	90863	0	2210	0	0	100.00	100.0-100.0
+direction	forward				97573	93687	0	3886	0	0	100.00	100.0-100.0
+direction	same				2950	2947	0	3	0	0	100.00	99.9-100.0
+distance	backward	1-2			4788	4772	0	16	0	0	100.00	99.9-100.0
+distance	backward	11-20			21010	20692	0	318	0	0	100.00	100.0-100.0
+distance	backward	21-40			32147	31145	0	1002	0	0	100.00	100.0-100.0
+distance	backward	3-5			7118	7088	0	30	0	0	100.00	99.9-100.0
+distance	backward	6-10			11730	11642	0	88	0	0	100.00	100.0-100.0
+distance	backward	>40			16280	15524	0	756	0	0	100.00	100.0-100.0
+distance	forward	1-2			5265	5217	0	48	0	0	100.00	99.9-100.0
+distance	forward	11-20			23615	22866	0	749	0	0	100.00	100.0-100.0
+distance	forward	21-40			32037	30219	0	1818	0	0	100.00	100.0-100.0
+distance	forward	3-5			7876	7796	0	80	0	0	100.00	100.0-100.0
+distance	forward	6-10			12853	12676	0	177	0	0	100.00	100.0-100.0
+distance	forward	>40			15927	14913	0	1014	0	0	100.00	100.0-100.0
+distance	same	0			2950	2947	0	3	0	0	100.00	99.9-100.0
+era	MMUL_1				107026	103641	0	3385	0	0	100.00	100.0-100.0
+era	Mmul_10				52451	50925	0	1526	0	0	100.00	100.0-100.0
+era	Mmul_8.0.1				34119	32931	0	1188	0	0	100.00	100.0-100.0
+era x direction x handoff	MMUL_1	backward	within		26159	26159	0	0	0	0	100.00	100.0-100.0
+era x direction x handoff	MMUL_1	forward	across		49977	46625	0	3352	0	0	100.00	100.0-100.0
+era x direction x handoff	MMUL_1	forward	within		29238	29208	0	30	0	0	100.00	100.0-100.0
+era x direction x handoff	MMUL_1	same	within		1652	1649	0	3	0	0	100.00	99.8-100.0
+era x direction x handoff	Mmul_10	backward	across		38396	36870	0	1526	0	0	100.00	100.0-100.0
+era x direction x handoff	Mmul_10	backward	within		6659	6659	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Mmul_10	forward	within		6597	6597	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Mmul_10	same	within		799	799	0	0	0	0	100.00	99.5-100.0
+era x direction x handoff	Mmul_8.0.1	backward	across		19038	18354	0	684	0	0	100.00	100.0-100.0
+era x direction x handoff	Mmul_8.0.1	backward	within		2821	2821	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Mmul_8.0.1	forward	across		9093	8589	0	504	0	0	100.00	100.0-100.0
+era x direction x handoff	Mmul_8.0.1	forward	within		2668	2668	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Mmul_8.0.1	same	within		499	499	0	0	0	0	100.00	99.2-100.0
+handoff	backward	across			57434	55224	0	2210	0	0	100.00	100.0-100.0
+handoff	backward	within			35639	35639	0	0	0	0	100.00	100.0-100.0
+handoff	forward	across			59070	55214	0	3856	0	0	100.00	100.0-100.0
+handoff	forward	within			38503	38473	0	30	0	0	100.00	100.0-100.0
+handoff	same	within			2950	2947	0	3	0	0	100.00	99.9-100.0
+query	id	all			61200	59740	0	1460	0	0	100.00	100.0-100.0
+query	id	best			121856	118192	0	3664	0	0	100.00	100.0-100.0
+query	name	all			3075	2717	0	358	0	0	100.00	99.9-100.0
+query	name	best			6150	5533	0	617	0	0	100.00	99.9-100.0
+query	name db	best			1315	1315	0	0	0	0	100.00	99.7-100.0
+stratum	travel_born_late				25645	23815	0	1830	0	0	100.00	100.0-100.0
+stratum	travel_handoff				51395	50855	0	540	0	0	100.00	100.0-100.0
+stratum	travel_merged				25725	25725	0	0	0	0	100.00	100.0-100.0
+stratum	travel_name				9225	8250	0	975	0	0	100.00	100.0-100.0
+stratum	travel_renamed				4810	4810	0	0	0	0	100.00	99.9-100.0
+stratum	travel_retired_none				25346	22592	0	2754	0	0	100.00	100.0-100.0
+stratum	travel_split				25725	25725	0	0	0	0	100.00	100.0-100.0
+stratum	travel_unchanged				25725	25725	0	0	0	0	100.00	100.0-100.0

@@ -1,0 +1,5 @@
+rep	cpu_model	freeze	features_in_d115	features_in_dold	features_in_s115	features_out	constructor_s	constructor_gc_s	unify_s	unify_gc_s	from_cache_s	from_cache_gc_s	rss_before_run_gb	peak_gb	result_cache_mb	output_digest
+1	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	false	38550	28592	47	46380	15.3563	2.481	7.4647	0.043	1.7893	1.119	0.48	0.7868	42.32	a0371579290e89b4
+2	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	false	38550	28592	47	46380	22.056	4.79	7.1373	0.043	2.1876	1.514	0.2567	0.7586	42.32	a0371579290e89b4
+3	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	false	38550	28592	47	46380	22.0279	4.756	7.0653	0.043	2.1898	1.514	0.2583	0.7617	42.32	a0371579290e89b4
+median		false	38550	28592	47	46380	22.0279	4.756	7.1373	0.043	2.1876	1.514	0.2583	0.7617	42.32	

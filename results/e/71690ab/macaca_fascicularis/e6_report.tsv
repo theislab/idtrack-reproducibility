@@ -1,0 +1,4 @@
+family	organism	lines	lines_with_violation	partial_answer	changed_by_larger	other_error	batch	unbounded_not_answered	median_first_finished_states	max_first_finished_states
+astar	macaca_fascicularis	200	0	0	0	0	0	0	10	50
+e	macaca_fascicularis	200	0	0	0	0	0	0	1	20
+harness	macaca_fascicularis	200	0	0	0	0	0	0	2	5000

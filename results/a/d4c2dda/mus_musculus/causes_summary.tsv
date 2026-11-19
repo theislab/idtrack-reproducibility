@@ -1,0 +1,27 @@
+stratum	cause	class	rule	answers	units
+A1	external_bridge	b	rule `external_bridge`	35211	838
+A1	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	20	1
+A2	external_bridge	b	rule `external_bridge`	2213	799
+A2	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	1	1
+A3_+1	external_bridge	b	rule `external_bridge`	1624	621
+A3_+2	external_bridge	b	rule `external_bridge`	2429	636
+A3_-1	external_bridge	b	rule `external_bridge`	2856	1162
+A3_-2	external_bridge	b	rule `external_bridge`	4542	1195
+A3_first	external_bridge	b	rule `external_bridge`	97276	1503
+A3_first	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	14	1
+A5_102_103_born	external_bridge	b	rule `external_bridge`	16	4
+A5_102_103_dies	external_bridge	b	rule `external_bridge`	360	102
+A5_67_68_born	external_bridge	b	rule `external_bridge`	419	223
+A5_67_68_dies	external_bridge	b	rule `external_bridge`	456	229
+A6_backward	external_bridge	b	rule `external_bridge`	36688	167
+A6_backward_handoff	external_bridge	b	rule `external_bridge`	159909	236
+A6_forward	external_bridge	b	rule `external_bridge`	25916	98
+A6_forward_handoff	external_bridge	b	rule `external_bridge`	108137	166
+A6_forward_handoff	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	140	1
+A7_tl_115	external_bridge	b	rule `external_bridge`	2524	585
+A7_tl_115	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	2	1
+A7_tl_sample	external_bridge	b	rule `external_bridge`	405	176
+A7_tl_sample	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	1	1
+A7_tx_115	external_bridge	b	rule `external_bridge`	3584	811
+A7_tx_115	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	2	1
+A7_tx_sample	external_bridge	b	rule `external_bridge`	646	265

@@ -1,0 +1,5 @@
+rep	cpu_model	python	import_idtrack_s	import_api_s	load_s	rss_after_load_gb	peak_after_load_gb	nodes	edges	graph_file_mb	files_written_beside_graph	gc_tracked_objects	gc_collect_s	modules_after_load	store_arrays_mb	names_list_mb	index_dict_mb	index_int_objects_mb	ntype_list_mb	connections_mb	versions_of_first_call_s	versions_of_second_call_s
+1	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	3.13.18	0.0361	0.5028	3.4234	1.0872	1.2106	3682041	8630251	345.2	0	532860	0.2005	networkx,numpy								
+2	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	3.13.18	0.0325	0.5093	3.476	1.0881	1.2113	3682041	8630251	345.2	0	532862	0.2018	networkx,numpy								
+3	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	3.13.18	0.0296	0.4858	3.452	1.0868	1.2084	3682041	8630251	345.2	0	532860	0.2021	networkx,numpy								
+median			0.0325	0.5028	3.452	1.0872	1.2106	3682041	8630251	345.2	0	532860	0.2018									

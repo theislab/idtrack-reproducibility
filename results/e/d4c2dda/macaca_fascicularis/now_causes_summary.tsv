@@ -1,0 +1,7 @@
+stratum	cause	class	rule	answers	units
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	77	34
+e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	25	25
+e2_internal_name	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	10	10
+e2_longversion	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	2	1
+e2_makeunique_syn	suffix_form_is_name_at_unread_release	e	-	1	1

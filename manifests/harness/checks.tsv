@@ -1,0 +1,4 @@
+path	bytes	sha256	source	time	rebuild
+harness/checks/check_handoffs.jsonl	5657	77cd156cf7e07dc3eee80c86dd733b97ce4836009beee67812e5671f8c3eca6b		2026-11-18T03:30:29	generate: idtrack-repro assembly-map <organisms> (the check of places mapped across each handoff)
+harness/evidence/exceptions_moves_homo_sapiens.tsv	151070	8dd13eb98d8160132e3e6bdf6fe88d0d100398b88808f6cad5e201166f71bdf8		2026-11-18T21:11:32	none: every answer the correction `exceptions` moved between the judge before and after it, with its class (the judge before is superseded)
+harness/evidence/exceptions_moves_mus_musculus.tsv	82817	a56ef74311fd7d1f700ef43527544b2bde88dcc8285420e99fd5d64fff3dc117		2026-11-18T21:11:08	none: every answer the correction `exceptions` moved between the judge before and after it, with its class (the judge before is superseded)

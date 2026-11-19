@@ -1,0 +1,7 @@
+stratum	cause	class	rule	answers	units
+d4_id_old	external_bridge	b	rule `external_bridge`	49	20
+d4_symbol	d4_mirbase_form	c	rule `mirbase_genes`	108	39
+d4_symbol	mirbase_not_in_graph	c	rule `mirbase_genes`	118	48
+d4_symbol	name_in_other_source	e	rule `names_before_synonyms`	1	1
+d4_symbol	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+d4_symbol	unexplained	?	-	1	1

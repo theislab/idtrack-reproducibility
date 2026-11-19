@@ -1,0 +1,27 @@
+relation	organism	count	value
+composition	homo_sapiens	by_history	134
+composition	homo_sapiens	holds	2863
+composition	homo_sapiens	not_one_gene	2059
+composition	homo_sapiens	refuted	3
+composition	homo_sapiens	triples	3000
+return	homo_sapiens	holds	3000
+return	homo_sapiens	pairs	3000
+roundtrip	homo_sapiens	EntrezGene|holds	328
+roundtrip	homo_sapiens	EntrezGene|ids	328
+roundtrip	homo_sapiens	EntrezGene|no_id	676
+roundtrip	homo_sapiens	HGNC Symbol|holds	497
+roundtrip	homo_sapiens	HGNC Symbol|ids	497
+roundtrip	homo_sapiens	HGNC Symbol|no_id	503
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|holds	328
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|ids	328
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|no_id	676
+roundtrip	homo_sapiens	NCBI gene|no_id	1000
+roundtrip	homo_sapiens	RefSeq_mRNA|holds	432
+roundtrip	homo_sapiens	RefSeq_mRNA|ids	432
+roundtrip	homo_sapiens	RefSeq_mRNA|no_id	771
+roundtrip	homo_sapiens	UniProtKB Gene Name|holds	243
+roundtrip	homo_sapiens	UniProtKB Gene Name|ids	243
+roundtrip	homo_sapiens	UniProtKB Gene Name|no_id	766
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|holds	229
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|ids	229
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|no_id	772

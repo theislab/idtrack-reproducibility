@@ -1,0 +1,18 @@
+stratum	cause	class	rule	answers	units
+backward	external_bridge	b	rule `external_bridge`	2839	950
+backward	gtf_lacks_core_gene	d	-	12	1
+backward	unexplained	?	-	164522	940
+backward_handoff	external_bridge	b	rule `external_bridge`	3845	1285
+backward_handoff	gtf_lacks_core_gene	d	-	4040	21
+backward_handoff	unexplained	?	-	769745	1298
+db	unexplained	?	-	141	2
+default	event_version_contradicts_tables	c	rule `event_version`	32	1
+default	external_bridge	b	rule `external_bridge`	4022	1347
+default	gtf_lacks_core_gene	d	-	283	21
+default	unexplained	?	-	86613	1349
+forward	event_version_contradicts_tables	c	rule `event_version`	504	1
+forward	external_bridge	b	rule `external_bridge`	660	220
+forward	unexplained	?	-	57953	220
+forward_handoff	event_version_contradicts_tables	c	rule `event_version`	168	1
+forward_handoff	external_bridge	b	rule `external_bridge`	1437	479
+forward_handoff	unexplained	?	-	259381	479

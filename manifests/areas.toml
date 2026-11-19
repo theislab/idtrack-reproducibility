@@ -1,0 +1,156 @@
+# The areas of the data root and their manifests (docs/data.md, "Manifests"). `include`/`exclude` are regular
+# expressions on the path in the data root; `rebuild` says how the area's files are made again; `rules` give another
+# rebuild for the files whose path matches (first match wins).
+
+[[area]]
+name = "truth"
+folders = ["truth"]
+exclude = ['/\.', '\.tmp$', '\.part$']
+rebuild = "fetch: idtrack-repro fetch-gtf / fetch-tables (the URL in `source`)"
+rules = [
+  ['/rest/', "none: Ensembl REST's answer on the date fetched (release 116); a later fetch answers for a later release"],
+  ['/check_rest\.json$', "generate: idtrack-repro check-truth"],
+  ['/SOURCES\.tsv$', "generate: written by the fetchers"],
+]
+
+[[area]]
+name = "harness/queries"
+folders = ["harness/queries"]
+exclude = ['/\.', '\.tmp$']
+rebuild = "generate: idtrack-repro make-queries (seeded; a published set is fixed, its sha256 in its manifest)"
+
+[[area]]
+name = "harness/answers"
+folders = ["harness/answers"]
+include = ['/results/shard_\d+_of_\d+\.jsonl$', '/results/load_\d+_of_\d+\.json$']
+rebuild = "run: idtrack-repro harness-score on the tree and its graphs (the same answers; other seconds)"
+
+[[area]]
+name = "harness/runs"
+folders = ["harness/runs"]
+exclude = ['/logs/', '/repo/', '\.tmp$', '\.log$']
+rebuild = "generate: idtrack-repro harness-score --merge, travel-report (from harness/answers)"
+rules = [
+  ['/travel/checks/', "run: idtrack-repro travel-checks on the tree (asks the compositions of the travel matrix)"],
+]
+
+[[area]]
+name = "harness/checks"
+folders = ["harness/checks", "harness/evidence"]
+rebuild = "generate: idtrack-repro assembly-map <organisms> (the check of places mapped across each handoff)"
+rules = [
+  ['/evidence/', "none: every answer the correction `exceptions` moved between the judge before and after it, with its class (the judge before is superseded)"],
+]
+
+[[area]]
+name = "families/design"
+folders = ["families/design"]
+rebuild = "generate: python -m idtrack_reproducibility.design.sizes / hard_sizes <organism> (from the truth store)"
+
+[[area]]
+name = "families/f0"
+folders = ["families/f0/runs/check_d4c2dda", "families/f0/runs/check_71690ab"]
+exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$']
+rebuild = "generate: idtrack-repro score / causes (from the answers)"
+rules = [
+  ['/answers/', "run: idtrack-repro run --family harness on the tree and its graphs (the same answers; other seconds)"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]
+
+[[area]]
+name = "families/astar"
+folders = ["families/astar/queries", "families/astar/selection", "families/astar/truth", "families/astar/runs/d4c2dda", "families/astar/runs/d4c2dda_tx"]
+exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$']
+rebuild = "generate: idtrack-repro score / causes / family astar report_astar (from the answers)"
+rules = [
+  ['/queries/', "generate: idtrack-repro family astar gen (seeded; a published set is fixed)"],
+  ['/selection/', "generate: idtrack-repro family astar selection (from the truth store and fixed_ids.tsv)"],
+  ['/truth/', "none: Ensembl REST's answer on the date fetched (family astar fetch_rest), else generated from the core tables (rest_from_core)"],
+  ['/answers/', "run: idtrack-repro run --family astar on the tree and its graphs (the same answers; other seconds)"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]
+
+[[area]]
+name = "families/a"
+folders = ["families/a/queries", "families/a/patterns", "families/a/a0/d4c2dda", "families/a/a8/d4c2dda", "families/a/runs/d4c2dda", "families/a/runs/d4c2dda_s110"]
+exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$', '/idtrack_tables/']
+rebuild = "generate: idtrack-repro score / causes / family a report_a (from the answers)"
+rules = [
+  ['/queries/', "generate: idtrack-repro family a gen_a / gen_a7 (seeded; a published set is fixed)"],
+  ['/patterns/', "generate: idtrack-repro family a patterns_a"],
+  ['/a0/', "run: idtrack-repro family a a0_fidelity on the tree and its graph"],
+  ['/a8/', "run: the graph of snapshot 110 built by the tree (family a build_a8)"],
+  ['/answers/', "run: idtrack-repro run --family a on the tree and its graphs (the same answers; other seconds)"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]
+
+[[area]]
+name = "families/e"
+folders = ["families/e/queries", "families/e/panels", "families/e/runs/d4c2dda", "families/e/runs/71690ab", "families/e/runs/71690ab_web"]
+exclude = ['/logs/', '/repo/', '/store/', '\.tmp$', '\.part$', '_superseded', '/e6_without_astar/', '\.log$']
+rebuild = "generate: idtrack-repro family e score_e (from the answers)"
+rules = [
+  ['/queries/', "generate: idtrack-repro family e gen_e (seeded; a published set is fixed)"],
+  ['/answers/', "run: idtrack-repro family e run_e on the tree and its graphs (the same answers; other seconds)"],
+  ['/(e6|e7|e8|e9|harm)/', "run: idtrack-repro family e budget / det / relations_e / web_e / harm_e on the tree"],
+]
+
+[[area]]
+name = "graphs"
+folders = ["graphs"]
+exclude = ['/\.', '\.tmp$', '\.log$']
+rebuild = "run: idtrack build of the tree d4c2dda (snapshot 115); equal graphs have equal content digests"
+
+[[area]]
+name = "hunts"
+folders = ["hunts"]
+exclude = ['/logs/', '\.tmp$', '/scratch', '/graphs/']
+rebuild = "run: the hunt's probes on the tree (docs/hunts.md)"
+rules = [
+  ['/reproduce/', "run: idtrack-repro hunts reproduce (python -m idtrack_reproducibility.hunts.reproduce) on the tree"],
+]
+
+[[area]]
+name = "corpus"
+folders = ["corpus"]
+exclude = ['/logs/', '/repo/', '\.tmp$', '\.log$']
+rebuild = "run: idtrack-repro corpus reference on the tree (python -m idtrack_reproducibility.corpus.pipeline reference; deterministic: equal files)"
+rules = [
+  ['^corpus/corpus/', "generate: python -m idtrack_reproducibility.corpus.pipeline make (seeded); the references were made with this corpus, which must not be drawn again"],
+]
+
+[[area]]
+name = "performance"
+folders = ["performance"]
+exclude = ['/logs/', '/repo/', '/harmonize/', '\.tmp$', '\.log$']
+rebuild = "run: python -m idtrack_reproducibility.families.h.run on the tree (timings vary with the node; the methods say how they are read)"
+
+[[area]]
+name = "families/b"
+folders = ["families/b"]
+exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
+rebuild = "generate: the family's generators, the common scorer and causes (docs/families/b.md)"
+rules = [
+  ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]
+
+[[area]]
+name = "families/c"
+folders = ["families/c"]
+exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
+rebuild = "generate: the family's generators, the common scorer and causes (docs/families/c.md)"
+rules = [
+  ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]
+
+[[area]]
+name = "families/d"
+folders = ["families/d"]
+exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
+rebuild = "generate: the family's generators, the common scorer and causes (docs/families/d.md)"
+rules = [
+  ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]

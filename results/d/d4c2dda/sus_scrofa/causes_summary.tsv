@@ -1,0 +1,25 @@
+stratum	cause	class	rule	answers	units
+d1_id_same_dominant	d1_history_part_not_place	b	ranking among Ensembl's successors	12	10
+d1_id_same_dominant	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	33	21
+d1_id_same_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	240	103
+d1_id_same_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	36	10
+d1_id_same_dominant	external_bridge	b	rule `external_bridge`	30	14
+d1_id_same_one	d1_history_part_not_place	b	ranking among Ensembl's successors	646	490
+d1_id_same_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	1465	871
+d1_id_same_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	197	62
+d1_id_same_one	d1_no_successor_nothing	b	rule `bridge_same_place`	480	134
+d1_id_same_one	external_bridge	b	rule `external_bridge`	44	19
+d1_id_same_open	d1_open_follows_history	b	rule `place_moves_marked`	1224	325
+d1_id_same_open	external_bridge	b	rule `external_bridge`	135	46
+d1_symbol_same_dominant	d1_name_history_to_another_place	b	rule `place_moves_marked`	153	77
+d1_symbol_same_dominant	d1_name_in_other_source	e	rule `names_before_synonyms`	20	13
+d1_symbol_same_dominant	d1_name_no_successor_nothing	b	rule `bridge_same_place`	4	2
+d1_symbol_same_dominant	d1_name_not_found	c	-	8	4
+d1_symbol_same_dominant	unexplained	?	-	1	1
+d1_symbol_same_one	d1_name_in_other_source	e	rule `names_before_synonyms`	58	46
+d1_symbol_same_one	d1_name_no_successor_nothing	b	rule `bridge_same_place`	4	2
+d1_symbol_same_one	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	38	25
+d1_symbol_same_one	d1_name_not_found	c	-	120	60
+d1_symbol_same_one	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	1	1
+d1_symbol_same_open	d1_name_history_to_another_place	b	rule `place_moves_marked`	8	4
+d1_symbol_same_open	d1_name_in_other_source	e	rule `names_before_synonyms`	46	26

@@ -1,0 +1,52 @@
+table	a	b	c	d	n	right	wrong	undetermined	timeout	error	rate	ci95
+all					192250	181882	221	10147	0	0	99.88	99.9-99.9
+direction	backward				79812	75497	221	4094	0	0	99.71	99.7-99.7
+direction	forward				109169	103119	0	6050	0	0	100.00	100.0-100.0
+direction	same				3269	3266	0	3	0	0	100.00	99.9-100.0
+distance	backward	1-2			5357	5293	12	52	0	0	99.77	99.6-99.9
+distance	backward	11-20			18256	17391	96	769	0	0	99.45	99.3-99.6
+distance	backward	21-40			26978	24975	49	1954	0	0	99.80	99.7-99.9
+distance	backward	3-5			7588	7481	20	87	0	0	99.73	99.6-99.8
+distance	backward	6-10			11576	11304	44	228	0	0	99.61	99.5-99.7
+distance	backward	>40			10057	9053	0	1004	0	0	100.00	100.0-100.0
+distance	forward	1-2			5955	5893	0	62	0	0	100.00	99.9-100.0
+distance	forward	11-20			25212	24131	0	1081	0	0	100.00	100.0-100.0
+distance	forward	21-40			37596	34469	0	3127	0	0	100.00	100.0-100.0
+distance	forward	3-5			8858	8741	0	117	0	0	100.00	100.0-100.0
+distance	forward	6-10			14416	14115	0	301	0	0	100.00	100.0-100.0
+distance	forward	>40			17132	15770	0	1362	0	0	100.00	100.0-100.0
+distance	same	0			3269	3266	0	3	0	0	100.00	99.9-100.0
+era	Sscrofa10.2				60555	56806	121	3628	0	0	99.79	99.7-99.8
+era	Sscrofa11.1				72173	68281	100	3792	0	0	99.85	99.8-99.9
+era	Sscrofa9				59522	56795	0	2727	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa10.2	backward	across		9251	8657	121	473	0	0	98.62	98.4-98.8
+era x direction x handoff	Sscrofa10.2	backward	within		9482	9482	0	0	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa10.2	forward	across		28283	25173	0	3110	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa10.2	forward	within		12473	12431	0	42	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa10.2	same	within		1066	1063	0	3	0	0	100.00	99.6-100.0
+era x direction x handoff	Sscrofa11.1	backward	across		40493	37012	0	3481	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa11.1	backward	within		16669	16429	100	140	0	0	99.40	99.3-99.5
+era x direction x handoff	Sscrofa11.1	forward	within		13783	13612	0	171	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa11.1	same	within		1228	1228	0	0	0	0	100.00	99.7-100.0
+era x direction x handoff	Sscrofa9	backward	within		3917	3917	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Sscrofa9	forward	across		48797	46070	0	2727	0	0	100.00	100.0-100.0
+era x direction x handoff	Sscrofa9	forward	within		5833	5833	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Sscrofa9	same	within		975	975	0	0	0	0	100.00	99.6-100.0
+handoff	backward	across			49744	45669	121	3954	0	0	99.74	99.7-99.8
+handoff	backward	within			30068	29828	100	140	0	0	99.67	99.6-99.7
+handoff	forward	across			77080	71243	0	5837	0	0	100.00	100.0-100.0
+handoff	forward	within			32089	31876	0	213	0	0	100.00	100.0-100.0
+handoff	same	within			3269	3266	0	3	0	0	100.00	99.9-100.0
+query	id	all			60000	56949	82	2969	0	0	99.86	99.8-99.9
+query	id	best			120000	113833	139	6028	0	0	99.88	99.9-99.9
+query	name	all			3075	2625	0	450	0	0	100.00	99.9-100.0
+query	name	best			6150	5450	0	700	0	0	100.00	99.9-100.0
+query	name db	best			3025	3025	0	0	0	0	100.00	99.9-100.0
+stratum	travel_born_late				22830	20385	122	2323	0	0	99.41	99.3-99.5
+stratum	travel_handoff				45865	44033	44	1788	0	0	99.90	99.9-99.9
+stratum	travel_merged				22920	22920	0	0	0	0	100.00	100.0-100.0
+stratum	travel_name				9225	8075	0	1150	0	0	100.00	100.0-100.0
+stratum	travel_renamed				22950	22950	0	0	0	0	100.00	100.0-100.0
+stratum	travel_retired_none				22590	18430	55	4105	0	0	99.70	99.6-99.8
+stratum	travel_split				22920	22139	0	781	0	0	100.00	100.0-100.0
+stratum	travel_unchanged				22950	22950	0	0	0	0	100.00	100.0-100.0

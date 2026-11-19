@@ -1,0 +1,33 @@
+change	qid	view	outcome_a	outcome_b	got_a	got_b	reason_b
+other change	e|e3_batch_container|batch|np_object|0	best	expected_error	right		ENSMFAG00000004054.2	
+other change	e|e3_batch_container|batch|np_object|1	best	expected_error	right		ENSMFAG00000042288.2	
+other change	e|e3_batch_container|batch|np_object|2	best	expected_error	right		ENSMFAG00000031420.2	
+other change	e|e3_batch_container|batch|np_object|3	best	expected_error	right		ENSMFAG00000000937.2	
+other change	e|e3_batch_container|batch|np_object|4	best	expected_error	right		ENSMFAG00000050778.1	
+other change	e|e3_batch_container|batch|np_str|0	best	expected_error	right		ENSMFAG00000004054.2	
+other change	e|e3_batch_container|batch|np_str|1	best	expected_error	right		ENSMFAG00000042288.2	
+other change	e|e3_batch_container|batch|np_str|2	best	expected_error	right		ENSMFAG00000031420.2	
+other change	e|e3_batch_container|batch|np_str|3	best	expected_error	right		ENSMFAG00000000937.2	
+other change	e|e3_batch_container|batch|np_str|4	best	expected_error	right		ENSMFAG00000050778.1	
+other change	e|e3_batch_container|batch|pd_series|0	best	expected_error	right		ENSMFAG00000004054.2	
+other change	e|e3_batch_container|batch|pd_series|1	best	expected_error	right		ENSMFAG00000042288.2	
+other change	e|e3_batch_container|batch|pd_series|2	best	expected_error	right		ENSMFAG00000031420.2	
+other change	e|e3_batch_container|batch|pd_series|3	best	expected_error	right		ENSMFAG00000000937.2	
+other change	e|e3_batch_container|batch|pd_series|4	best	expected_error	right		ENSMFAG00000050778.1	
+other change	e|e3_batch_container|batch|pd_series_string|0	best	expected_error	right		ENSMFAG00000004054.2	
+other change	e|e3_batch_container|batch|pd_series_string|1	best	expected_error	right		ENSMFAG00000042288.2	
+other change	e|e3_batch_container|batch|pd_series_string|2	best	expected_error	right		ENSMFAG00000031420.2	
+other change	e|e3_batch_container|batch|pd_series_string|3	best	expected_error	right		ENSMFAG00000000937.2	
+other change	e|e3_batch_container|batch|pd_series_string|4	best	expected_error	right		ENSMFAG00000050778.1	
+other change	e|e3_batch_container|batch|pd_index|0	best	expected_error	right		ENSMFAG00000004054.2	
+other change	e|e3_batch_container|batch|pd_index|1	best	expected_error	right		ENSMFAG00000042288.2	
+other change	e|e3_batch_container|batch|pd_index|2	best	expected_error	right		ENSMFAG00000031420.2	
+other change	e|e3_batch_container|batch|pd_index|3	best	expected_error	right		ENSMFAG00000000937.2	
+other change	e|e3_batch_container|batch|pd_index|4	best	expected_error	right		ENSMFAG00000050778.1	
+other change	e|e3_batch_container|batch|pd_categorical|0	best	expected_error	right		ENSMFAG00000004054.2	
+other change	e|e3_batch_container|batch|pd_categorical|1	best	expected_error	right		ENSMFAG00000042288.2	
+other change	e|e3_batch_container|batch|pd_categorical|2	best	expected_error	right		ENSMFAG00000031420.2	
+other change	e|e3_batch_container|batch|pd_categorical|3	best	expected_error	right		ENSMFAG00000000937.2	
+other change	e|e3_batch_container|batch|pd_categorical|4	best	expected_error	right		ENSMFAG00000050778.1	
+other change	e|e3_batch_iterable|batch|generator	best	expected_error	undetermined			open: an iterable the docs do not name; an answer or an argument-type error are both documented
+other change	e|e3_batch_iterable|batch|set	best	expected_error	undetermined			open: an iterable the docs do not name; an answer or an argument-type error are both documented

@@ -1,0 +1,30 @@
+relation	organism	count	value
+composition	macaca_mulatta	by_history	83
+composition	macaca_mulatta	holds	2915
+composition	macaca_mulatta	not_one_gene	1838
+composition	macaca_mulatta	refuted	2
+composition	macaca_mulatta	triples	3000
+return	macaca_mulatta	holds	3000
+return	macaca_mulatta	pairs	3000
+roundtrip	macaca_mulatta	EntrezGene|holds	620
+roundtrip	macaca_mulatta	EntrezGene|ids	620
+roundtrip	macaca_mulatta	EntrezGene|no_id	394
+roundtrip	macaca_mulatta	HGNC Symbol|holds	10
+roundtrip	macaca_mulatta	HGNC Symbol|ids	10
+roundtrip	macaca_mulatta	HGNC Symbol|no_id	990
+roundtrip	macaca_mulatta	NCBI gene (formerly Entrezgene)|holds	620
+roundtrip	macaca_mulatta	NCBI gene (formerly Entrezgene)|ids	620
+roundtrip	macaca_mulatta	NCBI gene (formerly Entrezgene)|no_id	394
+roundtrip	macaca_mulatta	NCBI gene|no_id	1000
+roundtrip	macaca_mulatta	RefSeq_mRNA|holds	165
+roundtrip	macaca_mulatta	RefSeq_mRNA|ids	165
+roundtrip	macaca_mulatta	RefSeq_mRNA|no_id	837
+roundtrip	macaca_mulatta	UniProtKB Gene Name|holds	519
+roundtrip	macaca_mulatta	UniProtKB Gene Name|ids	519
+roundtrip	macaca_mulatta	UniProtKB Gene Name|no_id	482
+roundtrip	macaca_mulatta	Uniprot/SWISSPROT|holds	6
+roundtrip	macaca_mulatta	Uniprot/SWISSPROT|ids	6
+roundtrip	macaca_mulatta	Uniprot/SWISSPROT|no_id	994
+roundtrip	macaca_mulatta	VGNC Symbol|holds	443
+roundtrip	macaca_mulatta	VGNC Symbol|ids	443
+roundtrip	macaca_mulatta	VGNC Symbol|no_id	557

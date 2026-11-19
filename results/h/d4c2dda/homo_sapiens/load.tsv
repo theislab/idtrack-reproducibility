@@ -1,0 +1,5 @@
+rep	cpu_model	python	import_idtrack_s	import_api_s	load_s	rss_after_load_gb	peak_after_load_gb	nodes	edges	graph_file_mb	files_written_beside_graph	gc_tracked_objects	gc_collect_s	modules_after_load	store_arrays_mb	names_list_mb	index_dict_mb	index_int_objects_mb	ntype_list_mb	connections_mb	versions_of_first_call_s	versions_of_second_call_s
+1	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	3.13.18	0.0272	1.8818	6.8878	1.1404	1.2637	3682041	8630251	345.2	0	582656	0.1992	h5py,networkx,numpy,pandas,pymysql,requests,tqdm,yaml	335.1	237.9	123.0	103.1	29.5	86.0	0.3489	0.0304
+2	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	3.13.18	0.0338	1.3146	3.5355	1.1361	1.259	3682041	8630251	345.2	0	582658	0.1936	h5py,networkx,numpy,pandas,pymysql,requests,tqdm,yaml	335.1	237.9	123.0	103.1	29.5	86.0	0.3508	0.0291
+3	Intel(R) Xeon(R) Gold 6134 CPU @ 3.20GHz	3.13.18	0.0312	1.2622	3.6085	1.1373	1.2614	3682041	8630251	345.2	0	582656	0.1995	h5py,networkx,numpy,pandas,pymysql,requests,tqdm,yaml	335.1	237.9	123.0	103.1	29.5	86.0	0.349	0.0306
+median			0.0312	1.3146	3.6085	1.1373	1.2614	3682041	8630251	345.2	0	582656	0.1992		335.1	237.9	123.0	103.1	29.5	86.0	0.349	0.0304

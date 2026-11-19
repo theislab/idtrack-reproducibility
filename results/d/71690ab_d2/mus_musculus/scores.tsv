@@ -1,0 +1,7 @@
+kind	variant	n	right	wrong	undetermined	timeout	error	rate	ci_low	ci_high
+d2_ids	*	5449	5447	0	2	0	0	1.0000	0.9993	1.0000
+d2_ids	best,default	5449	5447	0	2	0	0	1.0000	0.9993	1.0000
+d2_ids_versioned	*	195	190	0	5	0	0	1.0000	0.9802	1.0000
+d2_ids_versioned	best,default	195	190	0	5	0	0	1.0000	0.9802	1.0000
+d2_symbols	*	416	16	400	0	0	0	0.0385	0.0238	0.0616
+d2_symbols	best,default	416	16	400	0	0	0	0.0385	0.0238	0.0616

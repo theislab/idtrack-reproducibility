@@ -1,0 +1,43 @@
+table	a	b	c	d	n	right	wrong	undetermined	timeout	error	rate	ci95
+all					59400	58505	0	895	0	0	100.00	100.0-100.0
+direction	backward				22176	21996	0	180	0	0	100.00	100.0-100.0
+direction	forward				34722	34007	0	715	0	0	100.00	100.0-100.0
+direction	same				2502	2502	0	0	0	0	100.00	99.8-100.0
+distance	backward	1-2			3777	3771	0	6	0	0	100.00	99.9-100.0
+distance	backward	11-20			5850	5751	0	99	0	0	100.00	99.9-100.0
+distance	backward	21-40			975	960	0	15	0	0	100.00	99.6-100.0
+distance	backward	3-5			5229	5214	0	15	0	0	100.00	99.9-100.0
+distance	backward	6-10			6345	6300	0	45	0	0	100.00	99.9-100.0
+distance	forward	1-2			4554	4532	0	22	0	0	100.00	99.9-100.0
+distance	forward	11-20			11727	11331	0	396	0	0	100.00	100.0-100.0
+distance	forward	21-40			1770	1715	0	55	0	0	100.00	99.8-100.0
+distance	forward	3-5			6636	6581	0	55	0	0	100.00	99.9-100.0
+distance	forward	6-10			10035	9848	0	187	0	0	100.00	100.0-100.0
+distance	same	0			2502	2502	0	0	0	0	100.00	99.8-100.0
+era	Macaca_fascicularis_5.0				36003	35288	0	715	0	0	100.00	100.0-100.0
+era	Macaca_fascicularis_6.0				23397	23217	0	180	0	0	100.00	100.0-100.0
+era x direction x handoff	Macaca_fascicularis_5.0	backward	within		7218	7218	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Macaca_fascicularis_5.0	forward	across		18903	18188	0	715	0	0	100.00	100.0-100.0
+era x direction x handoff	Macaca_fascicularis_5.0	forward	within		8457	8457	0	0	0	0	100.00	100.0-100.0
+era x direction x handoff	Macaca_fascicularis_5.0	same	within		1425	1425	0	0	0	0	100.00	99.7-100.0
+era x direction x handoff	Macaca_fascicularis_6.0	backward	across		9900	9720	0	180	0	0	100.00	100.0-100.0
+era x direction x handoff	Macaca_fascicularis_6.0	backward	within		5058	5058	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Macaca_fascicularis_6.0	forward	within		7362	7362	0	0	0	0	100.00	99.9-100.0
+era x direction x handoff	Macaca_fascicularis_6.0	same	within		1077	1077	0	0	0	0	100.00	99.6-100.0
+handoff	backward	across			9900	9720	0	180	0	0	100.00	100.0-100.0
+handoff	backward	within			12276	12276	0	0	0	0	100.00	100.0-100.0
+handoff	forward	across			18903	18188	0	715	0	0	100.00	100.0-100.0
+handoff	forward	within			15819	15819	0	0	0	0	100.00	100.0-100.0
+handoff	same	within			2502	2502	0	0	0	0	100.00	99.8-100.0
+query	id	all			18750	18430	0	320	0	0	100.00	100.0-100.0
+query	id	best			37500	36925	0	575	0	0	100.00	100.0-100.0
+query	name	all			825	825	0	0	0	0	100.00	99.5-100.0
+query	name	best			1650	1650	0	0	0	0	100.00	99.8-100.0
+query	name db	best			675	675	0	0	0	0	100.00	99.4-100.0
+stratum	travel_born_late				9510	9330	0	180	0	0	100.00	100.0-100.0
+stratum	travel_handoff				9510	9510	0	0	0	0	100.00	100.0-100.0
+stratum	travel_merged				9510	9510	0	0	0	0	100.00	100.0-100.0
+stratum	travel_name				2475	2475	0	0	0	0	100.00	99.8-100.0
+stratum	travel_retired_none				9375	8660	0	715	0	0	100.00	100.0-100.0
+stratum	travel_split				9510	9510	0	0	0	0	100.00	100.0-100.0
+stratum	travel_unchanged				9510	9510	0	0	0	0	100.00	100.0-100.0

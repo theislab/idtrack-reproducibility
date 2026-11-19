@@ -1,0 +1,7 @@
+family	organism	stratum	view	n	right	expected_error	wrong	undetermined	timeout	error	not_supported	missing	rate	wilson_low	wilson_high	boot_low	boot_high	units	units_wrong	units_error	recovered	s_p50	s_p95	s_p99	s_max
+d	homo_sapiens	d2_synth_names_500	*	340	76	0	264	0	0	0	0	0	0.2235	0.1825	0.2708	0.1471	0.3029	68	62	0	0	0.03146	0.18109	0.29688	1.2078
+d	homo_sapiens	d2_synth_names_500	best	340	76	0	264	0	0	0	0		0.2235	0.1825	0.2708	0.1441	0.3059	68	62	0	0	0.03146	0.18109	0.29688	1.2078
+d	homo_sapiens	d2_synth_names_all	*	68	19	0	49	0	0	0	0	0	0.2794	0.1868	0.3956	0.1765	0.3824	68	49	0	0	4.93813	6.73082	7.05214	7.1176
+d	homo_sapiens	d2_synth_names_all	best	68	19	0	49	0	0	0	0		0.2794	0.1868	0.3956	0.1765	0.3971	68	49	0	0	4.93813	6.73082	7.05214	7.1176
+d	homo_sapiens	d2_synth_versioned_500	*	195	195	0	0	0	0	0	0	0	1.0000	0.9807	1.0000	1.0000	1.0000	39	0	0	0	0.02968	0.03911	0.04360	0.0548
+d	homo_sapiens	d2_synth_versioned_500	best	195	195	0	0	0	0	0	0		1.0000	0.9807	1.0000	1.0000	1.0000	39	0	0	0	0.02968	0.03911	0.04360	0.0548

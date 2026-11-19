@@ -1,0 +1,27 @@
+# The tests and the repository's checks on every push and pull request. Without the data root, the checks of the
+# data (manifests against their files, results against their sources) are reported as skipped; run them where the
+# data root is (README, "Checks").
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: python -m pip install -e ".[test]"
+      - name: Tests
+        run: python -m pytest -q
+      - name: Checks
+        run: idtrack-repro check

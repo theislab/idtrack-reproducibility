@@ -1,0 +1,52 @@
+table	a	b	c	d	n	right	wrong	undetermined	timeout	error	rate	ci95
+all					201448	186993	1857	12598	0	0	99.02	99.0-99.1
+direction	backward				83199	72529	1457	9213	0	0	98.03	97.9-98.1
+direction	forward				115163	111378	400	3385	0	0	99.64	99.6-99.7
+direction	same				3086	3086	0	0	0	0	100.00	99.9-100.0
+distance	backward	1-2			5154	4840	45	269	0	0	99.08	98.8-99.3
+distance	backward	11-20			20264	16193	517	3554	0	0	96.91	96.6-97.2
+distance	backward	21-40			23993	21912	365	1716	0	0	98.36	98.2-98.5
+distance	backward	3-5			7409	6425	126	858	0	0	98.08	97.7-98.4
+distance	backward	6-10			11466	9211	244	2011	0	0	97.42	97.1-97.7
+distance	backward	>40			14913	13948	160	805	0	0	98.87	98.7-99.0
+distance	forward	1-2			5486	5458	8	20	0	0	99.85	99.7-99.9
+distance	forward	11-20			24787	24107	90	590	0	0	99.63	99.5-99.7
+distance	forward	21-40			42317	41011	166	1140	0	0	99.60	99.5-99.7
+distance	forward	3-5			8060	7929	20	111	0	0	99.75	99.6-99.8
+distance	forward	6-10			13262	12929	41	292	0	0	99.68	99.6-99.8
+distance	forward	>40			21251	19944	75	1232	0	0	99.63	99.5-99.7
+distance	same	0			3086	3086	0	0	0	0	100.00	99.9-100.0
+era	GRCh37				89184	80743	1356	7085	0	0	98.35	98.3-98.4
+era	GRCh38				79858	77252	280	2326	0	0	99.64	99.6-99.7
+era	NCBI36				32406	28998	221	3187	0	0	99.24	99.1-99.3
+era x direction x handoff	GRCh37	backward	across		8169	6124	490	1555	0	0	92.59	91.9-93.2
+era x direction x handoff	GRCh37	backward	within		14306	8297	687	5322	0	0	92.35	91.8-92.9
+era x direction x handoff	GRCh37	forward	across		56156	55838	160	158	0	0	99.71	99.7-99.8
+era x direction x handoff	GRCh37	forward	within		9145	9076	19	50	0	0	99.79	99.7-99.9
+era x direction x handoff	GRCh37	same	within		1408	1408	0	0	0	0	100.00	99.7-100.0
+era x direction x handoff	GRCh38	backward	across		32753	30994	250	1509	0	0	99.20	99.1-99.3
+era x direction x handoff	GRCh38	backward	within		27095	26248	30	817	0	0	99.89	99.8-99.9
+era x direction x handoff	GRCh38	forward	within		18805	18805	0	0	0	0	100.00	100.0-100.0
+era x direction x handoff	GRCh38	same	within		1205	1205	0	0	0	0	100.00	99.7-100.0
+era x direction x handoff	NCBI36	backward	within		876	866	0	10	0	0	100.00	99.6-100.0
+era x direction x handoff	NCBI36	forward	across		29095	25697	221	3177	0	0	99.15	99.0-99.3
+era x direction x handoff	NCBI36	forward	within		1962	1962	0	0	0	0	100.00	99.8-100.0
+era x direction x handoff	NCBI36	same	within		473	473	0	0	0	0	100.00	99.2-100.0
+handoff	backward	across			40922	37118	740	3064	0	0	98.05	97.9-98.2
+handoff	backward	within			42277	35411	717	6149	0	0	98.02	97.9-98.2
+handoff	forward	across			85251	81535	381	3335	0	0	99.53	99.5-99.6
+handoff	forward	within			29912	29843	19	50	0	0	99.94	99.9-100.0
+handoff	same	within			3086	3086	0	0	0	0	100.00	99.9-100.0
+query	id	all			63512	58520	649	4343	0	0	98.90	98.8-99.0
+query	id	best			127296	118031	1168	8097	0	0	99.02	99.0-99.1
+query	name	all			3075	2996	0	79	0	0	100.00	99.9-100.0
+query	name	best			6150	6031	40	79	0	0	99.34	99.1-99.5
+query	name db	best			1415	1415	0	0	0	0	100.00	99.7-100.0
+stratum	travel_born_late				23067	21339	131	1597	0	0	99.39	99.3-99.5
+stratum	travel_handoff				51435	50781	105	549	0	0	99.79	99.8-99.8
+stratum	travel_merged				23305	20535	584	2186	0	0	97.23	97.0-97.4
+stratum	travel_name				9225	9027	40	158	0	0	99.56	99.4-99.7
+stratum	travel_renamed				24010	19014	484	4512	0	0	97.52	97.3-97.7
+stratum	travel_retired_none				21095	17613	215	3267	0	0	98.79	98.6-98.9
+stratum	travel_split				23586	22959	298	329	0	0	98.72	98.6-98.9
+stratum	travel_unchanged				25725	25725	0	0	0	0	100.00	100.0-100.0

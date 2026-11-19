@@ -1,0 +1,30 @@
+relation	organism	count	value
+composition	sus_scrofa	by_history	200
+composition	sus_scrofa	holds	2798
+composition	sus_scrofa	not_one_gene	2247
+composition	sus_scrofa	refuted	2
+composition	sus_scrofa	triples	3000
+return	sus_scrofa	holds	3000
+return	sus_scrofa	pairs	3000
+roundtrip	sus_scrofa	EntrezGene|holds	472
+roundtrip	sus_scrofa	EntrezGene|ids	472
+roundtrip	sus_scrofa	EntrezGene|no_id	531
+roundtrip	sus_scrofa	HGNC Symbol|holds	392
+roundtrip	sus_scrofa	HGNC Symbol|ids	392
+roundtrip	sus_scrofa	HGNC Symbol|no_id	608
+roundtrip	sus_scrofa	NCBI gene (formerly Entrezgene)|holds	472
+roundtrip	sus_scrofa	NCBI gene (formerly Entrezgene)|ids	472
+roundtrip	sus_scrofa	NCBI gene (formerly Entrezgene)|no_id	531
+roundtrip	sus_scrofa	NCBI gene|no_id	1000
+roundtrip	sus_scrofa	RefSeq_mRNA|holds	112
+roundtrip	sus_scrofa	RefSeq_mRNA|ids	112
+roundtrip	sus_scrofa	RefSeq_mRNA|no_id	892
+roundtrip	sus_scrofa	UniProtKB Gene Name|holds	555
+roundtrip	sus_scrofa	UniProtKB Gene Name|ids	555
+roundtrip	sus_scrofa	UniProtKB Gene Name|no_id	465
+roundtrip	sus_scrofa	Uniprot/SWISSPROT|holds	8
+roundtrip	sus_scrofa	Uniprot/SWISSPROT|ids	8
+roundtrip	sus_scrofa	Uniprot/SWISSPROT|no_id	992
+roundtrip	sus_scrofa	VGNC Symbol|holds	421
+roundtrip	sus_scrofa	VGNC Symbol|ids	421
+roundtrip	sus_scrofa	VGNC Symbol|no_id	579
