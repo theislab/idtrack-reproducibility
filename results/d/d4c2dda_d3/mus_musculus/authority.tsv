@@ -1,0 +1,13 @@
+stratum	view	lines	with_authority	ensembl_vs_authority_differ	agree	other	nothing	open_agree	open_other	open_nothing	open_agree_approved	open_agree_approved_case	open_agree_synonym	open_agree_withdrawn	open_nothing_withdrawn	open_other_approved	open_other_approved_case	open_other_synonym	open_other_withdrawn
+d3_cellmarker_default	all	114450	103760	379	102706	1048	6	1142	100	6	5	10	899	228	6	0	0	50	50
+d3_cellmarker_default	best	114450	103760	379	103306	448	6	1142	100	6	5	10	899	228	6	0	0	50	50
+d3_cellmarker_from	all	114450	103760	302	102740	1014	6	5312	210	6	340	28	900	4044	6	16	0	65	129
+d3_cellmarker_from	best	114450	103760	302	103389	365	6	5336	186	6	344	28	911	4053	6	12	0	54	120
+d3_msigdb_default	all	10702	10683	33	10563	120	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_msigdb_default	best	10702	10683	33	10653	30	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_msigdb_from	all	10702	10683	36	10565	118	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_msigdb_from	best	10702	10683	36	10655	28	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_panglaodb_default	all	4400	4299	49	4258	41	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_panglaodb_default	best	4400	4299	49	4287	12	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_panglaodb_from	all	4400	4299	47	4262	37	0	3	3	0	0	3	0	0	0	0	2	1	0
+d3_panglaodb_from	best	4400	4299	47	4285	14	0	3	3	0	0	3	0	0	0	0	2	1	0

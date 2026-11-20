@@ -40,11 +40,12 @@ import tempfile
 import time
 
 from idtrack_reproducibility import config as CFG
+from idtrack_reproducibility.harness import harness_lib as H
 
 ANGLES = ("inputs", "history", "regions")
 HS, MM, SS, MMU, MFA = "homo_sapiens", "mus_musculus", "sus_scrofa", "macaca_mulatta", "macaca_fascicularis"
 FIELDS = ("outcome", "status", "match", "error_type", "got", "got_base", "got_has", "n_got", "apart_any", "present")
-ENS_VERSIONED = re.compile(r"^(ENS[A-Z]*[GTPE]\d{11}|LRG_\d+)\.\d+$")
+ENS_VERSIONED = re.compile(rf"^({H.STABLE_ID_FORM})\.\d+$")
 
 
 def conv(org, ident, rec, expect, source, view="best", **kw):

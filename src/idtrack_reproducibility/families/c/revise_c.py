@@ -6,12 +6,14 @@ Usage: revise_c.py <organism> --correction <name> --set <new set name> [--dry-ru
 Corrections:
 - `rfam_label_accession`: an RFAM label line (`c4_rfam_label_*`, `c7_rfam_label`) whose label is written as an RFAM
   accession (`RF00003`): Ensembl writes the entry's accession as its label at some releases (core xrefs: `RFAM` rows
-  with `display_label` = `dbprimary_acc`), so the string is the accession of the entry, whose question the
-  accession's lines ask (`c4_rfam_acc_*`, `c7_rfam`); the label line expected only the genes of the label rows and
-  is left out (`excluded`, with the reason). Evidence: the core xref extracts (`core_xref/<release>.tsv.gz`).
+  with `display_label` = `dbprimary_acc`), so the string is also the entry's accession and names every gene of the
+  entry; the label line expected only the genes of the label rows: the entry's other genes go to `broad` (not
+  refuted). Evidence: the core xref extracts (`core_xref/<release>.tsv.gz`).
 - `other_database_broad`: a line without `from_database` whose string is also a value (accession or label) of another
-  Ensembl database, or the GTF's gene name, of other genes at the release read (the core xref extracts and the GTF of
-  that release): without `from_database` the string names those genes too, so an answer within them is not refuted;
+  Ensembl database, or the GTF's gene name, of other genes at the release read, or, for a line asked without a
+  release and without a version, at the target where the string is then read (rule `start_release`; an accession
+  with a version is read where it had it, rule `accession_versions`; the core xref extracts and the GTF of that
+  release): without `from_database` the string names those genes too, so an answer within them is not refuted;
   they go to `broad` (their walks to the target for a line read at an older release), and to `expect` of a `safe`
   line (the string names them). The corrected judge's `names_broad` for family C.
 """
@@ -37,17 +39,37 @@ def log(*a):
 
 
 def rfam_label_accession(org, lines, ctx):
-    """RFAM label lines whose label is the entry's accession: left out (the accession's lines ask the question)."""
-    for rec in lines:
-        if "rfam_label_accession" in (rec.get("revised_by") or []):
-            continue
+    """RFAM label lines whose label is written as an RFAM accession (`RF00003`): Ensembl writes an entry's accession as
+    its label at some releases, so the string is also the entry's accession and names every gene of the entry at the
+    release read and at the target, where the string is read when no release is given (core xrefs of database `RFAM`
+    with that accession). Those genes (walked to the target from an older release) are not refuted by the truth: they
+    go to `broad`; the label rows' genes stay `expect`."""
+    from idtrack_reproducibility.families.a import gen_a as GA
+    car = ctx["car"] if "car" in ctx else ctx.setdefault("car", Carriers(org))
+    for rec in sorted(lines, key=lambda r: (r.get("from_release") or r.get("read_at") or r["to_release"])):
         k = rec["kind"]
-        if (k.startswith("c4_rfam_label") or k == "c7_rfam_label") and re.match(r"^RF\d{5}$", str(rec["id"])):
-            new = dict(rec)
-            new["excluded"] = ("the label is written as the RFAM accession (Ensembl's label = accession at some "
-                               "releases): the accession's lines ask this question")
-            new["revised_by"] = list(rec.get("revised_by") or []) + ["rfam_label_accession"]
-            yield new
+        if "rfam_label_accession" in (rec.get("revised_by") or []) or rec.get("excluded") or \
+                not (k.startswith("c4_rfam_label") or k == "c7_rfam_label") or not re.match(r"^RF\d{5}$", str(rec["id"])):
+            continue
+        G = ctx["G"] if "G" in ctx else ctx.setdefault("G", GA.GenA(org, 115))  # built once, on the first such line
+        R = rec.get("from_release") or rec.get("read_at") or rec["to_release"]
+        t = rec["to_release"]
+        genes = {g for g in car.entry(R).get(str(rec["id"]), set()) if g in (G.tr.genes.get(R) or {})}
+        at_t = {g for g in car.entry(t).get(str(rec["id"]), set()) if g in (G.tr.genes.get(t) or {})}
+        ext = set(G.tr.vset(at_t, t))  # the entry's genes at the target, where the string is read without a release
+        if R == t:
+            ext |= set(G.tr.vset(genes, t))
+        else:
+            for g in sorted(genes):
+                E, B = G.walks(g, R, [t])
+                ext |= set(G.tr.vset(E.get(t, set()) | B.get(t, set()), t))
+        ext -= set(rec.get("expect") or []) | set(rec.get("broad") or [])
+        if not ext:
+            continue
+        new = dict(rec)
+        new["broad"] = sorted(set(rec.get("broad") or []) | set(rec.get("expect") or []) | ext)
+        new["revised_by"] = list(rec.get("revised_by") or []) + ["rfam_label_accession"]
+        yield new
 
 
 class Carriers:
@@ -72,14 +94,25 @@ class Carriers:
             self.cache[rel] = m
         return self.cache[rel]
 
+    def entry(self, rel):
+        """accession -> genes (base) of database `RFAM` at a release (core xref extract)."""
+        key = ("rfam", rel)
+        if key not in self.cache:
+            m = collections.defaultdict(set)
+            for ot, oid, gid, db, disp, acc, lab, ver, it in TC.read_xref(self.org, rel):
+                if db == "RFAM" and acc:
+                    m[acc].add(gid)
+            self.cache[key] = m
+        return self.cache[key]
+
 
 def other_database_broad(org, lines, ctx):
     """A string that other databases or the GTF give to other genes at the release read: those genes (walked to the
     target) in `broad` (in `expect` of a `safe` line)."""
     from idtrack_reproducibility.families.a import gen_a as GA
-    G = ctx.setdefault("G", GA.GenA(org, 115))
+    G = ctx["G"] if "G" in ctx else ctx.setdefault("G", GA.GenA(org, 115))
     tr = G.tr
-    car = ctx.setdefault("car", Carriers(org))
+    car = ctx["car"] if "car" in ctx else ctx.setdefault("car", Carriers(org))
     # lines sorted by the release read, so that one release's carriers are read once
     lines = sorted(lines, key=lambda r: (r.get("from_release") or r.get("read_at") or r["to_release"]))
     for rec in lines:
@@ -94,19 +127,23 @@ def other_database_broad(org, lines, ctx):
         if not gs and "." in q:
             gs = car.at(R).get(q.rsplit(".", 1)[0], set())  # an accession with its version: its unversioned value
         others = {g for g in gs if g in (tr.genes.get(R) or {})}
+        at_t = set()
+        # without a release an unversioned string is read at the target where it is held (rule `start_release`); a
+        # version of an accession is read where it had that version (rule `accession_versions`), not here
+        if rec.get("from_release") is None and R != t and not re.search(r"\.\d+$", q):
+            gt = car.at(t).get(q, set()) or (car.at(t).get(q.rsplit(".", 1)[0], set()) if "." in q else set())
+            at_t = set(tr.vset({g for g in gt if g in (tr.genes.get(t) or {})}, t))
         if R == t:
             extra = others - exp_b
-            if not extra:
-                continue
             ext = set(tr.vset(extra, t))
         else:
-            ext = set()
+            ext = set(at_t)
             for g in sorted(others):
                 E, B = G.walks(g, R, [t])
                 ext |= set(tr.vset(E.get(t, set()) | B.get(t, set()), t))
-            ext -= set(rec.get("expect") or [])
-            if not ext:
-                continue
+        ext -= set(rec.get("expect") or [])
+        if not ext:
+            continue
         new = dict(rec)
         if rec.get("rule") == "safe":
             new["expect"] = sorted(set(rec.get("expect") or []) | ext)

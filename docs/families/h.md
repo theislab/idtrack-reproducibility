@@ -15,7 +15,7 @@ Family H measures what idtrack costs in time and memory, per tree and organism, 
 
 ## Methods
 
-**Trees and graphs.** Both trees are measured on the same graph files, those `d4c2dda` built (their content digests: `results.toml`, `[graphs.d4c2dda]`), with the same Python (3.13) and the same versions of numpy, pandas, networkx and anndata. Each tree is called through its own public api: the d4c2dda generation through `API.convert_identifier` (one call per view: `best`, or `all`), the typed api (rule [`typed_api`](../rules.md#typed_api)) through `API.convert`, whose one call ranks every candidate and marks the best, so one call gives both views (`best_and_all_explained` is two batches for `d4c2dda` and one for `71690ab`).
+**Trees and graphs.** Both trees are measured on the same graph files, the reference graphs (built by `f27e810`, whose builder `d4c2dda` keeps: [the data](../data.md#layout); their content digests: `results.toml`, `[graphs.d4c2dda]`), with the same Python (3.13) and the same versions of numpy, pandas, networkx and anndata. Each tree is called through its own public api: the d4c2dda generation through `API.convert_identifier` (one call per view: `best`, or `all`), the typed api (rule [`typed_api`](../rules.md#typed_api)) through `API.convert`, whose one call ranks every candidate and marks the best, so one call gives both views (`best_and_all_explained` is two batches for `d4c2dda` and one for `71690ab`).
 
 **Inputs.** The identifiers are the distinct strings of the organism's corpus `convert_identifier` calls (every stratum, blank strings left out, sampled with seed 20261117 up to 10,000: all of them, from 7,468 for cynomolgus to 8,051 for human, `calls.tsv`, column `n` of `one_call_cold`); the corpus calls are the corpus's own (from 18,190 to 19,353 per organism, `n` of `corpus_calls`, with their release, database, view and explained paths). The harmonization's datasets are made once per organism from the graph (seed 7: `d115`, every gene id active at the last release without version; `dold`, every gene id of release 90 or the graph's first release when later; `s115`, the symbol of every gene of the last release that has one) and given to both trees (their sha256 are recorded with each repetition). The server's requests: a sample (seed 20261117) of the five organisms' corpus calls.
 
@@ -167,6 +167,8 @@ From `results/h/<tree>/<organism>/build.tsv`: a warm build reads the stored tabl
 | sus_scrofa | 71690ab | warm | 124.7 | 1.1708 | 0.1 | 649.4 | 85.2 | the same content digest |
 | macaca_fascicularis | d4c2dda | warm | 55.1 | 0.6504 | 0.0 | 272.6 | 47.5 | the same content digest |
 | macaca_fascicularis | 71690ab | warm | 53.9 | 0.6519 | 0.0 | 272.6 | 47.5 | the same content digest |
+
+No cold build was measured here. The only cold builds of the reference's builder are those that made the reference graphs (`f27e810`, whose builder `d4c2dda` keeps; one run each, the scheduler's elapsed time and sampled peak memory): pig 15:27 and 1.09 GiB, cynomolgus 6:50 and 0.50 GiB, rhesus 15:09 and 0.98 GiB, mouse 37:02 and 2.69 GiB, human 1:56:23 and 4.20 GiB ([the data](../data.md#layout)).
 
 ## Known limitations
 

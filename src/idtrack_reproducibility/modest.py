@@ -167,7 +167,7 @@ def cmd_run(a):
     cfg = CFG.get()
     ids = []
     for o in a.organisms:
-        mem = jobs.memory_for(o) + 16
+        mem = a.mem or jobs.memory_for(o)  # the parts run one after another: the largest part's peak
         fam = f" --families {','.join(a.families)}" if a.families != FAMILIES else ""
         ids.append(jobs.submit(f"modest_{a.tree}_{o}", jobs.module(cfg.python, "idtrack_reproducibility.modest",
                                                                    f"organism --tree {a.tree} --organism {o} "
@@ -218,6 +218,7 @@ def main(argv=None):
     r.add_argument("--tree", required=True)
     r.add_argument("--out", required=True)
     r.add_argument("--time", default="08:00:00")
+    r.add_argument("--mem", type=int, default=None, help="GB per job (default: the configuration's [jobs.memory_gb])")
     lists(r)
     o = sub.add_parser("organism")
     o.add_argument("--tree", required=True)

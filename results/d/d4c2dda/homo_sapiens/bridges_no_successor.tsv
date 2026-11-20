@@ -1,0 +1,15 @@
+stratum	view	right (bridge to the place's gene)	nothing	another gene	right (bridge to the place's gene) counts	nothing counts	another gene counts
+all strata	all	2384	2376	552	11545732	4418398	3971281
+all strata	best	2491	2376	445	13382579	4418398	2134434
+d1_id_cross_dominant	all	22	22	55	5481	8898	630321
+d1_id_cross_dominant	best	30	22	47	275824	8898	359978
+d1_id_cross_one	all	501	471	98	455826	130016	819352
+d1_id_cross_one	best	522	471	77	656314	130016	618864
+d1_id_same_dominant	all	153	103	126	2982911	253249	827793
+d1_id_same_dominant	best	171	103	108	3648175	253249	162529
+d1_id_same_one	all	1544	1563	235	2862541	1997896	505068
+d1_id_same_one	best	1596	1563	183	2887994	1997896	479615
+d1_id_versioned_dominant	all	18	15	16	2623033	236129	769460
+d1_id_versioned_dominant	best	22	15	12	3286782	236129	105711
+d1_id_versioned_one	all	146	202	22	2615940	1792210	419287
+d1_id_versioned_one	best	150	202	18	2627490	1792210	407737

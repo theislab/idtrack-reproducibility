@@ -4,7 +4,7 @@ Usage: score_e.py --organism <o> --run <run folder>/<organism> [--sets e1,e2,...
                   [--scores-to <folder>]   (default: the run folder; the answers are only read)
 
 - judge `now` (71690ab's docs): the base sets; judge `decided` (decided rules not built yet, docs/rules.md): the base sets with their
-  revision sets `<set>_dec` (gen_e.py). Each is the common scorer into `<scores-to>/scores_<judge>/`.
+  revision sets `<set>_dec` (gen_e.py) and `<set>_dec<k>` (revise_e.py, later decided revisions). Each is the common scorer into `<scores-to>/scores_<judge>/`.
 - family E's two rules are the common scorer's (`families.scorer`): `or_error` (an error whose classes include one of the line's
   `or_error`, `A|B`, is `expected_error`; an answer is judged by the line's rule) and `contains` (the published field
   `e_rule: contains`: an answer is right when every expected value is among its values: source inference, the band of
@@ -14,6 +14,7 @@ Usage: score_e.py --organism <o> --run <run folder>/<organism> [--sets e1,e2,...
 """
 import argparse
 import os
+import re
 import subprocess
 import sys
 
@@ -24,14 +25,18 @@ from idtrack_reproducibility.families import report as RP
 FAMILY = "e"
 
 
+DEC = re.compile(r"^(?P<base>.+)_dec(?P<k>\d*)$")  # a revision set of the decided judge: <set>_dec, <set>_dec2, ...
+
+
 def sets_for(organism, judge, only=None):
+    """The sets of a judge in publication order: `now` the base sets, `decided` with their revision sets `<set>_dec<k>`."""
     names = L.set_names(FAMILY, organism)
-    base = [s for s in names if not s.endswith("_dec")]
+    base = [s for s in names if not DEC.match(s)]
     if only:
         base = [s for s in base if s in only]
     if judge == "now":
         return base
-    return [s for s in names if s in base or (s.endswith("_dec") and s[:-4] in base)]
+    return [s for s in names if s in base or (DEC.match(s) and DEC.match(s).group("base") in base)]
 
 
 def summary(run, organism, judges):

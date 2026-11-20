@@ -117,14 +117,31 @@ def test_samples_are_seeded_sorted_and_whole_when_small():
     assert GC.sample("sus_scrofa", "x", ["b", "a"], 10) == ["a", "b"]
 
 
-def test_rfam_labels_written_as_accessions_are_left_out_of_the_label_lines():
-    lines = [dict(qid="1", kind="c4_rfam_label_at", id="RF00005"), dict(qid="2", kind="c4_rfam_label_at", id="tRNA"),
-             dict(qid="3", kind="c4_rfam_acc_at", id="RF00005"), dict(qid="4", kind="c7_rfam_label", id="RF00001"),
-             dict(qid="5", kind="c4_rfam_label_retired", id="RF00002", revised_by=["rfam_label_accession"])]
-    out = list(RC.rfam_label_accession("sus_scrofa", lines, {}))
-    assert [r["qid"] for r in out] == ["1", "4"]
-    assert all(r["excluded"] and r["revised_by"] == ["rfam_label_accession"] for r in out)
-    assert "excluded" not in lines[0]  # the published line is not changed
+def test_an_rfam_label_written_as_the_accession_widens_its_line_by_the_entry_s_genes():
+    class Tr:
+        genes = {100: {"G1": 1, "G2": 1, "G3": 1}}
+
+        @staticmethod
+        def vset(genes, rel):
+            return [f"{g}.1" for g in sorted(genes)]
+
+    class G:
+        tr = Tr()
+
+    class Car:
+        @staticmethod
+        def entry(rel):
+            return {"RF00005": {"G1", "G2", "G3"}, "RF00001": {"G1"}}
+
+    def line(qid, kind, ident, expect, **kw):
+        return dict(qid=qid, kind=kind, id=ident, from_release=100, to_release=100, expect=expect, broad=None, **kw)
+    lines = [line("1", "c4_rfam_label_at", "RF00005", ["G1.1"]), line("2", "c4_rfam_label_at", "tRNA", ["G1.1"]),
+             line("3", "c4_rfam_acc_at", "RF00005", ["G1.1"]), line("4", "c7_rfam_label", "RF00001", ["G1.1"]),
+             line("5", "c4_rfam_label_retired", "RF00005", ["G1.1"], revised_by=["rfam_label_accession"])]
+    out = list(RC.rfam_label_accession("sus_scrofa", lines, {"car": Car(), "G": G()}))
+    assert [r["qid"] for r in out] == ["1"]  # line 4: the entry has no other gene; 2, 3: no label written as accession
+    assert out[0]["expect"] == ["G1.1"] and out[0]["broad"] == ["G1.1", "G2.1", "G3.1"]
+    assert out[0]["revised_by"] == ["rfam_label_accession"] and lines[0]["broad"] is None
 
 
 @pytest.fixture
@@ -157,3 +174,56 @@ def test_causes_of_versions_never_had_and_of_ncbi_symbols_by_release(causes_c):
     assert names.index("t_accession_version_never_had") < names.index("t_entrezgene_label_rows")
     assert K.CAUSE_CLASS["accession_version_never_had"][0] == "a" and K.CAUSE_CLASS["rfam_label_is_accession"][0] == "d"
     assert "c6" in K.DB_KINDS
+
+
+def test_a_value_another_database_gives_at_the_target_widens_a_line_asked_without_a_release():
+    class Tr:
+        genes = {90: {"G1": 1}, 115: {"G2": 1, "G3": 1}}
+
+        @staticmethod
+        def vset(genes, rel):
+            return [f"{g}.1" for g in sorted(genes)]
+
+    class G:
+        tr = Tr()
+
+        @staticmethod
+        def walks(g, R, targets):
+            return {t: {"G2"} for t in targets}, {t: set() for t in targets}
+
+    class Car:
+        @staticmethod
+        def at(rel):
+            return {"2846624": {"G1"}} if rel == 90 else {"2846624": {"G3"}}
+
+    lines = [dict(qid="1", kind="c2_retired", stratum="c2_retired", id="2846624", from_release=None, read_at=90,
+                  to_release=115, expect=["G2.1"], broad=None, rule="set"),
+             dict(qid="2", kind="c2_at", stratum="c2_at", id="2846624", from_release=90, to_release=90,
+                  expect=["G1.1"], broad=None, rule="set")]
+    out = {r["qid"]: r for r in RC.other_database_broad("macaca_mulatta", lines, {"G": G(), "car": Car()})}
+    assert set(out) == {"1"} and out["1"]["broad"] == ["G2.1", "G3.1"] and out["1"]["expect"] == ["G2.1"]
+
+
+def test_an_accession_with_a_version_is_not_read_at_the_target():
+    class Tr:
+        genes = {90: {"G1": 1}, 115: {"G2": 1, "G3": 1}}
+
+        @staticmethod
+        def vset(genes, rel):
+            return [f"{g}.1" for g in sorted(genes)]
+
+    class G:
+        tr = Tr()
+
+        @staticmethod
+        def walks(g, R, targets):
+            return {t: {"G2"} for t in targets}, {t: set() for t in targets}
+
+    class Car:
+        @staticmethod
+        def at(rel):
+            return {} if rel == 90 else {"NM_1": {"G3"}}
+
+    line = dict(qid="1", kind="c2_oldver", stratum="c2_oldver", id="NM_1.2", from_release=None, read_at=90,
+                to_release=115, expect=["G2.1"], broad=None, rule="set")
+    assert list(RC.other_database_broad("x", [line], {"G": G(), "car": Car()})) == []

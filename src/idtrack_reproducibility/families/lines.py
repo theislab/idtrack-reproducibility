@@ -19,7 +19,7 @@ refuses an existing name; a change of truth is a revision set holding only the c
 qid, and the line of the latest set (highest `seq`) is the truth of a qid. The harness's sets (`family="harness"`)
 are read where they are (`accuracy/queries/<organism>/`), in the harness's order (`harness_lib.set_names`), with its
 exclusions (`harness_lib.EXCLUDED`, the `excluded` field) and its two judges (`published`: without the revision sets
-of the corrected judge).
+of the corrected judge and of the judge following idtrack's decided rules, `harness_lib.REVISED_JUDGES`).
 """
 import datetime
 import gzip
@@ -199,7 +199,8 @@ def split_panels(family, organism, names):
 def resolve_sets(family, organism, sets=None, judge="revised"):
     names = list(sets) if sets else set_names(family, organism)
     if family == "harness" and not sets and judge == "published":
-        names = [s for s in names if manifest(family, organism, s).get("judge") != "78"]
+        from idtrack_reproducibility.harness import harness_lib as H
+        names = [s for s in names if manifest(family, organism, s).get("judge") not in H.REVISED_JUDGES]
     return names
 
 

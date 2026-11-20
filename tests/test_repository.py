@@ -70,3 +70,18 @@ def test_anchors_follow_github(tmp_path):
     a = CHK.anchors_of(str(p))
     assert {"the-accuracy-harness", "the-corrections-of-the-judge", "scorepy-and-a-runs", "same", "same-1"} <= a
     assert "not-a-heading" not in a
+
+
+def test_no_tracked_file_shows_a_machine_path_the_account_or_a_work_order_name():
+    """Code, docs, configurations, results and manifests (their compressed ones too) name no path of a machine, no
+    account and no agent or work order: the cluster's paths live only in the data root's own configuration."""
+    from idtrack_reproducibility import check as K
+    problems = []
+    K.check_text(K.tracked_files(), problems)
+    bad = [p for p in problems if p[2].split(":")[0] in ("machine path", "cluster account or work folder",
+                                                           "agent or work-order name", "production mention")]
+    assert not bad, bad[:5]
+    for name, text in (("machine path", "/" + "home/someone/x"), ("machine path", "/" + "lustre/groups/x"),
+                       ("cluster account or work folder", "idtrack_upgrade_" + "work"),
+                       ("agent or work-order name", "cleanup_" + "repro")):
+        assert any(n == name and __import__("re").search(p, text) for n, p in K.FORBIDDEN), (name, text)

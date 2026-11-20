@@ -1,0 +1,23 @@
+# The environment the reference tree d4c2dda ran in for every stored result of this repository (the runs record
+# Python 3.11.12 in their load records): idtrack d4c2dda's dependencies at the versions installed there, plus pyarrow
+# for the runner's Parquet answers. d4c2dda's pyproject asks for Python 3.12 or newer; its code runs on 3.11, and the
+# results were made so. The checkout is put first on the path by the adapter; idtrack is not installed here.
+#   mamba env create -p <prefix> -f environments/tree_d4c2dda.yml
+name: idtrack-tree-d4c2dda
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.12
+  - numpy=1.26.4
+  - pandas=2.2.3
+  - networkx=3.4
+  - h5py=3.13.0
+  - scipy=1.14.1
+  - pyyaml=6.0.2
+  - requests=2.32.5
+  - urllib3=2.6.3
+  - pymysql=1.1.1
+  - pysocks=1.7.1
+  - tqdm=4.67.1
+  - anndata=0.10.8
+  - pyarrow=20.0.0

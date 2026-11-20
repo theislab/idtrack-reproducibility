@@ -22,3 +22,13 @@ def test_names_are_folded_as_the_case_and_separator_steps_fold():
 def test_expected_error_classes_name_both_api_generations():
     for e in (GE.E_RELEASE, GE.E_DB, GE.E_INVALID, GE.E_UNKNOWN_ID):
         assert "|" in e and e.split("|")[1].startswith("d4c2dda:")
+
+
+def test_the_decided_judge_takes_every_later_revision_of_its_sets(monkeypatch):
+    from idtrack_reproducibility.families import lines as L
+    from idtrack_reproducibility.families.e import score_e as SE
+    monkeypatch.setattr(L, "set_names", lambda family, organism: ["e1", "e1_dec", "e5", "e5_r1", "e1_dec2", "e8_identity",
+                                                                  "e8_identity_dec"])
+    assert SE.sets_for("x", "now") == ["e1", "e5", "e5_r1", "e8_identity"]
+    assert SE.sets_for("x", "decided") == ["e1", "e1_dec", "e5", "e5_r1", "e1_dec2", "e8_identity", "e8_identity_dec"]
+    assert SE.sets_for("x", "decided", only=["e1"]) == ["e1", "e1_dec", "e1_dec2"]

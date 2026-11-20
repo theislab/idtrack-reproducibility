@@ -12,6 +12,7 @@ import zlib
 
 from idtrack_reproducibility import config as CFG
 from idtrack_reproducibility import harness as _harness_pkg
+from idtrack_reproducibility.harness import harness_lib as _harness_lib
 
 ACCURACY = os.path.dirname(os.path.abspath(_harness_pkg.__file__))  # the harness's code (score.py, harness_lib.py, ...)
 ORGANISMS = list(CFG.ORGANISMS)
@@ -39,8 +40,8 @@ def __getattr__(name):
 SEED = 20261118  # cluster bootstrap (docs/methods.md, principle 6)
 N_BOOT = 2000
 
-ENS_VERSIONED = re.compile(r"^(ENS[A-Z]*[GTPE]\d{11}|LRG_\d+)\.\d+$")
-ENS_ID = re.compile(r"^(ENS[A-Z]*[GTPE]\d{11}|LRG_\d+)")
+ENS_VERSIONED = re.compile(rf"^({_harness_lib.STABLE_ID_FORM})\.\d+$")
+ENS_ID = re.compile(rf"^({_harness_lib.STABLE_ID_FORM})")
 
 
 def generation(clone):

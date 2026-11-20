@@ -1,4 +1,4 @@
-"""A small check of D-5 on 71690ab (pig graph, memory-mapped): convert_many on lists with missing-value strings and with
+"""A small check of missing values in lists (rule `missing_values`) on 71690ab (pig graph, memory-mapped): convert_many on lists with missing-value strings and with
 a blank string, item by item. Usage: check_missing_71690ab.py <clone> <graph file> <out json>"""
 import json
 import os

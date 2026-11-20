@@ -2,8 +2,8 @@
 
 Usage: causes.py --organism <o> --scored <scored folder> [--explain <explain .jsonl.gz>] [--und]
 
-From `cleanup_harness/scripts/classify.py` (itself `cleanup_residuals/scripts/classify.py`; review
-the reading of every wrong answer of the reference tree): the tests are the same functions, now over any family's scored folder
+The classifier of the reading of every wrong answer of the reference tree's harness run (docs/families/f0.md,
+"Causes"): its tests are functions over any family's scored folder
 (`wrong.tsv.gz` or, with --und, `undetermined.tsv.gz`) and the explain records of `explain.py` (default
 `<scored>/explain_wrong.jsonl.gz`, or `explain_undetermined.jsonl.gz`). Every cause is a test
 `t_<cause>(ctx) -> detail or None`; the first test that holds names the cause; a row no test explains is
@@ -86,7 +86,7 @@ CAUSE_CLASS = {
     "external_bridge": ("b", "rule `external_bridge`",
                         "Ensembl's history has no successor; idtrack bridges through an external id to a gene that "
                         "does not overlap the query's gene"),
-    "decision14_reverses_kind": ("d", "rule `version_newer_than_graph`", "the harness's kind `nonexistent_version` (a current id with its "
+    "newer_version_kind_reversed": ("d", "rule `version_newer_than_graph`", "the harness's kind `nonexistent_version` (a current id with its "
                                  "largest version + 37, expecting nothing): rule `version_newer_than_graph` answers a version above every "
                                  "version of a living id with its gene, flagged; the kind is kept and left out of the acceptance"),
     "history_branch": ("e", "-", "(undetermined only) the answer follows Ensembl's history, a branch outside the strict walk"),
@@ -555,13 +555,13 @@ def t_external_bridge(c):
     return "; ".join(parts)[:500]
 
 
-def t_decision14_reverses_kind(c):
+def t_newer_version_kind_reversed(c):
     if c.kind != "nonexistent_version":
         return None
     return f"{c.id}: answered {','.join(c.got) or 'nothing'} (rule `version_newer_than_graph`: a version newer than the graph)"
 
 
-TESTS = [t_decision14_reverses_kind, t_entrezgene_label_rows, t_biomart75_swissprot_entry_name, t_one_spelling_per_db_release,
+TESTS = [t_newer_version_kind_reversed, t_entrezgene_label_rows, t_biomart75_swissprot_entry_name, t_one_spelling_per_db_release,
          t_mirbase_not_in_graph, t_mouse_hgnc_projection, t_strict_walk_drops_living_id, t_copies_apart_before_82,
          t_gtf_lacks_core_gene, t_path_through_resurrection, t_event_version_contradicts_tables,
          t_vgnc_symbol_not_in_truth, t_name_in_db_not_in_truth, t_rfam_family_label,
@@ -628,6 +628,25 @@ def summary_from(causes_path, out_path, classes=None):
     write_summary(out_path, summ, CAUSE_CLASS if classes is None else classes)
 
 
+def summary_only(scored, suffix=""):
+    """`causes<suffix>.tsv.gz` with its class column, and `causes<suffix>_summary.tsv`, written again from the stored
+    rows under `CAUSE_CLASS` as it is now (the causes themselves are not classified again)."""
+    path = os.path.join(scored, f"causes{suffix}.tsv.gz")
+    summ = collections.defaultdict(lambda: [0, set()])
+    with gzip.open(path, "rt") as fh, gzip.open(path + ".tmp", "wt") as fo:
+        rd = csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE)
+        fo.write("\t".join(rd.fieldnames) + "\n")
+        for r in rd:
+            r["class"] = CAUSE_CLASS.get(r["cause"], (r["class"],))[0]
+            fo.write("\t".join(r[k] for k in rd.fieldnames) + "\n")
+            x = summ[(r["stratum"], r["cause"])]
+            x[0] += 1
+            x[1].add(r["unit"])
+    os.replace(path + ".tmp", path)
+    write_summary(os.path.join(scored, f"causes{suffix}_summary.tsv"), summ, CAUSE_CLASS)
+    print(open(os.path.join(scored, f"causes{suffix}_summary.tsv")).read())
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
@@ -635,11 +654,16 @@ def main():
     ap.add_argument("--explain", default=None)
     ap.add_argument("--und", action="store_true")
     ap.add_argument("--plugin", action="append", default=[], help="a family's module that registers its kinds and causes")
+    ap.add_argument("--summary-only", action="store_true", help="classify nothing: write the stored causes' class column and "
+                    "causes_summary.tsv again under the current classes and rules of the causes (renamed rules, a cause "
+                    "moved to another class)")
     a = ap.parse_args()
     import importlib.util
     for p in a.plugin:
         spec = importlib.util.spec_from_file_location(os.path.basename(p)[:-3], p)
         spec.loader.exec_module(importlib.util.module_from_spec(spec))
+    if a.summary_only:
+        return summary_only(a.scored, "_und" if a.und else "")
     src = "undetermined" if a.und else "wrong"
     with gzip.open(os.path.join(a.scored, f"{src}.tsv.gz"), "rt") as fh:
         rows = list(csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE))
@@ -653,7 +677,8 @@ def main():
     res = classify_rows(a.organism, rows, explain, und=a.und) if rows else []  # nothing to classify: empty tables
     suffix = "_und" if a.und else ""
     summ = collections.defaultdict(lambda: [0, set()])
-    with gzip.open(os.path.join(a.scored, f"causes{suffix}.tsv.gz"), "wt") as fo:
+    out = os.path.join(a.scored, f"causes{suffix}.tsv.gz")  # written beside, then renamed: never in place
+    with gzip.open(out + ".tmp", "wt") as fo:
         fo.write("organism\tqid\tview\tkind\tstratum\tunit\tcause\tclass\tdetail\n")
         for r, (view, cause, detail, same) in zip(rows, res):
             fo.write("\t".join(str(x).replace("\t", " ").replace("\n", " ") for x in
@@ -661,6 +686,7 @@ def main():
             s = summ[(r["stratum"], cause)]
             s[0] += 1
             s[1].add(r["unit"])
+    os.replace(out + ".tmp", out)
     write_summary(os.path.join(a.scored, f"causes{suffix}_summary.tsv"), summ, CAUSE_CLASS)
     diff = sum(1 for x in res if x[3] is False)
     print(f"{a.organism}: {len(rows)} {src} answers; {sum(1 for x in res if x[1] == 'unexplained')} unexplained; "

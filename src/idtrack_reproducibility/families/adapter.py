@@ -26,6 +26,14 @@ format the cause classifier reads, for both generations).
 Budget: `timeout` seconds per call. d4c2dda: SIGALRM at `timeout` (the harness's limit); 71690ab on:
 `budget_seconds=timeout` and SIGALRM at `timeout + 30` as a backstop. A `SearchBudgetExceededError` is the outcome
 `timeout` (principle 5: over the budget), as the alarm is.
+
+Graph files: d4c2dda and 71690ab keep the graph's manifest in `graph.graph["manifest"]`; from graph format 3 on the
+file's own record is `graph.record` (`content_digest`, `package_commit`). Either is read into the load record.
+
+Database names: from graph format 3 on, a graph records the names Ensembl gives a database at some release that the
+graph gives another name (`graph.renamed_databases`, rule `one_kind_per_database`). A line's `final_database` and
+`from_database` are asked under the graph's name where the graph records the line's name so; the comparison of the
+answer's database uses the name asked. A graph without the record (d4c2dda, 71690ab) is asked as the line names it.
 """
 import gc
 import json
@@ -60,6 +68,27 @@ def decode_id(line):
     if codec == "float_nan":
         return math.nan
     raise ValueError(f"unknown id_codec {codec}")
+
+
+def graph_manifest(graph):
+    """{content_digest, package_commit} of a loaded graph: the file's record (graph format 3 on: `graph.record`), else
+    the manifest that d4c2dda and 71690ab keep in `graph.graph["manifest"]`; {} when neither is there."""
+    record = getattr(graph, "record", None)
+    if record is not None and not callable(record):
+        return dict(content_digest=getattr(record, "content_digest", None),
+                    package_commit=getattr(record, "package_commit", None))
+    inner = getattr(graph, "graph", None)
+    return (inner.get("manifest") if isinstance(inner, dict) else None) or {}
+
+
+def renamed_databases(graph):
+    """{name Ensembl gives a database at some release: the graph's name for it} as the graph records it (graph format
+    3 on); {} for a graph without the record."""
+    try:
+        renamed = getattr(graph, "renamed_databases", None)
+    except Exception:  # noqa: BLE001  a graph of an older format may raise on a missing record field
+        return {}
+    return dict(renamed) if isinstance(renamed, dict) else {}
 
 
 def link_graph(graph, workdir):
@@ -100,14 +129,21 @@ class Adapter:
             self.graph = self.api.graph
             from idtrack.errors import SearchBudgetExceededError as Budget
         self.budget_error = Budget
-        manifest = (getattr(self.graph, "graph", None) or {}).get("manifest") or {}
+        manifest = graph_manifest(self.graph)
+        self.renamed = renamed_databases(self.graph)
         gc.collect()
         gc.freeze()  # a full collection over the loaded graph pauses for seconds; it would be counted as query time
         signal.signal(signal.SIGALRM, _alarm)
         self.info = dict(generation=self.gen, idtrack_file=idtrack.__file__, pythonhashseed=os.environ.get("PYTHONHASHSEED"),
                          python=sys.version.split()[0], load_seconds=round(time.time() - t0, 1), graph=os.path.abspath(graph),
                          graph_real=os.path.realpath(graph), files_written_in_repo=sorted(set(os.listdir(repo)) - before),
-                         content_digest=manifest.get("content_digest"), package_commit=manifest.get("package_commit"))
+                         content_digest=manifest.get("content_digest"), package_commit=manifest.get("package_commit"),
+                         renamed_databases=dict(sorted(self.renamed.items())))
+
+    def database(self, name):
+        """The name a line's database is asked under in this graph (the graph's own name where it records the line's
+        name as renamed; else the name itself)."""
+        return self.renamed.get(name, name) if isinstance(name, str) else name
 
     # ---------------- one line ----------------
 
@@ -184,16 +220,16 @@ class Adapter:
         return a
 
     def _ask_convert(self, line, views, explain):
+        db = self.database(line.get("final_database"))
         kw = dict(from_release=line.get("from_release"), to_release=line.get("to_release"),
-                  final_database=line.get("final_database"), budget_seconds=self.timeout)
+                  final_database=db, budget_seconds=self.timeout)
         if explain:
             kw["explain"] = True
         if line.get("from_database") is not None:
-            kw["from_database"] = line["from_database"]
+            kw["from_database"] = self.database(line["from_database"])
         ident = decode_id(line)
         res, fail, sec = self._call(lambda: self.api.convert(ident, **kw))
         out = []
-        db = line.get("final_database")
         for v in views:
             a = self._blank(line, v)
             a["seconds"] = round(sec, 6)

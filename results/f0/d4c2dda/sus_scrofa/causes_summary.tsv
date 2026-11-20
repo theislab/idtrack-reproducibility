@@ -6,7 +6,7 @@ name_ambiguous_to_set	support_ranks_shared_name	b	rules `ties`, `from_database`,
 name_changed_gene	external_bridge	b	rule `external_bridge`	52	26
 name_old_to_current	mirbase_not_in_graph	c	rule `mirbase_genes`	58	28
 name_unique_to_gene	mirbase_not_in_graph	c	rule `mirbase_genes`	270	127
-nonexistent_version	decision14_reverses_kind	d	rule `version_newer_than_graph`	1000	1000
+nonexistent_version	newer_version_kind_reversed	d	rule `version_newer_than_graph`	1000	1000
 old_gene_to_db	entrezgene_label_rows	a	rule `one_kind_per_database`	617	608
 retired_none	external_bridge	b	rule `external_bridge`	99	35
 reverse_absent	external_bridge	b	rule `external_bridge`	30	15

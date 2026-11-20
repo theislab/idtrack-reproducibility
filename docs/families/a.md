@@ -110,7 +110,7 @@ python -m idtrack_reproducibility.families.causes --organism <o> --scored <famil
 python -m idtrack_reproducibility.families.a.limits_a --out <tsv> <families>/a/runs/<tree>/<o> [...]
 ```
 
-The snapshot-110 graphs are built by the tree from the same downloaded tables, the snapshot's own history table fetched by idtrack's builder (`API(local_repository=...).build_graph(organism_name, snapshot_release=110)`), and A8 is run on them into `runs/d4c2dda_s110/<organism>` (`--sets a8_s110_v1,...`). A later tree is run with its own `--tag`, so that its job names do not repeat an earlier run's.
+The snapshot-110 graphs are built by the tree from the same downloaded tables, the snapshot's own history table fetched by idtrack's builder: `idtrack-repro family a build_a8 --organism <o> --tree d4c2dda [--submit]` (`families/a/build_a8.py`: the reference graph's tables copied into `<families>/a/a8/<tree>/<organism>/`, then the tree's public api builds snapshot 110 there), and A8 is run on them into `runs/d4c2dda_s110/<organism>` (`--sets a8_s110_v1,...`). A later tree is run with its own `--tag`, so that its job names do not repeat an earlier run's.
 
 ## Results
 
@@ -118,7 +118,7 @@ Runs `<families>/a/runs/d4c2dda/<organism>/` (the reference graphs, every set wi
 
 ### A0
 
-Rows `ok` / `by_design` / not explained per check, summed over the classes of `<families>/a/a0/d4c2dda/<organism>/summary.tsv` (A0's table as its run wrote it; it comes into `results/` when A0 is run again by this package, which names the rules in its by-design reasons) (in parentheses the rows counted apart: history events of sessions outside the graph's window and ids mapped onto themselves with score 1, which the builder by its rule makes no edge; human's links on GRCh37 at releases it does not serve):
+Rows `ok` / `by_design` / not explained per check, summed over the classes of `<families>/a/a0/d4c2dda/<organism>/summary.tsv` (A0's run of 2026-11-18 by the same checks of `a0_fidelity`; its reasons by design written by this package from the run's classes, `a0_fidelity <organism> --out <folder> --resummarize`; result file `results/a/d4c2dda/<organism>/a0_summary.tsv`) (in parentheses the rows counted apart: history events of sessions outside the graph's window and ids mapped onto themselves with score 1, which the builder by its rule makes no edge; human's links on GRCh37 at releases it does not serve):
 
 | check | pig | mouse | human | rhesus | cynomolgus |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -129,7 +129,7 @@ Rows `ok` / `by_design` / not explained per check, summed over the classes of `<
 
 By design (each class with its reason in A0's `summary.tsv`): LRG records in the graph that the GTF and BioMart lack (human); genes on patches at releases whose GTF has no patch file, so that every gene of the GTF reads primary (human, mouse); Ensembl events naming a version the gene tables do not have, which the builder follows the tables for (rule [`event_version`](../rules.md#event_version)'s kind), and births recorded later than the tables show; events placed at the nearest pair of releases by the builder's rule; version 0; events of ids in no table; core genes the GTF lacks and their transcripts; miRBase display names (rule [`mirbase_genes`](../rules.md#mirbase_genes)); WikiGene (not in the organism's externals); RFAM labels held as a second id (rule [`rfam_display_label`](../rules.md#rfam_display_label)); node spellings of the first release; BioMart NCBI tables without a label column; VGNC symbols that differ from Ensembl's labels.
 
-Not explained (the classes of A0's `summary.tsv` that are neither `ok` nor by design):
+Not explained (the classes of A0's `summary.tsv` that are neither `ok` nor by design; their rows of the known-limitations table, `limits_a --a0`: `L-id-shared-across-types` for human's transcript id, `L-event-versions` for human's event, `L-a0-unexplained` for the rest, read one by one below):
 
 | organism | check | class | rows | what |
 | --- | --- | --- | ---: | --- |
@@ -298,7 +298,7 @@ A's rows of [the known-limitations table](../../results/limitations/limitations.
 | `L-truth-gtf-short` | genes of a release missing from its GTF (the truth's) | wrong | – | – | 2,687 | – | – |
 | `L-unexplained` | wrong answers read by hand (above) | wrong | – | – | 2 | – | – |
 | `T-core-version` | the truth's version of a core-only gene at a release without versions (not idtrack's) | wrong | – | – | 6 | – | – |
-| `T-lrg-base` | the judge does not reduce LRG gene ids to their stable id (not idtrack's) | wrong | – | – | 24 | – | – |
+| `T-lrg-base` | the judge did not reduce LRG gene ids to their stable id (not idtrack's): corrected, the judge's stable id form (`harness_lib.STABLE_ID_FORM`) reads `LRG_<n>_g<k>`, `LRG_<n>t<k>`, `LRG_<n>p<k>` from 2026-11-20; the stored scoring predates it, a scoring again moves these rows | wrong | – | – | 24 | – | – |
 | `L-no-chain` | no successor and no assembly chain: the answer cannot be judged (Ensembl publishes no chain) | undetermined | 2,714,444 | – | – | 2,586,456 | 974,950 |
 | `L-bridge-at-place` | no successor; idtrack answers a gene at the same place (plausible, not Ensembl's statement; until `bridge_same_place`) | undetermined | 301,601 | 1,155,605 | 1,960,844 | – | – |
 | `L-chain-gap` | no successor and the place does not map through the chain | undetermined | 277,712 | 112,898 | 154,782 | – | – |

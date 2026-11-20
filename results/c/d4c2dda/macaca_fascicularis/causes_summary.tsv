@@ -1,12 +1,12 @@
 stratum	cause	class	rule	answers	units
-c2_oldver	accession_old_version_read_at_target	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	232	125
+c2_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	232	125
 c2_oldver	unexplained	?	-	46	24
-c2_ver_gap	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	7910	3955
-c2_ver_higher_retired	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	6754	3377
-c2_ver_lower	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	7410	3705
-c3_oldver	accession_old_version_read_at_target	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	1176	566
+c2_ver_gap	accession_version_never_had	a	rule `accession_versions` (decided)	7910	3955
+c2_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	6754	3377
+c2_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	7410	3705
+c3_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	1176	566
 c3_oldver	unexplained	?	-	136	75
-c3_ver_higher_retired	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	6146	3073
-c3_ver_lower	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	7382	3691
+c3_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	6146	3073
+c3_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	7382	3691
 c4_rfam_label_retired	rfam_label_is_accession	d	-	38	19
 c6:NCBI gene (formerly Entrezgene)	ncbi_label_name_by_release	a	rule `one_kind_per_database` (decided)	309084	18088

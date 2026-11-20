@@ -73,7 +73,7 @@ CAUSES = {
     "mouse_hgnc_projection": ("d", "harness_lib.EXCLUDED (mouse HGNC Symbol); the corrected judge",
                               "the mouse gene's display name is a human HGNC symbol projected onto it; the graph does not "
                               "hold HGNC symbols for mouse, the truth reads BioMart's display name"),
-    "infer_duplicates_counted": ("a", "docs/methods.md E8 (the relation); docs: 'each identifier counts once'",
+    "infer_duplicates_counted": ("a", "rule `inference_distinct_ids` (the relation of docs/methods.md E8)",
                                  "a repeated identifier counts once per occurrence in source inference; a list with "
                                  "duplicates can be placed at another release than the same list without them"),
     "line_premise_wrong": ("d", "revision e5_r1", "the line assumed a name of the organism's symbol database that the truth "

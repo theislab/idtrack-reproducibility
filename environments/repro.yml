@@ -1,5 +1,5 @@
 # The environment of the benchmark code (truth readers, query generators, scorer, reports, tests).
-# The idtrack tree under test runs in its own environment (see README, "Trees and their Python").
+# The idtrack tree under test runs in its own environment (see README, "Trees": environments/tree_<tree>.yml).
 #   mamba env create -p <prefix> -f environments/repro.yml
 #   <prefix>/bin/python -m pip install --no-deps -e .
 name: idtrack-repro

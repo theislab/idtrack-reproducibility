@@ -6,8 +6,8 @@ and their union `results/limitations/limitations.tsv` (the common columns, `limi
 `.provenance` file (its sources and their sha256) that `idtrack-repro results` reads. No number is typed.
 
 The builders: the harness's sets (`f0` runs; F0's map of the residual causes), `astar` (`limitations_astar`), `a`
-(`limits_a`: the causes with A's map plus the undetermined answers by reason), `e` (`limits_e`, judge `now`: what users
-get from the tree).
+(`limits_a`: the causes with A's map plus the undetermined answers by reason; A0's summaries with `--a0`), `e`
+(`limits_e`, judge `now`: what users get from the tree), `c` (F0's builder with C's map), `d` (`limits_d`).
 """
 import argparse
 import csv
@@ -25,8 +25,10 @@ BUILDERS = {
     "f0": ("f0", "{py} -m idtrack_reproducibility.families.limitations --family f0 --scored {runs} --out {out}"),
     "astar": ("astar", "{py} -m idtrack_reproducibility.families.astar.limitations_astar {run} --out {out}"),
     "a": ("a", "{py} -m idtrack_reproducibility.families.a.limits_a --out {out} {runs}"),
+    "a0": ("a0", "{py} -m idtrack_reproducibility.families.a.limits_a --a0 --out {out} {runs}"),
     "e": ("e", "{py} -m idtrack_reproducibility.families.e.limits_e --runs {runs} --judge now --out {out}"),
-    "c": ("c", "{py} -m idtrack_reproducibility.families.limitations --family c --scored {runs} --out {out}"),
+    "c": ("c", "{py} -m idtrack_reproducibility.families.limitations --family c --scored {runs} --map "
+               "{src}/idtrack_reproducibility/families/c/limitations_map_c.tsv --out {out}"),
     "d": ("d", "{py} -m idtrack_reproducibility.families.d.limits_d --out {out} {runs}"),
 }
 
@@ -40,35 +42,45 @@ def main(argv=None):
     data = CFG.get().root
     out_dir = os.path.join(ROOT, "results", "limitations")
     os.makedirs(out_dir, exist_ok=True)
-    union, prov_all = [], []
+    union, prov_all, seen = [], [], set()
     now = datetime.datetime.now().isoformat(timespec="seconds")
     for e in reg.get("run", []):
         fam = e["family"]
-        if fam not in BUILDERS or (a.only and fam not in a.only.split(",")) or "/runs/" not in e["folder"]:
+        if fam == "a" and "/a0/" in e["folder"]:
+            fam = "a0"  # A0, graph fidelity: its own builder over its summaries
+        elif "/runs/" not in e["folder"]:
             continue
-        if fam == "astar" and e["tree"] != "d4c2dda":
-            continue  # A*'s builder reads every organism's run of one name (its transcript runs have no causes)
+        if fam not in BUILDERS or (fam == "astar" and e["tree"] != "d4c2dda"):
+            continue  # (A*'s builder reads every organism's run of one name; its transcript runs have no causes)
         name, tmpl = BUILDERS[fam]
+        out = os.path.join(out_dir, f"{name}_{e['tree']}.tsv")
         runs = [os.path.join(data, e["folder"].format(organism=o)) for o in e["organisms"]]
         runs = [r for r in runs if os.path.exists(os.path.join(r, "causes.tsv.gz")) or
-                os.path.exists(os.path.join(r, "scores_now", "causes.tsv.gz"))]  # a run whose answers were classified
-        if not runs:
+                os.path.exists(os.path.join(r, "scores_now", "causes.tsv.gz")) or
+                (fam == "a0" and os.path.exists(os.path.join(r, "summary.tsv")))]  # a run whose answers were classified
+        if not runs or out in seen:
             continue
-        out = os.path.join(out_dir, f"{name}_{e['tree']}.tsv")
-        run_name = e["folder"].split("/runs/")[1].split("/")[0]
-        cmd = tmpl.format(py=sys.executable, runs=" ".join(runs), out=out, run=run_name)
+        seen.add(out)
+        if a.only and e["family"] not in a.only.split(","):  # another family's table, kept as it is in the union
+            if os.path.exists(out):
+                union += RES.read_tsv(out)
+                if os.path.exists(out + ".provenance"):
+                    prov_all += [dict(r, file="results/limitations/limitations.tsv") for r in RES.read_tsv(out + ".provenance")]
+            continue
+        run_name = e["folder"].split("/runs/")[1].split("/")[0] if "/runs/" in e["folder"] else e["tree"]
+        cmd = tmpl.format(py=sys.executable, runs=" ".join(runs), out=out, run=run_name, src=CFG.SRC)
         subprocess.run(cmd, shell=True, check=True)
         rows = RES.read_tsv(out)
         union += rows
         srcs = []
         for r in runs:
             for f in ("causes.tsv.gz", "scores_now/causes.tsv.gz", "report.tsv", "scores_now/report.tsv",
-                      "undetermined.tsv.gz", "e_summary.tsv"):
+                      "undetermined.tsv.gz", "e_summary.tsv", "summary.tsv"):
                 p = os.path.join(r, f)
                 if os.path.exists(p):
                     srcs.append(p)
         prov = [dict(file=os.path.relpath(out, ROOT), sha256="", generated_by=cmd.replace(sys.executable, "python")
-                     .replace(data + os.sep, "<data>/").replace(ROOT + os.sep, ""), source=os.path.relpath(p, data), source_sha256=RES.sha256(p),
+                     .replace(data + os.sep, "<data>/").replace(CFG.SRC + os.sep, "").replace(ROOT + os.sep, ""), source=os.path.relpath(p, data), source_sha256=RES.sha256(p),
                      scored_at="", commit=e["commit"], graph_digest="", generated_at=now) for p in srcs]
         RES.write_tsv(out + ".provenance", RES.PROV_COLS, prov)
         prov_all += [dict(r, file="results/limitations/limitations.tsv") for r in prov]

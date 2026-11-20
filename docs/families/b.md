@@ -16,7 +16,7 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 | --- | --- |
 | `runs/d4c2dda/macaca_fascicularis/` | every line answered; `scores_now/` holds `run.json` and `report.tsv` (sets `b1_v1`, `b8_v1`, `b5_v1`, `b6_v1`, `b7_v1`); `scores_decided/` not scored; no causes |
 | `runs/d4c2dda/macaca_mulatta/` | every line answered; `scores_now/` holds `run.json` and `report.tsv` (the same sets and `b4_v1`); `scores_decided/` not scored; no causes |
-| `runs/d4c2dda/mus_musculus/` | incomplete: 25 of 29 shards answered, not scored |
+| `runs/d4c2dda/mus_musculus/` | incomplete: shards 0 to 24 of 29 complete (8,464,522 lines; `partial.json` says so), shards 25 to 28 not asked, not scored; the answers are kept in the data root (manifested), and the runner, which asks only what has no answer, finishes them with `--shard 25/29` to `28/29` |
 | `runs/d4c2dda/sus_scrofa/`, `runs/d4c2dda/homo_sapiens/` | not run (no answer) |
 
 What is not built:

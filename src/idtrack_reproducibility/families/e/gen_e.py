@@ -44,6 +44,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 from idtrack_reproducibility.families import common as C
 from idtrack_reproducibility.harness import harness_lib as H
 from idtrack_reproducibility.families import lines as L
+from idtrack_reproducibility.harness import make_queries as MQ
 from idtrack_reproducibility.families.e import truth_e as T
 
 FAMILY = "e"
@@ -205,7 +206,8 @@ class Gen:
                 dec = dict(open=None, expect_error=E_MISSING)
             else:
                 now = dict(rule="set", expect=[], open="a spelling of a missing value outside rule `missing_values`")
-                dec = None
+                # pandas' spellings are refused by the rule as built (revise_e e1_dec2)
+                dec = dict(open=None, expect_error=E_MISSING) if MQ.is_missing_value(tok) else None
             tag = json.dumps(tok)
             self.add(s, f"e1_single_{j}", f"single|{tag}", tok, unit=tag, dec=dec, **now)
             # with the source database named: looked up (rule `missing_values`); no missing-value error either way
@@ -229,7 +231,8 @@ class Gen:
                     dec = dict(open=None, expect_error=E_MISSING)
                 else:
                     now = dict(rule="set", expect=[], open="a spelling of a missing value outside rule `missing_values`")
-                    dec = None
+                    # pandas' spellings are refused by the rule as built (revise_e e1_dec2)
+                    dec = dict(open=None, expect_error=E_MISSING) if MQ.is_missing_value(tok) else None
                 self.add(s, f"e1_batch_{j}", f"batch|{pos}|{tag}", tok, unit=tag, call="convert_many", batch=batch,
                          pos=pos, dec=dec, **now)
                 # the other items of that batch keep their answer (E8: an added item changes no other)
@@ -870,7 +873,7 @@ class Gen:
                 q["revised_by"] = ["decided"]
                 rev.append(q)
             if rev:
-                m = L.publish(FAMILY, self.org, s + "_dec", rev, desc + " (judge: the decisions not built yet: 52, 56, 79-87)",
+                m = L.publish(FAMILY, self.org, s + "_dec", rev, desc + " (judge: the decided rules not built in 71690ab, docs/rules.md)",
                               __file__, revises=[s], judge="decided", sources=sources, dry=dry)
                 out[s + "_dec"] = m["n"]
         return out

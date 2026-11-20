@@ -3,7 +3,7 @@
 Each test reads the scored row (query, expected, got, reason), the explain record where there is one, and Ensembl's
 xref extracts of family C (`truth_c.read_xref`), never idtrack's code:
 
-- `accession_version_never_had` (a; the decided answer to the open choice Q2, docs/methods.md): a RefSeq or UniProt accession written with a
+- `accession_version_never_had` (a; rule `accession_versions`, decided: the answer to the open choice Q2, docs/methods.md): a RefSeq or UniProt accession written with a
   version that Ensembl never gave it in the graph's window (below every version, in a gap, or above every version of
   an accession the graph no longer holds) is answered with the accession's gene: the version is dropped
   (`match: version`), where rule `version_newer_than_graph`'s rule answers nothing.
@@ -14,7 +14,7 @@ xref extracts of family C (`truth_c.read_xref`), never idtrack's code:
   another object form (the value is on an object of another form only).
 - `db_not_held_at_release` (c): the database's values at the release are outside the configuration's releases for the
   release's assembly (rule `primary_assembly_only`: the graph holds the primary assembly only).
-- `accession_old_version_read_at_target` (a; the decided answer to Q2: rule `version_newer_than_graph` for accession versions): an accession written
+- `accession_old_version_read_at_target` (a; rule `accession_versions`, decided): an accession written
   with a version it had at an older release, not at the target, is read at the target without its version (the genes
   the accession names there), not at the release where it had that version.
 - `value_of_another_database` (e; the judge reads one database): the string is also a value (accession or label) of
@@ -177,8 +177,7 @@ import __main__  # noqa: E402
 K.register_kinds(databases={"c6"})
 for mod in {id(m): m for m in (K, __main__) if hasattr(m, "register") and hasattr(m, "TESTS")}.values():
     mod.register_kinds(databases={"c6"})
-    mod.register("accession_version_never_had", "a", "decided answer to Q2 (rule `version_newer_than_graph` for accession "
-                 "versions)", "an accession version Ensembl never gave it in the window is answered with the "
+    mod.register("accession_version_never_had", "a", "rule `accession_versions` (decided)", "an accession version Ensembl never gave it in the window is answered with the "
                  "accession's gene (the version is dropped)", accession_version_never_had, before="entrezgene_label_rows")
     mod.register("ncbi_label_name_by_release", "a", "rule `one_kind_per_database` (decided)", "the NCBI symbols carry their name of 100 on "
                  "only from 100; before, they are filed under EntrezGene (to 87) or NCBI gene (88-99)",
@@ -189,7 +188,7 @@ for mod in {id(m): m for m in (K, __main__) if hasattr(m, "register") and hasatt
     mod.register("rfam_label_is_accession", "d", "-", "the label line's string is the RFAM accession (Ensembl writes "
                  "the accession as the label at some releases): the line should expect the entry's genes",
                  rfam_label_is_accession, before="entrezgene_label_rows")
-    mod.register("accession_old_version_read_at_target", "a", "decided answer to Q2 (rule `version_newer_than_graph` for accession versions)",
+    mod.register("accession_old_version_read_at_target", "a", "rule `accession_versions` (decided)",
                  "an accession version had at an older release is read at the target without its version",
                  accession_old_version_read_at_target, before="entrezgene_label_rows")
     mod.register("value_of_another_database", "e", "-", "the string is also a value or name of the returned gene in "

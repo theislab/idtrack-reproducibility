@@ -4,7 +4,7 @@ call of the API on both generations; imported, never copied). D1's lines are pla
 
 Usage:
   run_d.py --organism <o> --clone <clone> --graph <graph file> --out <run folder>/<organism> --sets d2_v1 [--shard i/n]
-  run_d.py ... --submit <n> [--tag <tag>]     n shard jobs on cpu_preemptible, named idtrack_cleanup_bench_d_<tag>_s<i>of<n>
+  run_d.py ... --submit <n> [--tag <tag>]     n shard jobs (the configured runner), named <name_prefix>d_<tag>_s<i>of<n>
 Score with F0's scorer (`../scorer.py --family d ...`). A resubmission asks only what has no answer.
 """
 import argparse

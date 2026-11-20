@@ -66,7 +66,7 @@ F0_MAP = {
                             "human release 48 (NCBI36): the GTF lists 32,354 genes, the core gene table 32,561; idtrack "
                             "answers genes of the core that the truth's gene list lacks", "none needed (idtrack follows "
                             "the core)", "none (the truth: presence from the core table where the GTF is short)"),
-    "decision14_reverses_kind": ("L-newer-versions", "history", "a version newer than the graph is answered",
+    "newer_version_kind_reversed": ("L-newer-versions", "history", "a version newer than the graph is answered",
                                  "a version above every version of a living id is answered with its gene, flagged "
                                  "`version_newer_than_graph` (rule `version_newer_than_graph`)", "read `match`", "none (rule `version_newer_than_graph`: by design)"),
 }

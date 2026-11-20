@@ -83,8 +83,8 @@ PATTERNS = {
     "branch_while_living": "a cross-id event from the id in a session it lives across (present in the GTF on both "
                            "sides): Ensembl maps it to another id while it continues (hunt finding hh-1); the id and "
                            "the ids it branches to",
-    "hunt_history": "an id named by the weakness hunts cleanup_hunt_history and cleanup_hunt_regions (their "
-                    "findings.tsv and review reports)",
+    "hunt_history": "an id named by the weakness hunts of history and of regions (their findings.tsv and "
+                    "reproducers, docs/hunts.md)",
     "non_reference_copy_ended": "a gene on a haplotype, patch or alternative locus (an assembly-exception sequence "
                                 "of the release, or GTF region patch) at some release, absent at the target, whose "
                                 "strict walk from its last release reaches nothing (hunt_regions R6, J1, J4)",

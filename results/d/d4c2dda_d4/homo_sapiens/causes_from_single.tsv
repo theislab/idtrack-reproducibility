@@ -1,0 +1,173 @@
+qid	view	src_qid	cause	class	detail
+d4|1006|46	all	retired_none|ENSG00000277813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1019|11	all	retired_none|ENSG00000217075|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|102|52	all	name_unique_to_gene|SNORD62|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|102|52	best	name_unique_to_gene|SNORD62|None|115|None|best	rfam_family_label	b	2 extra genes entered through RFAM only; their display names {'SNORD62B': 1, 'SNORD62A': 1}
+d4|1042|99	all	retired_none|ENSG00000256530|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1042|99	best	retired_none|ENSG00000256530|None|115|None|best	external_bridge	b	ENSG00000246877 via DNM1P35 [HGNC Symbol] gap 2 (63->65); distance other assembly
+d4|1163|73	all	retired_none|ENSG00000034063|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1163|73	best	retired_none|ENSG00000034063|None|115|None|best	external_bridge	b	ENSG00000065060 via synonym_id::ICBP90 [synonym_id::EntrezGene+synonym_id::HGNC Symbol] same release (75->75); distance other assembly
+d4|1167|72	all	retired_none|ENSG00000279978|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1167|72	best	retired_none|ENSG00000279978|None|115|None|best	external_bridge	b	ENSG00000279801 via 102723431 [EntrezGene] same release (78->78); distance other sequence
+d4|1213|3	all	retired_none|ENSG00000182230|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1213|3	best	retired_none|ENSG00000182230|None|115|None|best	external_bridge	b	ENSG00000251623 via 202134 [EntrezGene] same release (106->106); distance 7991
+d4|1216|16	all	retired_none|ENSG00000279820|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|121|48	all	retired_none|ENSG00000212514|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1247|37	all	retired_none|ENSG00000260098|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1247|37	best	retired_none|ENSG00000260098|None|115|None|best	external_bridge	b	ENSG00000137878 via OTTHUMG00000176411 [Havana gene] next release (66->67); distance other assembly
+d4|1258|66	all	retired_none|ENSG00000233501|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1258|66	best	retired_none|ENSG00000233501|None|115|None|best	external_bridge	b	ENSG00000230806 via SRGAP2-AS1 [EntrezGene+HGNC Symbol] same release (82->82); distance 84980058
+d4|1269|9	all	retired_none|ENSG00000278117|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1269|9	best	retired_none|ENSG00000278117|None|115|None|best	external_bridge	b	ENSG00000264115 via MIR3180-4 [EntrezGene+HGNC Symbol] same release (84->84); distance other sequence
+d4|1285|13	all	name_ambiguous_to_set|U3|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1285|13	best	name_ambiguous_to_set|U3|None|115|None|best	rfam_family_label	b	6 extra genes entered through RFAM only; their display names {'SNORD3H': 1, 'SNORD3J': 1, 'SNORD3E': 1, 'SNORD3D': 1}
+d4|1328|64	all	retired_none|ENSG00000182230|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1328|64	best	retired_none|ENSG00000182230|None|115|None|best	external_bridge	b	ENSG00000251623 via 202134 [EntrezGene] same release (106->106); distance 7991
+d4|135|13	all	retired_none|ENSG00000257774|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|135|13	best	retired_none|ENSG00000257774|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|135|23	all	retired_none|ENSG00000274802|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|135|42	all	retired_none|ENSG00000198864|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1413|20	all	retired_none|ENSG00000282276|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1413|20	best	retired_none|ENSG00000282276|None|115|None|best	external_bridge	b	ENSG00000187951 via 89839 [EntrezGene] same release (91->91); distance other sequence
+d4|1413|6	all	retired_none|ENSG00000281508|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1413|6	best	retired_none|ENSG00000281508|None|115|None|best	external_bridge	b	ENSG00000079102 via synonym_id::CDR [synonym_id::HGNC Symbol] same release (90->90); distance other sequence
+d4|1419|4	all	retired_none|ENSG00000213054|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1419|4	best	retired_none|ENSG00000213054|None|115|None|best	external_bridge	b	ENSG00000167578 jump 1 (bridge not located)
+d4|1425|82	all	retired_none|ENSG00000219086|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1425|82	best	retired_none|ENSG00000219086|None|115|None|best	external_bridge	b	ENSG00000187984 via C21orf126 [HGNC Symbol] next release (54->55); distance other assembly
+d4|1444|33	all	retired_none|ENSG00000281508|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1444|33	best	retired_none|ENSG00000281508|None|115|None|best	external_bridge	b	ENSG00000079102 via synonym_id::CDR [synonym_id::HGNC Symbol] same release (90->90); distance other sequence
+d4|1505|95	all	retired_none|ENSG00000167159|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1505|95	best	retired_none|ENSG00000167159|None|115|None|best	external_bridge	b	ENSG00000204650 via C17orf69 [EntrezGene+HGNC Symbol] next release (68->69); distance other assembly
+d4|1515|4	all	retired_none|ENSG00000273766|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1515|4	best	retired_none|ENSG00000273766|None|115|None|best	external_bridge	b	ENSG00000266545 via 100847005 [EntrezGene] same release (79->79); distance other sequence; ENSG00000277841 via 100847060 [EntrezGene] same release (79->79); distance other sequence
+d4|1572|69	all	retired_none|ENSG00000227127|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1572|69	best	retired_none|ENSG00000227127|None|115|None|best	external_bridge	b	ENSG00000148303 via RPL7AP70 [HGNC Symbol] next release (55->56); distance other assembly
+d4|1581|84	all	retired_none|ENSG00000196360|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1583|63	all	retired_none|ENSG00000196501|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1583|63	best	retired_none|ENSG00000196501|None|115|None|best	external_bridge	b	ENSG00000223345 via HIST2H2BA [HGNC Symbol] gap 6 (49->55); distance other assembly
+d4|1586|14	all	retired_none|ENSG00000285024|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1586|14	best	retired_none|ENSG00000285024|None|115|None|best	external_bridge	b	ENSG00000285607 via FAM90A9P [HGNC Symbol+UniProtKB Gene Name] next release (93->94); distance other sequence
+d4|1600|35	all	retired_none|ENSG00000269900|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1614|53	all	retired_none|ENSG00000282945|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1614|53	best	retired_none|ENSG00000282945|None|115|None|best	external_bridge	b	ENSG00000132661 via synonym_id::MTR2 [synonym_id::HGNC Symbol] same release (97->97); distance other sequence
+d4|1660|86	all	retired_none|ENSG00000231656|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1757|41	all	retired_none|ENSG00000277813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1764|96	all	retired_none|ENSG00000221856|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1764|96	best	retired_none|ENSG00000221856|None|115|None|best	external_bridge	b	ENSG00000121577 via synonym_id::POP2 [synonym_id::HGNC Symbol] same release (59->59); distance other assembly
+d4|1774|16	all	retired_none|ENSG00000124642|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1774|16	best	retired_none|ENSG00000124642|None|115|None|best	external_bridge	b	ENSG00000197409 jump 1 (bridge not located)
+d4|1780|5	all	retired_none|ENSG00000218858|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1780|5	best	retired_none|ENSG00000218858|None|115|None|best	external_bridge	b	ENSG00000231066 via OTTHUMG00000021167 [Havana gene] gap 5 (51->56); distance other assembly
+d4|178|0	all	retired_none|ENSG00000219086|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|178|0	best	retired_none|ENSG00000219086|None|115|None|best	external_bridge	b	ENSG00000187984 via C21orf126 [HGNC Symbol] next release (54->55); distance other assembly
+d4|17|24	all	retired_none|ENSG00000196501|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|17|24	best	retired_none|ENSG00000196501|None|115|None|best	external_bridge	b	ENSG00000223345 via HIST2H2BA [HGNC Symbol] gap 6 (49->55); distance other assembly
+d4|1800|81	all	retired_none|ENSG00000268991|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1800|81	best	retired_none|ENSG00000268991|None|115|None|best	external_bridge	b	ENSG00000268674 via FAM231A; [UniProtKB Gene Name] same release (78->78); distance other sequence
+d4|1802|89	all	retired_none|ENSG00000201784|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1802|89	best	retired_none|ENSG00000201784|None|115|None|best	external_bridge	b	ENSG00000201403 via synonym_id::U14 [synonym_id::EntrezGene+synonym_id::HGNC Symbol] same release (71->71); distance other assembly
+d4|1808|56	all	retired_none|ENSG00000285120|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1808|83	all	retired_none|ENSG00000284815|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1808|83	best	retired_none|ENSG00000284815|None|115|None|best	external_bridge	b	ENSG00000285975 via FAM90A7P [HGNC Symbol+UniProtKB Gene Name] next release (93->94); distance other sequence
+d4|1815|60	all	retired_none|ENSG00000199537|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1815|60	best	retired_none|ENSG00000199537|None|115|None|best	external_bridge	b	ENSG00000199453 via SNORD115-40 [EntrezGene+HGNC Symbol] next release (71->72); distance other assembly; ENSG00000199782 via SNORD115-40 [EntrezGene+HGNC Symbol] next release (71->72); distance other assembly
+d4|1819|97	all	retired_none|ENSG00000279898|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1819|97	best	retired_none|ENSG00000279898|None|115|None|best	external_bridge	b	ENSG00000173674 via synonym_id::EIF-4C [synonym_id::EntrezGene+synonym_id::HGNC Symbol] same release (77->77); distance other sequence
+d4|1834|98	all	retired_none|ENSG00000124642|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1834|98	best	retired_none|ENSG00000124642|None|115|None|best	external_bridge	b	ENSG00000197409 jump 1 (bridge not located)
+d4|183|2	all	retired_none|ENSG00000220976|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|183|2	best	retired_none|ENSG00000220976|None|115|None|best	external_bridge	b	ENSG00000225469 via OTTHUMG00000022573 [Havana gene] gap 5 (51->56); distance other assembly
+d4|1841|1	all	retired_none|ENSG00000285441|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1844|4	all	retired_none|ENSG00000078872|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1844|4	best	retired_none|ENSG00000078872|None|115|None|best	external_bridge	b	ENSG00000214078 jump 1 (bridge not located)
+d4|1864|83	all	retired_none|ENSG00000264875|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1864|83	best	retired_none|ENSG00000264875|None|115|None|best	external_bridge	b	ENSG00000253327 via 100500914 [EntrezGene] same release (78->78); distance 0 other strand
+d4|1892|45	all	retired_none|ENSG00000285024|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1892|45	best	retired_none|ENSG00000285024|None|115|None|best	external_bridge	b	ENSG00000285607 via FAM90A9P [HGNC Symbol+UniProtKB Gene Name] next release (93->94); distance other sequence
+d4|1929|98	all	retired_none|ENSG00000236568|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1929|98	best	retired_none|ENSG00000236568|None|115|None|best	external_bridge	b	ENSG00000229117 via RPL41 [HGNC Symbol] same release (56->56); distance other assembly
+d4|1957|73	all	retired_none|ENSG00000233166|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1957|73	best	retired_none|ENSG00000233166|None|115|None|best	external_bridge	b	ENSG00000246877 via synonym_id::DNM1DN8@ [synonym_id::HGNC Symbol] gap 10 (55->65); distance other assembly
+d4|1981|5	all	retired_none|ENSG00000218858|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1981|5	best	retired_none|ENSG00000218858|None|115|None|best	external_bridge	b	ENSG00000231066 via OTTHUMG00000021167 [Havana gene] gap 5 (51->56); distance other assembly
+d4|233|7	all	retired_none|ENSG00000256794|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|233|7	best	retired_none|ENSG00000256794|None|115|None|best	external_bridge	b	ENSG00000144401 via 100506290 [EntrezGene] gap 3 (64->67); distance other assembly
+d4|246|88	all	retired_none|ENSG00000189393|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|246|88	best	retired_none|ENSG00000189393|None|115|None|best	external_bridge	b	ENSG00000229924 via FAM90A14 [EntrezGene+HGNC Symbol] same release (66->66); distance other sequence
+d4|247|20	all	retired_none|ENSG00000220976|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|247|20	best	retired_none|ENSG00000220976|None|115|None|best	external_bridge	b	ENSG00000225469 via OTTHUMG00000022573 [Havana gene] gap 5 (51->56); distance other assembly
+d4|259|11	all	retired_none|ENSG00000223385|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|259|11	best	retired_none|ENSG00000223385|None|115|None|best	external_bridge	b	ENSG00000162946 via synonym_id::FLJ41105 [synonym_id::EntrezGene] same release (68->68); distance other assembly
+d4|275|0	all	retired_none|ENSG00000285120|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|276|45	all	retired_none|ENSG00000250606|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|276|45	best	retired_none|ENSG00000250606|None|115|None|best	external_bridge	b	ENSG00000158477 via synonym_id::T6 [synonym_id::EntrezGene] same release (75->75); distance other assembly
+d4|297|20	all	retired_none|ENSG00000214420|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|297|20	best	retired_none|ENSG00000214420|None|115|None|best	external_bridge	b	ENSG00000176809 via LRRC37A4 [HGNC Symbol+UniProtKB Gene Name] gap 2 (61->63); distance other assembly
+d4|297|69	all	retired_none|ENSG00000215620|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|297|69	best	retired_none|ENSG00000215620|None|115|None|best	external_bridge	b	ENSG00000219481 via 101059961 [EntrezGene] same release (73->73); distance other assembly
+d4|336|23	all	retired_none|ENSG00000160220|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|336|23	best	retired_none|ENSG00000160220|None|115|None|best	external_bridge	b	ENSG00000160221 jump 1 (bridge not located)
+d4|347|44	all	retired_none|ENSG00000154537|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|347|44	best	retired_none|ENSG00000154537|None|115|None|best	external_bridge	b	ENSG00000175170 via FAM27C [EntrezGene+HGNC Symbol+Vega gene] same release (78->78); distance other sequence
+d4|363|12	all	retired_none|ENSG00000255414|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|363|12	best	retired_none|ENSG00000255414|None|115|None|best	external_bridge	b	ENSG00000265388 via 102724910 [EntrezGene] same release (78->78); distance other sequence
+d4|364|51	all	retired_none|ENSG00000285441|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|376|10	all	retired_none|ENSG00000251795|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|376|10	best	retired_none|ENSG00000251795|None|115|None|best	external_bridge	b	ENSG00000207523 via SNORA66 [EntrezGene+HGNC Symbol+RFAM] same release (75->75); distance other assembly
+d4|387|11	all	retired_none|ENSG00000281551|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|387|11	best	retired_none|ENSG00000281551|None|115|None|best	external_bridge	b	ENSG00000251844 via snoMe28S-Am2634 [RFAM] same release (84->84); distance other sequence
+d4|413|22	all	retired_none|ENSG00000277813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|428|20	all	retired_none|ENSG00000284578|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|428|20	best	retired_none|ENSG00000284578|None|115|None|best	external_bridge	b	ENSG00000237296 via OTTHUMG00000156797 [Havana gene+Vega gene+Vega_gene] same release (88->88); distance other sequence
+d4|428|48	all	retired_none|ENSG00000217075|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|43|49	all	retired_none|ENSG00000173636|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|482|48	all	retired_none|ENSG00000207070|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|482|48	best	retired_none|ENSG00000207070|None|115|None|best	external_bridge	b	ENSG00000201467 via SNORA16 [RFAM] same release (72->72); distance other assembly; ENSG00000201544 via SNORA16 [RFAM] same release (72->72); distance other assembly; ENSG00000212293 via SNORA16 [RFAM] same release (72->72); distance other assembly
+d4|509|37	all	name_ambiguous_to_set|SNORA75|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|537|54	all	retired_none|ENSG00000264568|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|537|54	best	retired_none|ENSG00000264568|None|115|None|best	external_bridge	b	ENSG00000113657 via synonym_id::DRP3 [synonym_id::EntrezGene+synonym_id::UniProtKB Gene Name] same release (68->68); distance other assembly
+d4|563|85	all	retired_none|ENSG00000256530|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|563|85	best	retired_none|ENSG00000256530|None|115|None|best	external_bridge	b	ENSG00000246877 via DNM1P35 [HGNC Symbol] gap 2 (63->65); distance other assembly
+d4|607|23	all	retired_none|ENSG00000264875|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|607|23	best	retired_none|ENSG00000264875|None|115|None|best	external_bridge	b	ENSG00000253327 via 100500914 [EntrezGene] same release (78->78); distance 0 other strand
+d4|607|54	all	retired_none|ENSG00000236850|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|607|54	best	retired_none|ENSG00000236850|None|115|None|best	external_bridge	b	ENSG00000260518 via 96610 [EntrezGene] same release (78->78); distance other sequence
+d4|613|22	all	retired_none|ENSG00000277813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|616|45	all	retired_none|ENSG00000232505|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|616|45	best	retired_none|ENSG00000232505|None|115|None|best	external_bridge	b	ENSG00000197171 jump 1 (bridge not located)
+d4|657|4	all	retired_none|ENSG00000284578|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|657|4	best	retired_none|ENSG00000284578|None|115|None|best	external_bridge	b	ENSG00000237296 via OTTHUMG00000156797 [Havana gene+Vega gene+Vega_gene] same release (88->88); distance other sequence
+d4|662|30	all	retired_none|ENSG00000206182|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|662|30	best	retired_none|ENSG00000206182|None|115|None|best	external_bridge	b	ENSG00000288631 via TCEB3CL [HGNC Symbol] next release (49->50); distance other assembly
+d4|719|88	all	name_ambiguous_to_set|5_8S_rRNA|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|719|88	best	name_ambiguous_to_set|5_8S_rRNA|None|115|None|best	rfam_family_label	b	10 extra genes entered through RFAM only; their display names {'RNA5-8SP4': 1, 'RNA5-8SN2': 1, 'RNA5-8SN1': 1, 'RNA5-8SN3': 1}
+d4|71|6	all	retired_none|ENSG00000285441|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|728|7	all	retired_none|ENSG00000163486|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|728|7	best	retired_none|ENSG00000163486|None|115|None|best	external_bridge	b	ENSG00000171943 via SRGAP2C [EntrezGene+HGNC Symbol] same release (75->75); distance other assembly
+d4|736|1	all	retired_none|ENSG00000212438|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|747|53	all	retired_none|ENSG00000270016|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|747|53	best	retired_none|ENSG00000270016|None|115|None|best	external_bridge	b	ENSG00000282207 via OTTHUMG00000183911 [Havana gene+Vega gene+Vega_gene] same release (88->88); distance other sequence
+d4|757|20	all	retired_none|ENSG00000219471|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|757|20	best	retired_none|ENSG00000219471|None|115|None|best	external_bridge	b	ENSG00000197713 via RPE [HGNC Symbol] same release (54->54); distance other assembly
+d4|786|86	all	retired_none|ENSG00000215926|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|786|86	best	retired_none|ENSG00000215926|None|115|None|best	external_bridge	b	ENSG00000216141 via MIRN941-1 [HGNC Symbol] same release (54->54); distance other assembly; ENSG00000216195 via MIRN941-1 [HGNC Symbol] same release (54->54); distance other assembly; ENSG00000283206 via MIRN941-1 [HGNC Symbol] same release (54->54); distance other assembly; ENSG00000283513 via MIRN941-1 [HGNC Symbol] same release (54->54); distance other assembly
+d4|795|44	all	retired_none|ENSG00000285120|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|823|2	all	retired_none|ENSG00000285441|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|834|26	all	retired_none|ENSG00000214420|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|834|26	best	retired_none|ENSG00000214420|None|115|None|best	external_bridge	b	ENSG00000176809 via LRRC37A4 [HGNC Symbol+UniProtKB Gene Name] gap 2 (61->63); distance other assembly
+d4|846|24	all	retired_none|ENSG00000219471|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|846|24	best	retired_none|ENSG00000219471|None|115|None|best	external_bridge	b	ENSG00000197713 via RPE [HGNC Symbol] same release (54->54); distance other assembly
+d4|848|59	all	retired_none|ENSG00000196703|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|848|59	best	retired_none|ENSG00000196703|None|115|None|best	external_bridge	b	ENSG00000181214 via OR8G2 [HGNC Symbol] gap 2 (53->55); distance other assembly
+d4|880|89	all	retired_none|ENSG00000251795|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|880|89	best	retired_none|ENSG00000251795|None|115|None|best	external_bridge	b	ENSG00000207523 via SNORA66 [EntrezGene+HGNC Symbol+RFAM] same release (75->75); distance other assembly
+d4|898|26	all	retired_none|ENSG00000279898|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|898|26	best	retired_none|ENSG00000279898|None|115|None|best	external_bridge	b	ENSG00000173674 via synonym_id::EIF-4C [synonym_id::EntrezGene+synonym_id::HGNC Symbol] same release (77->77); distance other sequence
+d4|899|57	all	retired_none|ENSG00000231656|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|948|3	all	retired_none|ENSG00000281551|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|948|3	best	retired_none|ENSG00000281551|None|115|None|best	external_bridge	b	ENSG00000251844 via snoMe28S-Am2634 [RFAM] same release (84->84); distance other sequence
+d4|964|10	all	retired_none|ENSG00000232505|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|964|10	best	retired_none|ENSG00000232505|None|115|None|best	external_bridge	b	ENSG00000197171 jump 1 (bridge not located)
+d4|965|14	all	retired_none|ENSG00000219398|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|965|14	best	retired_none|ENSG00000219398|None|115|None|best	external_bridge	b	ENSG00000228874 via RPS24P11 [HGNC Symbol] next release (54->55); distance other assembly

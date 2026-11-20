@@ -161,3 +161,12 @@ def test_wilson_matches_between_harness_and_report():
     from idtrack_reproducibility.families import report as R
     assert R.wilson(37, 40) == H.wilson(37, 40)
     assert all(math.isnan(x) for x in R.wilson(0, 0))
+
+
+def test_a_synonym_read_at_a_release_whose_synonyms_the_truth_did_not_read_is_undetermined():
+    rec = dict(qid="q", kind="k", rule="safe", cmp="versioned", expect=["G1.1"], names_read_at=[98, 115])
+    a = ans(got=["G9.1"], match="synonym:exact", from_release=97)
+    assert SC.score_line(rec, "best", a, NO)[0] == "undetermined"
+    assert SC.score_line(rec, "best", dict(a, from_release=98), NO)[0] == "wrong"  # the truth read that release
+    assert SC.score_line(rec, "best", dict(a, match="exact"), NO)[0] == "wrong"     # a name: read at every release
+    assert SC.score_line(dict(rec, names_read_at=None), "best", a, NO)[0] == "wrong"

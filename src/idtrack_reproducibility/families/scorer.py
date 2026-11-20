@@ -11,9 +11,10 @@ Reads the family's lines (lines.load: the latest line of every qid) and the runn
 (`<run>/answers/*.parquet`, one row per line and view), and writes into `--scores-to` (default: the run folder):
 
   outcomes/part_<p>_of_<P>.parquet  one row per line and view: qid, view, family, stratum, kind, variant, unit, set,
-                                    outcome, reason, n_got, got (non-right rows only), seconds, calls, rule (the
-                                    judge: `published` or `revised:<corrections>`), and for non-right rows the query,
-                                    expected and broad
+                                    outcome, reason, n_got, got, seconds, calls, rule (the judge: `published` or
+                                    `revised:<corrections>`), query, expected, broad, and the answer's status, match
+                                    and error_type: on every row (the record, docs/records.md, version
+                                    `RECORD_VERSION`)
   scores.tsv, report.tsv, wrong.tsv.gz, undetermined.tsv.gz, errors.tsv, timeouts.tsv, run.json   (report.py)
 
 The rules (docs/harness.md "Scoring rules" and the corrected judge; docs/methods.md, F0):
@@ -33,6 +34,8 @@ The rules (docs/harness.md "Scoring rules" and the corrected judge; docs/methods
   before every other rule but `or_error` (a timeout or an error stays what it is: no answer was given). With
   `open_within` (a list of ids) beside it, only an answer within those ids (or empty) is undetermined; an answer with
   an id outside them is `wrong` (reason `open: <reason>; outside the place: <ids>`; ids compared after `cmp`).
+- `names_read_at` (a line field: the releases whose synonyms the truth reads): a wrong answer that read the string as
+  a synonym at another release is `undetermined` (the truth cannot say what it named there).
 - `contains` (rule; or family E's published field `e_rule: contains`): an answer is right when it is not empty and
   every expected value is among its values (e.g. source inference: the band of releases holds the release).
 - `relation` (rule; family E8): no truth; the line's `relation` = {"op": equal|subset|superset|disjoint,
@@ -55,7 +58,11 @@ from idtrack_reproducibility.families import lines as L
 
 SEP = "\x1f"
 OUT_COLS = ["qid", "view", "family", "stratum", "kind", "variant", "unit", "set", "outcome", "reason", "n_got", "got",
-            "seconds", "calls", "rule", "query", "expected", "broad"]
+            "seconds", "calls", "rule", "query", "expected", "broad", "status", "match", "error_type"]
+# The version of the record an outcome row is (docs/records.md): 1 = every row holds the query, the truth (`expected`,
+# `broad`), the answer as the tree returned it (`got`, `status`, `match`, `error_type`) and the verdict; 0 (before)
+# = the query, the truth and `got` on rows that are not right only. run.json says which.
+RECORD_VERSION = 1
 
 
 def out_schema():
@@ -127,7 +134,21 @@ def is_contains(line):
 
 
 def score_line(line, view, ans, places):
-    """(outcome, reason) of one line and view; ans is the answer row (dict) or None."""
+    """(outcome, reason) of one line and view; ans is the answer row (dict) or None. Then `names_read_at` (a line field:
+    the releases whose synonyms the truth reads): a wrong answer that read the string as a synonym at another release
+    is `undetermined` (the truth cannot say what the string named there)."""
+    o, why = _score_line(line, view, ans, places)
+    within = line.get("names_read_at")
+    if o == "wrong" and within is not None and ans:
+        rel, m = ans.get("from_release"), ans.get("match") or ""
+        if "synonym" in m and rel is not None and not (isinstance(rel, float) and math.isnan(rel)) and \
+                int(rel) not in {int(x) for x in within}:
+            return "undetermined", (f"read as a synonym ({m}) at {int(rel)}, a release whose synonyms the truth does not "
+                                    f"read; {why}")
+    return o, why
+
+
+def _score_line(line, view, ans, places):
     from idtrack_reproducibility.harness import score
     if ans is None:
         return "missing", "not run"
@@ -232,12 +253,13 @@ def score_part(a, part, nparts, places):
                     and line.get("rule") in ("set", "set_exact", "safe") and not is_contains(line)
                     and not line.get("apart") and not line.get("spellings")
                     and norm_key(got, line.get("cmp")) == SEP.join(sorted(set(line.get("expect") or []))))
+            own = {k: _text(cols[k][i]) for k in ("status", "match", "error_type")}
             if fast:
-                rows.append(dict(base, outcome="right", reason="" if line.get("rule") != "safe" else ("recovered" if got else "nothing"),
-                                 n_got=len(got), got=None, seconds=sec, calls=calls, query=None, expected=None, broad=None))
+                rows.append(_row(base, line, "right", "" if line.get("rule") != "safe" else ("recovered" if got else "nothing"),
+                                 got, sec, calls, own))
                 continue
             o, why = score_line(line, view, answer(line["qid"], view), places)
-            rows.append(_row(base, line, o, why, got, sec, calls))
+            rows.append(_row(base, line, o, why, got, sec, calls, own))
     out_dir = a.scores_to
     os.makedirs(os.path.join(out_dir, "outcomes"), exist_ok=True)
     path = os.path.join(out_dir, "outcomes", f"part_{part}_of_{nparts}.parquet")
@@ -246,14 +268,21 @@ def score_part(a, part, nparts, places):
     return dict(n=len(rows), missing=missing, excluded=excluded, sets=shas, deferred=deferred)
 
 
-def _row(base, line, o, why, got, sec, calls):
-    right = o in ("right", "expected_error")
+def _text(x):
+    """A string column's value as read through pandas (None, NaN or a string) as None or the string."""
+    return None if x is None or (isinstance(x, float) and math.isnan(x)) else str(x)
+
+
+def _row(base, line, o, why, got, sec, calls, own=None):
+    """One outcome row (record version `RECORD_VERSION`): the query, the truth, the answer and the verdict, on every row."""
     q = {k: line.get(k) for k in ("id", "from_release", "to_release", "final_database", "strategy", "from_database",
                                   "expect_error") if line.get(k) is not None or k in ("from_release", "final_database")}
     q["strategy"] = base["view"]  # the view scored (a line of strategy `both` is scored twice)
-    return dict(base, outcome=o, reason=why, n_got=len(got), got=None if right else ",".join(got), seconds=sec, calls=calls,
-                query=None if right else C.dumps(q), expected=None if right else ",".join(line.get("expect") or []),
-                broad=None if right or line.get("broad") is None else ",".join(line["broad"]))
+    own = own or {}
+    return dict(base, outcome=o, reason=why, n_got=len(got), got=",".join(got), seconds=sec, calls=calls,
+                query=C.dumps(q), expected=",".join(line.get("expect") or []),
+                broad=None if line.get("broad") is None else ",".join(line["broad"]),
+                status=own.get("status"), match=own.get("match"), error_type=own.get("error_type"))
 
 
 def score_relations(a, deferred):
@@ -283,7 +312,8 @@ def score_relations(a, deferred):
         if o == "missing":
             continue
         got = list(own["got"] or []) if own else []
-        rows.append(_row(base, line, o, why, got, own and own["seconds"], own and own["calls"]))
+        rows.append(_row(base, line, o, why, got, own and own["seconds"], own and own["calls"],
+                         {k: _text(own.get(k)) for k in ("status", "match", "error_type")} if own else None))
     pq.write_table(pa.Table.from_pylist(rows, schema=out_schema()), path + ".tmp", compression="zstd")
     os.replace(path + ".tmp", path)
     return len(rows)
@@ -327,7 +357,7 @@ def merge(a):
     loads = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(a.run, "answers", "load_*.json")))]
     clones = sorted({x.get("idtrack_file", "") for x in loads})
     digests = sorted({str(x.get("content_digest")) for x in loads})
-    info = dict(family=a.family, organism=a.organism, run=a.run, judge=a.judge, sets=sets, strata=a.strata, kinds=a.kinds,
+    info = dict(record_version=RECORD_VERSION, family=a.family, organism=a.organism, run=a.run, judge=a.judge, sets=sets, strata=a.strata, kinds=a.kinds,
                 limit=a.limit, n_rows=tot + nrel, n_relations=nrel, n_missing=sum(missing.values()), missing=missing,
                 n_excluded=sum(excluded.values()), excluded=excluded, parts=a.parts,
                 scored_at=datetime.datetime.now().isoformat(timespec="seconds"), idtrack_files=clones, graph_digests=digests,

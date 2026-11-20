@@ -2,7 +2,7 @@
 
 The benchmark families measure what was foreseen; the weakness hunts look for what was not. In a hunt, an analyst searches one angle of idtrack's use with whatever probes the angle needs, and every failure found becomes a finding: a minimal reproducer, the answer an independent truth expects, the answer idtrack gives, the cause read from the explained path and the code, a count of what the class touches, and a disposition. This page gives the method, the three hunts that have run (inputs, history, regions) with their findings and what each became, and how to reproduce them. The design of the hunts within the benchmark programme is in [the methods](methods.md#weakness-hunts).
 
-The three hunts ran on idtrack `71690ab` with the five graphs built by `d4c2dda`, the reference tree of the benchmarks. The two trees give the same answer to every reproducer below ([Reproducing](#reproducing)), and family E asked the inputs findings' lines on both. Every count below is the hunt's own, on that tree, unless another tree is named.
+The three hunts ran on idtrack `71690ab` with the five reference graphs of the benchmarks (built by `f27e810`, whose builder `d4c2dda` keeps: [the data](data.md#layout)). The two trees give the same answer to every reproducer below ([Reproducing](#reproducing)), and family E asked the inputs findings' lines on both. Every count below is the hunt's own, on that tree, unless another tree is named.
 
 | angle | findings | the findings table | the hunt's outputs (data root) |
 | --- | --- | --- | --- |
@@ -166,7 +166,7 @@ The third pass, on genes no earlier pass had chosen, found no new class. Not tes
 | R9 | question | an LRG id answers itself, not the gene it describes | [lrg_answers_gene](rules.md#lrg_answers_gene) | none (this reproducer only) |
 | J1 | judge | copies on patches, haplotypes and the Y PARs judged by the place of their own sequence | truth error: `exceptions`, `exceptions_span` | the harness's `exceptions` sets |
 | J2 | judge | the GTF of cynomolgus 112 lacks 47 genes the core database has | truth error: `core_places` | the harness's `core_places` set; A* pattern `gtf_lacks` |
-| J3 | judge | copies before 82 labelled primary, so a name expects them in the answer | truth error: `copies_apart_early` | A* revision set `v1r2` |
+| J3 | judge | copies before 82 labelled primary, so a name expects them in the answer | truth error: `copies_apart_early` | A* revision set `v1r2`; in the harness the correction `copies_apart_early` (human 429 lines, 147 wrong -> right, none right -> wrong; written, not published: [the harness's limits](harness.md#limits)) |
 | J4 | judge | the human travel matrix's GRCh37-backward cell: all its wrong lines are queries on GRCh37 haplotypes and patches | truth error: `exceptions`, `exceptions_span` | the harness's travel matrix (human) |
 
 R5 is not yet a row of the known-limitations table: no family asks names of releases 48 and 49, so its size is the hunt's count until one does. R3, R8 and R9 are measured by their reproducers only until a family publishes their lines.

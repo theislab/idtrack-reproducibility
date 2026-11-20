@@ -3,7 +3,8 @@
 # rows go into results/index.tsv (`report`: the common report.tsv; `scores`: the harness's scores.tsv). Only the
 # current scoring of each tree is named here; regenerating (`idtrack-repro results`) replaces the files.
 # `scope` is `exhaustive` (default: every line of the family's sets) or `panel` (a development stage measured by the
-# family's panel; docs/methods.md, "Measurement design").
+# family's panel; docs/methods.md, "Measurement design"). `rows` says what a run keeps where it has no rows of the
+# record (docs/records.md, "Checks").
 
 # The content digests of the graphs each tree was run on (as idtrack computes them; the runs record them).
 [graphs.d4c2dda]
@@ -40,9 +41,6 @@ folder = "families/f0/runs/check_d4c2dda/{organism}"
 generator = "idtrack-repro score --family harness; idtrack-repro causes"
 files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
 index = { "report.tsv" = "report" }
-# the causes of the current scoring: classified for pig and rhesus (their stored check runs used the current sets) and
-# cynomolgus; not for mouse and human (docs/verification.md)
-optional = ["causes_summary.tsv"]
 
 [[run]]
 family = "f0"
@@ -63,7 +61,7 @@ commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
 organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/astar/runs/d4c2dda/{organism}"
 generator = "idtrack-repro score --family astar; idtrack-repro causes; idtrack-repro family astar report_astar"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "per_pattern.tsv" = "astar/per_pattern.tsv", "per_pattern_stratum.tsv" = "astar/per_pattern_stratum.tsv", "open.tsv" = "astar/open.tsv" }
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "per_pattern.tsv" = "astar/per_pattern.tsv", "per_pattern_stratum.tsv" = "astar/per_pattern_stratum.tsv", "open.tsv" = "astar/open.tsv", "hard_ids.tsv.gz" = "astar/hard_ids.tsv.gz" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (cynomolgus)
 
@@ -100,8 +98,20 @@ generator = "idtrack-repro score --family a; idtrack-repro causes --plugin famil
 files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
 index = { "report.tsv" = "report" }
 
-# A0 (graph fidelity) comes into results/ when it is run again by this package (its stored table names the
-# earlier working notes' decision numbers in its by-design reasons); until then: <families>/a/a0/d4c2dda/<organism>/summary.tsv
+# A0, graph fidelity (no search): the reference graphs against Ensembl's tables (its reasons by design written by this
+# package's a0_fidelity from the stored classes: docs/families/a.md, "A0")
+[[run]]
+family = "a"
+tree = "d4c2dda"
+commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/a/a0/d4c2dda/{organism}"
+scored = ["summary.json"]
+generator = "idtrack-repro family a a0_fidelity (then --resummarize)"
+files = { "a0_summary.tsv" = "summary.tsv" }
+# A0 checks the graph, not answers: its rows are the graph's mismatches, every row that is not `ok` (<check>.tsv.gz),
+# and the counts per class of the others (the record, docs/records.md, "What each part keeps")
+rows = "every row that is not ok: presence/history/transcripts/names.tsv.gz; counts per class of the others"
 
 # ---------------- E: robustness ----------------
 [[run]]
@@ -138,6 +148,9 @@ folder = "families/e/runs/71690ab_web/e9"
 scored = []
 generator = "idtrack-repro family e web_e"
 files = { "e9_report.tsv" = "report.tsv" }
+# E9 compares the web service's answers with the package's: its rows are every difference (differences.jsonl); the
+# lines that agree are counted per stratum in report.tsv (the record, docs/records.md, "What each part keeps")
+rows = "every difference: differences.jsonl; agreeing lines counted per stratum"
 
 # ---------------- the known limitations (generated straight into results/) ----------------
 [[generated]]
@@ -183,8 +196,8 @@ tree = "d4c2dda"
 commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
 organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
 folder = "families/d/runs/d4c2dda/{organism}"
-generator = "family d run_d; idtrack-repro score --family d; idtrack-repro causes --plugin families/d/causes_d.py; family d report_d1"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+generator = "family d run_d; idtrack-repro score --family d; idtrack-repro causes --plugin families/d/causes_d.py; family d report_d1, bridges_d1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "rates.tsv" = "d1/rates.tsv", "datasets.tsv" = "d1/datasets.tsv", "history_vs_locus.tsv" = "d1/history_vs_locus.tsv", "wrong_classes.tsv" = "d1/wrong_classes.tsv", "bridges_no_successor.tsv" = "d1/bridges_no_successor.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]
 
@@ -196,7 +209,7 @@ graphs = "d4c2dda"
 organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
 folder = "families/d/runs/d4c2dda_d2/{organism}"
 generator = "family d run_d; idtrack-repro score --family d; family d report_d2"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "synthetic.tsv" = "d2/synthetic.tsv", "matrices.tsv" = "d2/matrices.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (pig)
 
@@ -208,7 +221,7 @@ graphs = "d4c2dda"
 organisms = ["mus_musculus", "homo_sapiens"]
 folder = "families/d/runs/d4c2dda_d3/{organism}"
 generator = "family d run_d; idtrack-repro score --family d; family d report_d3"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "authority.tsv" = "d3/authority.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]
 
@@ -220,7 +233,7 @@ graphs = "d4c2dda"
 organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/d/runs/d4c2dda_d4/{organism}"
 generator = "family d run_d; idtrack-repro score --family d; family d causes_d4_from_single; family d report_d4"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "batch_vs_single.tsv" = "d4/batch_vs_single.tsv", "causes_from_single.tsv" = "d4/causes_from_single.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (cynomolgus)
 

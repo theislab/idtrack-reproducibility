@@ -1,13 +1,13 @@
 stratum	cause	class	rule	answers	units
-c2_oldver	accession_old_version_read_at_target	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	1214	614
+c2_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	1214	614
 c2_oldver	external_bridge	b	rule `external_bridge`	17	12
 c2_oldver	unexplained	?	-	233	118
 c2_retired	value_of_another_database	e	-	8	4
-c2_ver_gap	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	1246	623
-c2_ver_higher_retired	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	7630	3815
-c2_ver_lower	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	7648	3824
-c3_ver_higher_retired	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	7894	3947
-c3_ver_lower	accession_version_never_had	a	decided answer to Q2 (rule `version_newer_than_graph` for accession versions)	8000	4000
+c2_ver_gap	accession_version_never_had	a	rule `accession_versions` (decided)	1246	623
+c2_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	7630	3815
+c2_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	7648	3824
+c3_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	7894	3947
+c3_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	8000	4000
 c4_mirbase_label	mirbase_not_in_graph	c	rule `mirbase_genes`	56	30
 c4_rfam_label_retired	rfam_label_is_accession	d	-	36	18
 c6:EntrezGene	entrezgene_label_rows	a	rule `one_kind_per_database`	95808	20170

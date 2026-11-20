@@ -1,8 +1,8 @@
 """Fetch the core database's gene stable ids of the releases whose GTF lacks genes that the core database has.
 
 Ensembl's GTFs of human 48-51 leave out genes on unplaced scaffolds, and the GTF of cynomolgus 112 leaves out 47 genes
-(measured by the weakness hunt `cleanup_hunt_history`, `mine/<organism>.gtf_vs_core.tsv`, on the tables idtrack's
-builder downloaded). The graph is built from the core tables, so the history truth reads presence from both. This
+(measured by the weakness hunt of history, docs/hunts.md, `<hunts>/history/mine/<organism>.gtf_vs_core.tsv`, on the
+tables idtrack's builder downloaded). The graph is built from the core tables, so the history truth reads presence from both. This
 script takes those genes from Ensembl's own FTP MySQL dumps (not from idtrack's downloads): `gene_stable_id.txt.gz`
 (releases before 65) or `gene.txt.gz` (stable_id and version in the gene table), into the one truth store
 (`accuracy/truth/<organism>/core/<core db>.<table>.txt.gz`, a line in SOURCES.tsv each).

@@ -51,7 +51,9 @@ MAP = {
     "suffix_form_is_name_at_unread_release": ("L-truth-names-unread", "truth", "names of releases without BioMart tables",
                                               "the suffixed form is exactly a name of another gene at a release whose name tables "
                                               "the truth does not read; the judge cannot say which the user meant",
-                                              "none needed", "none (the truth's reach)"),
+                                              "none needed", "the revision e2_names_every_release (names of every release "
+                                              "from the core xrefs; synonyms of releases without a synonym table "
+                                              "undetermined); the stored scorings predate it"),
     "internal_name_accepted": ("L-internal-names", "inputs", "the graph's internal names are read",
                                "`synonym_id::X` and `<id>.Void` are read as identifiers", "do not type them", "decided: rule `no_synonym_target`"),
     "long_version_value_error": ("L-long-inputs", "inputs", "very long versions raise a bare ValueError",
@@ -81,9 +83,11 @@ MAP = {
                                    "holds genes of other releases' synonyms", "none needed", "none (the judge's reach)"),
     "infer_duplicates_counted": ("L-infer-duplicates", "source inference", "repeated identifiers count once each time",
                                  "a list with repeated identifiers can be placed at another release than the same list without "
-                                 "repeats", "remove repeated identifiers before inferring", "open: no rule decided yet"),
+                                 "repeats", "remove repeated identifiers before inferring", "decided: rule `inference_distinct_ids`"),
     "lrg_gene_version_form": ("L-truth-lrg-form", "truth", "LRG gene ids of NCBI36 GTFs",
-                              "the GTF writes `LRG_<n>_g1`, the graph `LRG_<n>_g1.1`: the same gene", "none needed", "none (the judge's form)"),
+                              "the GTF writes `LRG_<n>_g1`, the graph `LRG_<n>_g1.1`: the same gene", "none needed",
+                              "corrected in the judge (its stable id form reads LRG gene ids, harness_lib.STABLE_ID_FORM); "
+                              "the stored scoring predates it"),
     "mouse_hgnc_projection": ("L-mouse-hgnc-names", "names", "human symbols projected onto mouse genes",
                               "a mouse gene whose display name is a human HGNC symbol (no MGI symbol) is not found by that name",
                               "use the Ensembl id", "none (the graph holds no HGNC symbols for mouse)"),

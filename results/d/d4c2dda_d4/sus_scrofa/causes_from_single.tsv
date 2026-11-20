@@ -1,0 +1,280 @@
+qid	view	src_qid	cause	class	detail
+d4|1020|97	all	name_unique_to_gene|ssc-mir-551a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1020|97	best	name_unique_to_gene|ssc-mir-551a|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-551a: display source at 115 miRBase; answer: nothing
+d4|104|18	all	separator_variant|ssc_mir_9805|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|104|18	best	separator_variant|ssc_mir_9805|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9805: display source at 115 miRBase; answer: nothing
+d4|1064|1	all	retired_none|ENSSSCG00000014111|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1064|1	best	retired_none|ENSSSCG00000014111|None|115|None|best	external_bridge	b	ENSSSCG00000014108 via 100523776 [EntrezGene] next release (97->98); distance 26374
+d4|1089|25	all	name_unique_to_gene|ssc-mir-10384-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1089|25	best	name_unique_to_gene|ssc-mir-10384-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10384-2: display source at 115 miRBase; answer: nothing
+d4|1110|7	all	name_unique_to_gene|ssc-mir-4331-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1110|7	best	name_unique_to_gene|ssc-mir-4331-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-4331-1: display source at 115 miRBase; answer: nothing
+d4|1122|5	all	retired_none|ENSSSCG00000001929|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1122|5	best	retired_none|ENSSSCG00000001929|None|115|None|best	external_bridge	b	ENSSSCG00000001930 via 100158154 [EntrezGene] same release (97->97); distance 13859
+d4|1125|0	all	retired_none|ENSSSCG00000032620|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1125|0	best	retired_none|ENSSSCG00000032620|None|115|None|best	external_bridge	b	ENSSSCG00000022081 via 100518335 [EntrezGene] next release (97->98); distance 153907
+d4|1133|10	all	separator_variant|ssc_mir_10389|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1133|10	best	separator_variant|ssc_mir_10389|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10389: display source at 115 miRBase; answer: nothing
+d4|113|14	all	separator_variant|ssc_mir_9850|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|113|14	best	separator_variant|ssc_mir_9850|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9850: display source at 115 miRBase; answer: nothing
+d4|1154|29	all	retired_none|ENSSSCG00000020489|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1154|29	best	retired_none|ENSSSCG00000020489|None|115|None|best	external_bridge	b	ENSSSCG00000020505 via SCARNA6 [RFAM] same release (91->91); distance other sequence
+d4|1165|31	all	separator_variant|ssc_mir_503|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1165|31	best	separator_variant|ssc_mir_503|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-503: display source at 115 miRBase; answer: nothing
+d4|1173|42	all	retired_none|ENSSSCG00000023428|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1173|42	best	retired_none|ENSSSCG00000023428|None|115|None|best	external_bridge	b	ENSSSCG00000020505 via SCARNA6 [RFAM] same release (91->91); distance 13967
+d4|117|3	all	retired_none|ENSSSCG00000039054|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|117|3	best	retired_none|ENSSSCG00000039054|None|115|None|best	external_bridge	b	ENSSSCG00000007681 via synonym_id::CASP [synonym_id::HGNC Symbol] same release (98->98); distance other sequence
+d4|11|3	all	separator_variant|ssc_mir_7141|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|11|3	best	separator_variant|ssc_mir_7141|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7141: display source at 115 miRBase; answer: nothing
+d4|1252|13	all	separator_variant|ssc_mir_9843|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1252|13	best	separator_variant|ssc_mir_9843|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9843: display source at 115 miRBase; answer: nothing
+d4|1252|14	all	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1252|14	best	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-16-1: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1288|0	all	retired_none|ENSSSCG00000020336|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1288|0	best	retired_none|ENSSSCG00000020336|None|115|None|best	external_bridge	b	ENSSSCG00000018553 via SNORA22 [RFAM] same release (91->91); distance other sequence; ENSSSCG00000019782 via SNORA22 [RFAM] same release (91->91); distance other sequence; ENSSSCG00000023632 via SNORA22 [RFAM] same release (91->91); distance other sequence
+d4|1358|61	all	name_unique_to_gene|ssc-mir-1388|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1358|61	best	name_unique_to_gene|ssc-mir-1388|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-1388: display source at 115 miRBase; answer: nothing
+d4|1389|17	all	retired_none|ENSSSCG00000035687|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1389|17	best	retired_none|ENSSSCG00000035687|None|115|None|best	external_bridge	b	ENSSSCG00000012459 via APOOL [NCBI gene+UniProtKB Gene Name] same release (93->93); distance other sequence
+d4|1406|8	all	separator_variant|ssc_mir_9861|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1406|8	best	separator_variant|ssc_mir_9861|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9861: display source at 115 miRBase; answer: nothing
+d4|1415|57	all	name_unique_to_gene|ssc-mir-144|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1415|57	best	name_unique_to_gene|ssc-mir-144|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-144: display source at 115 miRBase; answer: nothing
+d4|1434|34	all	name_unique_to_gene|ssc-mir-7142|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1434|34	best	name_unique_to_gene|ssc-mir-7142|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7142: display source at 115 miRBase; answer: nothing
+d4|1449|4	all	name_changed_gene|IFN-ALPHA-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1475|36	all	retired_none|ENSSSCG00000041672|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1475|36	best	retired_none|ENSSSCG00000041672|None|115|None|best	external_bridge	b	ENSSSCG00000052950 via IFN-ALPHA-1 [NCBI gene (formerly Entrezgene)+UniProtKB Gene Name] next release (106->107); distance 225126
+d4|1482|10	all	separator_variant|ssc_mir_9831|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1482|10	best	separator_variant|ssc_mir_9831|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9831: display source at 115 miRBase; answer: nothing
+d4|1513|21	all	name_unique_to_gene|ssc-mir-9805|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1513|21	best	name_unique_to_gene|ssc-mir-9805|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9805: display source at 115 miRBase; answer: nothing
+d4|1527|18	all	name_unique_to_gene|ssc-mir-9857|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1527|18	best	name_unique_to_gene|ssc-mir-9857|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9857: display source at 115 miRBase; answer: nothing
+d4|1527|23	all	separator_variant|ssc_mir_342|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1527|23	best	separator_variant|ssc_mir_342|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-342: display source at 115 miRBase; answer: nothing
+d4|1527|67	all	name_unique_to_gene|ssc-mir-9784-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1527|67	best	name_unique_to_gene|ssc-mir-9784-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9784-1: display source at 115 miRBase; answer: nothing
+d4|1541|36	all	separator_variant|ssc_mir_9792|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1541|36	best	separator_variant|ssc_mir_9792|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9792: display source at 115 miRBase; answer: nothing
+d4|154|90	all	separator_variant|ssc_mir_9803|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|154|90	best	separator_variant|ssc_mir_9803|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9803: display source at 115 miRBase; answer: nothing
+d4|1575|7	all	name_unique_to_gene|ssc-mir-9813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1575|7	best	name_unique_to_gene|ssc-mir-9813|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9813: display source at 115 miRBase; answer: nothing
+d4|1580|36	all	name_unique_to_gene|ssc-mir-4331-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1580|36	best	name_unique_to_gene|ssc-mir-4331-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-4331-2: display source at 115 miRBase; answer: nothing
+d4|1595|8	all	separator_variant|ssc_mir_9800|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1595|8	best	separator_variant|ssc_mir_9800|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9800: display source at 115 miRBase; answer: nothing
+d4|1621|11	all	name_unique_to_gene|ssc-mir-10390|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1621|11	best	name_unique_to_gene|ssc-mir-10390|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10390: display source at 115 miRBase; answer: nothing
+d4|1632|39	all	separator_variant|ssc_mir_411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1632|39	best	separator_variant|ssc_mir_411|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-411: display source at 115 miRBase; answer: nothing
+d4|1633|8	all	retired_none|ENSSSCG00000024505|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1633|8	best	retired_none|ENSSSCG00000024505|None|115|None|best	external_bridge	b	ENSSSCG00000042884 via 100049696 [EntrezGene] same release (97->97); distance 597
+d4|1654|26	all	retired_none|ENSSSCG00000021770|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1654|26	best	retired_none|ENSSSCG00000021770|None|115|None|best	external_bridge	b	ENSSSCG00000002738 via ZNF19 [HGNC Symbol+NCBI gene] next release (97->98); distance 4396
+d4|1671|0	all	name_unique_to_gene|ssc-mir-9825|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1671|0	best	name_unique_to_gene|ssc-mir-9825|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9825: display source at 115 miRBase; answer: nothing
+d4|1682|93	all	name_unique_to_gene|ssc-mir-9858|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1682|93	best	name_unique_to_gene|ssc-mir-9858|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9858: display source at 115 miRBase; answer: nothing
+d4|1685|71	all	name_unique_to_gene|ssc-mir-10384-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1685|71	best	name_unique_to_gene|ssc-mir-10384-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10384-2: display source at 115 miRBase; answer: nothing
+d4|16|19	all	name_unique_to_gene|ssc-mir-6529|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|16|19	best	name_unique_to_gene|ssc-mir-6529|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-6529: display source at 115 miRBase; answer: nothing
+d4|1703|19	all	separator_variant|ssc_mir_10389|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1703|19	best	separator_variant|ssc_mir_10389|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10389: display source at 115 miRBase; answer: nothing
+d4|1703|21	all	separator_variant|ssc_mir_9841|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1703|21	best	separator_variant|ssc_mir_9841|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9841: display source at 115 miRBase; answer: nothing
+d4|1705|11	all	name_unique_to_gene|ssc-mir-7134|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1705|11	best	name_unique_to_gene|ssc-mir-7134|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7134: display source at 115 miRBase; answer: nothing
+d4|1705|33	all	retired_none|ENSSSCG00000033951|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1705|33	best	retired_none|ENSSSCG00000033951|None|115|None|best	external_bridge	b	ENSSSCG00000036910 via synonym_id::URP [synonym_id::HGNC Symbol] same release (98->98); distance 97316808
+d4|1714|1	all	retired_none|ENSSSCG00000021770|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1714|1	best	retired_none|ENSSSCG00000021770|None|115|None|best	external_bridge	b	ENSSSCG00000002738 via ZNF19 [HGNC Symbol+NCBI gene] next release (97->98); distance 4396
+d4|1714|18	all	case_variant|SSC-MIR-9837|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1714|18	best	case_variant|SSC-MIR-9837|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9837: display source at 115 miRBase; answer: nothing
+d4|1734|3	all	retired_none|ENSSSCG00000039143|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1734|3	best	retired_none|ENSSSCG00000039143|None|115|None|best	external_bridge	b	ENSSSCG00000056215 via 100624295 [EntrezGene] gap 10 (97->107); distance 0; ENSSSCG00000057385 via LOC110257841 [NCBI gene (formerly Entrezgene)+UniProtKB Gene Name] gap 10 (97->107); distance 8277
+d4|1761|82	all	name_unique_to_gene|ssc-mir-10389|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1761|82	best	name_unique_to_gene|ssc-mir-10389|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10389: display source at 115 miRBase; answer: nothing
+d4|1776|81	all	name_unique_to_gene|ssc-mir-582|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1776|81	best	name_unique_to_gene|ssc-mir-582|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-582: display source at 115 miRBase; answer: nothing
+d4|1778|6	all	separator_variant|ssc_mir_9796|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1778|6	best	separator_variant|ssc_mir_9796|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9796: display source at 115 miRBase; answer: nothing
+d4|1778|77	all	separator_variant|ssc_mir_9796|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1778|77	best	separator_variant|ssc_mir_9796|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9796: display source at 115 miRBase; answer: nothing
+d4|1790|13	all	separator_variant|ssc_mir_9861|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1790|13	best	separator_variant|ssc_mir_9861|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9861: display source at 115 miRBase; answer: nothing
+d4|1797|47	all	name_unique_to_gene|ssc-mir-7143|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1797|47	best	name_unique_to_gene|ssc-mir-7143|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7143: display source at 115 miRBase; answer: nothing
+d4|1803|31	all	separator_variant|ssc_mir_7139|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1803|31	best	separator_variant|ssc_mir_7139|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7139: display source at 115 miRBase; answer: nothing
+d4|1822|54	all	name_unique_to_gene|ssc-mir-10382|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1822|54	best	name_unique_to_gene|ssc-mir-10382|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10382: display source at 115 miRBase; answer: nothing
+d4|1823|4	all	name_unique_to_gene|ssc-mir-342|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1823|4	best	name_unique_to_gene|ssc-mir-342|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-342: display source at 115 miRBase; answer: nothing
+d4|183|5	all	separator_variant|ssc_mir_7141|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|183|5	best	separator_variant|ssc_mir_7141|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7141: display source at 115 miRBase; answer: nothing
+d4|1847|1	all	separator_variant|ssc_mir_9813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1847|1	best	separator_variant|ssc_mir_9813|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9813: display source at 115 miRBase; answer: nothing
+d4|1860|36	all	name_unique_to_gene|ssc-mir-9787|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1860|36	best	name_unique_to_gene|ssc-mir-9787|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9787: display source at 115 miRBase; answer: nothing
+d4|1876|6	all	name_unique_to_gene|ssc-mir-9789|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1876|6	best	name_unique_to_gene|ssc-mir-9789|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9789: display source at 115 miRBase; answer: nothing
+d4|1877|43	all	separator_variant|ssc_mir_9800|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1877|43	best	separator_variant|ssc_mir_9800|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9800: display source at 115 miRBase; answer: nothing
+d4|1891|8	all	separator_variant|ssc_mir_96|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1891|8	best	separator_variant|ssc_mir_96|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-96: display source at 115 miRBase; answer: nothing
+d4|18|104	all	separator_variant|ssc_mir_223|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|18|104	best	separator_variant|ssc_mir_223|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-223: display source at 115 miRBase; answer: nothing
+d4|18|17	all	case_variant|SSC-MIR-7136|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|18|17	best	case_variant|SSC-MIR-7136|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7136: display source at 115 miRBase; answer: nothing
+d4|1924|18	all	retired_none|ENSSSCG00000001929|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1924|18	best	retired_none|ENSSSCG00000001929|None|115|None|best	external_bridge	b	ENSSSCG00000001930 via 100158154 [EntrezGene] same release (97->97); distance 13859
+d4|1928|39	all	name_unique_to_gene|ssc-mir-486-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1928|39	best	name_unique_to_gene|ssc-mir-486-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-486-2: display source at 115 miRBase; answer: nothing
+d4|1936|25	all	separator_variant|ssc_mir_9857|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1936|25	best	separator_variant|ssc_mir_9857|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9857: display source at 115 miRBase; answer: nothing
+d4|1936|5	all	name_unique_to_gene|ssc-mir-138|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1936|5	best	name_unique_to_gene|ssc-mir-138|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-138: display source at 115 miRBase; answer: nothing
+d4|1954|48	all	separator_variant|ssc_mir_9805|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1954|48	best	separator_variant|ssc_mir_9805|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9805: display source at 115 miRBase; answer: nothing
+d4|1980|7	all	name_unique_to_gene|ssc-mir-9854|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1980|7	best	name_unique_to_gene|ssc-mir-9854|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9854: display source at 115 miRBase; answer: nothing
+d4|1996|11	all	separator_variant|ssc_mir_7137|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1996|11	best	separator_variant|ssc_mir_7137|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7137: display source at 115 miRBase; answer: nothing
+d4|209|51	all	separator_variant|ssc_mir_9812|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|209|51	best	separator_variant|ssc_mir_9812|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9812: display source at 115 miRBase; answer: nothing
+d4|21|57	all	separator_variant|ssc_mir_2411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|21|57	best	separator_variant|ssc_mir_2411|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-2411: display source at 115 miRBase; answer: nothing
+d4|222|5	all	separator_variant|ssc_mir_7135|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|222|5	best	separator_variant|ssc_mir_7135|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7135: display source at 115 miRBase; answer: nothing
+d4|231|7	all	retired_none|ENSSSCG00000024408|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|233|44	all	name_unique_to_gene|ssc-mir-10382|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|233|44	best	name_unique_to_gene|ssc-mir-10382|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10382: display source at 115 miRBase; answer: nothing
+d4|242|11	all	retired_none|ENSSSCG00000033504|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|242|11	best	retired_none|ENSSSCG00000033504|None|115|None|best	external_bridge	b	ENSSSCG00000058544 via 100522337 [EntrezGene] next release (97->98); distance 293177; ENSSSCG00000059911 via 100522337 [EntrezGene] next release (97->98); distance 0
+d4|264|3	all	retired_none|ENSSSCG00000033504|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|264|3	best	retired_none|ENSSSCG00000033504|None|115|None|best	external_bridge	b	ENSSSCG00000058544 via 100522337 [EntrezGene] next release (97->98); distance 293177; ENSSSCG00000059911 via 100522337 [EntrezGene] next release (97->98); distance 0
+d4|26|19	all	separator_variant|ssc_mir_9813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|26|19	best	separator_variant|ssc_mir_9813|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9813: display source at 115 miRBase; answer: nothing
+d4|295|60	all	separator_variant|ssc_mir_10389|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|295|60	best	separator_variant|ssc_mir_10389|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10389: display source at 115 miRBase; answer: nothing
+d4|311|33	all	retired_none|ENSSSCG00000035146|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|311|33	best	retired_none|ENSSSCG00000035146|None|115|None|best	external_bridge	b	ENSSSCG00000016464 via CASP2 [NCBI gene+UniProtKB Gene Name] same release (93->93); distance other sequence
+d4|318|17	all	separator_variant|ssc_mir_7142|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|318|17	best	separator_variant|ssc_mir_7142|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7142: display source at 115 miRBase; answer: nothing
+d4|328|0	all	separator_variant|ssc_mir_1388|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|328|0	best	separator_variant|ssc_mir_1388|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-1388: display source at 115 miRBase; answer: nothing
+d4|328|20	all	separator_variant|ssc_mir_1388|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|328|20	best	separator_variant|ssc_mir_1388|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-1388: display source at 115 miRBase; answer: nothing
+d4|348|5	all	retired_none|ENSSSCG00000023188|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|348|5	best	retired_none|ENSSSCG00000023188|None|115|None|best	external_bridge	b	ENSSSCG00000001924 via 100511268 [EntrezGene] next release (97->98); distance 14155
+d4|358|23	all	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|358|23	best	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-16-1: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|371|30	all	name_unique_to_gene|ssc-mir-9812|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|371|30	best	name_unique_to_gene|ssc-mir-9812|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9812: display source at 115 miRBase; answer: nothing
+d4|408|29	all	name_unique_to_gene|ssc-mir-4331-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|408|29	best	name_unique_to_gene|ssc-mir-4331-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-4331-2: display source at 115 miRBase; answer: nothing
+d4|422|100	all	case_variant|SSC-MIR-9787|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|422|100	best	case_variant|SSC-MIR-9787|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9787: display source at 115 miRBase; answer: nothing
+d4|423|11	all	name_unique_to_gene|ssc-mir-9853-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|423|11	best	name_unique_to_gene|ssc-mir-9853-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9853-1: display source at 115 miRBase; answer: nothing
+d4|459|13	all	separator_variant|ssc_mir_339_2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|459|13	best	separator_variant|ssc_mir_339_2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-339-2: display source at 115 miRBase; answer: nothing
+d4|462|13	all	name_unique_to_gene|ssc-mir-1224|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|462|13	best	name_unique_to_gene|ssc-mir-1224|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-1224: display source at 115 miRBase; answer: nothing
+d4|462|8	all	name_unique_to_gene|ssc-mir-9801|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|462|8	best	name_unique_to_gene|ssc-mir-9801|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9801: display source at 115 miRBase; answer: nothing
+d4|495|42	all	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|495|42	best	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-16-1: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|505|0	all	name_unique_to_gene|ssc-mir-10387|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|505|0	best	name_unique_to_gene|ssc-mir-10387|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10387: display source at 115 miRBase; answer: nothing
+d4|529|69	all	separator_variant|IFN_ALPHA_1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|52|11	all	case_variant|SSC-MIR-2411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|52|11	best	case_variant|SSC-MIR-2411|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-2411: display source at 115 miRBase; answer: nothing
+d4|52|75	all	separator_variant|ssc_mir_9857|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|52|75	best	separator_variant|ssc_mir_9857|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9857: display source at 115 miRBase; answer: nothing
+d4|563|0	all	name_unique_to_gene|ssc-mir-7139|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|563|0	best	name_unique_to_gene|ssc-mir-7139|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7139: display source at 115 miRBase; answer: nothing
+d4|563|6	all	name_unique_to_gene|ssc-mir-7139|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|563|6	best	name_unique_to_gene|ssc-mir-7139|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7139: display source at 115 miRBase; answer: nothing
+d4|563|8	all	name_unique_to_gene|ssc-mir-7139|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|563|8	best	name_unique_to_gene|ssc-mir-7139|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7139: display source at 115 miRBase; answer: nothing
+d4|565|17	all	name_unique_to_gene|ssc-mir-9833|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|565|17	best	name_unique_to_gene|ssc-mir-9833|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9833: display source at 115 miRBase; answer: nothing
+d4|568|0	all	separator_variant|ssc_mir_9830|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|568|0	best	separator_variant|ssc_mir_9830|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9830: display source at 115 miRBase; answer: nothing
+d4|585|6	all	name_unique_to_gene|ssc-mir-7141|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|585|6	best	name_unique_to_gene|ssc-mir-7141|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7141: display source at 115 miRBase; answer: nothing
+d4|628|0	all	name_unique_to_gene|ssc-mir-16-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|628|0	best	name_unique_to_gene|ssc-mir-16-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-16-2: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|649|19	all	name_unique_to_gene|ssc-mir-411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|649|19	best	name_unique_to_gene|ssc-mir-411|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-411: display source at 115 miRBase; answer: nothing
+d4|676|44	all	name_unique_to_gene|ssc-mir-96|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|676|44	best	name_unique_to_gene|ssc-mir-96|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-96: display source at 115 miRBase; answer: nothing
+d4|685|26	all	name_unique_to_gene|ssc-mir-670|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|685|26	best	name_unique_to_gene|ssc-mir-670|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-670: display source at 115 miRBase; answer: nothing
+d4|693|3	all	separator_variant|ssc_mir_9813|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|693|3	best	separator_variant|ssc_mir_9813|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9813: display source at 115 miRBase; answer: nothing
+d4|699|3	all	synonym_to_gene|PHGPx|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|699|3	best	synonym_to_gene|PHGPx|None|115|None|best	synonym_spelling_merged	c	read as synonym_id::PHGPX (synonym:case); the extra genes carry ENSSSCG00000022742:PHGPX
+d4|70|67	all	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|70|67	best	name_unique_to_gene|ssc-mir-16-1|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-16-1: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|716|3	all	name_unique_to_gene|ssc-mir-2411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|716|3	best	name_unique_to_gene|ssc-mir-2411|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-2411: display source at 115 miRBase; answer: nothing
+d4|729|5	all	name_unique_to_gene|ssc-mir-370|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|729|5	best	name_unique_to_gene|ssc-mir-370|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-370: display source at 115 miRBase; answer: nothing
+d4|770|89	all	name_ambiguous_to_set|ssc-mir-6782|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|770|89	best	name_ambiguous_to_set|ssc-mir-6782|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-6782: display source at 115 miRBase; answer: nothing
+d4|781|24	all	separator_variant|ssc_mir_9817|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|781|24	best	separator_variant|ssc_mir_9817|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9817: display source at 115 miRBase; answer: nothing
+d4|79|28	all	name_unique_to_gene|ssc-mir-9824|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|79|28	best	name_unique_to_gene|ssc-mir-9824|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9824: display source at 115 miRBase; answer: nothing
+d4|802|40	all	name_unique_to_gene|ssc-mir-10391|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|802|40	best	name_unique_to_gene|ssc-mir-10391|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-10391: display source at 115 miRBase; answer: nothing
+d4|820|23	all	name_unique_to_gene|ssc-mir-9811|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|820|23	best	name_unique_to_gene|ssc-mir-9811|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9811: display source at 115 miRBase; answer: nothing
+d4|841|29	all	name_unique_to_gene|ssc-mir-9860|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|841|29	best	name_unique_to_gene|ssc-mir-9860|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9860: display source at 115 miRBase; answer: nothing
+d4|849|28	all	separator_variant|ssc_mir_6529|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|849|28	best	separator_variant|ssc_mir_6529|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-6529: display source at 115 miRBase; answer: nothing
+d4|84|1	all	separator_variant|ssc_mir_9794|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|84|1	best	separator_variant|ssc_mir_9794|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9794: display source at 115 miRBase; answer: nothing
+d4|85|16	all	name_unique_to_gene|ssc-mir-9833|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|85|16	best	name_unique_to_gene|ssc-mir-9833|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9833: display source at 115 miRBase; answer: nothing
+d4|85|9	all	name_unique_to_gene|ssc-mir-9833|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|85|9	best	name_unique_to_gene|ssc-mir-9833|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9833: display source at 115 miRBase; answer: nothing
+d4|86|54	all	separator_variant|ssc_mir_9805|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|86|54	best	separator_variant|ssc_mir_9805|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9805: display source at 115 miRBase; answer: nothing
+d4|875|11	all	retired_none|ENSSSCG00000023428|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|875|11	best	retired_none|ENSSSCG00000023428|None|115|None|best	external_bridge	b	ENSSSCG00000020505 via SCARNA6 [RFAM] same release (91->91); distance 13967
+d4|875|24	all	retired_none|ENSSSCG00000032620|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|875|24	best	retired_none|ENSSSCG00000032620|None|115|None|best	external_bridge	b	ENSSSCG00000022081 via 100518335 [EntrezGene] next release (97->98); distance 153907
+d4|894|10	all	name_unique_to_gene|ssc-mir-9861|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|894|10	best	name_unique_to_gene|ssc-mir-9861|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9861: display source at 115 miRBase; answer: nothing
+d4|89|31	all	retired_none|ENSSSCG00000043027|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|89|31	best	retired_none|ENSSSCG00000043027|None|115|None|best	external_bridge	b	ENSSSCG00000060028 via LOC100518655 [NCBI gene (formerly Entrezgene)+UniProtKB Gene Name] next release (106->107); distance 127323
+d4|913|25	all	separator_variant|ssc_mir_9817|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|913|25	best	separator_variant|ssc_mir_9817|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9817: display source at 115 miRBase; answer: nothing
+d4|926|44	all	name_unique_to_gene|ssc-mir-4331-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|926|44	best	name_unique_to_gene|ssc-mir-4331-2|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-4331-2: display source at 115 miRBase; answer: nothing
+d4|933|9	all	separator_variant|ssc_mir_9811|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|933|9	best	separator_variant|ssc_mir_9811|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9811: display source at 115 miRBase; answer: nothing
+d4|935|30	all	retired_none|ENSSSCG00000007964|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|935|30	best	retired_none|ENSSSCG00000007964|None|115|None|best	external_bridge	b	ENSSSCG00000012656 via synonym_id::MEF [synonym_id::HGNC Symbol] same release (90->90); distance other sequence
+d4|945|77	all	retired_none|ENSSSCG00000016462|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|945|77	best	retired_none|ENSSSCG00000016462|None|115|None|best	external_bridge	b	ENSSSCG00000016464 via synonym_id::CLC1 [synonym_id::HGNC Symbol] next release (97->98); distance 1488
+d4|953|6	all	separator_variant|ssc_mir_9857|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|953|6	best	separator_variant|ssc_mir_9857|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9857: display source at 115 miRBase; answer: nothing
+d4|956|65	all	name_unique_to_gene|ssc-mir-9859|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|956|65	best	name_unique_to_gene|ssc-mir-9859|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-9859: display source at 115 miRBase; answer: nothing
+d4|962|49	all	separator_variant|ssc_mir_378b|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|962|49	best	separator_variant|ssc_mir_378b|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-378b: display source at 115 miRBase; answer: nothing
+d4|963|49	all	case_variant|SSC-MIR-2411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|963|49	best	case_variant|SSC-MIR-2411|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-2411: display source at 115 miRBase; answer: nothing
+d4|966|44	all	separator_variant|ssc_mir_7143|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|966|44	best	separator_variant|ssc_mir_7143|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-7143: display source at 115 miRBase; answer: nothing
+d4|980|54	all	case_variant|SSC-MIR-370|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|980|54	best	case_variant|SSC-MIR-370|None|115|None|best	mirbase_not_in_graph	c	ssc-mir-370: display source at 115 miRBase; answer: nothing

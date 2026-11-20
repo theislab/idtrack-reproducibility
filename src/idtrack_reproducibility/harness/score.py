@@ -39,7 +39,7 @@ import zlib
 
 from idtrack_reproducibility.harness import harness_lib as H
 
-ENS = re.compile(r"^(ENS[A-Z]*[GTPE]\d{11}|LRG_\d+)\.\d+$")
+ENS = re.compile(rf"^({H.STABLE_ID_FORM})\.\d+$")
 
 
 class QueryTimeout(BaseException):  # not an Exception: the package must not swallow it
@@ -52,12 +52,14 @@ def _alarm(signum, frame):
 
 def load_queries(org, sets, kinds, judge="revised"):
     """The latest line of every qid over the sets named (default: every published set, in order). With judge
-    `published`, the revision sets of the corrected judge (manifest `judge: 78`) are left out: the judge as it was before."""
+    `published`, the revision sets of the corrected judge and of the judge following idtrack's decided rules (manifest
+    `judge` `78` or `rules`: harness_lib.REVISED_JUDGES) are left out: the judge as it was before."""
     d = H.query_dir(org)
     if not sets:
         sets = H.set_names(d)
         if judge == "published":
-            sets = [x for x in sets if json.load(open(os.path.join(d, f"{x}.manifest.json"))).get("judge") != "78"]
+            sets = [x for x in sets if json.load(open(os.path.join(d, f"{x}.manifest.json"))).get("judge")
+                    not in H.REVISED_JUDGES]
     by_qid, man = {}, {}
     for s in sets:
         p = os.path.join(d, f"{s}.jsonl.gz")

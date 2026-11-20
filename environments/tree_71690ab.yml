@@ -1,0 +1,21 @@
+# The environment the tree 71690ab ran in for every stored result of this repository (the runs record Python 3.13.18):
+# idtrack's dependencies at these versions, plus pyarrow for the runner's Parquet answers. The trees after 71690ab
+# (Python 3.12 or newer) run in it too. The checkout is put first on the path by the adapter; idtrack is not
+# installed here.
+#   mamba env create -p <prefix> -f environments/tree_71690ab.yml
+name: idtrack-tree-71690ab
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.18
+  - numpy=2.5.4
+  - pandas=3.1.1
+  - networkx=3.7
+  - h5py=3.16.0
+  - pyyaml=6.0.3
+  - requests=2.34.2
+  - urllib3=2.8.0
+  - pymysql=1.2.4
+  - tqdm=4.70.1
+  - scipy=1.18.1
+  - pyarrow=26.0.1

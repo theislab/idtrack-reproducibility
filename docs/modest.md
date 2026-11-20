@@ -16,21 +16,23 @@ A family's part is a published selection of qids, `<families>/<family>/panels/<o
 
 ## Size
 
-`idtrack-repro modest size` computes it from the sets' manifests (no set is read). With the sets published on 2026-11-19 and 500 lines per stratum:
+`idtrack-repro modest size` computes the samples' size from the sets' manifests (no set is read); `modest build` adds each family's hunt lines (for A* and A the lines of the ids A*'s selection took from the weakness hunts, every line of a set or stratum named `hunt*` in the others). The selections built on 2026-11-19 (`modest_v1` of every family and organism; 500 lines per stratum; one job, 13 minutes, 1.0 GB):
 
-| part | lines (five organisms) | strata |
-| --- | ---: | ---: |
-| harness | 2,615,211 | (every line) |
-| A* | 42,500 | 85 |
-| A | 70,176 | 142 |
-| B | 57,077 | 139 |
-| C | 98,515 | 221 |
-| D | 59,947 | 166 |
-| E | 253,624 | 1,002 |
-| hunt reproducers | 29 findings | |
-| **total** | **3,197,050 lines** | |
+| part | pig | mouse | human | rhesus | cynomolgus | five organisms | of them hunt lines |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| harness (every line of every published set) | | | | | | 2,615,211 | |
+| A* | 8,500 | 37,526 | 192,006 | 62,867 | 17,505 | 318,404 | 276,007 |
+| A | 15,000 | 22,159 | 30,862 | 18,283 | 17,604 | 103,908 | 33,745 |
+| B | 10,557 | 13,076 | 13,370 | 10,832 | 9,242 | 57,077 | 0 |
+| C | 32,052 | 8,000 | 7,625 | 27,333 | 23,505 | 98,515 | 0 |
+| D | 12,859 | 16,560 | 21,528 | 4,500 | 4,500 | 59,947 | 0 |
+| E | 50,375 | 52,347 | 51,095 | 50,300 | 49,507 | 253,624 | 38 |
+| hunt reproducers | | | | | | 29 findings | |
+| **total** | | | | | | **3,506,686 lines** | |
 
-Time: the harness's answers of `d4c2dda` took 116 to 372 seconds of query time per organism (`query_seconds_total` of the stored scorings: pig 204, mouse 372, human 346, rhesus 170, cynomolgus 116); the families' samples add about 580,000 lines (most asked under both views: two calls each on `d4c2dda`, one from `71690ab` on); loading a graph takes seconds to a minute and is repeated per part, and scoring the harness's sets takes minutes per organism. One job per organism is expected to finish in one to two hours (an estimate from these measurements, not yet a measured run); its memory is the organism's from the configuration plus 16 GB.
+Each selection's manifest (`<families>/<family>/panels/<organism>/modest_v1.manifest.json`) holds its counts per stratum and reason, the seed and the sha256 of its file; the data manifests list them.
+
+Time: the harness's answers of `d4c2dda` took 116 to 372 seconds of query time per organism (`query_seconds_total` of the stored scorings: pig 204, mouse 372, human 346, rhesus 170, cynomolgus 116); the families' selections add 891,475 lines (most asked under both views: two calls each on `d4c2dda`, one from `71690ab` on); loading a graph takes seconds to a minute and is repeated per part, and scoring the harness's sets takes minutes per organism. One job per organism is expected to finish in one to two hours (an estimate from these measurements, not yet a measured run). Its parts run one after another, so a job needs the largest part's peak: the configuration's `[jobs.memory_gb]` of the organism (or `--mem`). Measured on the reference tree: the peak of `d4c2dda`'s query shards was 3.5 GB (pig), 4.6 (mouse), 4.8 (human), 3.7 (rhesus) and 3.2 (cynomolgus) (the scheduler's sampled peaks of family A*'s and A's shards, the largest of the families' runs), the scoring of the harness's human sets 3.3 GB; trees from `71690ab` on hold the graph in less memory (load peaks 0.2 to 1.2 GB, [H](families/h.md#load)). The configuration of record asks for these peaks plus a quarter: 5, 6, 6, 5 and 4 GB.
 
 ## What it can and cannot detect
 
@@ -40,7 +42,7 @@ Time: the harness's answers of `d4c2dda` took 116 to 372 seconds of query time p
 ## Commands
 
 ```
-# once: build the families' selections (reads each family's sets once; run it as a job: about an hour or two)
+# once: build the families' selections (reads each family's sets once; built 2026-11-19: 13 minutes in one job)
 idtrack-repro modest build                      # --per-stratum 500 by default; --dry counts without writing
 
 # measure a tree: one job per organism (the configured runner); the reference too, once, for the comparison

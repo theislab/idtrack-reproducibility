@@ -1,0 +1,18 @@
+stratum	cause	class	rule	answers	units
+cross_assembly	external_bridge	b	rule `external_bridge`	9	5
+name_changed_gene	external_bridge	b	rule `external_bridge`	66	59
+name_changed_gene	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	4	3
+name_old_to_current	external_bridge	b	rule `external_bridge`	7	4
+name_old_to_current	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	1	1
+name_old_to_current	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	1	1
+nonexistent_version	newer_version_kind_reversed	d	rule `version_newer_than_graph`	1000	1000
+old_gene_to_db	entrezgene_label_rows	a	rule `one_kind_per_database`	308	307
+retired_none	external_bridge	b	rule `external_bridge`	380	144
+reverse_absent	external_bridge	b	rule `external_bridge`	63	33
+synonym_to_gene	name_in_other_source	e	rule `names_before_synonyms`	4	4
+synonym_to_gene	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	112	44
+travel_handoff	external_bridge	b	rule `external_bridge`	119	3
+travel_merged	external_bridge	b	rule `external_bridge`	65	1
+travel_name	external_bridge	b	rule `external_bridge`	86	2
+travel_retired_none	external_bridge	b	rule `external_bridge`	1700	6
+travel_split	external_bridge	b	rule `external_bridge`	56	1

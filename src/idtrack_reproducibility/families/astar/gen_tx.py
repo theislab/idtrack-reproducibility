@@ -3,7 +3,7 @@
 Usage: gen_tx.py <organism> --set <name> [--target 115] [--dry-run]
 
 Transcript and translation ids cost 6 to 18 ms per query on d4c2dda (docs/methods.md, forty times a gene id), so the
-set is bounded (the whole (id, release) matrix of transcripts is family A7's, when S3 has made them fast):
+set is bounded (the whole (id, release) matrix of transcripts is family A7's, once idtrack answers them fast):
 - `astar_tx`, `astar_tl` (and `_v` with the version of the release asked from): every transcript (translation) id
   whose gene is a selected gene at some release, from its first and from its last release (GTF `tx_<release>`), to
   that release itself and to the target (115);

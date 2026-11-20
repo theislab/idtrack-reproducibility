@@ -1,6 +1,7 @@
 """A0, graph fidelity (docs/methods.md, A): the graph against Ensembl's tables, no search.
 
 Usage: a0_fidelity.py <organism> --clone <idtrack clone> --graph <graph .npz> --out <folder> [--checks P,H,T,N]
+       a0_fidelity.py <organism> --out <folder> --resummarize   (the reasons by design of a stored run written again)
 
 Checks (each over every release of the graph's window that the truth has):
 
@@ -69,6 +70,46 @@ NAME_FAMILIES = {
 }
 
 
+# Why a class of a check is by design (Tally.design reads a class, its tail after ':' or its region suffix after '|'):
+# the checks' reasons, one table per check; `--resummarize` writes them into a stored summary.
+BY_DESIGN = {
+    "presence": {"core_only_absent": "truth: core gene the GTF lacks (A*'s truth adds it)",
+          "graph_extra|lrg": "truth: the GTF lacks LRG records (hh-5); the core has them",
+          "nonref_mark_extra|gtf_without_patch_file": "truth: the GTF of the release has no patch file, so every gene reads primary (J3)"},
+    "history": {
+        "self_same_version_no_edge_by_rule": "builder's rule: an id mapped onto itself with score 1 and no other event "
+                                              "of the id in the session is no edge",
+        "outside_window": "session outside the graph's window",
+        "version_zero": "Ensembl's version 0 (builder leaves it out)",
+        "birth:node_missing:id_in_no_gtf": "builder: an event whose id is in no id table is left out",
+        "retirement:node_missing:id_in_no_gtf": "builder: an event whose id is in no id table is left out",
+        "between_ids:node_missing:id_in_no_gtf": "builder: an event whose id is in no id table is left out",
+        "edge_version_change_unversioned_gtf": "the GTFs of the two releases write no versions: not checkable",
+        "birth:other_release": "Ensembl's event contradicts its gene tables (the id exists earlier); the builder follows the tables",
+        "version_change:other_pair": "the builder's documented rule: an event that does not fit its session's pair is placed at the nearest pair it fits",
+        "between_ids:other_pair": "the builder's documented rule: an event that does not fit its session's pair is placed at the nearest pair it fits",
+        "event_version_not_in_tables": "Ensembl's event names a version its gene tables do not have there (rule `event_version`'s kind); the builder follows the tables",
+        "lrg": "truth: the GTF lacks LRG records (hh-5); the core has them",
+    },
+    "transcripts": {"tx:link_only_on_another_assembly": "a link held only on an assembly that does not serve the release (counted per id)",
+                                   "tl:link_only_on_another_assembly": "a link held only on an assembly that does not serve the release (counted per id)","tx:graph_extra|lrg": "truth: the GTF lacks LRG records (hh-5)",
+                                   "tl:graph_extra|lrg": "truth: the GTF lacks LRG records (hh-5)",
+                                   "tx:graph_extra|parent_core_only": "truth: transcripts of core genes the GTF lacks (hh-5, J2)",
+                                   "tl:graph_extra|parent_core_only": "truth: translations of core genes the GTF lacks (hh-5, J2)"},
+    "names": {"database_not_in_graph": "the organism's externals file does not include the database",
+          "source_not_in_graph": "the display name's source database is not in the graph (miRBase: rule `mirbase_genes` adds it)",
+          "graph_extra|label_column_absent": "truth: BioMart's NCBI table of the release has no label column",
+          "vgnc:missing": "authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then",
+          "vgnc:graph_extra": "authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then",
+          "vgnc:under_another_database": "authority: VGNC's own symbols; Ensembl wrote the gene's label under another database",
+          "vgnc:graph_extra_gene_without_table_row": "authority: VGNC's own symbols (no VGNC id in BioMart for the gene)",
+          "links_on_another_assembly_not_read": "links of a release on an assembly that does not serve it (human GRCh37 at 76 on): not part of the graph's answers at that release; counted, not compared",
+          "graph_extra_gene_without_table_row|lrg": "truth: BioMart has no rows for LRG records (hh-5)",
+          "other_spelling": "rule `spelling_steps`: a node is named as the value was written at its first release",
+          "rfam:graph_extra": "rule `rfam_display_label`: the graph holds an RFAM family's accession and its label as two ids"},
+}
+
+
 def log(*a):
     print(time.strftime("%H:%M:%S"), *a, flush=True)
 
@@ -76,6 +117,39 @@ def log(*a):
 def split_node(name):
     i = name.rfind(".")
     return (name[:i], name[i + 1:]) if i > 0 else (name, "")
+
+
+def design_of(by_design, cls):
+    """The reason a class is by design: the class, or its tail after a ':' or a '|' (`node_missing:...`); '' if none."""
+    base = cls.split("|", 1)[0]
+    parts = [cls] + [cls.split(":", i)[-1] for i in range(1, cls.count(":") + 1)] + [cls.rsplit("|", 1)[-1]]
+    if base != cls:  # a region suffix (`|patch`, `|not_in_gtf`) does not change why the class is by design
+        parts += [base] + [base.split(":", i)[-1] for i in range(1, base.count(":") + 1)]
+    for c in parts:
+        if c in by_design:
+            return by_design[c]
+    return ""
+
+
+def resummarize(folder):
+    """Write the reasons by design of a stored A0 run's summary.tsv again from `BY_DESIGN` (the classes, counts, ids and
+    examples are the run's; nothing else changes), and record it in summary.json (`by_design_written`)."""
+    path = os.path.join(folder, "summary.tsv")
+    with open(path) as fh:
+        header = fh.readline().rstrip("\n").split("\t")
+        rows = [dict(zip(header, line.rstrip("\n").split("\t"))) for line in fh if line.strip()]
+    with open(path + ".tmp", "w") as fo:
+        fo.write("\t".join(header) + "\n")
+        for r in rows:
+            r["by_design"] = design_of(BY_DESIGN.get(r["check"], {}), r["class"])
+            fo.write("\t".join(r[k] for k in header) + "\n")
+    os.replace(path + ".tmp", path)
+    jp = os.path.join(folder, "summary.json")
+    info = json.load(open(jp)) if os.path.exists(jp) else {}
+    info["by_design_written"] = dict(at=time.strftime("%Y-%m-%dT%H:%M:%S"), a0_sha256=L_sha(__file__))
+    json.dump(info, open(jp + ".tmp", "w"), indent=1, default=str)
+    os.replace(jp + ".tmp", jp)
+    return len(rows)
 
 
 class Tally:
@@ -104,15 +178,7 @@ class Tally:
         self.fh.close()
 
     def design(self, cls):
-        """The reason a class is by design: the class, or its tail after a ':' or a '|' (`node_missing:...`)."""
-        base = cls.split("|", 1)[0]
-        parts = [cls] + [cls.split(":", i)[-1] for i in range(1, cls.count(":") + 1)] + [cls.rsplit("|", 1)[-1]]
-        if base != cls:  # a region suffix (`|patch`, `|not_in_gtf`) does not change why the class is by design
-            parts += [base] + [base.split(":", i)[-1] for i in range(1, base.count(":") + 1)]
-        for c in parts:
-            if c in self.by_design:
-                return self.by_design[c]
-        return ""
+        return design_of(self.by_design, cls)
 
     def rows(self):
         for cls in sorted(self.n):
@@ -177,10 +243,7 @@ def bits(mask):
 
 def check_presence(gr, tr, rels, out):
     G = gr.G
-    by = {"core_only_absent": "truth: core gene the GTF lacks (A*'s truth adds it)",
-          "graph_extra|lrg": "truth: the GTF lacks LRG records (hh-5); the core has them",
-          "nonref_mark_extra|gtf_without_patch_file": "truth: the GTF of the release has no patch file, so every gene reads primary (J3)"}
-    t = Tally(out, "presence", by)
+    t = Tally(out, "presence", BY_DESIGN["presence"])
     hist = collections.defaultdict(lambda: collections.defaultdict(set))  # R -> id -> {versions} (history view)
     xref = collections.defaultdict(lambda: collections.defaultdict(set))  # R -> id -> {versions} (xref view)
     nonref = collections.defaultdict(set)  # R -> ids marked non-reference
@@ -281,22 +344,7 @@ def check_history(gr, tr, rels, out, hist=None):
         i, v = split_node(node)
         vs = (hist.get(r) or {}).get(i, set())
         return bool(vs) and v not in vs
-    by = {
-        "self_same_version_no_edge_by_rule": "builder's rule: an id mapped onto itself with score 1 and no other event "
-                                              "of the id in the session is no edge",
-        "outside_window": "session outside the graph's window",
-        "version_zero": "Ensembl's version 0 (builder leaves it out)",
-        "birth:node_missing:id_in_no_gtf": "builder: an event whose id is in no id table is left out",
-        "retirement:node_missing:id_in_no_gtf": "builder: an event whose id is in no id table is left out",
-        "between_ids:node_missing:id_in_no_gtf": "builder: an event whose id is in no id table is left out",
-        "edge_version_change_unversioned_gtf": "the GTFs of the two releases write no versions: not checkable",
-        "birth:other_release": "Ensembl's event contradicts its gene tables (the id exists earlier); the builder follows the tables",
-        "version_change:other_pair": "the builder's documented rule: an event that does not fit its session's pair is placed at the nearest pair it fits",
-        "between_ids:other_pair": "the builder's documented rule: an event that does not fit its session's pair is placed at the nearest pair it fits",
-        "event_version_not_in_tables": "Ensembl's event names a version its gene tables do not have there (rule `event_version`'s kind); the builder follows the tables",
-        "lrg": "truth: the GTF lacks LRG records (hh-5); the core has them",
-    }
-    t = Tally(out, "history", by)
+    t = Tally(out, "history", BY_DESIGN["history"])
     first, last = rels[0], rels[-1]
     pos = {r: i for i, r in enumerate(rels)}
     edge_cache = {}
@@ -435,11 +483,7 @@ def check_history(gr, tr, rels, out, hist=None):
 
 def check_transcripts(gr, tr, rels, out):
     G = gr.G
-    t = Tally(out, "transcripts", {"tx:link_only_on_another_assembly": "a link held only on an assembly that does not serve the release (counted per id)",
-                                   "tl:link_only_on_another_assembly": "a link held only on an assembly that does not serve the release (counted per id)","tx:graph_extra|lrg": "truth: the GTF lacks LRG records (hh-5)",
-                                   "tl:graph_extra|lrg": "truth: the GTF lacks LRG records (hh-5)",
-                                   "tx:graph_extra|parent_core_only": "truth: transcripts of core genes the GTF lacks (hh-5, J2)",
-                                   "tl:graph_extra|parent_core_only": "truth: translations of core genes the GTF lacks (hh-5, J2)"})
+    t = Tally(out, "transcripts", BY_DESIGN["transcripts"])
     index = G._frozen().index
     relmask = sum(1 << r for r in rels)
     # graph: transcript base -> [(transcript node, gene node, mask)], translation base -> [(node, transcript node, mask)]
@@ -553,18 +597,7 @@ def truth_pairs(org, r, fam, meta=None):
 
 def check_names(gr, tr, rels, hist, out):
     G = gr.G
-    by = {"database_not_in_graph": "the organism's externals file does not include the database",
-          "source_not_in_graph": "the display name's source database is not in the graph (miRBase: rule `mirbase_genes` adds it)",
-          "graph_extra|label_column_absent": "truth: BioMart's NCBI table of the release has no label column",
-          "vgnc:missing": "authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then",
-          "vgnc:graph_extra": "authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then",
-          "vgnc:under_another_database": "authority: VGNC's own symbols; Ensembl wrote the gene's label under another database",
-          "vgnc:graph_extra_gene_without_table_row": "authority: VGNC's own symbols (no VGNC id in BioMart for the gene)",
-          "links_on_another_assembly_not_read": "links of a release on an assembly that does not serve it (human GRCh37 at 76 on): not part of the graph's answers at that release; counted, not compared",
-          "graph_extra_gene_without_table_row|lrg": "truth: BioMart has no rows for LRG records (hh-5)",
-          "other_spelling": "rule `spelling_steps`: a node is named as the value was written at its first release",
-          "rfam:graph_extra": "rule `rfam_display_label`: the graph holds an RFAM family's accession and its label as two ids"}
-    t = Tally(out, "names", by)
+    t = Tally(out, "names", BY_DESIGN["names"])
     bm = [r for r in H.biomart_releases(tr.org) if r in rels]
     bmask = sum(1 << r for r in bm)
     types = {}
@@ -683,11 +716,18 @@ def check_names(gr, tr, rels, hist, out):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("organism")
-    ap.add_argument("--clone", required=True)
-    ap.add_argument("--graph", required=True)
+    ap.add_argument("--clone")
+    ap.add_argument("--graph")
     ap.add_argument("--out", required=True)
     ap.add_argument("--checks", default="P,H,T,N")
+    ap.add_argument("--resummarize", action="store_true", help="only write the reasons by design of the stored "
+                    "summary.tsv in --out again (no graph read)")
     a = ap.parse_args()
+    if a.resummarize:
+        print(a.organism, resummarize(a.out), "classes")
+        return
+    if not a.clone or not a.graph:
+        ap.error("--clone and --graph are required (but with --resummarize)")
     org = a.organism
     os.makedirs(a.out, exist_ok=True)
     checks = a.checks.split(",")

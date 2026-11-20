@@ -1,2 +1,2 @@
 stratum	cause	class	rule	answers	units
-nonexistent_version	decision14_reverses_kind	d	rule `version_newer_than_graph`	1000	1000
+nonexistent_version	newer_version_kind_reversed	d	rule `version_newer_than_graph`	1000	1000

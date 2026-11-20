@@ -33,6 +33,15 @@ EXCLUDED = {
     ("mus_musculus", "old_gene_to_db", "HGNC Symbol"): "as above",
 }
 NOT_A_DATABASE_OF = {"mus_musculus": {"HGNC Symbol"}}  # used by make_queries for new sets
+# A stable id of Ensembl's scheme, without its version: Ensembl's genes, transcripts, translations and exons
+# (`ENS<species><G|T|P|E><11 digits>`), and LRG records with their genes, transcripts and proteins as Ensembl names
+# them (`LRG_<n>`, `LRG_<n>_g<k>`, `LRG_<n>t<k>`, `LRG_<n>p<k>`). One definition for every reader of ids.
+STABLE_ID_FORM = r"(?:ENS[A-Z]*[GTPE]\d{11}|LRG_\d+(?:_g\d+|[tp]\d+)?)"
+# The judges of revision sets (a manifest's `judge`): `78`, the judge corrected where it was wrong (rule
+# `judge_corrections`);
+# `rules`, the judge following the rules idtrack decided after 71690ab (make_queries.RULES_JUDGE). The judge
+# `published` leaves out every set of these.
+REVISED_JUDGES = ("78", "rules")
 
 
 def truth_dir(org):

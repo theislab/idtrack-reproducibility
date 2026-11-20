@@ -1,0 +1,176 @@
+qid	view	src_qid	cause	class	detail
+d4|1029|5	all	separator_variant|mml_mir_663_1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1029|5	best	separator_variant|mml_mir_663_1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-663-1: display source at 115 miRBase; answer: nothing
+d4|1066|35	all	name_unique_to_gene|mml-mir-7179|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1066|35	best	name_unique_to_gene|mml-mir-7179|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7179: display source at 115 miRBase; answer: nothing
+d4|1077|38	all	name_unique_to_gene|mml-mir-6505|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1077|38	best	name_unique_to_gene|mml-mir-6505|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6505: display source at 115 miRBase; answer: nothing
+d4|113|36	all	separator_variant|mml_mir_378d|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|113|36	best	separator_variant|mml_mir_378d|None|115|None|best	mirbase_not_in_graph	c	mml-mir-378d: display source at 115 miRBase; answer: nothing
+d4|1162|56	all	separator_variant|mml_mir_514a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1162|56	best	separator_variant|mml_mir_514a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-514a: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|1203|2	all	name_unique_to_gene|mml-mir-892c|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1203|2	best	name_unique_to_gene|mml-mir-892c|None|115|None|best	mirbase_not_in_graph	c	mml-mir-892c: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1215|17	all	name_unique_to_gene|mml-mir-1283|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1215|17	best	name_unique_to_gene|mml-mir-1283|None|115|None|best	mirbase_not_in_graph	c	mml-mir-1283: display source at 115 miRBase; answer: nothing
+d4|1222|18	all	separator_variant|mml_mir_513b_2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1256|58	all	name_changed_gene|mml-mir-663-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1256|58	best	name_changed_gene|mml-mir-663-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-663-1: display source at 115 miRBase; answer: nothing
+d4|1267|34	all	name_unique_to_gene|mml-mir-217|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1267|34	best	name_unique_to_gene|mml-mir-217|None|115|None|best	mirbase_not_in_graph	c	mml-mir-217: display source at 115 miRBase; answer: nothing
+d4|1281|11	all	separator_variant|mml_mir_1283|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1281|11	best	separator_variant|mml_mir_1283|None|115|None|best	mirbase_not_in_graph	c	mml-mir-1283: display source at 115 miRBase; answer: nothing
+d4|1336|20	all	separator_variant|mml_mir_7171|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1336|20	best	separator_variant|mml_mir_7171|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7171: display source at 115 miRBase; answer: nothing
+d4|1357|31	all	separator_variant|mml_mir_6130|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1357|31	best	separator_variant|mml_mir_6130|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6130: display source at 115 miRBase; answer: nothing
+d4|1357|92	all	name_unique_to_gene|mml-mir-6505|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1357|92	best	name_unique_to_gene|mml-mir-6505|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6505: display source at 115 miRBase; answer: nothing
+d4|1375|5	all	name_unique_to_gene|mml-mir-513a-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1375|5	best	name_unique_to_gene|mml-mir-513a-2|None|115|None|best	mirbase_not_in_graph	c	mml-mir-513a-2: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1397|60	all	separator_variant|mml_mir_7201|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1397|60	best	separator_variant|mml_mir_7201|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7201: display source at 115 miRBase; answer: nothing
+d4|1405|85	all	name_unique_to_gene|mml-mir-518a-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1405|85	best	name_unique_to_gene|mml-mir-518a-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-518a-1: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|1430|54	all	separator_variant|mml_mir_3927|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1430|54	best	separator_variant|mml_mir_3927|None|115|None|best	mirbase_not_in_graph	c	mml-mir-3927: display source at 115 miRBase; answer: nothing
+d4|1434|1	all	name_unique_to_gene|mml-mir-548h|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1434|1	best	name_unique_to_gene|mml-mir-548h|None|115|None|best	mirbase_not_in_graph	c	mml-mir-548h: display source at 115 miRBase; answer: nothing
+d4|1439|53	all	case_variant|MML-MIR-378J|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1439|53	best	case_variant|MML-MIR-378J|None|115|None|best	mirbase_not_in_graph	c	mml-mir-378j: display source at 115 miRBase; answer: nothing
+d4|1459|25	all	name_unique_to_gene|mml-mir-519a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1459|25	best	name_unique_to_gene|mml-mir-519a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-519a: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|1460|2	all	name_unique_to_gene|mml-mir-518a-4|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1460|2	best	name_unique_to_gene|mml-mir-518a-4|None|115|None|best	mirbase_not_in_graph	c	mml-mir-518a-4: display source at 115 miRBase; answer: nothing
+d4|1472|41	all	name_unique_to_gene|mml-mir-6827|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1472|41	best	name_unique_to_gene|mml-mir-6827|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6827: display source at 115 miRBase; answer: nothing
+d4|1497|19	all	name_unique_to_gene|mml-mir-7179|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1497|19	best	name_unique_to_gene|mml-mir-7179|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7179: display source at 115 miRBase; answer: nothing
+d4|14|11	all	case_variant|MML-MIR-500A|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1501|15	all	separator_variant|mml_mir_518a_4|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1501|15	best	separator_variant|mml_mir_518a_4|None|115|None|best	mirbase_not_in_graph	c	mml-mir-518a-4: display source at 115 miRBase; answer: nothing
+d4|1511|2	all	name_unique_to_gene|mml-mir-509-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1511|2	best	name_unique_to_gene|mml-mir-509-2|None|115|None|best	mirbase_not_in_graph	c	mml-mir-509-2: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|1513|5	all	name_unique_to_gene|mml-mir-6130|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1513|5	best	name_unique_to_gene|mml-mir-6130|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6130: display source at 115 miRBase; answer: nothing
+d4|1556|32	all	separator_variant|mml_mir_371|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1556|32	best	separator_variant|mml_mir_371|None|115|None|best	mirbase_not_in_graph	c	mml-mir-371: display source at 115 miRBase; answer: nothing
+d4|1572|18	all	name_unique_to_gene|mml-mir-513b-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1572|18	best	name_unique_to_gene|mml-mir-513b-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-513b-1: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1586|13	all	separator_variant|mml_mir_890|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1603|7	all	separator_variant|mml_mir_517a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1603|7	best	separator_variant|mml_mir_517a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-517a: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|163|4	all	name_unique_to_gene|mml-mir-663-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|163|4	best	name_unique_to_gene|mml-mir-663-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-663-1: display source at 115 miRBase; answer: nothing
+d4|1643|28	all	separator_variant|mml_mir_509_1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1643|28	best	separator_variant|mml_mir_509_1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-509-1: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|1666|7	all	name_unique_to_gene|mml-mir-513a-2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1666|7	best	name_unique_to_gene|mml-mir-513a-2|None|115|None|best	mirbase_not_in_graph	c	mml-mir-513a-2: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1746|82	all	separator_variant|mml_mir_7207|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1746|82	best	separator_variant|mml_mir_7207|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7207: display source at 115 miRBase; answer: nothing
+d4|1753|89	all	name_unique_to_gene|mml-mir-513a-3|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1753|89	best	name_unique_to_gene|mml-mir-513a-3|None|115|None|best	mirbase_not_in_graph	c	mml-mir-513a-3: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1787|44	all	name_unique_to_gene|mml-mir-890|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1816|45	all	name_unique_to_gene|mml-mir-663-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1816|45	best	name_unique_to_gene|mml-mir-663-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-663-1: display source at 115 miRBase; answer: nothing
+d4|1836|23	all	name_unique_to_gene|mml-mir-92a-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1836|23	best	name_unique_to_gene|mml-mir-92a-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-92a-1: display source at 115 miRBase; answer: nothing
+d4|1949|90	all	separator_variant|mml_mir_892c|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1949|90	best	separator_variant|mml_mir_892c|None|115|None|best	mirbase_not_in_graph	c	mml-mir-892c: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|1963|22	all	case_variant|MML-MIR-548E|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1963|22	best	case_variant|MML-MIR-548E|None|115|None|best	mirbase_not_in_graph	c	mml-mir-548e: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|1969|21	all	name_unique_to_gene|mml-mir-519a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1969|21	best	name_unique_to_gene|mml-mir-519a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-519a: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|201|6	all	name_unique_to_gene|mml-mir-519a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|201|6	best	name_unique_to_gene|mml-mir-519a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-519a: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|204|12	all	separator_variant|mml_mir_7172|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|204|12	best	separator_variant|mml_mir_7172|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7172: display source at 115 miRBase; answer: nothing
+d4|204|37	all	case_variant|MML-MIR-6128|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|204|37	best	case_variant|MML-MIR-6128|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6128: display source at 115 miRBase; answer: nothing
+d4|216|21	all	separator_variant|mml_mir_7205|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|216|21	best	separator_variant|mml_mir_7205|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7205: display source at 115 miRBase; answer: nothing
+d4|282|25	best	name_ambiguous_to_set|OCM|None|115|None|best	support_ranks_shared_name	b	returned genes have equal BioMart 115 name sources than the missing ones; ENSMMUG00000049706*:display:VGNC Symbol+uniprot_gn+entrez+wikigene; ENSMMUG00000056983:display:UniProtKB Gene Name+uniprot_gn+entrez+wikigene
+d4|32|50	all	name_unique_to_gene|mml-mir-6794|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|32|50	best	name_unique_to_gene|mml-mir-6794|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6794: display source at 115 miRBase; answer: nothing
+d4|345|45	all	name_unique_to_gene|mml-mir-7197|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|345|45	best	name_unique_to_gene|mml-mir-7197|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7197: display source at 115 miRBase; answer: nothing
+d4|379|4	all	separator_variant|mml_mir_6130|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|379|4	best	separator_variant|mml_mir_6130|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6130: display source at 115 miRBase; answer: nothing
+d4|387|57	all	name_unique_to_gene|mml-mir-7172|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|387|57	best	name_unique_to_gene|mml-mir-7172|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7172: display source at 115 miRBase; answer: nothing
+d4|397|45	all	separator_variant|mml_mir_7202|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|397|45	best	separator_variant|mml_mir_7202|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7202: display source at 115 miRBase; answer: nothing
+d4|419|25	all	separator_variant|mml_mir_147a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|419|25	best	separator_variant|mml_mir_147a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-147a: display source at 115 miRBase; answer: nothing
+d4|428|98	all	separator_variant|mml_mir_7190|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|428|98	best	separator_variant|mml_mir_7190|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7190: display source at 115 miRBase; answer: nothing
+d4|435|68	all	name_unique_to_gene|mml-mir-7200|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|435|68	best	name_unique_to_gene|mml-mir-7200|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7200: display source at 115 miRBase; answer: nothing
+d4|481|2	all	case_variant|MML-MIR-7166|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|481|2	best	case_variant|MML-MIR-7166|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7166: display source at 115 miRBase; answer: nothing
+d4|516|33	all	separator_variant|mml_mir_892c|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|516|33	best	separator_variant|mml_mir_892c|None|115|None|best	mirbase_not_in_graph	c	mml-mir-892c: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|533|89	all	name_unique_to_gene|mml-mir-7166|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|533|89	best	name_unique_to_gene|mml-mir-7166|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7166: display source at 115 miRBase; answer: nothing
+d4|589|7	all	separator_variant|mml_mir_7177|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|589|7	best	separator_variant|mml_mir_7177|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7177: display source at 115 miRBase; answer: nothing
+d4|602|8	all	separator_variant|mml_mir_7205|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|602|8	best	separator_variant|mml_mir_7205|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7205: display source at 115 miRBase; answer: nothing
+d4|620|0	all	separator_variant|mml_mir_7176|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|620|0	best	separator_variant|mml_mir_7176|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7176: display source at 115 miRBase; answer: nothing
+d4|646|43	all	name_unique_to_gene|mml-mir-3927|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|646|43	best	name_unique_to_gene|mml-mir-3927|None|115|None|best	mirbase_not_in_graph	c	mml-mir-3927: display source at 115 miRBase; answer: nothing
+d4|658|12	all	name_unique_to_gene|mml-mir-519b|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|658|12	best	name_unique_to_gene|mml-mir-519b|None|115|None|best	mirbase_not_in_graph	c	mml-mir-519b: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|670|53	all	name_unique_to_gene|mml-mir-548j|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|670|53	best	name_unique_to_gene|mml-mir-548j|None|115|None|best	mirbase_not_in_graph	c	mml-mir-548j: display source at 115 miRBase; answer: nothing
+d4|682|3	all	separator_variant|mml_mir_7184|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|682|3	best	separator_variant|mml_mir_7184|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7184: display source at 115 miRBase; answer: nothing
+d4|700|16	all	name_unique_to_gene|mml-mir-7177|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|700|16	best	name_unique_to_gene|mml-mir-7177|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7177: display source at 115 miRBase; answer: nothing
+d4|704|5	all	separator_variant|mml_mir_6131|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|704|5	best	separator_variant|mml_mir_6131|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6131: display source at 115 miRBase; answer: nothing
+d4|716|2	all	case_variant|MML-MIR-4650|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|716|2	best	case_variant|MML-MIR-4650|None|115|None|best	mirbase_not_in_graph	c	mml-mir-4650: display source at 115 miRBase; answer: nothing
+d4|718|1	all	name_ambiguous_to_set|mml-mir-146b|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|718|1	best	name_ambiguous_to_set|mml-mir-146b|None|115|None|best	mirbase_not_in_graph	c	mml-mir-146b: display source at 115 miRBase; answer: nothing
+d4|718|6	all	name_ambiguous_to_set|mml-mir-146b|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|718|6	best	name_ambiguous_to_set|mml-mir-146b|None|115|None|best	mirbase_not_in_graph	c	mml-mir-146b: display source at 115 miRBase; answer: nothing
+d4|737|26	all	name_unique_to_gene|mml-mir-7199|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|737|26	best	name_unique_to_gene|mml-mir-7199|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7199: display source at 115 miRBase; answer: nothing
+d4|746|38	all	name_unique_to_gene|mml-mir-7199|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|746|38	best	name_unique_to_gene|mml-mir-7199|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7199: display source at 115 miRBase; answer: nothing
+d4|759|73	all	name_unique_to_gene|mml-mir-105-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|759|73	best	name_unique_to_gene|mml-mir-105-1|None|115|None|best	mirbase_not_in_graph	c	mml-mir-105-1: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|760|56	all	name_changed_gene|mml-mir-578|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|760|56	best	name_changed_gene|mml-mir-578|None|115|None|best	mirbase_not_in_graph	c	mml-mir-578: display source at 115 miRBase; answer: found through synonym_id::NCBI gene (formerly Entrezgene)
+d4|784|83	all	separator_variant|mml_mir_105_2|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|784|83	best	separator_variant|mml_mir_105_2|None|115|None|best	mirbase_not_in_graph	c	mml-mir-105-2: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|790|38	all	name_unique_to_gene|mml-mir-513a-1|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|790|4	all	case_variant|MML-MIR-6128|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|790|4	best	case_variant|MML-MIR-6128|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6128: display source at 115 miRBase; answer: nothing
+d4|793|40	all	case_variant|MML-MIR-7197|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|793|40	best	case_variant|MML-MIR-7197|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7197: display source at 115 miRBase; answer: nothing
+d4|802|7	all	name_unique_to_gene|mml-mir-6133|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|802|7	best	name_unique_to_gene|mml-mir-6133|None|115|None|best	mirbase_not_in_graph	c	mml-mir-6133: display source at 115 miRBase; answer: nothing
+d4|828|41	all	separator_variant|mml_mir_519e|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|828|41	best	separator_variant|mml_mir_519e|None|115|None|best	mirbase_not_in_graph	c	mml-mir-519e: display source at 115 miRBase; answer: nothing
+d4|854|41	all	separator_variant|mml_mir_548h|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|854|41	best	separator_variant|mml_mir_548h|None|115|None|best	mirbase_not_in_graph	c	mml-mir-548h: display source at 115 miRBase; answer: nothing
+d4|878|44	all	separator_variant|mml_mir_7163|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|878|44	best	separator_variant|mml_mir_7163|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7163: display source at 115 miRBase; answer: nothing
+d4|887|35	all	separator_variant|mml_mir_7185|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|887|35	best	separator_variant|mml_mir_7185|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7185: display source at 115 miRBase; answer: nothing
+d4|887|48	best	name_ambiguous_to_set|CYP2E1|None|115|None|best	support_ranks_shared_name	b	returned genes have equal BioMart 115 name sources than the missing ones; ENSMMUG00000006339:display:NCBI gene (formerly Entrezgene)+uniprot_gn+entrez+wikigene; ENSMMUG00000050538*:display:VGNC Symbol+uniprot_gn+entrez+wikigene
+d4|938|46	all	name_unique_to_gene|mml-mir-517a|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|938|46	best	name_unique_to_gene|mml-mir-517a|None|115|None|best	mirbase_not_in_graph	c	mml-mir-517a: display source at 115 miRBase; answer: found through synonym_id::EntrezGene
+d4|943|35	all	separator_variant|mml_mir_892c|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|943|35	best	separator_variant|mml_mir_892c|None|115|None|best	mirbase_not_in_graph	c	mml-mir-892c: display source at 115 miRBase; answer: found through synonym_id::NCBI gene
+d4|954|7	all	separator_variant|mml_mir_7173|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|954|7	best	separator_variant|mml_mir_7173|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7173: display source at 115 miRBase; answer: nothing
+d4|95|25	all	separator_variant|mml_mir_217|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|95|25	best	separator_variant|mml_mir_217|None|115|None|best	mirbase_not_in_graph	c	mml-mir-217: display source at 115 miRBase; answer: nothing
+d4|985|39	all	separator_variant|mml_mir_7186|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|985|39	best	separator_variant|mml_mir_7186|None|115|None|best	mirbase_not_in_graph	c	mml-mir-7186: display source at 115 miRBase; answer: nothing
+d4|994|47	all	separator_variant|mml_mir_513a_3|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|994|47	best	separator_variant|mml_mir_513a_3|None|115|None|best	mirbase_not_in_graph	c	mml-mir-513a-3: display source at 115 miRBase; answer: found through synonym_id::NCBI gene

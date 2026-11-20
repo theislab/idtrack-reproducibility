@@ -773,7 +773,7 @@ def names_first(org, lines):
 
 # ---------------- the corrected judge: the judge corrected and widened (revision sets; README "The corrected judge") ----------------
 
-ENS_ID = re.compile(r"^(ENS[A-Z]*[GTPE]\d{11}|LRG_\d+)(\.\d+)?$")
+ENS_ID = re.compile(rf"^({H.STABLE_ID_FORM})(\.\d+)?$")
 
 
 def gene_base(x):
@@ -1148,36 +1148,12 @@ def _lower_map(v2g):
 
 
 def rev_capitals_mgi(org, lines, C):
-    """Rule `single_case_symbols` (mouse): a string written entirely in capitals that is, without letter case, the MGI symbol of
-    exactly one gene is read as that symbol first: the line expects that gene (read at an older release: its strict
-    walk), and the genes it expected go to `broad`, as rule `name_before_synonym` made the judge follow rule `spelling_of_release`."""
-    out = collections.defaultdict(list)
-    if org != "mus_musculus":
-        return out
-    for rec in lines:
-        s = rec["id"]
-        if rec.get("final_database") or rec.get("excluded") or ENS_ID.match(s) or s != s.upper() or \
-                not any(ch.isalpha() for ch in s):
-            continue
-        rel = rec["from_release"] or rec["to_release"]
-        mgi = C.bm(rel, "mgi", 1)
-        if not mgi or s in mgi[1]:
-            continue
-        low = C._cached(("mgi_low", rel), lambda: _lower_map(mgi[1]))
-        genes = low.get(s.lower(), set()) & C.primary(rel)
-        if len(genes) != 1:
-            continue
-        (g,) = genes
-        tgt = rec["to_release"]
-        new_E = {g} if tgt == rel else C.tr.walk_fwd(g, rel, tgt, True, living=True)
-        if not new_E or new_E == {gene_base(e) for e in rec["expect"]}:
-            continue
-        Ev = _vers(C, new_E, tgt, rec["cmp"])
-        broad = set(rec["broad"] or []) | set(rec["expect"]) | set(Ev)
-        out[rec["kind"]].append(revised(rec, "capitals_mgi", f"capitals read as the MGI symbol of {g} (the corrected judge "
-                                        f"after rule `single_case_symbols`)", expect=Ev, rule="set_exact" if len(Ev) > 1 else "set",
-                                        broad=sorted(broad)))
-    return out
+    """Rule `single_case_symbols` (strings written entirely in capitals): in an organism whose authority
+    writes symbols in mixed letter case (`mixed_case_symbols`: MGI's), a string written entirely in capitals that is no
+    exact symbol and is, without letter case, the symbol of exactly one gene is read as that symbol first: the line
+    expects that gene (read at an older release: its strict walk), and the genes it expected go to `broad`, as rule
+    `name_before_synonym` made the judge follow rule `spelling_of_release`."""
+    return _single_case(org, lines, C, "capitals_mgi", "upper")
 
 
 def rev_places(org, lines, C):
@@ -1351,6 +1327,237 @@ def rev_core_places(org, lines, C):
     return out
 
 
+# ---------------- the judge following idtrack's decided rules (docs/rules.md; revision sets of judge `rules`) ----------------
+
+# Rule `missing_values`: the spellings of a missing value that the decided rule refuses (compared without letter case
+# and surrounding white space; the empty string too): the strings pandas reads as missing by default (its own list,
+# read here) and the two the rule adds, pandas' text of a missing date or time and UniProt's placeholder name (no
+# source lists those two; the rule names them, docs/rules.md).
+MISSING_ADDED = frozenset({"nat", "unknown"})
+
+
+def missing_values():
+    """Rule `missing_values`'s spellings, casefolded: pandas' default missing values and `MISSING_ADDED`."""
+    from pandas._libs.parsers import STR_NA_VALUES
+    return frozenset(v.casefold() for v in STR_NA_VALUES if v) | MISSING_ADDED
+# Rule `stray_punctuation`: the ASCII members of Unicode's property Terminal_Punctuation (the property is not exposed
+# by `unicodedata`), and the quotation marks: Unicode's initial and final quotes (categories Pi, Pf) and ASCII's two.
+TERMINAL_PUNCTUATION = "!,.:;?"
+ASCII_QUOTES = "'\""
+
+
+def is_missing_value(s):
+    """Rule `missing_values`: the string stands for a missing value."""
+    return not s.strip() or s.strip().casefold() in missing_values()
+
+
+def strip_stray_punctuation(s):
+    """Rule `stray_punctuation`: the string without the punctuation that ends a sentence at its end and without a pair of
+    quotation marks around it, repeatedly (a quote at one end only stays); the string itself when nothing would be left."""
+    import unicodedata
+
+    def quote(ch):
+        return ch in ASCII_QUOTES or unicodedata.category(ch) in ("Pi", "Pf")
+    cur = s.strip()
+    while True:
+        before = cur
+        cur = cur.rstrip(TERMINAL_PUNCTUATION).rstrip()
+        if len(cur) > 2 and quote(cur[0]) and quote(cur[-1]):
+            cur = cur[1:-1].strip()
+        if cur == before:
+            break
+    return cur or s
+
+
+def mixed_case_symbols(C, rel):
+    """(gene -> {symbol}, symbol -> {gene}) of the organism's nomenclature authority at a release when that authority
+    writes its symbols in mixed letter case, else None. The authority is the source of most genes' display names in
+    BioMart's gene table (MGI Symbol for mouse, HGNC Symbol for human and pig, VGNC Symbol for the macaques); it writes
+    in mixed case when more than half of those display names hold a small letter. Rule `single_case_symbols` applies
+    to organisms of that kind only (idtrack reads the same convention from its graph's symbols)."""
+    def make():
+        g2n = C.display(rel)[1]
+        sources = collections.Counter(src for name, src in g2n.values() if name and src)
+        if not sources:
+            return None
+        src = sources.most_common(1)[0][0]
+        names = [name for name, s in g2n.values() if name and s == src]
+        if sum(1 for n in names if any(ch.islower() for ch in n)) * 2 <= len(names):
+            return None
+        if src in GENE_DB:
+            pp = C.bm(rel, *GENE_DB[src])
+        elif src == "VGNC Symbol":
+            pp = C.vgnc(rel)
+        else:
+            pp = None
+        return pp if pp and pp[1] else None
+    return C._cached(("mixed_case_symbols", rel), make)
+
+
+def _single_case(org, lines, C, name, case):
+    """Rule `single_case_symbols` for strings written entirely in one letter case (`upper` or `lower`): see
+    rev_capitals_mgi and rev_lower_case_symbols."""
+    out = collections.defaultdict(list)
+    for rec in lines:
+        s = rec["id"]
+        if rec.get("final_database") or rec.get("excluded") or ENS_ID.match(s) or not any(ch.isalpha() for ch in s) or \
+                s != (s.upper() if case == "upper" else s.lower()):
+            continue
+        rel = rec["from_release"] or rec["to_release"]
+        mixed = mixed_case_symbols(C, rel)
+        if not mixed or s in mixed[1]:
+            continue
+        low = C._cached(("mixed_low", rel), lambda: _lower_map(mixed[1]))
+        genes = low.get(s.lower(), set()) & C.primary(rel)
+        if len(genes) != 1:
+            continue
+        (g,) = genes
+        tgt = rec["to_release"]
+        new_E = {g} if tgt == rel else C.tr.walk_fwd(g, rel, tgt, True, living=True)
+        if not new_E or new_E == {gene_base(e) for e in rec["expect"]}:
+            continue
+        Ev = _vers(C, new_E, tgt, rec["cmp"])
+        broad = set(rec["broad"] or []) | set(rec["expect"]) | set(Ev)
+        words = "capitals" if case == "upper" else "lower case"
+        out[rec["kind"]].append(revised(rec, name, f"{words} read as the symbol of {g} (the corrected judge after rule "
+                                        f"`single_case_symbols`)", expect=Ev, rule="set_exact" if len(Ev) > 1 else "set",
+                                        broad=sorted(broad)))
+    return out
+
+
+def rev_lower_case_symbols(org, lines, C):
+    """Rule `single_case_symbols` (decided; strings written entirely in lower case): in an organism whose
+    authority writes symbols in mixed letter case (`mixed_case_symbols`), a string written entirely in lower case that
+    is no exact symbol and is, without letter case, the symbol of exactly one gene is read as that symbol first: the
+    line expects that gene (read at an older release: its strict walk), and the genes it expected go to `broad`, as
+    `capitals_mgi` does for capitals."""
+    return _single_case(org, lines, C, "lower_case_symbols", "lower")
+
+
+def rev_stray_punctuation(org, lines, C):
+    """Rule `stray_punctuation` (decided): punctuation that ends a sentence at the end of a string and quotes
+    around it are no part of an identifier, so a line whose string carries them asks for the identifier without them
+    (`strip_stray_punctuation`). For a line that expects Ensembl genes of a string read as a name or synonym at the
+    release asked about (from_release, else to_release), the expected genes are those that carry the string, with or
+    without the punctuation, as a name there (rule `name_before_synonym`), else as a synonym (BioMart's display names,
+    name tables and synonyms, VGNC and Vega names: `Ctx78.name_genes`), genes of the primary sequence; the genes it
+    expected before go to `broad`. Lines that ask for another database, or whose string has no such punctuation, are
+    not touched."""
+    out = collections.defaultdict(list)
+    for rec in lines:
+        s = rec["id"]
+        if rec.get("final_database") or rec.get("excluded") or ENS_ID.match(s):
+            continue
+        clean = strip_stray_punctuation(s)
+        if clean == s.strip():
+            continue
+        rel = rec["from_release"] or rec["to_release"]
+        prim = C.primary(rel)
+        names = (C.name_genes(rel, s) | C.name_genes(rel, clean)) & prim
+        syn = (C.name_genes(rel, s, synonyms=True) | C.name_genes(rel, clean, synonyms=True)) & prim
+        genes = names or syn
+        tgt = rec["to_release"]
+        new_E = genes if tgt == rel else set().union(*(C.tr.walk_fwd(g, rel, tgt, True, living=True) for g in genes))
+        if not new_E or new_E == {gene_base(e) for e in rec["expect"]}:
+            continue
+        Ev = _vers(C, new_E, tgt, rec["cmp"])
+        broad = set(rec["broad"] or []) | set(rec["expect"]) | set(Ev)
+        out[rec["kind"]].append(revised(rec, "stray_punctuation", f"read as {clean!r} (rule `stray_punctuation`)",
+                                        expect=Ev, rule="set_exact" if len(Ev) > 1 else "set", broad=sorted(broad)))
+    return out
+
+
+def rev_missing_values(org, lines, C):
+    """Rule `missing_values` (decided): a string that stands for a missing value
+    (`missing_values()`) is no identifier and is refused before any lookup, unless its source database is named. The
+    harness's lines carry no source database, so such a line (drawn from a table where a placeholder stands as a gene's
+    synonym, e.g. a synonym `N/A`) asks for no gene: it is left out of the scores (`excluded`, with the reason). The
+    refusal itself is measured by family E (E1, judge `decided`)."""
+    out = collections.defaultdict(list)
+    for rec in lines:
+        s = rec["id"]
+        if rec.get("excluded") or rec.get("from_database") or ENS_ID.match(s) or not is_missing_value(s):
+            continue
+        out[rec["kind"]].append(revised(rec, "missing_values", "a missing value, no identifier (rule `missing_values`)",
+                                        excluded=f"{s!r} stands for a missing value (rule `missing_values`: refused; "
+                                                 "family E measures the refusal)"))
+    return out
+
+
+def rev_par_shared_names(org, lines, C):
+    """Rule `par_shared_names` (decided): a name that the X and Y copies of a pseudoautosomal gene share is
+    the X gene's, with the Y copy reported apart. Where a line asked by a name expects Ensembl genes and its expected
+    set at the target release holds a gene placed in a pseudoautosomal region of a sequence (Ensembl's assembly
+    exceptions of the release, type PAR: the region of Y and the segment of X it equals) together with a gene of the
+    segment it equals (the place projected by its offset overlaps that gene's place, GTF places), the copy leaves
+    `expect` and is expected in the list reported apart (`apart`), as rule `judge_copies_apart` does for copies on
+    patches; `rule` `set_exact` stays only while more than one gene is expected; `broad` and the rest are kept."""
+    from idtrack_reproducibility.harness import assembly_map
+    out = collections.defaultdict(list)
+    exc = C._cached("exceptions", lambda: assembly_map.Exceptions(org))
+    for rec in lines:
+        if rec.get("final_database") or rec.get("excluded") or ENS_ID.match(rec["id"]) or len(rec["expect"]) < 2:
+            continue
+        tgt = rec["to_release"]
+        par = {sq: rows for sq, rows in exc.rows(tgt).items() if any(r["type"] == "PAR" for r in rows)}
+        if not par:
+            continue
+        places = C.gtf(tgt)
+        base = {e: gene_base(e) for e in rec["expect"]}
+        copies = set()
+        for e, g in base.items():
+            p = places.get(g)
+            if not p or p["seqname"] not in par:
+                continue
+            proj = exc.project(dict(p), tgt)
+            if proj is p or proj.get("exception") != "PAR":
+                continue
+            if any(o != e and assembly_map.overlaps(proj, places.get(h)) for o, h in base.items()):
+                copies.add(e)
+        if not copies or copies == set(rec["expect"]):
+            continue
+        keep = sorted(set(rec["expect"]) - copies)
+        apart = sorted(set(rec.get("apart") or []) | copies)
+        rule = "set" if rec["rule"] == "set_exact" and len(keep) == 1 else rec["rule"]
+        out[rec["kind"]].append(revised(rec, "par_shared_names", "Y copies apart (rule `par_shared_names`)", expect=keep,
+                                        apart=apart, rule=rule))
+    return out
+
+
+def rev_copies_apart_early(org, lines, C):
+    """Rule `judge_copies_apart` before release 82: Ensembl's GTFs before 82 have no file of the genes on patches and
+    haplotypes, so `copies_apart` could not tell copies there and such lines still expect the copies inside the answer.
+    Ensembl's assembly exceptions of every release (`exceptions/<release>.tsv`) name the sequences that are haplotypes
+    and patches: a line that expects Ensembl genes at a target release before 82, holds no `apart` yet, and expects genes
+    both on such sequences (GTF places) and off them expects the genes off them, the others reported apart (`apart`);
+    `rule` `set_exact` stays only while more than one gene is expected. The pseudoautosomal regions are no copies here
+    (rule `par_shared_names` reads them)."""
+    from idtrack_reproducibility.harness import assembly_map
+    out = collections.defaultdict(list)
+    exc = C._cached("exceptions", lambda: assembly_map.Exceptions(org))
+    for rec in lines:
+        t = rec["to_release"]
+        if t is None or t >= 82 or rec.get("final_database") or rec.get("excluded") or len(rec["expect"]) < 2 or \
+                rec.get("apart"):
+            continue
+        places, rows = C.gtf(t), exc.rows(t)
+        side = {}
+        for e in rec["expect"]:
+            g = places.get(gene_base(e)) if ENS_ID.match(e) else None
+            if g is None:
+                break
+            side[e] = any(r["type"] != "PAR" for r in rows.get(g["seqname"], ()))
+        else:
+            if all(side.values()) or not any(side.values()):
+                continue
+            keep = sorted(e for e, v in side.items() if not v)
+            rule = "set" if rec["rule"] == "set_exact" and len(keep) == 1 else rec["rule"]
+            out[rec["kind"]].append(revised(rec, "copies_apart_early", "copies apart before 82 (rule `judge_copies_apart`, "
+                                            "places from Ensembl's assembly exceptions)", expect=keep,
+                                            apart=sorted(e for e, v in side.items() if v), rule=rule))
+    return out
+
+
 # name -> function (its docstring says what it revises and why), in the order they are published
 REVISIONS = {
     "swissprot75": rev_swissprot75,
@@ -1367,7 +1574,16 @@ REVISIONS = {
     "exceptions": rev_exceptions,
     "exceptions_span": rev_exceptions_span,
     "core_places": rev_core_places,
+    "missing_values": rev_missing_values,
+    "lower_case_symbols": rev_lower_case_symbols,
+    "stray_punctuation": rev_stray_punctuation,
+    "par_shared_names": rev_par_shared_names,
+    "copies_apart_early": rev_copies_apart_early,
 }
+# The judge of each correction's revision set (its manifest's `judge`): `78`, the judge corrected where it was wrong
+# (rule `judge_corrections`); `rules`, the judge following a rule idtrack decided after 71690ab (docs/rules.md). Both are left out
+# by the judge `published` (harness_lib.REVISED_JUDGES).
+RULES_JUDGE = {"missing_values", "lower_case_symbols", "stray_punctuation", "par_shared_names"}
 
 
 def not_revised_after(name, lines):
@@ -1422,14 +1638,15 @@ def publish_revisions(a, d, names, C=None):
         os.replace(tmp, path)
         sha = hashlib.sha256(open(path, "rb").read()).hexdigest()
         man = dict(organism=a.organism, set=set_name, seed=SEED, kinds=counts, n=sum(counts.values()), sha256=sha,
-                   revises=dict(based_on), judge="78", correction=name, revision=" ".join((func.__doc__ or "").split()))
+                   revises=dict(based_on), judge="rules" if name in RULES_JUDGE else "78", correction=name,
+                   revision=" ".join((func.__doc__ or "").split()))
         json.dump(man, open(os.path.join(d, f"{set_name}.manifest.json"), "w"), indent=1)
         based_on[set_name] = sha
         print("wrote", path, man["n"], sha, flush=True)
     return summary
 
 
-# ---------------- the travel matrix (brief cleanup_harness v2, part 5) ----------------
+# ---------------- the travel matrix (docs/harness.md, "The travel matrix") ----------------
 
 TRAVEL_IDS = 50       # ids per history stratum
 TRAVEL_ORIGINS = 5    # releases of origin per id (an even subset of the releases where it exists)

@@ -39,6 +39,7 @@ name = "harness/checks"
 folders = ["harness/checks", "harness/evidence"]
 rebuild = "generate: idtrack-repro assembly-map <organisms> (the check of places mapped across each handoff)"
 rules = [
+  ['/evidence/copies_apart_early_', "generate: python -m idtrack_reproducibility.harness.measure_revision --correction copies_apart_early (from harness/answers)"],
   ['/evidence/', "none: every answer the correction `exceptions` moved between the judge before and after it, with its class (the judge before is superseded)"],
 ]
 
@@ -49,21 +50,23 @@ rebuild = "generate: python -m idtrack_reproducibility.design.sizes / hard_sizes
 
 [[area]]
 name = "families/f0"
-folders = ["families/f0/runs/check_d4c2dda", "families/f0/runs/check_71690ab"]
+folders = ["families/f0/runs/check_d4c2dda", "families/f0/runs/check_71690ab", "families/f0/recheck_2026_11_19"]
 exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$']
 rebuild = "generate: idtrack-repro score / causes (from the answers)"
 rules = [
   ['/answers/', "run: idtrack-repro run --family harness on the tree and its graphs (the same answers; other seconds)"],
   ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+  ['/recheck_2026_11_19/', "none: the tables of the scorer's check before the move (docs/verification.md)"],
 ]
 
 [[area]]
 name = "families/astar"
-folders = ["families/astar/queries", "families/astar/selection", "families/astar/truth", "families/astar/runs/d4c2dda", "families/astar/runs/d4c2dda_tx"]
+folders = ["families/astar/queries", "families/astar/panels", "families/astar/selection", "families/astar/truth", "families/astar/runs/d4c2dda", "families/astar/runs/d4c2dda_tx"]
 exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$']
 rebuild = "generate: idtrack-repro score / causes / family astar report_astar (from the answers)"
 rules = [
   ['/queries/', "generate: idtrack-repro family astar gen (seeded; a published set is fixed)"],
+  ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
   ['/selection/', "generate: idtrack-repro family astar selection (from the truth store and fixed_ids.tsv)"],
   ['/truth/', "none: Ensembl REST's answer on the date fetched (family astar fetch_rest), else generated from the core tables (rest_from_core)"],
   ['/answers/', "run: idtrack-repro run --family astar on the tree and its graphs (the same answers; other seconds)"],
@@ -72,14 +75,15 @@ rules = [
 
 [[area]]
 name = "families/a"
-folders = ["families/a/queries", "families/a/patterns", "families/a/a0/d4c2dda", "families/a/a8/d4c2dda", "families/a/runs/d4c2dda", "families/a/runs/d4c2dda_s110"]
+folders = ["families/a/queries", "families/a/panels", "families/a/patterns", "families/a/a0/d4c2dda", "families/a/a8/d4c2dda", "families/a/runs/d4c2dda", "families/a/runs/d4c2dda_s110"]
 exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$', '/idtrack_tables/']
 rebuild = "generate: idtrack-repro score / causes / family a report_a (from the answers)"
 rules = [
   ['/queries/', "generate: idtrack-repro family a gen_a / gen_a7 (seeded; a published set is fixed)"],
+  ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
   ['/patterns/', "generate: idtrack-repro family a patterns_a"],
   ['/a0/', "run: idtrack-repro family a a0_fidelity on the tree and its graph"],
-  ['/a8/', "run: the graph of snapshot 110 built by the tree (family a build_a8)"],
+  ['/a8/', "run: idtrack-repro family a build_a8 --organism <o> --tree d4c2dda (the graph of snapshot 110 built by the tree)"],
   ['/answers/', "run: idtrack-repro run --family a on the tree and its graphs (the same answers; other seconds)"],
   ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
 ]
@@ -91,6 +95,7 @@ exclude = ['/logs/', '/repo/', '/store/', '\.tmp$', '\.part$', '_superseded', '/
 rebuild = "generate: idtrack-repro family e score_e (from the answers)"
 rules = [
   ['/queries/', "generate: idtrack-repro family e gen_e (seeded; a published set is fixed)"],
+  ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
   ['/answers/', "run: idtrack-repro family e run_e on the tree and its graphs (the same answers; other seconds)"],
   ['/(e6|e7|e8|e9|harm)/', "run: idtrack-repro family e budget / det / relations_e / web_e / harm_e on the tree"],
 ]
@@ -99,7 +104,7 @@ rules = [
 name = "graphs"
 folders = ["graphs"]
 exclude = ['/\.', '\.tmp$', '\.log$']
-rebuild = "run: idtrack build of the tree d4c2dda (snapshot 115); equal graphs have equal content digests"
+rebuild = "run: idtrack build of f27e810 (snapshot 115), whose builder d4c2dda keeps; equal graphs have equal content digests"
 
 [[area]]
 name = "hunts"
@@ -131,6 +136,8 @@ folders = ["families/b"]
 exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
 rebuild = "generate: the family's generators, the common scorer and causes (docs/families/b.md)"
 rules = [
+  ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
+  ['/runs/d4c2dda/mus_musculus/', "run: partial (shards 0 to 24 of 29 of the tree d4c2dda; partial.json): the runner finishes it, the scorer scores it"],
   ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
   ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
 ]
@@ -141,6 +148,7 @@ folders = ["families/c"]
 exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
 rebuild = "generate: the family's generators, the common scorer and causes (docs/families/c.md)"
 rules = [
+  ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
   ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
   ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
 ]
@@ -151,6 +159,8 @@ folders = ["families/d"]
 exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
 rebuild = "generate: the family's generators, the common scorer and causes (docs/families/d.md)"
 rules = [
+  ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
+  ['/inputs/atlas/', "fetch: idtrack-repro family d inputs_atlas (the atlas project's files; inputs/atlas/SOURCES.tsv names each origin and the checkout's commit)"],
   ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
   ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
 ]

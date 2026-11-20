@@ -1,0 +1,9 @@
+dataset	view	lines	n	right	wrong	undetermined	error	timeout	rate	right_counts	wrong_counts	undetermined_counts	error_counts	timeout_counts	rate_counts
+sterr2025_pigneurog3chronoscrna	all	scored	28453	19115	1013	8325	0	0	0.94967	480386508	8397748	56609284	0	0	0.98282
+sterr2025_pigneurog3chronoscrna	all	strict	18595	18048	547	0	0	0	0.97058	447925988	1767824	0	0	0	0.99607
+sterr2025_pigneurog3chronoscrna	best	scored	28453	19222	900	8331	0	0	0.95527	481679315	5342923	58371302	0	0	0.98903
+sterr2025_pigneurog3chronoscrna	best	strict	18595	18148	447	0	0	0	0.97596	449042802	651010	0	0	0	0.99855
+yang2026_pigpostnatalpancreasmultiome	all	scored	30282	21364	1605	7313	0	0	0.93012	691942780	60649931	79780881	0	0	0.91941
+yang2026_pigpostnatalpancreasmultiome	all	strict	21264	20178	1086	0	0	0	0.94893	651694294	1348108	0	0	0	0.99794
+yang2026_pigpostnatalpancreasmultiome	best	scored	30282	21483	1485	7314	0	0	0.93534	746700757	5891872	79780963	0	0	0.99217
+yang2026_pigpostnatalpancreasmultiome	best	strict	21264	20291	973	0	0	0	0.95424	651716590	1325812	0	0	0	0.99797

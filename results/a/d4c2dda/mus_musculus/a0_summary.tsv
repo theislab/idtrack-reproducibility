@@ -1,0 +1,51 @@
+check	class	by_design	count	ids	example
+presence	nonref_mark_extra|gtf_without_patch_file	truth: the GTF of the release has no patch file, so every gene reads primary (J3)	1859	334	[{"release": 70, "id": "ENSMUSG00000096925", "version": "", "region": "primary", "graph_history": "", "graph_xref": ""}, {"release": 70, "id": "ENSMUSG00000096928", "version": "", "region": "primary", "graph_history": "", "graph_xref": ""}]
+presence	ok		3144871	93072	
+presence	ok|patch		12874	882	
+history	birth:node_missing:event_version_not_in_tables	Ensembl's event names a version its gene tables do not have there (rule `event_version`'s kind); the builder follows the tables	2	2	[{"session": 55, "old": "", "new": "ENSMUSG00000118662.1", "score": 0.0, "recorded": "102->103", "sides": "102->103", "graph": ""}, {"session": 55, "old": "", "new": "ENSMUSG00000118669.1", "score": 0.0, "recorded": "102->103", "sides": "102->103", "graph": ""}]
+history	birth:other_release	Ensembl's event contradicts its gene tables (the id exists earlier); the builder follows the tables	1	1	[{"session": 65, "old": "", "new": "ENSMUSG00000121012.1", "score": 0.99, "recorded": "112->113", "sides": "112->113", "graph": "ENSMUSG00000121012.Void:106->107"}]
+history	edge_ok_birth_or_return		93668	93666	[{"session": "", "old": "ENSMUSG00000000001.Void", "new": "ENSMUSG00000000001.2", "score": "", "recorded": "", "sides": "48->48", "graph": "edge"}, {"session": "", "old": "ENSMUSG00000000003.Void", "new": "ENSMUSG00000000003.6", "score": "", "recorded": "", "sides": "48->48", "graph": "edge"}]
+history	edge_ok_event		52515	3957	[{"session": "", "old": "ENSMUSG00000001417.5", "new": "ENSMUSG00000103766.1", "score": "", "recorded": "", "sides": "77->78", "graph": "edge"}, {"session": "", "old": "ENSMUSG00000001417.5", "new": "ENSMUSG00000104445.1", "score": "", "recorded": "", "sides": "77->78", "graph": "edge"}]
+history	edge_ok_last_loop		78334	78334	[{"session": "", "old": "ENSMUSG00000000001.5", "new": "ENSMUSG00000000001.5", "score": "", "recorded": "", "sides": "103->inf", "graph": "edge"}, {"session": "", "old": "ENSMUSG00000000003.16", "new": "ENSMUSG00000000003.16", "score": "", "recorded": "", "sides": "103->inf", "graph": "edge"}]
+history	edge_ok_retirement		15334	15334	[{"session": "", "old": "ENSMUSG00000000325.16", "new": "ENSMUSG00000000325.Retired", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}, {"session": "", "old": "ENSMUSG00000000702.7", "new": "ENSMUSG00000000702.Retired", "score": "", "recorded": "", "sides": "67->68", "graph": "edge"}]
+history	edge_ok_self_event		57656	20898	[{"session": "", "old": "ENSMUSG00000000031.16", "new": "ENSMUSG00000000031.16", "score": "", "recorded": "", "sides": "97->98", "graph": "edge"}, {"session": "", "old": "ENSMUSG00000000031.16", "new": "ENSMUSG00000000031.16", "score": "", "recorded": "", "sides": "98->99", "graph": "edge"}]
+history	edge_ok_version_change		193889	55549	[{"session": "", "old": "ENSMUSG00000000001.2", "new": "ENSMUSG00000000001.3", "score": "", "recorded": "", "sides": "48->49", "graph": "edge"}, {"session": "", "old": "ENSMUSG00000000001.3", "new": "ENSMUSG00000000001.4", "score": "", "recorded": "", "sides": "56->57", "graph": "edge"}]
+history	ok_between_ids		52515	3957	
+history	ok_birth		104151	65348	
+history	ok_retirement		24344	14091	
+history	ok_self_same_version		57656	20898	
+history	ok_version_change		190708	52928	
+history	outside_window	session outside the graph's window	291443	59130	
+history	self_same_version_no_edge_by_rule	builder's rule: an id mapped onto itself with score 1 and no other event of the id in the session is no edge	67032	36814	
+history	version_change:node_missing:event_version_not_in_tables	Ensembl's event names a version its gene tables do not have there (rule `event_version`'s kind); the builder follows the tables	3179	3179	[{"session": 55, "old": "ENSMUSG00000105381.1", "new": "ENSMUSG00000105381.2", "score": 0.99, "recorded": "102->103", "sides": "102->103", "graph": "missing ENSMUSG00000105381.2"}, {"session": 55, "old": "ENSMUSG00000077314.1", "new": "ENSMUSG00000077314.2", "score": 0.99, "recorded": "102->103", "sides": "102->103", "graph": "missing ENSMUSG00000077314.2"}]
+transcripts	tl:ok		3889757	87276	
+transcripts	tl:ok|patch		15512	1091	
+transcripts	tx:ok		7870689	306387	
+transcripts	tx:ok|patch		31318	2150	
+names	display:ok		272322	91457	
+names	display:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	199	172	[{"release": 75, "family": "display", "gene": "ENSMUSG00000099269", "value": "CALM5", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}, {"release": 75, "family": "display", "gene": "ENSMUSG00000098598", "value": "POU6F1", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}]
+names	display:source_not_in_graph	the display name's source database is not in the graph (miRBase: rule `mirbase_genes` adds it)	616	597	[{"release": 75, "family": "display", "gene": "ENSMUSG00000097605", "value": "mmu-mir-3061", "region": "primary", "graph_dbs": "source=miRBase"}, {"release": 75, "family": "display", "gene": "ENSMUSG00000098324", "value": "mmu-mir-673", "region": "primary", "graph_dbs": "source=miRBase"}]
+names	hgnc:database_not_in_graph	the organism's externals file does not include the database	22	21	[{"release": 80, "family": "hgnc", "gene": "ENSMUSG00000095041", "value": "PISD", "region": "primary", "graph_dbs": ""}, {"release": 80, "family": "hgnc", "gene": "ENSMUSG00000063897", "value": "DHRSX", "region": "primary", "graph_dbs": ""}]
+names	links_on_another_assembly_not_read	links of a release on an assembly that does not serve it (human GRCh37 at 76 on): not part of the graph's answers at that release; counted, not compared	0	0	
+names	mgi:ok		268402	87680	
+names	mgi:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	98	71	[{"release": 75, "family": "mgi", "gene": "ENSMUSG00000028327", "value": "1300002K09Rik", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "mgi", "gene": "ENSMUSG00000058736", "value": "Gm10047", "region": "primary", "graph_dbs": ""}]
+names	ncbi:graph_extra|label_column_absent	truth: BioMart's NCBI table of the release has no label column	46429	25994	[{"release": 75, "family": "ncbi", "gene": "ENSMUSG00000095309", "value": "Vmn1r125", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "ncbi", "gene": "ENSMUSG00000000126", "value": "Wnt9a", "region": "primary", "graph_dbs": ""}]
+names	ncbi:ok		213851	66405	
+names	ncbi:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	14	5	[{"release": 105, "family": "ncbi", "gene": "ENSMUSG00000119320", "value": "Snora70", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "ncbi", "gene": "ENSMUSG00000021850", "value": "ccdc198", "region": "primary", "graph_dbs": ""}]
+names	refseq_mrna:ok		181689	50805	
+names	refseq_mrna_predicted:ok		163171	60220	
+names	refseq_ncrna:ok		29081	11552	
+names	refseq_ncrna_predicted:ok		27780	18324	
+names	refseq_peptide:ok		140880	49887	
+names	refseq_peptide_predicted:ok		97044	63509	
+names	rfam:graph_extra	rule `rfam_display_label`: the graph holds an RFAM family's accession and its label as two ids	12714	5447	[{"release": 75, "family": "rfam", "gene": "ENSMUSG00000097846", "value": "U3", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "rfam", "gene": "ENSMUSG00000099195", "value": "MEG8_1", "region": "primary", "graph_dbs": ""}]
+names	rfam:ok		12714	5447	
+names	sptrembl:ok		190059	53749	
+names	swissprot:ok		77405	16687	
+names	synonym:ok		151276	51861	
+names	synonym:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	1074	365	[{"release": 105, "family": "synonym", "gene": "ENSMUSG00000096768", "value": "edr", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "synonym", "gene": "ENSMUSG00000031349", "value": "Bpa", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:missing		8	8	[{"release": 75, "family": "uniprot_gn", "gene": "ENSMUSG00000096505", "value": "ENSMUSG00000076816", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "uniprot_gn", "gene": "ENSMUSG00000093969", "value": "ENSMUSG00000076816", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:ok		86046	26444	
+names	uniprot_gn:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	20112	20021	[{"release": 75, "family": "uniprot_gn", "gene": "ENSMUSG00000052642", "value": "4930504O13RIK", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "uniprot_gn", "gene": "ENSMUSG00000048490", "value": "NRIP1", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:under_another_database		2	2	[{"release": 75, "family": "uniprot_gn", "gene": "ENSMUSG00000094825", "value": "ENSMUSG00000079376", "region": "primary", "graph_dbs": "synonym_id::EntrezGene"}, {"release": 75, "family": "uniprot_gn", "gene": "ENSMUSG00000096629", "value": "ENSMUSG00000079376", "region": "primary", "graph_dbs": "synonym_id::EntrezGene"}]
+names	wikigene:database_not_in_graph	the organism's externals file does not include the database	102400	37947	[{"release": 75, "family": "wikigene", "gene": "ENSMUSG00000095309", "value": "Vmn1r125", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "wikigene", "gene": "ENSMUSG00000000126", "value": "Wnt9a", "region": "primary", "graph_dbs": ""}]

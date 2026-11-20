@@ -179,6 +179,31 @@ def collect(root, only=None, dry=False):
     return index, prov, problems
 
 
+def rows_behind(root, data, problems):
+    """Every registered run's tables rest on rows in the data root: each scored folder holds its outcome rows (the
+    record, docs/records.md: `outcomes/*.parquet`, as many as its run.json counts, or the harness's
+    `outcomes.tsv.gz`), unless the registry says what it keeps instead (`rows = "<what>"`)."""
+    import pyarrow.parquet as pq
+    for e in registry(root).get("run", []):
+        if e.get("rows"):
+            continue
+        for org in e["organisms"]:
+            base = os.path.join(data, e["folder"].format(organism=org))
+            for rj in e.get("scored") or ["run.json"]:
+                folder = os.path.dirname(os.path.join(base, rj))
+                rel = os.path.relpath(folder, data)
+                parts = glob.glob(os.path.join(folder, "outcomes", "*.parquet"))
+                if parts:
+                    n = sum(pq.ParquetFile(p).metadata.num_rows for p in parts)
+                    want = (json.load(open(os.path.join(folder, "run.json"))).get("n_rows")
+                            if os.path.exists(os.path.join(folder, "run.json")) else None)
+                    if not n or (want is not None and n != want):
+                        problems.append(("results", rel, f"{n} outcome rows where run.json counts {want}"))
+                elif not (os.path.exists(os.path.join(folder, "outcomes.tsv.gz")) and
+                          os.path.getsize(os.path.join(folder, "outcomes.tsv.gz")) > 0):
+                    problems.append(("results", rel, "no rows behind its tables (no outcomes in the data root)"))
+
+
 def check(root, problems, skipped):
     """The results' checks of `idtrack-repro check` (see check.py)."""
     res = os.path.join(root, "results")
@@ -204,6 +229,7 @@ def check(root, problems, skipped):
     if not os.path.isdir(data):
         skipped.append(f"results staleness: no data root at {data}")
         return
+    rows_behind(root, data, problems)
     for rel, r in prov.items():
         if not r.get("source"):
             continue

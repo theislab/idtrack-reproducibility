@@ -37,10 +37,18 @@ homo_sapiens = "data/graphs/homo_sapiens/graph_homo_sapiens_assembly38_min48_max
 macaca_mulatta = "data/graphs/macaca_mulatta/graph_macaca_mulatta_assembly10_min48_max115_narrow.npz"
 macaca_fascicularis = "data/graphs/macaca_fascicularis/graph_macaca_fascicularis_assembly6_min91_max115_narrow.npz"
 
+# External inputs a family reads that are not in the data root's areas (family D: the atlas project's checkout and its
+# per-feature locus tables, for regenerating D's sets; the copies D read are in <families>/d/inputs/, docs/families/d.md).
+[sources]
+# rosetta = "<a checkout of the atlas project>"
+# rosetta_m02 = "<its per-feature locus tables (m02)>"
+
 [jobs]
 # `local` runs every job at once in this process's environment; `slurm` submits it with sbatch.
 runner = "local"
 name_prefix = "idtrack_repro_"
+# The Python of this package in jobs (default: the Python that submits them).
+# python = "<prefix>/bin/python"
 [jobs.slurm]
 partition = "cpu_p"
 qos = "cpu_normal"

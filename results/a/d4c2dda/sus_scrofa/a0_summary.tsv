@@ -1,0 +1,43 @@
+check	class	by_design	count	ids	example
+presence	ok		1621150	63533	
+history	edge_ok_birth_or_return		63533	63533	[{"session": "", "old": "ENSSSCG00000000001.Void", "new": "ENSSSCG00000000001.1", "score": "", "recorded": "", "sides": "56->56", "graph": "edge"}, {"session": "", "old": "ENSSSCG00000000002.Void", "new": "ENSSSCG00000000002.1", "score": "", "recorded": "", "sides": "56->56", "graph": "edge"}]
+history	edge_ok_event		23007	5293	[{"session": "", "old": "ENSSSCG00000000009.1", "new": "ENSSSCG00000024718.1", "score": "", "recorded": "", "sides": "66->67", "graph": "edge"}, {"session": "", "old": "ENSSSCG00000000012.1", "new": "ENSSSCG00000024718.1", "score": "", "recorded": "", "sides": "66->67", "graph": "edge"}]
+history	edge_ok_last_loop		35682	35682	[{"session": "", "old": "ENSSSCG00000000002.4", "new": "ENSSSCG00000000002.4", "score": "", "recorded": "", "sides": "98->inf", "graph": "edge"}, {"session": "", "old": "ENSSSCG00000000003.5", "new": "ENSSSCG00000000003.5", "score": "", "recorded": "", "sides": "107->inf", "graph": "edge"}]
+history	edge_ok_retirement		27851	27851	[{"session": "", "old": "ENSSSCG00000000001.2", "new": "ENSSSCG00000000001.Retired", "score": "", "recorded": "", "sides": "89->90", "graph": "edge"}, {"session": "", "old": "ENSSSCG00000000004.2", "new": "ENSSSCG00000000004.Retired", "score": "", "recorded": "", "sides": "89->90", "graph": "edge"}]
+history	edge_ok_self_event		1173	1147	[{"session": "", "old": "ENSSSCG00000000045.4", "new": "ENSSSCG00000000045.4", "score": "", "recorded": "", "sides": "106->107", "graph": "edge"}, {"session": "", "old": "ENSSSCG00000000205.4", "new": "ENSSSCG00000000205.4", "score": "", "recorded": "", "sides": "106->107", "graph": "edge"}]
+history	edge_ok_version_change		64786	24886	[{"session": "", "old": "ENSSSCG00000000001.1", "new": "ENSSSCG00000000001.2", "score": "", "recorded": "", "sides": "66->67", "graph": "edge"}, {"session": "", "old": "ENSSSCG00000000002.1", "new": "ENSSSCG00000000002.2", "score": "", "recorded": "", "sides": "66->67", "graph": "edge"}]
+history	ok_between_ids		23007	5293	
+history	ok_birth		43551	43551	
+history	ok_retirement		27849	27849	
+history	ok_self_same_version		1173	1147	
+history	ok_version_change		64786	24886	
+transcripts	tl:ok		2029030	81850	
+transcripts	tx:ok		2442760	107484	
+names	display:missing		2	2	[{"release": 80, "family": "display", "gene": "ENSSSCG00000022737", "value": "MYD88", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}, {"release": 80, "family": "display", "gene": "ENSSSCG00000010369", "value": "NPY", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}]
+names	display:ok		167966	25434	
+names	display:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	131	56	[{"release": 75, "family": "display", "gene": "ENSSSCG00000011414", "value": "CISH_TV2", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}, {"release": 75, "family": "display", "gene": "ENSSSCG00000008866", "value": "GUCY1A3", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}]
+names	display:source_not_in_graph	the display name's source database is not in the graph (miRBase: rule `mirbase_genes` adds it)	2885	435	[{"release": 75, "family": "display", "gene": "ENSSSCG00000009536", "value": "ssc-mir-7144", "region": "primary", "graph_dbs": "source=miRBase"}, {"release": 75, "family": "display", "gene": "ENSSSCG00000002573", "value": "ssc-mir-127", "region": "primary", "graph_dbs": "source=miRBase"}]
+names	hgnc:ok		132001	19875	
+names	links_on_another_assembly_not_read	links of a release on an assembly that does not serve it (human GRCh37 at 76 on): not part of the graph's answers at that release; counted, not compared	0	0	
+names	ncbi:graph_extra|label_column_absent	truth: BioMart's NCBI table of the release has no label column	55214	25131	[{"release": 75, "family": "ncbi", "gene": "ENSSSCG00000005673", "value": "LOC100620589", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "ncbi", "gene": "ENSSSCG00000018094", "value": "CYTB", "region": "primary", "graph_dbs": ""}]
+names	ncbi:ok		303831	50794	
+names	refseq_mrna:ok		37656	5054	
+names	refseq_mrna_predicted:ok		427906	74568	
+names	refseq_ncrna:ok		2888	400	
+names	refseq_ncrna_predicted:ok		21375	3698	
+names	refseq_peptide:ok		37281	5276	
+names	refseq_peptide_predicted:ok		435127	80889	
+names	rfam:graph_extra	rule `rfam_display_label`: the graph holds an RFAM family's accession and its label as two ids	15411	3150	[{"release": 75, "family": "rfam", "gene": "ENSSSCG00000023111", "value": "U6", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "rfam", "gene": "ENSSSCG00000030500", "value": "SNORA1", "region": "primary", "graph_dbs": ""}]
+names	rfam:ok		15411	3150	
+names	sptrembl:ok		551849	108720	
+names	swissprot:ok		5287	891	
+names	synonym:ok		5586	1050	
+names	synonym:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	7	1	[{"release": 105, "family": "synonym", "gene": "ENSSSCG00000024052", "value": "PHGPx", "region": "primary", "graph_dbs": ""}, {"release": 106, "family": "synonym", "gene": "ENSSSCG00000024052", "value": "PHGPx", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:missing		1	1	[{"release": 77, "family": "uniprot_gn", "gene": "ENSSSCG00000022101", "value": "PIGBRCA1", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:ok		136088	22719	
+names	uniprot_gn:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	355	107	[{"release": 75, "family": "uniprot_gn", "gene": "ENSSSCG00000011414", "value": "CISH_TV2", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "uniprot_gn", "gene": "ENSSSCG00000008866", "value": "GUCY1A3", "region": "primary", "graph_dbs": ""}]
+names	vgnc:graph_extra	authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then	668	98	[{"release": 105, "family": "vgnc", "gene": "ENSSSCG00000001483", "value": "FAM83B", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "vgnc", "gene": "ENSSSCG00000037701", "value": "GPR182", "region": "primary", "graph_dbs": ""}]
+names	vgnc:missing	authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then	1357	302	[{"release": 105, "family": "vgnc", "gene": "ENSSSCG00000001483", "value": "SACK1B", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "vgnc", "gene": "ENSSSCG00000037701", "value": "ACKR5", "region": "primary", "graph_dbs": ""}]
+names	vgnc:ok		97575	14602	
+names	vgnc:under_another_database	authority: VGNC's own symbols; Ensembl wrote the gene's label under another database	535	142	[{"release": 105, "family": "vgnc", "gene": "ENSSSCG00000004009", "value": "TCTE3", "region": "primary", "graph_dbs": "UniProtKB Gene Name"}, {"release": 105, "family": "vgnc", "gene": "ENSSSCG00000026900", "value": "C1H15orf41", "region": "primary", "graph_dbs": "UniProtKB Gene Name"}]
+names	wikigene:database_not_in_graph	the organism's externals file does not include the database	178852	36013	[{"release": 75, "family": "wikigene", "gene": "ENSSSCG00000005673", "value": "LOC100620589", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "wikigene", "gene": "ENSSSCG00000018094", "value": "CYTB", "region": "primary", "graph_dbs": ""}]

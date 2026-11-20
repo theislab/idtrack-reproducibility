@@ -18,7 +18,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 | the regression corpus | whether an answer changed between two idtrack trees (no truth) | [docs/corpus.md](docs/corpus.md) | `idtrack_reproducibility.corpus` |
 | the weakness hunts | findings of three hunts (inputs, history, regions), with runnable reproducers | [docs/hunts.md](docs/hunts.md) | `idtrack_reproducibility.hunts` |
 
-How the move into this package was verified (the stored scorings scored again, line by line) is [docs/verification.md](docs/verification.md). A measurement of any tree in a few hours is the [modest set](docs/modest.md).
+Every benchmark keeps one row per query line, view and subject (a tree or another tool): [the record](docs/records.md) (its columns, how to load it, a worked example). How the move into this package was verified (the stored scorings scored again, line by line) is [docs/verification.md](docs/verification.md). A measurement of any tree in a few hours is the [modest set](docs/modest.md).
 
 The design of the whole programme (principles, needs, coverage, the families F and G still to come, intervals, known limitations, the comparison with other tools) is [docs/methods.md](docs/methods.md). The rules of idtrack and of the judge that the benchmarks cite by name are in [docs/rules.md](docs/rules.md).
 
@@ -26,14 +26,14 @@ The design of the whole programme (principles, needs, coverage, the families F a
 
 | path | what |
 | --- | --- |
-| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `results.py`, `manifests.py`, `check.py` |
+| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `results.py`, `records.py` (the record's loader), `manifests.py`, `check.py` |
 | `docs/` | the methods of each benchmark, the rules, the data, how to add a benchmark |
 | `results/` | the current results: tables per benchmark, tree and organism, `index.tsv` (one row per family, stratum, organism and tree) and `provenance.tsv` (what generated each file, from which source) |
 | `results.toml` | the registry of the scored runs whose tables are the results |
 | `manifests/` | one manifest per area of the data root (path, size, sha256, source, time, how to rebuild) and `areas.toml` |
 | `hunts/` | the weakness hunts' findings tables |
 | `tests/` | unit tests on small invented cases (no data needed) |
-| `environments/` | the environment of the package |
+| `environments/` | the environment of the package (`repro.yml`) and of the trees the results were made with (`tree_<tree>.yml`) |
 | `idtrack-repro.example.toml` | the configuration, commented |
 
 The data (truth files, query sets, answers, scored runs, graphs) are not in git: they live in a data root whose layout and manifests are described in [docs/data.md](docs/data.md).
@@ -47,7 +47,9 @@ mamba env create -p <prefix> -f environments/repro.yml     # Python 3.13 with nu
 
 or `python -m pip install -e ".[test]"` in any Python 3.12 or newer. The command `idtrack-repro` (or `python -m idtrack_reproducibility.cli`) runs every step.
 
-The idtrack that is measured is a **tree**: a checkout of github.com/theislab/idtrack at a commit, with the Python that runs it. The results here measure two trees: `d4c2dda` (the reference every later version is compared with) and `71690ab` (the same answers with a typed api; idtrack's main branch). To measure a tree, clone idtrack, check out the commit, install its dependencies in an environment (`python -m pip install -e <checkout>`), and name the checkout, its Python and its graphs in the configuration (`[trees.<name>]`). `pip install -e ".[idtrack]"` installs idtrack `71690ab` itself into this package's environment.
+## Trees
+
+The idtrack that is measured is a **tree**: a checkout of github.com/theislab/idtrack at a commit, with the Python that runs it. The results here measure two trees: `d4c2dda` (the reference every later version is compared with) and `71690ab` (the same answers with a typed api; idtrack's main branch). To measure a tree, clone idtrack, check out the commit, make the tree's environment, and name the checkout, its Python and its graphs in the configuration (`[trees.<name>]`); the adapter puts the checkout first on the path, so idtrack need not be installed in it. The environments the stored results were made in are `environments/tree_d4c2dda.yml` (Python 3.11.12: every result of `d4c2dda`) and `environments/tree_71690ab.yml` (Python 3.13.18: `71690ab` and the trees after it); a tree's runs record its Python (`load_<i>_of_<n>.json`). `pip install -e ".[idtrack]"` installs idtrack `71690ab` itself into this package's environment.
 
 ## Configuration
 
@@ -77,7 +79,7 @@ One TOML file and environment variables; nothing is a path of a particular machi
 | the modest set | `idtrack-repro modest build` once; `idtrack-repro modest run --tree <tree> --out <folder>` (one job per organism); `idtrack-repro modest compare <reference> <tree>` ([docs/modest.md](docs/modest.md)) |
 | checks | `idtrack-repro check` |
 
-Each benchmark's document says how to reproduce it from an empty data root ("Reproducing from scratch"): [harness](docs/harness.md), [F0](docs/families/f0.md#reproducing-from-scratch), [A*](docs/families/astar.md#reproducing-from-scratch), [A](docs/families/a.md#reproducing-from-scratch), [E](docs/families/e.md#reproducing-from-scratch), [H](docs/families/h.md#reproducing-from-scratch), [the corpus](docs/corpus.md), [the hunts](docs/hunts.md#reproducing).
+Each benchmark's document says how to reproduce it from an empty data root ("Reproducing from scratch"): [harness](docs/harness.md), [F0](docs/families/f0.md#reproducing-from-scratch), [A*](docs/families/astar.md#reproducing-from-scratch), [A](docs/families/a.md#reproducing-from-scratch), [B](docs/families/b.md#reproducing-from-scratch), [C](docs/families/c.md#reproducing-from-scratch), [D](docs/families/d.md#reproducing-from-scratch), [E](docs/families/e.md#reproducing-from-scratch), [H](docs/families/h.md#reproducing-from-scratch), [the corpus](docs/corpus.md), [the hunts](docs/hunts.md#reproducing).
 
 ## Results
 
@@ -87,7 +89,7 @@ The known limitations, measured by the families, are one table: `results/limitat
 
 ## Checks
 
-`idtrack-repro check` fails on a machine path or a mention of a private working record in any tracked file, a broken link or section, a family without its methods document, tests or limitations rows, a result not generated by the pipeline or missing from the index, an index row of a missing file, a result whose source has changed since (stale), and a data manifest that does not match its files. Without the data root it says which checks it skipped. The CI workflow (`.github/workflows/tests.yml`) runs the tests and the checks on Python 3.12 to 3.14; while the organisation's Actions are not available for private repositories, run `python -m pytest -q` and `idtrack-repro check` before every push.
+`idtrack-repro check` fails on a machine path or a mention of a private working record in any tracked file, a broken link or section, a family without its methods document, tests or limitations rows, a result not generated by the pipeline or missing from the index, an index row of a missing file, a result whose source has changed since (stale), a result without the rows of [the record](docs/records.md) behind it in the data root, and a data manifest that does not match its files. Without the data root it says which checks it skipped. The CI workflow (`.github/workflows/tests.yml`) runs the tests and the checks on Python 3.12 to 3.14; while the organisation's Actions are not available for private repositories, run `python -m pytest -q` and `idtrack-repro check` before every push.
 
 ## Adding a benchmark
 

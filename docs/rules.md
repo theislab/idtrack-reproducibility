@@ -49,7 +49,7 @@ Rules of the judge (the truth's reading) are marked **judge**.
 *d4c2dda.* With `from_database`, the named database decides which genes a string enters; the support of an entry gene still counts every database that attaches the string to it.
 
 ### missing_values
-*decided (beyond blank strings, which `71690ab` already refuses with `MissingValueError`).* A string that stands for a missing value (empty, `nan`, `NaN`, `NA`, `N/A`, `None`, `null`, `NaT` in any letter case, with white space, and the placeholder names of the sources such as UniProt's `unknown`) is refused before any lookup with an input error that names it; it is still looked up when the caller names its source database. The graph drops identifiers without any letter or digit. The harmonizer leaves such features out with that reason.
+*decided (beyond blank strings, which `71690ab` already refuses with `MissingValueError`).* A string that stands for a missing value (empty; the strings pandas reads as missing by default: `nan`, `NaN`, `NA`, `N/A`, `n/a`, `None`, `null`, `NULL`, `<NA>`, `#N/A`, `#NA`, `-NaN`, `1.#IND`, ...; and `NaT` and UniProt's placeholder name `unknown`; in any letter case, with white space) is refused before any lookup with an input error that names it; it is still looked up when the caller names its source database. The graph drops identifiers without any letter or digit. The harmonizer leaves such features out with that reason.
 
 ### single_case_symbols
 *decided.* In an organism whose symbols are written in mixed case (mouse), a string written entirely in capitals, or entirely in lower case, that is not exactly a name is read first as a symbol without letter case; where that gives exactly one gene it is the answer and the other reading is among the alternatives.
@@ -77,6 +77,9 @@ Rules of the judge (the truth's reading) are marked **judge**.
 
 ### inference_per_release
 *decided.* Source inference reads a list's names at each candidate release and answers with the band of releases the list cannot tell apart, with the margin to the next.
+
+### inference_distinct_ids
+*decided.* Source inference counts each distinct identifier of a list once, however often the list repeats it (the documented reading of `71690ab`, which counted each occurrence).
 
 ### typed_api
 *71690ab.* One error hierarchy rooted in `IdtrackError` (input errors, graph-file errors, build errors); typed results with a lossless `to_dict()`; a per-call budget of time and search states (`SearchBudgetExceededError`).
@@ -204,3 +207,9 @@ Rules of the judge (the truth's reading) are marked **judge**.
 
 ### judge_corrections
 *judge.* The judge is corrected where it is wrong, with evidence that does not come from idtrack, by revision sets (a published set is never rewritten): each correction is named (`swissprot75`, `living_ids`, `split_name_set`, `names_broad`, `spellings_once`, `projected_hgnc`, `support`, `resurrection`, `capitals_mgi`, `places`, `sessions_effective`, `exceptions`, `exceptions_span`, `core_places`); [the accuracy harness](harness.md#the-corrections-of-the-judge) states each with its evidence. The families' own revision sets (A*'s `copies_apart_early`, its REST and core-gene readings; A's and E's) are listed in their documents.
+
+### stable_id_form
+*judge.* A stable id of Ensembl's scheme is compared without its version where a line compares by stable id: Ensembl's genes, transcripts, translations and exons (`ENS<species><G|T|P|E><11 digits>`) and LRG records with their genes, transcripts and proteins (`LRG_<n>`, `LRG_<n>_g<k>`, `LRG_<n>t<k>`, `LRG_<n>p<k>`); one definition (`harness_lib.STABLE_ID_FORM`) for the harness, the families and the hunts. Until 2026-11-20 LRG gene ids kept their version (family A's `T-lrg-base`, family E's `L-truth-lrg-form`).
+
+### judge_follows_rules
+*judge.* Where a rule decided for idtrack after `71690ab` changes what a line asks or expects, the judge follows the rule, by revision sets as for its corrections: the accuracy harness's sets of judge `rules` (`missing_values`, `lower_case_symbols`, `stray_punctuation`, `par_shared_names`; [the accuracy harness](harness.md#the-judge-following-idtracks-decided-rules)), and the families' `decided` judges (family E's `_dec` sets). The judge `published` leaves out every revision set.

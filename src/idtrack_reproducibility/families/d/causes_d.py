@@ -297,7 +297,8 @@ def d2_names_read_at_last_release(c):
     """D2: a list of symbols (or of symbols and ids) whose inferred releases are not the releases its Ensembl display
     names fit best: infer_source resolves every string at the graph's last release (its docstring), so a name that
     changed is not counted and a name new since counts at the newest releases only, and it counts a name in every name
-    database, so neighbouring releases where the names live in another source tie (finding D-4)."""
+    database, so neighbouring releases where the names live in another source tie (rule `inference_per_release`, decided,
+    reads them at each candidate release)."""
     if not str(c.r.get("qid", "")).startswith("d2") or c.kind not in ("d2_symbols", "d2_mixed"):
         return None
     return f"inferred {','.join(sorted(c.got))[:40]}; Ensembl's names fit {','.join(sorted(c.exp))[:40]}"
@@ -357,7 +358,7 @@ for mod in {id(m): m for m in (K, __main__) if hasattr(m, "register") and hasatt
              "D3: a name of several genes; `all` returns only some of them", d3_part_of_several),
             ("d3_nothing", "c", "-", "D3: Ensembl names a gene so at the release read; idtrack answers nothing", d3_nothing)):
         mod.register(name, cls, dec, text, fn, before="external_bridge")
-    mod.register("d2_names_read_at_last_release", "b", "infer_source's documented reading (finding D-4)",
+    mod.register("d2_names_read_at_last_release", "a", "rule `inference_per_release`",
                  "D2: a symbol list's releases inferred from names read at the graph's last release, in every name database", d2_names_read_at_last_release,
                  before=first)
     mod.register("d4_separator_synonym", "e", "rule `names_before_synonyms`; the separator search",

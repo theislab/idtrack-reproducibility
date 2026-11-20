@@ -1,0 +1,51 @@
+dataset	source	features	stated	rosetta_release	expected	idtrack	outcome	items	best_share
+balboa2022_scisletmaturation	{library}_*_matrix.mtx.gz	all	98	98	98,99	98,99	right	20621	1.0
+balboa2022_scisletmaturation	{library}_*_matrix.mtx.gz	counted	98	98	98,99	98,99	right	18636	1.0
+corujosimon2024_humantrophectoderm	GSE244721_counts_revised.csv.gz	all	None	89	88,89	88,89	right	19636	1.0
+corujosimon2024_humantrophectoderm	GSE244721_counts_revised.csv.gz	counted	None	89	88,89	88,89	right	18661	1.0
+greywilson2025_hepatobiliarybud	{library}_*-matrix.mtx.gz	all	98	98	98	98	right	36601	1.0
+greywilson2025_hepatobiliarybud	{library}_*-matrix.mtx.gz	counted	98	98	98	98	right	33137	1.0
+luo2023_ctcfcrispri	{library}_*_matrix.mtx.gz	all	93	93	92,93	92,93	right	33538	1.0
+luo2023_ctcfcrispri	{library}_*_matrix.mtx.gz	counted	93	93	92,93	92,93	right	26502	1.0
+ma2023_humanearlypancreas	OMIX001616-01.txt.gz	all	93	93	93	93	right	33538	0.999284
+ma2023_humanearlypancreas	OMIX001616-02.txt.gz	all	93	93	93	93	right	33538	0.999284
+ma2023_humanearlypancreas	OMIX001616-01.txt.gz	counted	93	93	93	93	right	28477	0.999368
+ma2023_humanearlypancreas	OMIX001616-02.txt.gz	counted	93	93	93	93	right	28150	0.999325
+mereu2026_humanpancreasatlas	fetal_snRNA_260601_RNA.h5ad	all	None	98	98	99	wrong	31284	0.999776
+mereu2026_humanpancreasatlas	fetal_snRNA_260601_RNA.h5ad	counted	None	98	98	99	wrong	31237	0.999776
+mima2025_ipscacinar	GSM8208910_matrix_inflection_demulti_OsafuneWTA1.txt.gz	all	101	101	101	101	right	35084	0.999886
+mima2025_ipscacinar	GSM8208910_matrix_inflection_demulti_OsafuneWTA1.txt.gz	counted	101	101	101	101	right	35084	0.999886
+petropoulos2016_humanpreimplantation	counts.txt	all	None	77	77	115	wrong	26178	0.880931
+petropoulos2016_humanpreimplantation	counts.txt	counted	None	77	77	115	wrong	24444	0.914376
+sozen2021_humanhepstructures	GSM5387818_natural_matrix.mtx.gz	all	None	84	83,84	83,84	right	33694	1.0
+sozen2021_humanhepstructures	GSM5387818_natural_matrix.mtx.gz	counted	None	84	83,84	83,84	right	13022	1.0
+sun2026_periembryoid	{library}_matrix.mtx.gz	all	98	98	98	98	right	36601	1.0
+sun2026_periembryoid	{library}_matrix.mtx.gz	counted	98	98	98	98	right	33700	1.0
+tosti2020_humanpancreassn	neonatal_pancreas.rds	all	None	75	75	115	wrong	25936	0.998265
+tosti2020_humanpancreassn	adult_pancreas.rds	all	None	75	75	94	wrong	43815	0.768938
+tosti2020_humanpancreassn	neonatal_pancreas.rds	counted	None	75	75	115	wrong	25238	0.998375
+tosti2020_humanpancreassn	adult_pancreas.rds	counted	None	75	75	115	wrong	28315	0.997952
+wiedenmann2021_humanpdlo	{library}_*.tar.gz	all	96	96	96	96	right	33939	1.0
+wiedenmann2021_humanpdlo	{library}_*.tar.gz	counted	96	96	96	96	right	28019	1.0
+xiang2020_humanpregastrula	GSE136447_555sample_gene_count_matrix.txt.gz	all	None	95	94,95	94,95	right	64792	1.0
+xiang2020_humanpregastrula	GSE136447_555sample_gene_count_matrix.txt.gz	counted	None	95	94,95	94,95	right	50619	1.0
+xu2023_humanorganogenesis	GSE157329_raw_counts.mtx.gz	all	None	98	83..100 (18)	83..100 (18)	right	32351	1.0
+xu2023_humanorganogenesis	GSE157329_raw_counts.mtx.gz	counted	None	98	83..100 (18)	83..100 (18)	right	26645	1.0
+yan2013_humanpreimplantation	{library}_Sample_*.expression.txt.gz	all	None	68	61	115	wrong	20047	0.926423
+yan2013_humanpreimplantation	{library}_Sample_*.expression.txt.gz	counted	None	68	61	115	wrong	20047	0.926423
+yang2022_hhexscreen	{library}_*_raw-counts.tsv.gz	all	98	98	98	98	right	36601	1.0
+yang2022_hhexscreen	{library}_*_raw-counts.tsv.gz	counted	98	98	98..100 (3)	98..100 (3)	right	30706	1.0
+yu2021_humanendoderm	Table_fetal_atlas_count.mtx.gz	all	None	75	75	115	wrong	28691	0.997316
+yu2021_humanendoderm	Table_fetal_atlas_count.mtx.gz	counted	None	75	75	115	wrong	28011	0.997287
+yu2021_humanfetalpancreas_human	OMIX236-20-02.gz	all	None	84	84	115	wrong	22550	0.999113
+yu2021_humanfetalpancreas_human	OMIX236-20-01.gz	all	None	87	85..87 (3)	85..87 (3)	right	63254	1.0
+yu2021_humanfetalpancreas_human	OMIX236-20-02.gz	counted	None	84	84	115	wrong	22549	0.999113
+yu2021_humanfetalpancreas_human	OMIX236-20-01.gz	counted	None	87	85..87 (3)	85..87 (3)	right	37871	1.0
+yu2023_humanblastoid	GSM6443386_matrix_readcount_LW121.csv.gz	all	None	93	92,93	92,93	right	33538	1.0
+yu2023_humanblastoid	GSM6443386_matrix_readcount_LW121.csv.gz	counted	None	93	92,93	92,93	right	23484	1.0
+zeng2023_humanembryo_human	GSE155121_human_data_raw.h5ad.gz	all	None	75	74..115 (42)	74..115 (42)	right	32738	1.0
+zeng2023_humanembryo_human	GSE155121_human_data_raw.h5ad.gz	counted	None	75	74..115 (42)	74..115 (42)	right	27543	1.0
+zhu2023_scisletmultiome	GSE202497_all.mtx.gz	all	None	75	75	115	wrong	32738	0.997098
+zhu2023_scisletmultiome	GSE202499_raw.h5ad.gz	all	None	75	75	115	wrong	32738	0.997098
+zhu2023_scisletmultiome	GSE202497_all.mtx.gz	counted	None	75	75	115	wrong	27312	0.997876
+zhu2023_scisletmultiome	GSE202499_raw.h5ad.gz	counted	None	75	75	115	wrong	29183	0.998321
