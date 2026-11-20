@@ -133,7 +133,7 @@ No call raised and none fell back to another release of origin; the consistency 
 | hh-5 | low | the truth's GTFs lack genes the core database has; sessions placed at their old release | truth error: `core_places`, `sessions_effective` | the harness's `core_places` sets; A* pattern `gtf_lacks`; A pattern `core_only` |
 | hh-6 | low | the judge's copies apart before 82 and its place for ids Ensembl later moved | truth error: `copies_apart_early` | A* revision set `v1r2` |
 
-hh-6 has two parts: the copies apart before release 82 are corrected in A* (`copies_apart_early`); the locus rule's reference place (the place at the release of origin, wrong for an id Ensembl later moved) has no correction yet, so such lines stay judged by the place of origin.
+hh-6 has two parts: the copies apart before release 82 are corrected in A* (`copies_apart_early`) and in the harness (human `v19`); the locus rule's reference place (the place at the release of origin, wrong for an id Ensembl later moved) has no correction yet, so such lines stay judged by the place of origin.
 
 ## Regions
 
@@ -166,7 +166,7 @@ The third pass, on genes no earlier pass had chosen, found no new class. Not tes
 | R9 | question | an LRG id answers itself, not the gene it describes | [lrg_answers_gene](rules.md#lrg_answers_gene) | none (this reproducer only) |
 | J1 | judge | copies on patches, haplotypes and the Y PARs judged by the place of their own sequence | truth error: `exceptions`, `exceptions_span` | the harness's `exceptions` sets |
 | J2 | judge | the GTF of cynomolgus 112 lacks 47 genes the core database has | truth error: `core_places` | the harness's `core_places` set; A* pattern `gtf_lacks` |
-| J3 | judge | copies before 82 labelled primary, so a name expects them in the answer | truth error: `copies_apart_early` | A* revision set `v1r2`; in the harness the correction `copies_apart_early` (human 429 lines, 147 wrong -> right, none right -> wrong; written, not published: [the harness's limits](harness.md#limits)) |
+| J3 | judge | copies before 82 labelled primary, so a name expects them in the answer | truth error: `copies_apart_early` | A* revision set `v1r2`; in the harness the correction `copies_apart_early` (human `v19`, 429 lines; on `d4c2dda`'s answers 147 wrong -> right, none right -> wrong: [the corrections of the judge](harness.md#the-corrections-of-the-judge)) |
 | J4 | judge | the human travel matrix's GRCh37-backward cell: all its wrong lines are queries on GRCh37 haplotypes and patches | truth error: `exceptions`, `exceptions_span` | the harness's travel matrix (human) |
 
 R5 is not yet a row of the known-limitations table: no family asks names of releases 48 and 49, so its size is the hunt's count until one does. R3, R8 and R9 are measured by their reproducers only until a family publishes their lines.

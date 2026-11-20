@@ -7,7 +7,7 @@ Family B asks idtrack to read gene names as Ensembl wrote them at every release:
 What is built:
 
 - the truth readers (`truth_b`), the generators of the sets (`gen_b`: B1 with B2 and B3 as strata, and B8; `gen_b2`: B4 to B7), the fetcher of the authorities' files and of Ensembl's synonyms (`fetch_b`), the builder of revision sets (`revise_b`), the report of a run (`report_b`) and the plugin of the common classifier (`causes_b`, which registers B's kinds of lines; B has no cause of its own yet);
-- the truth files B fetched, each in its organism's `SOURCES.tsv`: HGNC's complete set and withdrawn list (and the listing of HGNC's quarterly archive), MGI's `MRK_List1.rpt`, `MRK_List2.rpt` and `MRK_ENSEMBL.rpt`, NCBI's `gene_info` of the five taxa, and Ensembl's synonyms of every cross-reference of release 115 (`core_synonyms/115.tsv.gz`);
+- the truth files B fetched, each in its organism's `SOURCES.tsv`: HGNC's complete set and withdrawn list (and the listing of HGNC's quarterly archive), MGI's `MRK_List1.rpt`, `MRK_List2.rpt` and `MRK_ENSEMBL.rpt`, NCBI's `gene_info` of the five taxa, and Ensembl's synonyms of every cross-reference of release 115 (`core_synonyms/115.tsv.gz`) and, for mouse, of every release of its window (48 to 115, fetched for family E's letter-case lines; Ensembl serves the core table `external_synonym` at every release, as `.txt.gz.bz2` at 89);
 - the published sets of all five organisms (version 1; [the sets](#the-sets)).
 
 What was run and scored, on the reference tree `d4c2dda` and its graphs:
@@ -21,7 +21,7 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 
 What is not built:
 
-- Ensembl's synonyms of every release (`fetch_b synonyms --releases all`; only release 115 is fetched);
+- Ensembl's synonyms of every release for the organisms other than mouse (`fetch_b synonyms --releases all`; release 115 is fetched for all five, every release for mouse), and B's truth read from them (it reads release 115's);
 - the revision sets of the truth the code writes since version 1 was published: Ensembl's synonyms of every cross-reference beside BioMart's synonyms, rule [`support_ranks_shared_name`](../rules.md#support_ranks_shared_name)'s support from Ensembl's cross-references at releases without a BioMart table, B8's `spellings` of one value, the original name's `broad` on B6's lines judged `set`, and B6's and B7's `safe` lines accepting the original name's genes in any name source. `revise_b` was tried on cynomolgus without publishing; until these revision sets are published, the published sets are the truth of the results below;
 - the runs of pig, mouse and human, the `decided` scorings, the explained paths and causes of the wrong answers, the family's limitations map and its rows of the known-limitations table, the authority measure (`report_b`, written, not run), and the family's panel ([Measurement design](../methods.md#measurement-design)).
 
@@ -74,7 +74,7 @@ Nothing of idtrack; every file is in its organism's `SOURCES.tsv` (`truth_b.Name
 
 - **Display names at every release**: the GTF's `gene_name` of every release of the window (pig 56 to 115, human, mouse and rhesus 48 to 115, cynomolgus 91 to 115), with the region where the release's GTF marks patches (human and mouse from 82): copies on patches are reported apart (rule [`judge_copies_apart`](../rules.md#judge_copies_apart)).
 - **Other name sources at R**: where an archive BioMart answers, its HGNC, MGI, UniProt gene name, NCBI label and WikiGene tables, VGNC's symbol of BioMart's VGNC id and the Vega names, as the accuracy harness reads them; and at every release Ensembl's cross-references of the release (`core_xref/<R>.tsv.gz`, family C's extract of the release's MySQL dumps): the labels of HGNC, MGI, VGNC, UniProt gene name, NCBI gene, WikiGene, Vega and the clone-based names. RFAM and miRBase labels are no names (rules [`mirbase_genes`](../rules.md#mirbase_genes), [`rfam_display_label`](../rules.md#rfam_display_label)). A gene carrying the string in another name source at R goes into `broad` (the corrected judge's `names_broad`, rule [`judge_corrections`](../rules.md#judge_corrections)).
-- **Synonyms at R**: BioMart's synonym table where an archive answers (it holds the synonyms of a gene's display cross-reference only), and Ensembl's synonyms of every cross-reference where `core_synonyms/<R>.tsv.gz` is fetched (release 115).
+- **Synonyms at R**: BioMart's synonym table where an archive answers (it holds the synonyms of a gene's display cross-reference only), and Ensembl's synonyms of every cross-reference where `core_synonyms/<R>.tsv.gz` is fetched (B's published sets read release 115's).
 - **The reach**: where the synonyms of R are not read, the genes that carry the string as a synonym at any release read; where no name source of R is read, the genes that carry it as a name at any release. An answer within the reach is open, one outside it wrong; every line says what was read (`name_src`: `biomart`, `core_xref`, `none+reach`, with `+synonyms` or `+synonyms_reach`).
 - **The history**: A*'s walks (`astar.truth.TruthA`): the strict walk with living ids (rule [`id_lives_on`](../rules.md#id_lives_on)) is `expect`, the broad walk with ids brought back (rule [`resurrection`](../rules.md#resurrection)) goes into `broad`; where the history ends for a name of one gene, the locus rule with the corrected judge's places across assemblies, assembly exceptions and core places; one gene that split is judged `set` (the corrected judge's `split_name_set`); mouse display names that are projected HGNC symbols and no name in another source are left out (`projected_hgnc`).
 - **The authorities** (beside the truth, never the judge): HGNC's complete set (symbol, `prev_symbol`, `alias_symbol`, Ensembl gene id) and withdrawn list; MGI's `MRK_List1.rpt` (withdrawn symbols with their current marker, synonyms) and `MRK_ENSEMBL.rpt` (MGI's own Ensembl ids); VGNC's gene sets; NCBI's `gene_info` (synonyms, Ensembl ids of `dbXrefs`).
@@ -92,7 +92,7 @@ Locations, trees, graphs and the job runner come from the configuration ([runnin
 ```
 # the authorities' files and Ensembl's synonyms (once; one host at a time)
 python -m idtrack_reproducibility.families.b.fetch_b hgnc|mgi|ncbi
-python -m idtrack_reproducibility.families.b.fetch_b synonyms --releases 115|all|<r,r,...>
+python -m idtrack_reproducibility.families.b.fetch_b synonyms --releases 115|all|<r,r,...> [--organisms <o>,...]
 # the sets (published once): B1 and B8 read every release's tables (a job of the configured runner)
 python -m idtrack_reproducibility.families.b.gen_b --organism <o> [--sets b1,b8] [--dry]
 python -m idtrack_reproducibility.families.b.gen_b2 --organism <o> [--sets b4,b5,b6,b7] [--dry]

@@ -45,6 +45,22 @@ def clean(v):
     return bool(v) and v.strip() == v and not ENS_LIKE.match(v) and not v.isdigit()
 
 
+def core_synonyms(org, R):
+    """synonym -> {gene ids} of Ensembl's synonyms of every xref of a name database at R (`core_synonyms/<R>.tsv.gz`,
+    fetch_b.py synonyms), or None where not fetched."""
+    p = os.path.join(H.truth_dir(org), "core_synonyms", f"{R}.tsv.gz")
+    if not os.path.exists(p):
+        return None
+    out = collections.defaultdict(set)
+    with gzip.open(p, "rt") as fh:
+        next(fh)
+        for line in fh:
+            c = line.rstrip("\n").split("\t")
+            if len(c) >= 3 and NAME_DB.match(c[2]) and c[0]:
+                out[c[0]].add(C.base_id(c[1]))
+    return out
+
+
 class NamesB:
     def __init__(self, org, log=print):
         self.org, self.log = org, log
@@ -147,19 +163,7 @@ class NamesB:
         return self._slot(self._src, R, make)
 
     def core_synonyms(self, R):
-        """synonym -> {gene ids} of Ensembl's synonyms of every xref of a name database at R (`core_synonyms/<R>.tsv.gz`,
-        fetch_b.py synonyms), or None where not fetched."""
-        p = os.path.join(H.truth_dir(self.org), "core_synonyms", f"{R}.tsv.gz")
-        if not os.path.exists(p):
-            return None
-        out = collections.defaultdict(set)
-        with gzip.open(p, "rt") as fh:
-            next(fh)
-            for line in fh:
-                c = line.rstrip("\n").split("\t")
-                if len(c) >= 3 and NAME_DB.match(c[2]) and c[0]:
-                    out[c[0]].add(C.base_id(c[1]))
-        return out
+        return core_synonyms(self.org, R)
 
     def synonyms(self, R):
         """name -> {genes} as a synonym at R: BioMart's synonym table (the synonyms of a gene's display xref) and,

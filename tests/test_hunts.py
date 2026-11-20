@@ -23,10 +23,10 @@ def rule_names():
 
 
 def corrections():
-    """The judge's corrections named by rule `judge_corrections`, and A*'s revision `copies_apart_early`."""
+    """The judge's corrections named by rule `judge_corrections` (A*'s revision `copies_apart_early` among them)."""
     text = open(os.path.join(ROOT, "docs", "rules.md"), encoding="utf-8").read()
     part = text.split("### judge_corrections", 1)[1]
-    return set(re.findall(r"`([a-z0-9_]+)`", part)) | {"copies_apart_early"}
+    return set(re.findall(r"`([a-z0-9_]+)`", part))
 
 
 def findings_table(angle):

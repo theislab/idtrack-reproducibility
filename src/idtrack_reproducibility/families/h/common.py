@@ -144,6 +144,21 @@ def dump(path: str, obj) -> None:
     os.replace(path + ".tmp", path)
 
 
+def dump_calls(path: str, rows: list) -> str:
+    """The timed calls of a measure as rows of the record (docs/records.md: one row per call, outcome `unjudged`),
+    beside its report: `<report without .json>.calls.parquet`. Returns the file."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    out = path[: -len(".json")] + ".calls.parquet" if path.endswith(".json") else path + ".calls.parquet"
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    types = {"record_version": pa.int32(), "seconds": pa.float64(), "calls": pa.int32(), "n_got": pa.int32()}
+    cols = sorted({k for r in rows for k in r})
+    schema = pa.schema([(c, types.get(c, pa.string())) for c in cols])
+    pq.write_table(pa.Table.from_pylist(rows, schema=schema), out + ".tmp", compression="zstd")
+    os.replace(out + ".tmp", out)
+    return out
+
+
 MEMORY_UNIT = "GB of 10^9 bytes"
 
 

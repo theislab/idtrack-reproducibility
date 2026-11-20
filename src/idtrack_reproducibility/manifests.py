@@ -74,6 +74,22 @@ def source_for(path, srcs):
     return srcs.get(stem, ("", ""))
 
 
+def area_sources(data, area):
+    """{data-root path: origin} of an area that names a table of its files' origins (`sources`: columns `path` in the
+    table's folder, `source`, `path_in_source`, `commit`), e.g. external inputs copied from another project."""
+    if not area.get("sources"):
+        return {}
+    p = os.path.join(data, area["sources"])
+    base = os.path.dirname(area["sources"])
+    out = {}
+    if os.path.exists(p):
+        with open(p, newline="") as fh:
+            for r in csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE):
+                where = f"{r.get('source', '')}:{r.get('path_in_source', '')}" + (f" at {r['commit']}" if r.get("commit") else "")
+                out[os.path.join(base, r["path"])] = (where, r.get("copied", ""))
+    return out
+
+
 def rebuild_of(rel, area):
     for pat, how in area.get("rules", []):
         if re.search(pat, rel):
@@ -101,7 +117,7 @@ def walk(data, area):
 def build(root, name, area, dry=False):
     cfg = CFG.get()
     data = cfg.root
-    srcs = sources_of(data)
+    srcs = dict(sources_of(data), **area_sources(data, area))
     rows = []
     for rel, p in walk(data, area):
         st = os.stat(p)

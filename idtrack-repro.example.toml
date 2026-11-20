@@ -60,6 +60,14 @@ mus_musculus = 50
 sus_scrofa = 24
 macaca_mulatta = 24
 macaca_fascicularis = 20
+# Memory (GB) of one job of the modest set (one organism, its parts one after another): the largest measured peak of its
+# parts plus a quarter (docs/modest.md, "Memory"; defaults in idtrack_reproducibility.config.MODEST_MEMORY_GB).
+[jobs.modest_memory_gb]
+homo_sapiens = 8
+mus_musculus = 7
+sus_scrofa = 5
+macaca_mulatta = 5
+macaca_fascicularis = 4
 
 [tools]
 # The idtrack-web command for family E's web-layer checks (E9).

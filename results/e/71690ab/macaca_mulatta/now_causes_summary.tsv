@@ -1,8 +1,6 @@
 stratum	cause	class	rule	answers	units
 e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	87	38
-e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	27	27
 e2_internal_name	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	17	17
 e2_longversion	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
 e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	6	3
-e2_makeunique_syn	suffix_form_is_name_at_unread_release	e	-	3	3
-e8_infer_duplicates	infer_duplicates_counted	a	docs/methods.md E8 (the relation); docs: 'each identifier counts once'	1	1
+e8_infer_duplicates	infer_duplicates_counted	a	rule `inference_distinct_ids` (the relation of docs/methods.md E8)	1	1

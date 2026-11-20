@@ -170,3 +170,6 @@ def test_a_synonym_read_at_a_release_whose_synonyms_the_truth_did_not_read_is_un
     assert SC.score_line(rec, "best", dict(a, from_release=98), NO)[0] == "wrong"  # the truth read that release
     assert SC.score_line(rec, "best", dict(a, match="exact"), NO)[0] == "wrong"     # a name: read at every release
     assert SC.score_line(dict(rec, names_read_at=None), "best", a, NO)[0] == "wrong"
+    # through the separator or case step another string is read: judged as it is (the fault IN-3, not the truth's reach)
+    assert SC.score_line(rec, "best", dict(a, match="synonym:separator"), NO)[0] == "wrong"
+    assert SC.score_line(rec, "best", dict(a, match="synonym:case"), NO)[0] == "wrong"

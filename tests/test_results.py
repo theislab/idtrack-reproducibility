@@ -23,7 +23,7 @@ def make(tmp_path, data_root):
     run.mkdir(parents=True)
     (run / "report.tsv").write_text(REPORT)
     write_outcomes(run, 3)
-    json.dump(dict(scored_at="2026-11-19T10:00:00", graph_digests=["dig"], n_rows=3), open(run / "run.json", "w"))
+    json.dump(dict(record_version=1, scored_at="2026-11-19T10:00:00", graph_digests=["dig"], n_rows=3), open(run / "run.json", "w"))
     return str(repo), run
 
 
@@ -76,6 +76,12 @@ def test_a_table_needs_its_rows_in_the_data_root(tmp_path, data_root):
     problems = []
     RES.check(repo, problems, skipped)
     assert [p[2] for p in problems] == ["no rows behind its tables (no outcomes in the data root)"]
+    write_outcomes(run, 3)  # rows of an earlier version of the record
+    info = json.load(open(run / "run.json"))
+    json.dump(dict(info, record_version=0), open(run / "run.json", "w"))
+    problems = []
+    RES.check(repo, problems, skipped)
+    assert [p[2].split(":")[0] for p in problems] == ["rows of record version 0, not 1"]
 
 
 def test_a_panel_result_is_marked_and_a_wrong_scope_refused(tmp_path, data_root):

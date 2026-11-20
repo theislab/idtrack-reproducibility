@@ -1,6 +1,8 @@
 # The areas of the data root and their manifests (docs/data.md, "Manifests"). `include`/`exclude` are regular
 # expressions on the path in the data root; `rebuild` says how the area's files are made again; `rules` give another
-# rebuild for the files whose path matches (first match wins).
+# rebuild for the files whose path matches (first match wins). `publish = false` marks an area of external inputs that
+# is not published with the data (docs/data.md, "Publication"): its manifest says what each file is, where it came
+# from (`sources`: a table of the area naming each file's origin) and its checksum.
 
 [[area]]
 name = "truth"
@@ -156,11 +158,18 @@ rules = [
 [[area]]
 name = "families/d"
 folders = ["families/d"]
-exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke']
+exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke', '^families/d/inputs/atlas/']
 rebuild = "generate: the family's generators, the common scorer and causes (docs/families/d.md)"
 rules = [
   ['/panels/', "generate: idtrack-repro modest build (seeded; a published selection is fixed)"],
-  ['/inputs/atlas/', "fetch: idtrack-repro family d inputs_atlas (the atlas project's files; inputs/atlas/SOURCES.tsv names each origin and the checkout's commit)"],
   ['/answers/', "run: the family's runner on the tree and its graphs (the same answers; other seconds)"],
   ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
 ]
+
+[[area]]
+name = "families/d_atlas_inputs"
+folders = ["families/d/inputs/atlas"]
+publish = false
+sources = "families/d/inputs/atlas/SOURCES.tsv"
+rebuild = "fetch: idtrack-repro family d inputs_atlas (copies of the atlas project's files from its checkout and tables, configured as [sources]; not published with the data: their release is the atlas project's decision)"
+

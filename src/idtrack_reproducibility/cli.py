@@ -26,6 +26,7 @@ COMMANDS = {
     # the families (common machinery)
     "run": ("idtrack_reproducibility.families.runner", "ask a family's sets on a tree and its graph (sharded, resumable jobs)"),
     "score": ("idtrack_reproducibility.families.scorer", "score a family's run (partitions in parallel, then a merge)"),
+    "rescore": ("idtrack_reproducibility.rescore", "every registered scoring again under today's judge, from its stored answers"),
     "report": ("idtrack_reproducibility.families.report", "a scored run's report.tsv and tables"),
     "compare": ("idtrack_reproducibility.families.compare", "two scored runs: rates, regressions, every moved answer"),
     "explain": ("idtrack_reproducibility.families.explain", "the non-right answers asked again with their explained paths"),

@@ -13,14 +13,18 @@ Per organism it holds (docs/modest.md):
 Usage:
   idtrack-repro modest size [--per-stratum 500]          the size, from the sets' manifests (reads no set)
   idtrack-repro modest build [--per-stratum 500] [--families a,e] [--organisms ...] [--dry]
-  idtrack-repro modest run --tree <name> --out <folder> [--organisms ...] [--families ...]
+  idtrack-repro modest run --tree <name> --out <folder> [--organisms ...] [--families ...] [--shards d=8]
                                                            one job per organism (the configured runner)
-  idtrack-repro modest organism --tree <name> --organism <o> --out <folder>   (the job's body: every part in turn)
+  idtrack-repro modest organism --tree <name> --organism <o> --out <folder> [--shards d=8] [--score-only]
+                                                           the job's body: every part in turn (--score-only: the
+                                                           stored answers scored again under today's judge)
   idtrack-repro modest compare <folder a> <folder b> [--out <tsv>]
                                                            every part of two trees' runs: rates, regressions, moves
 
 A run's folder: `<out>/<organism>/<part>/` with the answers and the scored tables of each part (`harness`, the
-families, `hunts.json`), and `<out>/<organism>/modest.json` (the parts, their exit codes, times).
+families, `hunts.json`), and `<out>/<organism>/modest.json` (the parts, their exit codes, times, the answers taken
+from other runs of the same tree (`reused`: the runner's `reuse`), a part killed by a signal). A part may be asked in
+shards at once (`--shards d=8`, `[jobs.modest_shards]`): the runner's own sharding, each shard a process of the job.
 """
 import argparse
 import glob
@@ -109,16 +113,42 @@ def run(cmd, log):
     return rc, round(time.time() - t0, 1)
 
 
-def organism_parts(tree, organism, out, families=FAMILIES):
-    """The commands of one organism's modest run, in order: (part, [commands])."""
+def killed_by(rc):
+    """The signal that killed a command (`subprocess` gives -N; a shell that ran it gives 128 + N), else None."""
+    if rc < 0:
+        return -rc
+    if rc > 128:
+        return rc - 128
+    return None
+
+
+def asked(cmd, n):
+    """A runner's command for `n` shards: one command (`--shard 0/1`), or a list of the n shards' commands, run at once."""
+    return f"{cmd} --shard 0/1" if n <= 1 else [f"{cmd} --shard {i}/{n}" for i in range(n)]
+
+
+def shards_of(spec=None):
+    """{part: shards} of the configuration (`[jobs.modest_shards]`), updated by `spec` (`d=8,e=2`)."""
+    out = dict(CFG.get().modest_shards)
+    for x in (spec or "").split(","):
+        if x.strip():
+            k, v = x.split("=")
+            out[k.strip()] = int(v)
+    return out
+
+
+def organism_parts(tree, organism, out, families=FAMILIES, shards=None):
+    """The commands of one organism's modest run, in order: (part, [commands]); a command that is a list is the
+    shards of one part's runner, run at once (`shards`: {part: n})."""
     cfg = CFG.get()
+    shards = shards or {}
     t = cfg.tree(tree)
     graph = cfg.graph(tree, organism)
     py_tree, py = t["python"], cfg.python
     base = os.path.join(out, organism)
     common = f"--organism {organism} --clone {t['source']} --graph {graph}"
-    parts = [("harness", [f"{py_tree} -m idtrack_reproducibility.families.runner --family harness {common} "
-                          f"--out {base}/harness --shard 0/1",
+    parts = [("harness", [asked(f"{py_tree} -m idtrack_reproducibility.families.runner --family harness {common} "
+                                f"--out {base}/harness", shards.get("harness", 1)),
                           f"{py} -m idtrack_reproducibility.families.scorer --family harness --organism {organism} "
                           f"--run {base}/harness"])]
     for f in families:
@@ -127,7 +157,7 @@ def organism_parts(tree, organism, out, families=FAMILIES):
             continue
         runner = RUNNER.get(f, "idtrack_reproducibility.families.runner")
         fam = "" if f in RUNNER else f"--family {f} "
-        cmds = [f"{py_tree} -m {runner} {fam}{common} --out {base}/{f} --sets {sel} --shard 0/1"]
+        cmds = [asked(f"{py_tree} -m {runner} {fam}{common} --out {base}/{f} --sets {sel}", shards.get(f, 1))]
         if f == "e":  # family E is judged twice: its sets without the `_dec` revision sets, and with them
             from .families.e import score_e as SE
             for judge in ("now", "decided"):
@@ -143,20 +173,66 @@ def organism_parts(tree, organism, out, families=FAMILIES):
     return parts
 
 
+def run_shards(cmds, log):
+    """The shards of one part's runner at once (each to its own log beside `log`); the worst exit (a signal first)."""
+    t0 = time.time()
+    procs = []
+    with open(log, "a") as fo:
+        for k, c in enumerate(cmds):
+            fo.write(f"$ {c}   (shard log {log}.s{k})\n")
+    for k, c in enumerate(cmds):
+        procs.append(subprocess.Popen(c, shell=True, stdout=open(f"{log}.s{k}", "a"), stderr=subprocess.STDOUT))
+    rcs = [p.wait() for p in procs]
+    killed = [rc for rc in rcs if killed_by(rc)]
+    return (killed[0] if killed else max(rcs, key=abs)), round(time.time() - t0, 1)
+
+
+def reused_of(folder):
+    """{source run folder: lines} the part's runner took from other runs of the tree (its load records' `reused`)."""
+    out = {}
+    for p in glob.glob(os.path.join(folder, "answers", "load_*.json")):
+        for k, v in (json.load(open(p)).get("reused") or {}).items():
+            out[k] = out.get(k, 0) + v
+    return out
+
+
 def cmd_organism(a):
     base = os.path.join(a.out, a.organism)
     os.makedirs(base, exist_ok=True)
     log = os.path.join(base, "modest.log")
-    done = []
-    for part, cmds in organism_parts(a.tree, a.organism, a.out, a.families):
+    done, killed = [], None
+    for part, cmds in organism_parts(a.tree, a.organism, a.out, a.families, shards_of(getattr(a, "shards", None))):
+        if getattr(a, "score_only", False):  # the stored answers scored again (the judge of today); nothing asked
+            cmds = [c for c in cmds if isinstance(c, str) and "families.scorer" in c]
         for c in cmds:
-            rc, secs = run(c, log)
-            done.append(dict(part=part, command=c.split(" -m ", 1)[-1].split(" ", 1)[0], exit=rc, seconds=secs))
+            rc, secs = run_shards(c, log) if isinstance(c, list) else run(c, log)
+            first = c[0] if isinstance(c, list) else c
+            done.append(dict(part=part, command=first.split(" -m ", 1)[-1].split(" ", 1)[0], exit=rc, seconds=secs,
+                             **({"shards": len(c)} if isinstance(c, list) else {})))
+            if " --shard " in first:
+                done[-1]["reused"] = reused_of(os.path.join(base, part))
+            sig = killed_by(rc)
+            if sig:  # killed (e.g. by the scheduler for memory): the run stops, never goes on beside a lost part
+                killed = dict(part=part, command=done[-1]["command"], signal=sig)
+                break
             if rc and part != "hunts":  # a reproducer exits 1 when a finding changed: a result, not a failure
                 break
+        if killed:
+            break
     tr = CFG.get().tree(a.tree)
-    json.dump(dict(tree=a.tree, commit=tr["commit"], organism=a.organism, parts=done,
-                   finished=time.strftime("%Y-%m-%d %H:%M:%S")), open(os.path.join(base, "modest.json"), "w"), indent=1)
+    rec = os.path.join(base, "modest.json")
+    if not getattr(a, "score_only", False) and os.path.exists(rec):  # an earlier run of this organism keeps its record
+        k = len(glob.glob(os.path.join(base, "modest.earlier_*.json"))) + 1
+        os.replace(rec, os.path.join(base, f"modest.earlier_{k}.json"))
+    json.dump(dict(tree=a.tree, commit=tr["commit"], organism=a.organism, parts=done, killed=killed,
+                   finished=time.strftime("%Y-%m-%d %H:%M:%S")),
+              open(os.path.join(base, "modest_scored_again.json" if getattr(a, "score_only", False) else "modest.json"), "w"),
+              indent=1)  # a scoring again keeps the run's own record
+    if killed:
+        sys.stderr.write(f"{a.organism}: part {killed['part']} ({killed['command']}) was killed by signal {killed['signal']} "
+                         f"(SIGKILL: most often the job's memory; see `modest run` and [jobs.modest_memory_gb]); "
+                         f"the run stopped, the parts after it were not run\n")
+        return 2
     bad = [d for d in done if d["exit"] and d["part"] != "hunts"]
     print(f"{a.organism}: {len(done)} steps, {len(bad)} failed")
     return 1 if bad else 0
@@ -166,13 +242,17 @@ def cmd_run(a):
     from . import jobs
     cfg = CFG.get()
     ids = []
+    shards = shards_of(a.shards)
+    n = max([1] + [v for k, v in shards.items() if k == "harness" or k in a.families])
     for o in a.organisms:
-        mem = a.mem or jobs.memory_for(o)  # the parts run one after another: the largest part's peak
+        # the parts run one after another: the largest part's measured peak; a part's n shards at once each hold the graph
+        mem = a.mem or max(cfg.modest_memory_gb[o], n * cfg.memory_gb[o] if n > 1 else 0)
         fam = f" --families {','.join(a.families)}" if a.families != FAMILIES else ""
+        sh = f" --shards {a.shards}" if a.shards else ""
         ids.append(jobs.submit(f"modest_{a.tree}_{o}", jobs.module(cfg.python, "idtrack_reproducibility.modest",
                                                                    f"organism --tree {a.tree} --organism {o} "
-                                                                   f"--out {os.path.abspath(a.out)}{fam}"),
-                               os.path.join(os.path.abspath(a.out), "logs"), cpus=2, mem_gb=mem, time=a.time))
+                                                                   f"--out {os.path.abspath(a.out)}{fam}{sh}"),
+                               os.path.join(os.path.abspath(a.out), "logs"), cpus=max(2, n), mem_gb=mem, time=a.time))
     print(" ".join(ids))
 
 
@@ -218,13 +298,17 @@ def main(argv=None):
     r.add_argument("--tree", required=True)
     r.add_argument("--out", required=True)
     r.add_argument("--time", default="08:00:00")
-    r.add_argument("--mem", type=int, default=None, help="GB per job (default: the configuration's [jobs.memory_gb])")
+    r.add_argument("--mem", type=int, default=None, help="GB per job (default: the configuration's [jobs.modest_memory_gb])")
+    r.add_argument("--shards", default=None, help="parts asked in shards at once, `d=8,e=2` (beside [jobs.modest_shards])")
     lists(r)
     o = sub.add_parser("organism")
     o.add_argument("--tree", required=True)
     o.add_argument("--organism", required=True)
     o.add_argument("--out", required=True)
     o.add_argument("--families", default=",".join(FAMILIES))
+    o.add_argument("--shards", default=None)
+    o.add_argument("--score-only", action="store_true", help="score the stored answers again (today's judge); ask nothing, "
+                   "run no reproducer")
     c = sub.add_parser("compare")
     c.add_argument("a")
     c.add_argument("b")

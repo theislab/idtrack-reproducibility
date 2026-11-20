@@ -1,204 +1,9 @@
 judge	organism	stratum	n	right	expected_error	wrong	undetermined	timeout	error	rate	wilson_low	wilson_high	answered	undetermined_answered
-now	mus_musculus	e1_batch_blank	27	0	27	0	0	0	0	1.0000	0.8754	1.0000	0	0
-now	mus_musculus	e1_batch_d52	123	0	0	0	123	0	0				48	48
-now	mus_musculus	e1_batch_d81	36	0	0	0	36	0	0				36	36
-now	mus_musculus	e1_batch_neighbour	438	438	0	0	0	0	0	1.0000	0.9913	1.0000	438	0
-now	mus_musculus	e1_batch_other	60	0	0	0	60	0	0				6	6
-now	mus_musculus	e1_fromdb_blank	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
-now	mus_musculus	e1_fromdb_d52	82	0	0	0	82	0	0				0	0
-now	mus_musculus	e1_fromdb_d81	24	0	0	0	24	0	0				0	0
-now	mus_musculus	e1_fromdb_other	40	0	0	0	40	0	0				0	0
-now	mus_musculus	e1_single_blank	9	0	9	0	0	0	0	1.0000	0.7009	1.0000	0	0
-now	mus_musculus	e1_single_d52	41	0	0	0	41	0	0				16	16
-now	mus_musculus	e1_single_d81	12	0	0	0	12	0	0				12	12
-now	mus_musculus	e1_single_other	20	0	0	0	20	0	0				2	2
-now	mus_musculus	e2_acc_refseq	200	199	0	0	1	0	0	1.0000	0.9811	1.0000	100	1
-now	mus_musculus	e2_acc_uniprot	200	196	0	0	4	0	0	1.0000	0.9808	1.0000	200	4
-now	mus_musculus	e2_all_makeunique	231585	231180	0	33	372	0	0	0.9999	0.9998	0.9999	344	218
-now	mus_musculus	e2_all_punct	231585	231092	0	493	0	0	0	0.9979	0.9977	0.9981	14307	0
-now	mus_musculus	e2_bidi_gu	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
-now	mus_musculus	e2_bidi_gv	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
-now	mus_musculus	e2_bidi_name	2000	2000	0	0	0	0	0	1.0000	0.9981	1.0000	0	0
-now	mus_musculus	e2_bidi_ncbi	1000	1000	0	0	0	0	0	1.0000	0.9962	1.0000	0	0
-now	mus_musculus	e2_bidi_refseq	500	500	0	0	0	0	0	1.0000	0.9924	1.0000	0	0
-now	mus_musculus	e2_bidi_syn	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
-now	mus_musculus	e2_bidi_tl	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
-now	mus_musculus	e2_bidi_tx	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
-now	mus_musculus	e2_bidi_uniprot	500	500	0	0	0	0	0	1.0000	0.9924	1.0000	0	0
-now	mus_musculus	e2_brackets_gu	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_brackets_gv	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_brackets_name	1600	1600	0	0	0	0	0	1.0000	0.9976	1.0000	0	0
-now	mus_musculus	e2_brackets_ncbi	800	800	0	0	0	0	0	1.0000	0.9952	1.0000	0	0
-now	mus_musculus	e2_brackets_refseq	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
-now	mus_musculus	e2_brackets_syn	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_brackets_tl	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_brackets_tx	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_brackets_uniprot	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
-now	mus_musculus	e2_case_lower_alone	71174	71174	0	0	0	0	0	1.0000	0.9999	1.0000	71174	0
-now	mus_musculus	e2_case_lower_competing	14	12	0	2	0	0	0	0.8571	0.6006	0.9599	14	0
-now	mus_musculus	e2_case_lower_folded	6163	0	0	0	6163	0	0				6163	6163
-now	mus_musculus	e2_case_upper_alone	70980	70980	0	0	0	0	0	1.0000	0.9999	1.0000	70980	0
-now	mus_musculus	e2_case_upper_competing	131	121	0	10	0	0	0	0.9237	0.8652	0.9580	131	0
-now	mus_musculus	e2_case_upper_folded	5998	0	0	0	5998	0	0				5998	5998
-now	mus_musculus	e2_ctrl_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_ctrl_gv	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_ctrl_name	2800	2800	0	0	0	0	0	1.0000	0.9986	1.0000	0	0
-now	mus_musculus	e2_ctrl_ncbi	1400	1400	0	0	0	0	0	1.0000	0.9973	1.0000	0	0
-now	mus_musculus	e2_ctrl_refseq	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
-now	mus_musculus	e2_ctrl_syn	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_ctrl_tl	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_ctrl_tx	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_ctrl_uniprot	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
-now	mus_musculus	e2_dash_name	112	112	0	0	0	0	0	1.0000	0.9668	1.0000	0	0
-now	mus_musculus	e2_dash_syn	264	264	0	0	0	0	0	1.0000	0.9857	1.0000	0	0
-now	mus_musculus	e2_emoji_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_emoji_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_emoji_name	800	800	0	0	0	0	0	1.0000	0.9952	1.0000	0	0
-now	mus_musculus	e2_emoji_ncbi	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
-now	mus_musculus	e2_emoji_refseq	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
-now	mus_musculus	e2_emoji_syn	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_emoji_tl	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_emoji_tx	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_emoji_uniprot	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
-now	mus_musculus	e2_fullwidth_gu	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_fullwidth_gv	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_fullwidth_name	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
-now	mus_musculus	e2_fullwidth_ncbi	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
-now	mus_musculus	e2_fullwidth_refseq	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
-now	mus_musculus	e2_fullwidth_syn	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_fullwidth_tl	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_fullwidth_tx	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_fullwidth_uniprot	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
-now	mus_musculus	e2_idcase_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	300	0
-now	mus_musculus	e2_idcase_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	300	0
-now	mus_musculus	e2_innerspace_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_innerspace_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_innerspace_name	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	1	0
-now	mus_musculus	e2_innerspace_ncbi	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
-now	mus_musculus	e2_innerspace_refseq	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
-now	mus_musculus	e2_innerspace_syn	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_innerspace_tl	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_innerspace_tx	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_innerspace_uniprot	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
-now	mus_musculus	e2_internal_name	400	391	0	9	0	0	0	0.9775	0.9578	0.9881	22	0
-now	mus_musculus	e2_internal_syn	150	149	0	1	0	0	0	0.9933	0.9632	0.9988	150	0
-now	mus_musculus	e2_junk_arabic	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_cjk	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_combining	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_emoji	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_inj	17	17	0	0	0	0	0	1.0000	0.8157	1.0000	0	0
-now	mus_musculus	e2_junk_mixed	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_num	9	9	0	0	0	0	0	1.0000	0.7009	1.0000	0	0
-now	mus_musculus	e2_junk_rtl	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_sep	4	4	0	0	0	0	0	1.0000	0.5101	1.0000	0	0
-now	mus_musculus	e2_junk_surrogates	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_junk_wild	7	6	0	1	0	0	0	0.8571	0.4869	0.9743	1	0
-now	mus_musculus	e2_junk_zw	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e2_long	8	8	0	0	0	0	0	1.0000	0.6756	1.0000	0	0
-now	mus_musculus	e2_long_padded	2	2	0	0	0	0	0	1.0000	0.3424	1.0000	2	0
-now	mus_musculus	e2_longversion	1200	750	0	0	0	0	450	0.6250	0.5973	0.6520	750	0
-now	mus_musculus	e2_lookalike_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_lookalike_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_lookalike_name	221	221	0	0	0	0	0	1.0000	0.9829	1.0000	0	0
-now	mus_musculus	e2_lookalike_refseq	197	197	0	0	0	0	0	1.0000	0.9809	1.0000	0	0
-now	mus_musculus	e2_lookalike_syn	203	203	0	0	0	0	0	1.0000	0.9814	1.0000	0	0
-now	mus_musculus	e2_lookalike_tl	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_lookalike_tx	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
-now	mus_musculus	e2_lookalike_uniprot	164	164	0	0	0	0	0	1.0000	0.9771	1.0000	0	0
-now	mus_musculus	e2_makeunique_name	2000	1997	0	0	3	0	0	1.0000	0.9981	1.0000	0	0
-now	mus_musculus	e2_makeunique_syn	750	745	0	0	5	0	0	1.0000	0.9949	1.0000	5	5
-now	mus_musculus	e2_numbers_ncbi	1600	1600	0	0	0	0	0	1.0000	0.9976	1.0000	0	0
-now	mus_musculus	e2_prefix	500	500	0	0	0	0	0	1.0000	0.9924	1.0000	0	0
-now	mus_musculus	e2_punct_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_punct_gv	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	0	0
-now	mus_musculus	e2_punct_name	2800	2798	0	2	0	0	0	0.9993	0.9974	0.9998	78	0
-now	mus_musculus	e2_punct_ncbi	1400	1400	0	0	0	0	0	1.0000	0.9973	1.0000	0	0
-now	mus_musculus	e2_punct_refseq	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_punct_syn	1050	1047	0	3	0	0	0	0.9971	0.9916	0.9990	91	0
-now	mus_musculus	e2_punct_tl	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_punct_tx	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_punct_uniprot	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
-now	mus_musculus	e2_separators_name	42	34	0	0	8	0	0	1.0000	0.8985	1.0000	28	8
-now	mus_musculus	e2_separators_syn	104	104	0	0	0	0	0	1.0000	0.9644	1.0000	71	0
-now	mus_musculus	e2_txcase_tl_unversioned	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
-now	mus_musculus	e2_txcase_tl_versioned	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	150	0
-now	mus_musculus	e2_txcase_tx_unversioned	134	134	0	0	0	0	0	1.0000	0.9721	1.0000	0	0
-now	mus_musculus	e2_txcase_tx_versioned	166	166	0	0	0	0	0	1.0000	0.9774	1.0000	166	0
-now	mus_musculus	e2_versionform_gv	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	300	0
-now	mus_musculus	e2_ws_gu	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
-now	mus_musculus	e2_ws_gv	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
-now	mus_musculus	e2_ws_name	2400	2400	0	0	0	0	0	1.0000	0.9984	1.0000	2400	0
-now	mus_musculus	e2_ws_ncbi	1200	1200	0	0	0	0	0	1.0000	0.9968	1.0000	1200	0
-now	mus_musculus	e2_ws_refseq	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	600	0
-now	mus_musculus	e2_ws_syn	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
-now	mus_musculus	e2_ws_tl	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
-now	mus_musculus	e2_ws_tx	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
-now	mus_musculus	e2_ws_uniprot	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	600	0
-now	mus_musculus	e2_zw_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_zw_gv	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_zw_name	2800	2800	0	0	0	0	0	1.0000	0.9986	1.0000	0	0
-now	mus_musculus	e2_zw_ncbi	1400	1400	0	0	0	0	0	1.0000	0.9973	1.0000	0	0
-now	mus_musculus	e2_zw_refseq	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
-now	mus_musculus	e2_zw_syn	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_zw_tl	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_zw_tx	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
-now	mus_musculus	e2_zw_uniprot	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
-now	mus_musculus	e3_batch_container	40	10	30	0	0	0	0	1.0000	0.9124	1.0000	10	0
-now	mus_musculus	e3_batch_empty	1	0	0	0	1	0	0				0	0
-now	mus_musculus	e3_batch_iterable	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e3_batch_nonstring_item	10	0	10	0	0	0	0	1.0000	0.7225	1.0000	0	0
-now	mus_musculus	e3_batch_pd_string_na	1	0	1	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e3_batch_str	1	0	1	0	0	0	0	1.0000	0.2065	1.0000	0	0
-now	mus_musculus	e3_single_nonstring	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
-now	mus_musculus	e3_single_npstr	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	1	0
-now	mus_musculus	e3_single_npstr_ref	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	1	0
-now	mus_musculus	e4_gene_unversioned	20000	20000	0	0	0	0	0	1.0000	0.9998	1.0000	0	0
-now	mus_musculus	e4_gene_versioned	196033	196033	0	0	0	0	0	1.0000	1.0000	1.0000	0	0
-now	mus_musculus	e4_ncbi_foreign	6000	0	0	0	6000	0	0				149	149
-now	mus_musculus	e4_symbol_absent	2413	0	0	0	2413	0	0				26	26
-now	mus_musculus	e4_symbol_case	8363	8363	0	0	0	0	0	1.0000	0.9995	1.0000	8363	0
-now	mus_musculus	e4_symbol_exact	4	2	0	2	0	0	0	0.5000	0.1500	0.8500	2	0
-now	mus_musculus	e4_symbol_other	242	0	0	0	242	0	0				221	221
-now	mus_musculus	e4_symbol_shared	978	0	0	0	978	0	0				977	977
-now	mus_musculus	e4_transcript	12000	12000	0	0	0	0	0	1.0000	0.9997	1.0000	0	0
-now	mus_musculus	e4_translation	4000	4000	0	0	0	0	0	1.0000	0.9990	1.0000	0	0
-now	mus_musculus	e5_backward	2	0	0	0	2	0	0				1	1
-now	mus_musculus	e5_database_spelling	6	6	0	0	0	0	0	1.0000	0.6097	1.0000	3	0
-now	mus_musculus	e5_database_synonym	1	0	0	0	1	0	0				0	0
-now	mus_musculus	e5_database_type	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
-now	mus_musculus	e5_database_unknown	6	0	6	0	0	0	0	1.0000	0.6097	1.0000	0	0
-now	mus_musculus	e5_infer_mode	4	0	0	0	4	0	0				4	4
-now	mus_musculus	e5_infer_mode_invalid	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
-now	mus_musculus	e5_infer_nothing	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_reference	4	2	0	0	2	0	0	1.0000	0.3424	1.0000	2	0
-now	mus_musculus	e5_release_above	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_below	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_false	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_float	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
-now	mus_musculus	e5_release_huge	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_list	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_nan	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_negative	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_numpy	5	5	0	0	0	0	0	1.0000	0.5655	1.0000	4	0
-now	mus_musculus	e5_release_str	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e5_release_true	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
-now	mus_musculus	e5_release_zero	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
-now	mus_musculus	e8_case_pair	8345	8345	0	0	0	0	0	1.0000	0.9995	1.0000	8345	0
-now	mus_musculus	e8_identity_unversioned_primary	1024739	1024739	0	0	0	0	0	1.0000	1.0000	1.0000	1024739	0
-now	mus_musculus	e8_identity_versioned_patch	12874	12874	0	0	0	0	0	1.0000	0.9997	1.0000	12874	0
-now	mus_musculus	e8_identity_versioned_primary	2120132	2120132	0	0	0	0	0	1.0000	1.0000	1.0000	2120132	0
-now	mus_musculus	e8_infer_duplicates	24	23	0	1	0	0	0	0.9583	0.7976	0.9926	24	0
-now	mus_musculus	e8_infer_order	96	48	0	0	48	0	0	1.0000	0.9259	1.0000	96	48
-now	mus_musculus	e8_versioned_pair	6000	6000	0	0	0	0	0	1.0000	0.9994	1.0000	6000	0
-now	mus_musculus	e8_whitespace_pair	4000	4000	0	0	0	0	0	1.0000	0.9990	1.0000	4000	0
-now	mus_musculus	hunt_IN-1	3	0	0	0	3	0	0				3	3
-now	mus_musculus	hunt_IN-11	1	0	0	1	0	0	0	0.0000	0.0000	0.7935	1	0
-now	mus_musculus	hunt_IN-2	5	0	0	0	5	0	0				5	5
 decided	mus_musculus	e1_batch_blank	27	0	27	0	0	0	0	1.0000	0.8754	1.0000	0	0
 decided	mus_musculus	e1_batch_d52	123	0	0	123	0	0	0	0.0000	0.0000	0.0303	48	0
 decided	mus_musculus	e1_batch_d81	36	0	0	36	0	0	0	0.0000	0.0000	0.0964	36	0
 decided	mus_musculus	e1_batch_neighbour	438	438	0	0	0	0	0	1.0000	0.9913	1.0000	438	0
-decided	mus_musculus	e1_batch_other	60	0	0	0	60	0	0				6	6
+decided	mus_musculus	e1_batch_other	60	0	0	9	51	0	0	0.0000	0.0000	0.2991	6	6
 decided	mus_musculus	e1_fromdb_blank	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
 decided	mus_musculus	e1_fromdb_d52	82	0	0	0	82	0	0				0	0
 decided	mus_musculus	e1_fromdb_d81	24	0	0	0	24	0	0				0	0
@@ -206,10 +11,10 @@ decided	mus_musculus	e1_fromdb_other	40	0	0	0	40	0	0				0	0
 decided	mus_musculus	e1_single_blank	9	0	9	0	0	0	0	1.0000	0.7009	1.0000	0	0
 decided	mus_musculus	e1_single_d52	41	0	0	41	0	0	0	0.0000	0.0000	0.0857	16	0
 decided	mus_musculus	e1_single_d81	12	0	0	12	0	0	0	0.0000	0.0000	0.2425	12	0
-decided	mus_musculus	e1_single_other	20	0	0	0	20	0	0				2	2
+decided	mus_musculus	e1_single_other	20	0	0	3	17	0	0	0.0000	0.0000	0.5615	2	2
 decided	mus_musculus	e2_acc_refseq	200	199	0	0	1	0	0	1.0000	0.9811	1.0000	100	1
 decided	mus_musculus	e2_acc_uniprot	200	196	0	0	4	0	0	1.0000	0.9808	1.0000	200	4
-decided	mus_musculus	e2_all_makeunique	231585	231180	0	33	372	0	0	0.9999	0.9998	0.9999	344	218
+decided	mus_musculus	e2_all_makeunique	231585	231180	0	28	377	0	0	0.9999	0.9998	0.9999	344	223
 decided	mus_musculus	e2_all_punct	231585	13814	0	217771	0	0	0	0.0596	0.0587	0.0606	14307	0
 decided	mus_musculus	e2_bidi_gu	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
 decided	mus_musculus	e2_bidi_gv	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
@@ -231,10 +36,10 @@ decided	mus_musculus	e2_brackets_tx	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
 decided	mus_musculus	e2_brackets_uniprot	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
 decided	mus_musculus	e2_case_lower_alone	71174	71174	0	0	0	0	0	1.0000	0.9999	1.0000	71174	0
 decided	mus_musculus	e2_case_lower_competing	14	2	0	12	0	0	0	0.1429	0.0401	0.3994	14	0
-decided	mus_musculus	e2_case_lower_folded	6163	0	0	0	6163	0	0				6163	6163
+decided	mus_musculus	e2_case_lower_folded	6163	3	0	0	6160	0	0	1.0000	0.4385	1.0000	6163	6160
 decided	mus_musculus	e2_case_upper_alone	70980	70980	0	0	0	0	0	1.0000	0.9999	1.0000	70980	0
 decided	mus_musculus	e2_case_upper_competing	131	0	0	131	0	0	0	0.0000	0.0000	0.0285	131	0
-decided	mus_musculus	e2_case_upper_folded	5998	0	0	0	5998	0	0				5998	5998
+decided	mus_musculus	e2_case_upper_folded	5998	3	0	2	5993	0	0	0.6000	0.2307	0.8824	5998	5993
 decided	mus_musculus	e2_ctrl_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
 decided	mus_musculus	e2_ctrl_gv	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
 decided	mus_musculus	e2_ctrl_name	2800	2800	0	0	0	0	0	1.0000	0.9986	1.0000	0	0
@@ -389,3 +194,198 @@ decided	mus_musculus	e8_whitespace_pair	4000	4000	0	0	0	0	0	1.0000	0.9990	1.0000
 decided	mus_musculus	hunt_IN-1	3	0	0	2	1	0	0	0.0000	0.0000	0.6576	3	1
 decided	mus_musculus	hunt_IN-11	1	0	0	1	0	0	0	0.0000	0.0000	0.7935	1	0
 decided	mus_musculus	hunt_IN-2	5	0	0	5	0	0	0	0.0000	0.0000	0.4345	5	0
+now	mus_musculus	e1_batch_blank	27	0	27	0	0	0	0	1.0000	0.8754	1.0000	0	0
+now	mus_musculus	e1_batch_d52	123	0	0	0	123	0	0				48	48
+now	mus_musculus	e1_batch_d81	36	0	0	0	36	0	0				36	36
+now	mus_musculus	e1_batch_neighbour	438	438	0	0	0	0	0	1.0000	0.9913	1.0000	438	0
+now	mus_musculus	e1_batch_other	60	0	0	0	60	0	0				6	6
+now	mus_musculus	e1_fromdb_blank	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
+now	mus_musculus	e1_fromdb_d52	82	0	0	0	82	0	0				0	0
+now	mus_musculus	e1_fromdb_d81	24	0	0	0	24	0	0				0	0
+now	mus_musculus	e1_fromdb_other	40	0	0	0	40	0	0				0	0
+now	mus_musculus	e1_single_blank	9	0	9	0	0	0	0	1.0000	0.7009	1.0000	0	0
+now	mus_musculus	e1_single_d52	41	0	0	0	41	0	0				16	16
+now	mus_musculus	e1_single_d81	12	0	0	0	12	0	0				12	12
+now	mus_musculus	e1_single_other	20	0	0	0	20	0	0				2	2
+now	mus_musculus	e2_acc_refseq	200	199	0	0	1	0	0	1.0000	0.9811	1.0000	100	1
+now	mus_musculus	e2_acc_uniprot	200	196	0	0	4	0	0	1.0000	0.9808	1.0000	200	4
+now	mus_musculus	e2_all_makeunique	231585	231180	0	28	377	0	0	0.9999	0.9998	0.9999	344	223
+now	mus_musculus	e2_all_punct	231585	231092	0	493	0	0	0	0.9979	0.9977	0.9981	14307	0
+now	mus_musculus	e2_bidi_gu	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
+now	mus_musculus	e2_bidi_gv	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
+now	mus_musculus	e2_bidi_name	2000	2000	0	0	0	0	0	1.0000	0.9981	1.0000	0	0
+now	mus_musculus	e2_bidi_ncbi	1000	1000	0	0	0	0	0	1.0000	0.9962	1.0000	0	0
+now	mus_musculus	e2_bidi_refseq	500	500	0	0	0	0	0	1.0000	0.9924	1.0000	0	0
+now	mus_musculus	e2_bidi_syn	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
+now	mus_musculus	e2_bidi_tl	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
+now	mus_musculus	e2_bidi_tx	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	0	0
+now	mus_musculus	e2_bidi_uniprot	500	500	0	0	0	0	0	1.0000	0.9924	1.0000	0	0
+now	mus_musculus	e2_brackets_gu	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_brackets_gv	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_brackets_name	1600	1600	0	0	0	0	0	1.0000	0.9976	1.0000	0	0
+now	mus_musculus	e2_brackets_ncbi	800	800	0	0	0	0	0	1.0000	0.9952	1.0000	0	0
+now	mus_musculus	e2_brackets_refseq	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
+now	mus_musculus	e2_brackets_syn	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_brackets_tl	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_brackets_tx	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_brackets_uniprot	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
+now	mus_musculus	e2_case_lower_alone	71174	71174	0	0	0	0	0	1.0000	0.9999	1.0000	71174	0
+now	mus_musculus	e2_case_lower_competing	14	12	0	2	0	0	0	0.8571	0.6006	0.9599	14	0
+now	mus_musculus	e2_case_lower_folded	6163	3	0	0	6160	0	0	1.0000	0.4385	1.0000	6163	6160
+now	mus_musculus	e2_case_upper_alone	70980	70980	0	0	0	0	0	1.0000	0.9999	1.0000	70980	0
+now	mus_musculus	e2_case_upper_competing	131	122	0	9	0	0	0	0.9313	0.8746	0.9634	131	0
+now	mus_musculus	e2_case_upper_folded	5998	3	0	2	5993	0	0	0.6000	0.2307	0.8824	5998	5993
+now	mus_musculus	e2_ctrl_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_ctrl_gv	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_ctrl_name	2800	2800	0	0	0	0	0	1.0000	0.9986	1.0000	0	0
+now	mus_musculus	e2_ctrl_ncbi	1400	1400	0	0	0	0	0	1.0000	0.9973	1.0000	0	0
+now	mus_musculus	e2_ctrl_refseq	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
+now	mus_musculus	e2_ctrl_syn	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_ctrl_tl	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_ctrl_tx	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_ctrl_uniprot	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
+now	mus_musculus	e2_dash_name	112	112	0	0	0	0	0	1.0000	0.9668	1.0000	0	0
+now	mus_musculus	e2_dash_syn	264	264	0	0	0	0	0	1.0000	0.9857	1.0000	0	0
+now	mus_musculus	e2_emoji_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_emoji_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_emoji_name	800	800	0	0	0	0	0	1.0000	0.9952	1.0000	0	0
+now	mus_musculus	e2_emoji_ncbi	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
+now	mus_musculus	e2_emoji_refseq	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
+now	mus_musculus	e2_emoji_syn	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_emoji_tl	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_emoji_tx	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_emoji_uniprot	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
+now	mus_musculus	e2_fullwidth_gu	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_fullwidth_gv	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_fullwidth_name	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	0	0
+now	mus_musculus	e2_fullwidth_ncbi	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
+now	mus_musculus	e2_fullwidth_refseq	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
+now	mus_musculus	e2_fullwidth_syn	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_fullwidth_tl	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_fullwidth_tx	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_fullwidth_uniprot	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
+now	mus_musculus	e2_idcase_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	300	0
+now	mus_musculus	e2_idcase_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	300	0
+now	mus_musculus	e2_innerspace_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_innerspace_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_innerspace_name	400	400	0	0	0	0	0	1.0000	0.9905	1.0000	1	0
+now	mus_musculus	e2_innerspace_ncbi	200	200	0	0	0	0	0	1.0000	0.9812	1.0000	0	0
+now	mus_musculus	e2_innerspace_refseq	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
+now	mus_musculus	e2_innerspace_syn	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_innerspace_tl	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_innerspace_tx	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_innerspace_uniprot	100	100	0	0	0	0	0	1.0000	0.9630	1.0000	0	0
+now	mus_musculus	e2_internal_name	400	391	0	9	0	0	0	0.9775	0.9578	0.9881	22	0
+now	mus_musculus	e2_internal_syn	150	149	0	1	0	0	0	0.9933	0.9632	0.9988	150	0
+now	mus_musculus	e2_junk_arabic	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_cjk	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_combining	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_emoji	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_inj	17	17	0	0	0	0	0	1.0000	0.8157	1.0000	0	0
+now	mus_musculus	e2_junk_mixed	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_num	9	9	0	0	0	0	0	1.0000	0.7009	1.0000	0	0
+now	mus_musculus	e2_junk_rtl	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_sep	4	4	0	0	0	0	0	1.0000	0.5101	1.0000	0	0
+now	mus_musculus	e2_junk_surrogates	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_junk_wild	7	6	0	1	0	0	0	0.8571	0.4869	0.9743	1	0
+now	mus_musculus	e2_junk_zw	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e2_long	8	8	0	0	0	0	0	1.0000	0.6756	1.0000	0	0
+now	mus_musculus	e2_long_padded	2	2	0	0	0	0	0	1.0000	0.3424	1.0000	2	0
+now	mus_musculus	e2_longversion	1200	750	0	0	0	0	450	0.6250	0.5973	0.6520	750	0
+now	mus_musculus	e2_lookalike_gu	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_lookalike_gv	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_lookalike_name	221	221	0	0	0	0	0	1.0000	0.9829	1.0000	0	0
+now	mus_musculus	e2_lookalike_refseq	197	197	0	0	0	0	0	1.0000	0.9809	1.0000	0	0
+now	mus_musculus	e2_lookalike_syn	203	203	0	0	0	0	0	1.0000	0.9814	1.0000	0	0
+now	mus_musculus	e2_lookalike_tl	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_lookalike_tx	300	300	0	0	0	0	0	1.0000	0.9874	1.0000	0	0
+now	mus_musculus	e2_lookalike_uniprot	164	164	0	0	0	0	0	1.0000	0.9771	1.0000	0	0
+now	mus_musculus	e2_makeunique_name	2000	1997	0	0	3	0	0	1.0000	0.9981	1.0000	0	0
+now	mus_musculus	e2_makeunique_syn	750	745	0	0	5	0	0	1.0000	0.9949	1.0000	5	5
+now	mus_musculus	e2_numbers_ncbi	1600	1600	0	0	0	0	0	1.0000	0.9976	1.0000	0	0
+now	mus_musculus	e2_prefix	500	500	0	0	0	0	0	1.0000	0.9924	1.0000	0	0
+now	mus_musculus	e2_punct_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_punct_gv	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	0	0
+now	mus_musculus	e2_punct_name	2800	2798	0	2	0	0	0	0.9993	0.9974	0.9998	78	0
+now	mus_musculus	e2_punct_ncbi	1400	1400	0	0	0	0	0	1.0000	0.9973	1.0000	0	0
+now	mus_musculus	e2_punct_refseq	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_punct_syn	1050	1047	0	3	0	0	0	0.9971	0.9916	0.9990	91	0
+now	mus_musculus	e2_punct_tl	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_punct_tx	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_punct_uniprot	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	0	0
+now	mus_musculus	e2_separators_name	42	34	0	0	8	0	0	1.0000	0.8985	1.0000	28	8
+now	mus_musculus	e2_separators_syn	104	104	0	0	0	0	0	1.0000	0.9644	1.0000	71	0
+now	mus_musculus	e2_txcase_tl_unversioned	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	0	0
+now	mus_musculus	e2_txcase_tl_versioned	150	150	0	0	0	0	0	1.0000	0.9750	1.0000	150	0
+now	mus_musculus	e2_txcase_tx_unversioned	134	134	0	0	0	0	0	1.0000	0.9721	1.0000	0	0
+now	mus_musculus	e2_txcase_tx_versioned	166	166	0	0	0	0	0	1.0000	0.9774	1.0000	166	0
+now	mus_musculus	e2_versionform_gv	750	750	0	0	0	0	0	1.0000	0.9949	1.0000	300	0
+now	mus_musculus	e2_ws_gu	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
+now	mus_musculus	e2_ws_gv	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
+now	mus_musculus	e2_ws_name	2400	2400	0	0	0	0	0	1.0000	0.9984	1.0000	2400	0
+now	mus_musculus	e2_ws_ncbi	1200	1200	0	0	0	0	0	1.0000	0.9968	1.0000	1200	0
+now	mus_musculus	e2_ws_refseq	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	600	0
+now	mus_musculus	e2_ws_syn	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
+now	mus_musculus	e2_ws_tl	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
+now	mus_musculus	e2_ws_tx	900	900	0	0	0	0	0	1.0000	0.9957	1.0000	900	0
+now	mus_musculus	e2_ws_uniprot	600	600	0	0	0	0	0	1.0000	0.9936	1.0000	600	0
+now	mus_musculus	e2_zw_gu	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_zw_gv	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_zw_name	2800	2800	0	0	0	0	0	1.0000	0.9986	1.0000	0	0
+now	mus_musculus	e2_zw_ncbi	1400	1400	0	0	0	0	0	1.0000	0.9973	1.0000	0	0
+now	mus_musculus	e2_zw_refseq	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
+now	mus_musculus	e2_zw_syn	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_zw_tl	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_zw_tx	1050	1050	0	0	0	0	0	1.0000	0.9964	1.0000	0	0
+now	mus_musculus	e2_zw_uniprot	700	700	0	0	0	0	0	1.0000	0.9945	1.0000	0	0
+now	mus_musculus	e3_batch_container	40	10	30	0	0	0	0	1.0000	0.9124	1.0000	10	0
+now	mus_musculus	e3_batch_empty	1	0	0	0	1	0	0				0	0
+now	mus_musculus	e3_batch_iterable	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e3_batch_nonstring_item	10	0	10	0	0	0	0	1.0000	0.7225	1.0000	0	0
+now	mus_musculus	e3_batch_pd_string_na	1	0	1	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e3_batch_str	1	0	1	0	0	0	0	1.0000	0.2065	1.0000	0	0
+now	mus_musculus	e3_single_nonstring	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
+now	mus_musculus	e3_single_npstr	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	1	0
+now	mus_musculus	e3_single_npstr_ref	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	1	0
+now	mus_musculus	e4_gene_unversioned	20000	20000	0	0	0	0	0	1.0000	0.9998	1.0000	0	0
+now	mus_musculus	e4_gene_versioned	196033	196033	0	0	0	0	0	1.0000	1.0000	1.0000	0	0
+now	mus_musculus	e4_ncbi_foreign	6000	0	0	0	6000	0	0				149	149
+now	mus_musculus	e4_symbol_absent	2413	0	0	0	2413	0	0				26	26
+now	mus_musculus	e4_symbol_case	8363	8363	0	0	0	0	0	1.0000	0.9995	1.0000	8363	0
+now	mus_musculus	e4_symbol_exact	4	2	0	2	0	0	0	0.5000	0.1500	0.8500	2	0
+now	mus_musculus	e4_symbol_other	242	0	0	0	242	0	0				221	221
+now	mus_musculus	e4_symbol_shared	978	0	0	0	978	0	0				977	977
+now	mus_musculus	e4_transcript	12000	12000	0	0	0	0	0	1.0000	0.9997	1.0000	0	0
+now	mus_musculus	e4_translation	4000	4000	0	0	0	0	0	1.0000	0.9990	1.0000	0	0
+now	mus_musculus	e5_backward	2	0	0	0	2	0	0				1	1
+now	mus_musculus	e5_database_spelling	6	6	0	0	0	0	0	1.0000	0.6097	1.0000	3	0
+now	mus_musculus	e5_database_synonym	1	0	0	0	1	0	0				0	0
+now	mus_musculus	e5_database_type	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
+now	mus_musculus	e5_database_unknown	6	0	6	0	0	0	0	1.0000	0.6097	1.0000	0	0
+now	mus_musculus	e5_infer_mode	4	0	0	0	4	0	0				4	4
+now	mus_musculus	e5_infer_mode_invalid	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
+now	mus_musculus	e5_infer_nothing	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_reference	4	2	0	0	2	0	0	1.0000	0.3424	1.0000	2	0
+now	mus_musculus	e5_release_above	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_below	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_false	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_float	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
+now	mus_musculus	e5_release_huge	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_list	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_nan	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_negative	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_numpy	5	5	0	0	0	0	0	1.0000	0.5655	1.0000	4	0
+now	mus_musculus	e5_release_str	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e5_release_true	3	0	3	0	0	0	0	1.0000	0.4385	1.0000	0	0
+now	mus_musculus	e5_release_zero	2	0	2	0	0	0	0	1.0000	0.3424	1.0000	0	0
+now	mus_musculus	e8_case_pair	8345	8345	0	0	0	0	0	1.0000	0.9995	1.0000	8345	0
+now	mus_musculus	e8_identity_unversioned_primary	1024739	1024739	0	0	0	0	0	1.0000	1.0000	1.0000	1024739	0
+now	mus_musculus	e8_identity_versioned_patch	12874	12874	0	0	0	0	0	1.0000	0.9997	1.0000	12874	0
+now	mus_musculus	e8_identity_versioned_primary	2120132	2120132	0	0	0	0	0	1.0000	1.0000	1.0000	2120132	0
+now	mus_musculus	e8_infer_duplicates	24	23	0	1	0	0	0	0.9583	0.7976	0.9926	24	0
+now	mus_musculus	e8_infer_order	96	48	0	0	48	0	0	1.0000	0.9259	1.0000	96	48
+now	mus_musculus	e8_versioned_pair	6000	6000	0	0	0	0	0	1.0000	0.9994	1.0000	6000	0
+now	mus_musculus	e8_whitespace_pair	4000	4000	0	0	0	0	0	1.0000	0.9990	1.0000	4000	0
+now	mus_musculus	hunt_IN-1	3	0	0	0	3	0	0				3	3
+now	mus_musculus	hunt_IN-11	1	0	0	1	0	0	0	0.0000	0.0000	0.7935	1	0
+now	mus_musculus	hunt_IN-2	5	0	0	0	5	0	0				5	5

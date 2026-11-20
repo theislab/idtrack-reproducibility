@@ -4,17 +4,18 @@
     df = records.load(parts=["a"], organisms=["sus_scrofa"])            # a pandas frame, one long table
     df = records.load(folders=["<run>/sus_scrofa/e/scores_now"])         # any scored folder (a modest run's part)
     hunts = records.load_hunts("<hunts>/reproduce/d4c2dda")              # the hunts' reproducers, one row per call
+    corpus = records.load_corpus("<corpus>/runs/d4c2dda/sus_scrofa/run1.jsonl.gz")   # the regression corpus's calls
+    h = records.load_h("<performance>/runs/<tree>/<organism>")           # family H's timed calls
+    raw = records.load_raw("<families>/g/raw/<tool>/<version>/<organism>")  # another tool's raw responses (family G)
 
-The rows are the scored folders' `outcomes/*.parquet` (written by the common scorer, `families/scorer.py`) with the
-folder's own facts added from its `run.json` and the answers' load records (the subject, its version, the graph's
-digest, the Python, when it was scored) and, where the folder was classified, the cause of each wrong answer
-(`causes.tsv.gz`) and its row of the known-limitations table. Record version 1 (`run.json` `record_version`) holds the
-query, the truth and the answer on every row; a scoring of version 0 holds them on the rows that are not right only:
-`load(..., complete=True)` fills `got`, `status`, `match` and `error_type` of its other rows from the run's answers
-and `query`, `expected` and `broad` from the family's sets (the latest line of the qid in the sets the scoring
-read), so that every row of every stored scoring is the same record.
+The rows are the scored folders' `outcomes/*.parquet` (written by the common scorer, `families/scorer.py`, and by the
+harness's own scorer, `harness/score.py`) with the folder's own facts added from its `run.json` and the answers' load
+records (the subject, its version, the graph's digest, the Python, when it was scored) and, where the folder was
+classified, the cause of each wrong answer (`causes.tsv.gz`) and its row of the known-limitations table. Every row
+holds the query, the truth, the answer as the subject returned it and the verdict (record version `RECORD_VERSION`;
+a scoring of an earlier version is scored again from its stored answers: `idtrack-repro rescore`).
 
-Usage (a quick look): python -m idtrack_reproducibility.records [--parts a,e] [--organisms ...] [--complete] [--out x.parquet]
+Usage (a quick look): python -m idtrack_reproducibility.records [--parts a,e] [--organisms ...] [--out x.parquet]
 """
 import argparse
 import csv
@@ -32,11 +33,16 @@ COLUMNS = ["record_version", "subject_kind", "subject", "subject_version", "grap
            "python", "part", "scoring", "organism", "family", "set", "qid", "view", "stratum", "kind", "variant",
            "unit", "query", "judge", "expected", "broad", "outcome", "reason", "got", "n_got", "status", "match",
            "error_type", "seconds", "calls", "cause", "cause_class", "limitation", "scored_at", "folder"]
-OUTCOMES = ("right", "wrong", "undetermined", "timeout", "error", "expected_error", "not_supported", "missing")
+OUTCOMES = ("right", "wrong", "undetermined", "timeout", "error", "expected_error", "not_supported", "missing", "unjudged")
+# The index of another tool's raw responses (family G): one row per request, beside the files that hold the responses
+# as the tool returned them (docs/records.md, "Another tool").
+RAW_COLUMNS = ["request_id", "tool", "tool_version", "organism", "endpoint", "method", "url", "params", "body", "qids",
+               "asked_at", "http_status", "seconds", "bytes", "sha256", "file", "error"]
 
 
-def registered_folders(parts=None, organisms=None, subjects=None):
-    """[(part, subject, organism, scored folder)] of the runs `results.toml` names, with E's two scorings each."""
+def registered_folders(parts=None, organisms=None, subjects=None, with_rows=True):
+    """[(part, subject, organism, scored folder)] of the runs `results.toml` names, with E's two scorings each (with
+    `with_rows`, only those whose rows of the record are in the data root)."""
     from .check import ROOT
     from . import results as RES
     data = CFG.get().root
@@ -51,7 +57,7 @@ def registered_folders(parts=None, organisms=None, subjects=None):
             base = os.path.join(data, e["folder"].format(organism=o))
             subs = [os.path.dirname(os.path.join(base, s)) for s in e.get("scored", ["run.json"])]
             for f in subs:
-                if glob.glob(os.path.join(f, "outcomes", "*.parquet")):
+                if not with_rows or glob.glob(os.path.join(f, "outcomes", "*.parquet")):
                     out.append((part, e["tree"], o, f))
     return out
 
@@ -94,70 +100,23 @@ def _limitations():
     return out
 
 
-def _complete(df, info):
-    """Fill the rows a scoring of record version 0 left without answer or truth (right answers) from the run's answers
-    and the family's sets."""
-    import pandas as pd
-    import pyarrow.parquet as pq
-    from .families import lines as L
-    need = df["got"].isna()
-    if need.any() and info.get("run") and os.path.isdir(os.path.join(info["run"], "answers")):
-        want = set(zip(df.loc[need, "qid"], df.loc[need, "view"]))
-        got = {}
-        for p in sorted(glob.glob(os.path.join(info["run"], "answers", "*.parquet"))):
-            t = pq.read_table(p, columns=["qid", "view", "got", "status", "match", "error_type"]).to_pandas()
-            for r in t.itertuples(index=False):
-                if (r.qid, r.view) in want:
-                    got[(r.qid, r.view)] = r
-        for c in ("got", "status", "match", "error_type"):
-            vals = []
-            for q, v, cur in zip(df["qid"], df["view"], df[c] if c in df else [None] * len(df)):
-                r = got.get((q, v))
-                if r is None or not (cur is None or (isinstance(cur, float) and pd.isna(cur))):
-                    vals.append(cur)
-                else:
-                    x = getattr(r, c)
-                    vals.append(",".join(x) if c == "got" and x is not None else x)
-            df[c] = vals
-    need = df["expected"].isna()
-    if need.any():
-        fam = info.get("family")
-        lines = L.load_qids(fam, info["organism"], set(df.loc[need, "qid"]), sets=info.get("sets") or None)
-        exp, brd, qry = [], [], []
-        for q, v, e, b, qq in zip(df["qid"], df["view"], df["expected"], df["broad"], df["query"]):
-            ln = lines.get(q)
-            if ln is None or not (e is None or (isinstance(e, float) and pd.isna(e))):
-                exp.append(e), brd.append(b), qry.append(qq)
-                continue
-            exp.append(",".join(ln.get("expect") or []))
-            brd.append(None if ln.get("broad") is None else ",".join(ln["broad"]))
-            qd = {k: ln.get(k) for k in ("id", "from_release", "to_release", "final_database", "from_database",
-                                         "expect_error") if ln.get(k) is not None or k in ("from_release", "final_database")}
-            qd["strategy"] = v
-            qry.append(json.dumps(qd, sort_keys=True, separators=(",", ":"), default=str))
-        df["expected"], df["broad"], df["query"] = exp, brd, qry
-    return df
-
-
-def load_folder(folder, part=None, complete=False, columns=None, limitations=None):
+def load_folder(folder, part=None, columns=None, limitations=None):
     """The record rows of one scored folder (a pandas frame with `COLUMNS`)."""
     import pandas as pd
     import pyarrow as pa
     import pyarrow.parquet as pq
     info = _run_info(folder)
+    if info["record_version"] < RECORD_VERSION:
+        raise SystemExit(f"{folder}: a scoring of record version {info['record_version']} (before {RECORD_VERSION}); score "
+                         f"it again from its stored answers: idtrack-repro rescore (or the scorer on its run)")
     tabs = [pq.read_table(p) for p in sorted(glob.glob(os.path.join(folder, "outcomes", "*.parquet")))]
-    df = pa.concat_tables(tabs, promote_options="default").to_pandas() if tabs else pd.DataFrame()
-    for c in ("status", "match", "error_type", "got", "query", "expected", "broad"):
-        if c not in df:
-            df[c] = None
-    if complete and info["record_version"] < 1 and len(df):
-        df = _complete(df, info)
+    df = pa.concat_tables(tabs, promote_options="default").to_pandas() if tabs else pd.DataFrame(columns=COLUMNS)
     for k in ("record_version", "subject_kind", "subject", "subject_version", "graph_digest", "asked_at", "endpoint",
               "python", "organism", "scored_at"):
         df[k] = info[k]
     df["part"] = part or info["family"]
     df["scoring"] = os.path.basename(folder) if os.path.basename(folder).startswith("scores_") else ""
-    df["folder"] = os.path.relpath(folder, CFG.get().root) if os.path.isabs(folder) else folder
+    df["folder"] = CFG.in_root(folder)
     df["judge"] = df.pop("rule") if "rule" in df else None
     cz = _causes(folder)
     pairs = list(zip(df["qid"], df["view"]))
@@ -172,13 +131,13 @@ def load_folder(folder, part=None, complete=False, columns=None, limitations=Non
     return df[columns] if columns else df
 
 
-def load(parts=None, organisms=None, subjects=None, folders=None, complete=False, columns=None):
+def load(parts=None, organisms=None, subjects=None, folders=None, columns=None):
     """One long table over the given scored folders, or over the runs `results.toml` registers (filtered by part,
     organism and subject: a tree's name in the registry)."""
     import pandas as pd
     lim = _limitations()
     todo = [(None, None, None, f) for f in folders] if folders else registered_folders(parts, organisms, subjects)
-    frames = [load_folder(f, part=p, complete=complete, columns=columns, limitations=lim) for p, _, _, f in todo]
+    frames = [load_folder(f, part=p, columns=columns, limitations=lim) for p, _, _, f in todo]
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=columns or COLUMNS)
 
 
@@ -207,17 +166,90 @@ def load_hunts(folder):
     return pd.DataFrame(rows).reindex(columns=COLUMNS)
 
 
+def _tree_of(path):
+    """(name, commit) of the tree whose run a file of `<runs>/<tree>/<organism>/` is: the configured tree's commit."""
+    name = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(path))))
+    t = CFG.get().trees.get(name) or {}
+    return name, t.get("commit", "")
+
+
+def load_corpus(answers, corpus=None):
+    """The regression corpus's answers of one run (`<corpus>/runs/<tree>/<organism>/run1.jsonl.gz` or `merged.jsonl.gz`)
+    as rows of the record: one row per call, the call's arguments as `query`, the answer's target ids as `got` and its
+    canonical form in `reason`, outcome `unjudged` (the corpus has no truth: docs/corpus.md); `corpus` is the corpus
+    file (default `<corpus>/corpus/<organism>.jsonl`)."""
+    import pandas as pd
+    org = os.path.basename(os.path.dirname(os.path.abspath(answers)))
+    corpus = corpus or os.path.join(CFG.get().corpus, "corpus", f"{org}.jsonl")
+    calls = {}
+    with open(corpus) as fh:
+        for x in fh:
+            c = json.loads(x)
+            calls[c["qid"]] = c
+    tree, commit = _tree_of(answers)
+    rows, meta = [], {}
+    opener = gzip.open if answers.endswith(".gz") else open
+    with opener(answers, "rt") as fh:
+        for x in fh:
+            r = json.loads(x)
+            if "meta" in r:
+                meta = r["meta"]
+                continue
+            if "qid" not in r:
+                continue
+            c = calls.get(r["qid"], {})
+            res = r.get("result") if isinstance(r.get("result"), dict) else {}
+            got = [str(t) for t in (res.get("target_id") or []) if not isinstance(t, (dict, list))]
+            err = r.get("error") or {}
+            rows.append(dict(record_version=RECORD_VERSION, subject_kind="tree", subject=tree, subject_version=commit,
+                             python=meta.get("python"), part="corpus", organism=org, family="corpus", qid=r["qid"],
+                             stratum=c.get("stratum"), kind=r.get("entry"), variant=None, unit=None,
+                             query=json.dumps(c.get("args"), sort_keys=True, default=str), judge="none (no truth)",
+                             outcome="unjudged", reason=json.dumps(r.get("result"), sort_keys=True, default=str)[:2000]
+                             if r.get("ok") else None, got=",".join(got), n_got=len(got),
+                             status=res.get("match") and ("converted" if got else None), match=res.get("match"),
+                             error_type=err.get("type") if isinstance(err, dict) else None, seconds=r.get("dt"),
+                             calls=1, scored_at=meta.get("start"), folder=CFG.in_root(answers)))
+    return pd.DataFrame(rows).reindex(columns=COLUMNS)
+
+
+def load_h(folder):
+    """Family H's timed calls of one run folder (`<performance>/runs/<tree>/<organism>/calls_rep<k>.calls.parquet`):
+    one row per call and repetition, outcome `unjudged` (H measures time, not answers), `kind` the measure (`A`: one
+    call per identifier with the defaults, caches cold; `F`: every corpus call with its own arguments)."""
+    import pandas as pd
+    import pyarrow.parquet as pq
+    frames = []
+    for p in sorted(glob.glob(os.path.join(folder, "*.calls.parquet"))):
+        df = pq.read_table(p).to_pandas()
+        df["folder"] = CFG.in_root(p)
+        frames.append(df)
+    return pd.concat(frames, ignore_index=True).reindex(columns=COLUMNS) if frames else pd.DataFrame(columns=COLUMNS)
+
+
+def raw_schema():
+    import pyarrow as pa
+    types = {"http_status": pa.int32(), "seconds": pa.float64(), "bytes": pa.int64(), "qids": pa.list_(pa.string())}
+    return pa.schema([(c, types.get(c, pa.string())) for c in RAW_COLUMNS])
+
+
+def load_raw(folder):
+    """Another tool's raw responses of one organism (`<families>/g/raw/<tool>/<version>/<organism>/index.parquet`): one
+    row per request with the file that holds the response as the tool returned it (`RAW_COLUMNS`)."""
+    import pyarrow.parquet as pq
+    return pq.read_table(os.path.join(folder, "index.parquet"), schema=raw_schema()).to_pandas()
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m idtrack_reproducibility.records", description=__doc__.split("\n\n")[0])
     ap.add_argument("--parts", default=None)
     ap.add_argument("--organisms", default=None)
     ap.add_argument("--subjects", default=None)
     ap.add_argument("--folders", default=None, help="comma-separated scored folders (instead of the registry's runs)")
-    ap.add_argument("--complete", action="store_true")
     ap.add_argument("--out", default=None, help="write the table as Parquet")
     a = ap.parse_args(argv)
     sp = lambda x: x.split(",") if x else None  # noqa: E731
-    df = load(sp(a.parts), sp(a.organisms), sp(a.subjects), sp(a.folders), a.complete)
+    df = load(sp(a.parts), sp(a.organisms), sp(a.subjects), sp(a.folders))
     print(f"{len(df):,} rows; by part and outcome:")
     if len(df):
         print(df.groupby(["part", "subject", "organism", "outcome"]).size().to_string())

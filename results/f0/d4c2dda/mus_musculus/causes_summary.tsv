@@ -10,6 +10,7 @@ old_gene_to_db	entrezgene_label_rows	a	rule `one_kind_per_database`	308	307
 retired_none	external_bridge	b	rule `external_bridge`	380	144
 reverse_absent	external_bridge	b	rule `external_bridge`	63	33
 synonym_to_gene	name_in_other_source	e	rule `names_before_synonyms`	4	4
+synonym_to_gene	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	3	2
 synonym_to_gene	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	112	44
 travel_handoff	external_bridge	b	rule `external_bridge`	119	3
 travel_merged	external_bridge	b	rule `external_bridge`	65	1

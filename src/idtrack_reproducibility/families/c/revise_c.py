@@ -1,7 +1,7 @@
 """Revision sets of family C: corrections of the judge where its truth is wrong, published under the qids of the lines
 they change (a published set is never rewritten; `lines.publish(revises=...)`), with the evidence in the docstring.
 
-Usage: revise_c.py <organism> --correction <name> --set <new set name> [--dry-run]
+Usage: revise_c.py <organism> --correction <name> --set <new set name> [--dry-run] [--redo <published revision set>]
 
 Corrections:
 - `rfam_label_accession`: an RFAM label line (`c4_rfam_label_*`, `c7_rfam_label`) whose label is written as an RFAM
@@ -15,7 +15,8 @@ Corrections:
   with a version is read where it had it, rule `accession_versions`; the core xref extracts and the GTF of that
   release): without `from_database` the string names those genes too, so an answer within them is not refuted;
   they go to `broad` (their walks to the target for a line read at an older release), and to `expect` of a `safe`
-  line (the string names them). The corrected judge's `names_broad` for family C.
+  line (the string names them); the copies the line expects apart are not others. The corrected judge's
+  `names_broad` for family C.
 """
 import argparse
 import collections
@@ -63,7 +64,7 @@ def rfam_label_accession(org, lines, ctx):
             for g in sorted(genes):
                 E, B = G.walks(g, R, [t])
                 ext |= set(G.tr.vset(E.get(t, set()) | B.get(t, set()), t))
-        ext -= set(rec.get("expect") or []) | set(rec.get("broad") or [])
+        ext -= set(rec.get("expect") or []) | set(rec.get("broad") or []) | set(rec.get("apart") or [])
         if not ext:
             continue
         new = dict(rec)
@@ -141,7 +142,9 @@ def other_database_broad(org, lines, ctx):
             for g in sorted(others):
                 E, B = G.walks(g, R, [t])
                 ext |= set(tr.vset(E.get(t, set()) | B.get(t, set()), t))
-        ext -= set(rec.get("expect") or [])
+        # the line's own genes and the copies it expects reported apart (rule `judge_copies_apart`: a copy on a patch
+        # or haplotype that carries the value is the line's, answered apart, never inside the answer) are no others
+        ext -= set(rec.get("expect") or []) | set(rec.get("apart") or [])
         if not ext:
             continue
         new = dict(rec)
@@ -164,8 +167,13 @@ def main():
     ap.add_argument("--set", required=True)
     ap.add_argument("--sets", default=None, help="the sets read (default: every published set)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--redo", default=None, help="a published revision set of this correction, made again (the correction "
+                    "fixed since): every line of it is corrected anew from its line before the set, and the lines that "
+                    "differ from the published ones are published as --set")
     a = ap.parse_args()
     org = a.organism
+    if a.redo:
+        return redo(org, a)
     sets = a.sets.split(",") if a.sets else None
     names = L.resolve_sets(FAMILY, org, sets, "revised")
     # the latest line of a qid: a revision set's line replaces the base set's (sets in the order of their seq)
@@ -195,6 +203,33 @@ def main():
     man = L.publish(FAMILY, org, a.set, out, f"revision `{a.correction}` (revise_c.py docstring)", ME,
                     revises=L.resolve_sets(FAMILY, org, None, "revised"), judge="c-" + a.correction, sources=["core_xref/<release>.tsv.gz", "gtf/genes_<release>.tsv.gz"],
                     manifest_extra=dict(correction=a.correction, revision=doc.strip() or a.correction), dry=a.dry_run, log=log)
+    log("published", {k: v for k, v in (man or {}).items() if k != "counts"})
+
+
+def redo(org, a):
+    """`--redo`: a published revision set of the correction made again from the lines before it (main's docstring)."""
+    names = L.resolve_sets(FAMILY, org, None, "revised")
+    before = names[:names.index(a.redo)]
+    published = {r["qid"]: r for r in L.iter_set(L._set_file(L.query_dir(FAMILY, org), a.redo))}
+    prior = L.load_qids(FAMILY, org, set(published), sets=before)
+    for r in prior.values():
+        r.pop("set", None)
+    again = {r["qid"]: r for r in CORRECTIONS[a.correction](org, list(prior.values()), {})}
+    keys = ("expect", "broad", "apart", "rule", "open", "revised_by", "other_carriers")
+    out = []
+    for q, old in published.items():
+        new = again.get(q, prior[q])  # where the correction no longer applies, the line before it is the truth again
+        if any((new.get(k) or None) != (old.get(k) or None) for k in keys):
+            out.append(new)
+    log("redo", a.redo, "lines", len(published), "differ", len(out),
+        dict(collections.Counter((r["stratum"], q in again) for q, r in ((r["qid"], r) for r in out))))
+    if not out:
+        return
+    doc = CORRECTIONS[a.correction].__doc__ or ""
+    man = L.publish(FAMILY, org, a.set, out, f"revision `{a.correction}` made again ({a.redo}; revise_c.py docstring)", ME,
+                    revises=names, judge="c-" + a.correction, sources=["core_xref/<release>.tsv.gz", "gtf/genes_<release>.tsv.gz"],
+                    manifest_extra=dict(correction=a.correction, redo=a.redo, revision=doc.strip() or a.correction),
+                    dry=a.dry_run, log=log)
     log("published", {k: v for k, v in (man or {}).items() if k != "counts"})
 
 

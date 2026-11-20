@@ -29,9 +29,9 @@ c2_default_v	best,default	129014	129014	0	0	0	0	1.0000	1.0000	1.0000
 c2_oldver	*	255804	224656	1464	29684	0	0	0.9935	0.9932	0.9938
 c2_oldver	all,default	127902	112251	809	14842	0	0	0.9928	0.9923	0.9933
 c2_oldver	best,default	127902	112405	655	14842	0	0	0.9942	0.9937	0.9946
-c2_retired	*	149288	128912	8	20368	0	0	0.9999	0.9999	1.0000
+c2_retired	*	149288	128912	4	20372	0	0	1.0000	0.9999	1.0000
 c2_retired	all,default	74644	64456	4	10184	0	0	0.9999	0.9998	1.0000
-c2_retired	best,default	74644	64456	4	10184	0	0	0.9999	0.9998	1.0000
+c2_retired	best,default	74644	64456	0	10188	0	0	1.0000	0.9999	1.0000
 c2_ver_catalog	*	8000	8000	0	0	0	0	1.0000	0.9995	1.0000
 c2_ver_catalog	all,default	4000	4000	0	0	0	0	1.0000	0.9990	1.0000
 c2_ver_catalog	best,default	4000	4000	0	0	0	0	1.0000	0.9990	1.0000
@@ -125,9 +125,9 @@ c4_rfam_label_default	best,default	54	54	0	0	0	0	1.0000	0.9336	1.0000
 c4_rfam_label_not_held	*	544	530	0	14	0	0	1.0000	0.9928	1.0000
 c4_rfam_label_not_held	all,default	272	265	0	7	0	0	1.0000	0.9857	1.0000
 c4_rfam_label_not_held	best,default	272	265	0	7	0	0	1.0000	0.9857	1.0000
-c4_rfam_label_retired	*	1690	1574	36	80	0	0	0.9776	0.9692	0.9838
-c4_rfam_label_retired	all,default	845	787	18	40	0	0	0.9776	0.9649	0.9858
-c4_rfam_label_retired	best,default	845	787	18	40	0	0	0.9776	0.9649	0.9858
+c4_rfam_label_retired	*	1690	1574	2	114	0	0	0.9987	0.9954	0.9997
+c4_rfam_label_retired	all,default	845	787	2	56	0	0	0.9975	0.9908	0.9993
+c4_rfam_label_retired	best,default	845	787	0	58	0	0	1.0000	0.9951	1.0000
 c4_rnacentral	*	28976	28976	0	0	0	0	1.0000	0.9999	1.0000
 c4_rnacentral	all,default	14488	14488	0	0	0	0	1.0000	0.9997	1.0000
 c4_rnacentral	best,default	14488	14488	0	0	0	0	1.0000	0.9997	1.0000

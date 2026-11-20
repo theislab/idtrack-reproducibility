@@ -1,0 +1,34 @@
+stratum	cause	class	rule	answers	units
+c1_retired	external_bridge	b	rule `external_bridge`	35	18
+c2_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	1366	608
+c2_oldver	external_bridge	b	rule `external_bridge`	244	128
+c2_oldver	unexplained	?	-	436	199
+c2_retired	external_bridge	b	rule `external_bridge`	147	76
+c2_retired	value_of_another_database	e	-	3	3
+c2_ver_gap	accession_version_never_had	a	rule `accession_versions` (decided)	7974	3987
+c2_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	7560	3780
+c2_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	7776	3888
+c3_deleted	external_bridge	b	rule `external_bridge`	491	250
+c3_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	5268	1382
+c3_oldver	external_bridge	b	rule `external_bridge`	230	57
+c3_oldver	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	17	17
+c3_oldver	unexplained	?	-	870	200
+c3_retired	external_bridge	b	rule `external_bridge`	510	262
+c3_secondary_held	external_bridge	b	rule `external_bridge`	10	7
+c3_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	7330	3665
+c3_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	7848	3924
+c4_mirbase_label	mirbase_not_in_graph	c	rule `mirbase_genes`	6	3
+c4_rfam_label_retired	rfam_label_is_accession	d	-	2	2
+c5_clone_retired	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+c5_clone_retired	unexplained	?	-	14	14
+c5_clone_retired	value_of_another_database	e	-	21	19
+c6:EntrezGene	entrezgene_label_rows	a	rule `one_kind_per_database`	127392	18322
+c6:NCBI gene (formerly Entrezgene)	ncbi_label_name_by_release	a	rule `one_kind_per_database` (decided)	361076	19842
+c7_ncbi	external_bridge	b	rule `external_bridge`	1396	291
+c7_ncbi	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	3229	272
+c7_ncbi	value_of_another_database	e	-	482	33
+c7_refseq	external_bridge	b	rule `external_bridge`	5530	1122
+c7_refseq	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	11657	1100
+c7_refseq	value_of_another_database	e	-	869	58
+c7_uniprot	external_bridge	b	rule `external_bridge`	234	114
+c7_uniprot	value_of_another_database	e	-	2	2

@@ -43,6 +43,8 @@ Jobs (`runner` is `slurm` or `local`; IDTRACK_REPRO_RUNNER):
     extra = []                     # further sbatch arguments
     [jobs.memory_gb]               # memory of a job that loads a graph, per organism
     homo_sapiens = 90
+    [jobs.modest_memory_gb]        # memory of a modest-set job (its largest part's measured peak), per organism
+    homo_sapiens = 8
 
 The module reads no idtrack and runs on Python 3.11 too (the Python of an older tree imports it).
 """
@@ -54,6 +56,12 @@ ORGANISMS = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "ma
 LOCATIONS = ["truth", "harness", "families", "corpus", "hunts", "performance", "graphs", "cache"]
 # Memory of one job that holds a graph of the reference tree (d4c2dda) and asks it, with room for the run (GB).
 MEMORY_GB = {"homo_sapiens": 90, "mus_musculus": 50, "sus_scrofa": 24, "macaca_mulatta": 24, "macaca_fascicularis": 20}
+# Memory of one job of the modest set (one organism; its parts run one after another, so the largest part's peak): the
+# largest measured peak of its parts plus a quarter (docs/modest.md, "Memory"): the scoring of the harness's sets in one
+# partition (pig 3.52, mouse 5.45, human 6.14, rhesus 2.52, cynomolgus 1.65 GB: the kernel's peak of the scorer, 2026-11-20),
+# the query shards (pig 3.5, mouse 4.6, human 4.8, rhesus 3.7, cynomolgus 3.2 GB) and the modest jobs of 2026-11-20 (at
+# most 5.6 GB, mouse; 5.7 GB human).
+MODEST_MEMORY_GB = {"homo_sapiens": 8, "mus_musculus": 7, "sus_scrofa": 5, "macaca_mulatta": 5, "macaca_fascicularis": 4}
 SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # the folder holding the package (src/)
 
 
@@ -99,6 +107,8 @@ class Config:
                           qos=os.environ.get("IDTRACK_REPRO_SLURM_QOS") or sl.get("qos"),
                           extra=list(sl.get("extra", [])))
         self.memory_gb = dict(MEMORY_GB, **jobs.get("memory_gb", {}))
+        self.modest_memory_gb = dict(MODEST_MEMORY_GB, **jobs.get("modest_memory_gb", {}))
+        self.modest_shards = dict(jobs.get("modest_shards", {}))  # part -> shards asked at once in a modest job
         self.python = jobs.get("python") or sys.executable  # the Python of this package in jobs
 
     def source(self, name):
@@ -143,6 +153,29 @@ class Config:
 
 
 _CONFIG = None
+
+
+KEEP = object()
+
+
+def in_root(path, outside=KEEP):
+    """A path as a record stores it: relative to the data root when it lies inside it (so that the data root can move);
+    else the absolute path, or `outside` where given (e.g. None: a checkout outside the data root is no part of the
+    record, whose commit names it)."""
+    if not path:
+        return path
+    full = os.path.abspath(path)
+    for base in (os.path.abspath(get().root), os.path.realpath(get().root)):
+        if full == base or full.startswith(base + os.sep):
+            return os.path.relpath(full, base)
+    return full if outside is KEEP else outside
+
+
+def from_root(path):
+    """A path a record stores (`in_root`) as an absolute path: a relative one is read from the data root."""
+    if not path:
+        return path
+    return path if os.path.isabs(path) else os.path.normpath(os.path.join(get().root, path))
 
 
 def find_file():

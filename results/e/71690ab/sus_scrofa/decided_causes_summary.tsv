@@ -3,12 +3,13 @@ e1_batch_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; de
 e1_batch_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	87	29
 e1_batch_d81	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	18	6
 e1_batch_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	18	6
+e1_batch_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	9	3
 e1_single_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	12	12
 e1_single_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	29	29
 e1_single_d81	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	6	6
 e1_single_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	6	6
-e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	84	36
-e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	24	24
+e1_single_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	3	3
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	82	36
 e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	26	26
 e2_all_punct	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	48640	16367
 e2_dash_name	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	24	3
@@ -29,7 +30,6 @@ e2_longversion	long_input_not_refused	a	rule `bounded_arguments` (finding IN-8; 
 e2_longversion	long_version_value_error	a	rule `bounded_arguments` (finding IN-8; decided)	450	150
 e2_makeunique_name	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	3	1
 e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	4	2
-e2_makeunique_syn	suffix_form_is_name_at_unread_release	e	-	2	2
 e2_punct_gu	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	1050	150
 e2_punct_gv	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	900	150
 e2_punct_name	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	2790	400

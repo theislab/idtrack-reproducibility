@@ -1,21 +1,21 @@
-stratum	view	items	both_right	both_undetermined	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_unknown	right_in_list_only	right_no_single
-*	all	76803	638	0	525	423	0	0	75217
-*	best	76803	74681	522	0	423	100	100	1077
-d4_id_current	all	9117	638	0	0	0	0	0	8479
-d4_id_current	best	9117	8479	0	0	0	0	0	638
-d4_id_old	all	9800	0	0	506	0	0	0	9294
-d4_id_old	best	9800	9194	506	0	0	100	100	0
-d4_missing	all	862	0	0	0	423	0	0	439
-d4_missing	best	862	0	0	0	423	0	0	439
-d4_ncbi	all	9035	0	0	0	0	0	0	9035
-d4_ncbi	best	9035	9035	0	0	0	0	0	0
-d4_nothing	all	9301	0	0	0	0	0	0	9301
-d4_nothing	best	9301	9301	0	0	0	0	0	0
-d4_refseq	all	9333	0	0	0	0	0	0	9333
-d4_refseq	best	9333	9333	0	0	0	0	0	0
-d4_symbol	all	9683	0	0	19	0	0	0	9664
-d4_symbol	best	9683	9667	16	0	0	0	0	0
-d4_transcript	all	10241	0	0	0	0	0	0	10241
-d4_transcript	best	10241	10241	0	0	0	0	0	0
-d4_uniprot	all	9431	0	0	0	0	0	0	9431
-d4_uniprot	best	9431	9431	0	0	0	0	0	0
+stratum	view	items	both_right	both_undetermined	list_undetermined_alone_no_single	outcome_differs_unknown	right_in_list_only	right_no_single
+*	all	76803	638	0	948	0	0	75217
+*	best	76803	74681	522	423	100	100	1077
+d4_id_current	all	9117	638	0	0	0	0	8479
+d4_id_current	best	9117	8479	0	0	0	0	638
+d4_id_old	all	9800	0	0	506	0	0	9294
+d4_id_old	best	9800	9194	506	0	100	100	0
+d4_missing	all	862	0	0	423	0	0	439
+d4_missing	best	862	0	0	423	0	0	439
+d4_ncbi	all	9035	0	0	0	0	0	9035
+d4_ncbi	best	9035	9035	0	0	0	0	0
+d4_nothing	all	9301	0	0	0	0	0	9301
+d4_nothing	best	9301	9301	0	0	0	0	0
+d4_refseq	all	9333	0	0	0	0	0	9333
+d4_refseq	best	9333	9333	0	0	0	0	0
+d4_symbol	all	9683	0	0	19	0	0	9664
+d4_symbol	best	9683	9667	16	0	0	0	0
+d4_transcript	all	10241	0	0	0	0	0	10241
+d4_transcript	best	10241	10241	0	0	0	0	0
+d4_uniprot	all	9431	0	0	0	0	0	9431
+d4_uniprot	best	9431	9431	0	0	0	0	0

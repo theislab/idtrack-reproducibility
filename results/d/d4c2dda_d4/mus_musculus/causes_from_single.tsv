@@ -1,6 +1,6 @@
 qid	view	src_qid	cause	class	detail
 d4|1013|72	all	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|1013|72	best	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1013|72	best	retired_none|ENSMUSG00000116233|None|115|None|best	external_bridge	b	ENSMUSG00000079593 via 4933416I08Rik [MGI Symbol+NCBI gene (formerly Entrezgene)] same release (102->102); distance other assembly
 d4|1039|42	all	retired_none|ENSMUSG00000074835|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|1039|42	best	retired_none|ENSMUSG00000074835|None|115|None|best	external_bridge	b	ENSMUSG00000071302 via C330022B21Rik [MGI Symbol+UniProtKB Gene Name] gap 5 (60->65); distance other assembly
 d4|1042|47	all	retired_none|ENSMUSG00000072922|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -89,9 +89,9 @@ d4|1647|25	all	retired_none|ENSMUSG00000093844|None|115|None|best	not_classified
 d4|164|9	all	retired_none|ENSMUSG00000095359|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|164|9	best	retired_none|ENSMUSG00000095359|None|115|None|best	external_bridge	b	ENSMUSG00000093950 via synonym_id::MGC107100 [synonym_id::EntrezGene] same release (69->69); distance other assembly
 d4|1654|21	all	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|1654|21	best	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1654|21	best	retired_none|ENSMUSG00000116233|None|115|None|best	external_bridge	b	ENSMUSG00000079593 via 4933416I08Rik [MGI Symbol+NCBI gene (formerly Entrezgene)] same release (102->102); distance other assembly
 d4|1654|29	all	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|1654|29	best	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|1654|29	best	retired_none|ENSMUSG00000116233|None|115|None|best	external_bridge	b	ENSMUSG00000079593 via 4933416I08Rik [MGI Symbol+NCBI gene (formerly Entrezgene)] same release (102->102); distance other assembly
 d4|168|93	all	retired_none|ENSMUSG00000094645|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|168|93	best	retired_none|ENSMUSG00000094645|None|115|None|best	external_bridge	b	ENSMUSG00000096666 via 100862156 [EntrezGene] next release (75->76); distance other assembly
 d4|1690|23	all	retired_none|ENSMUSG00000041748|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -147,7 +147,7 @@ d4|212|50	best	retired_none|ENSMUSG00000116476|None|115|None|best	external_bridg
 d4|242|29	all	retired_none|ENSMUSG00000118642|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|242|29	best	retired_none|ENSMUSG00000118642|None|115|None|best	external_bridge	b	ENSMUSG00000024360 via synonym_id::ERF1 [synonym_id::MGI Symbol] same release (110->110); distance other sequence
 d4|253|89	all	retired_none|ENSMUSG00000116200|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|253|89	best	retired_none|ENSMUSG00000116200|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|253|89	best	retired_none|ENSMUSG00000116200|None|115|None|best	external_bridge	b	ENSMUSG00000119133 via 115485836 [EntrezGene] same release (99->99); distance other assembly; ENSMUSG00000119355 via 115485836 [EntrezGene] same release (99->99); distance other assembly
 d4|265|9	all	retired_none|ENSMUSG00000119794|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|265|9	best	retired_none|ENSMUSG00000119794|None|115|None|best	external_bridge	b	ENSMUSG00000119783 via LOC115489828 [NCBI gene (formerly Entrezgene)] next release (103->104); distance other sequence
 d4|266|7	all	retired_none|ENSMUSG00000076756|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -172,7 +172,7 @@ d4|474|89	all	retired_none|ENSMUSG00000097437|None|115|None|best	not_classified_
 d4|474|89	best	retired_none|ENSMUSG00000097437|None|115|None|best	external_bridge	b	ENSMUSG00000007656 via synonym_id::19kDa [synonym_id::EntrezGene+synonym_id::MGI Symbol] same release (82->82); distance other assembly
 d4|522|7	all	retired_none|ENSMUSG00000107547|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|524|3	all	retired_none|ENSMUSG00000116200|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|524|3	best	retired_none|ENSMUSG00000116200|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|524|3	best	retired_none|ENSMUSG00000116200|None|115|None|best	external_bridge	b	ENSMUSG00000119133 via 115485836 [EntrezGene] same release (99->99); distance other assembly; ENSMUSG00000119355 via 115485836 [EntrezGene] same release (99->99); distance other assembly
 d4|534|46	all	retired_none|ENSMUSG00000116466|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|534|46	best	retired_none|ENSMUSG00000116466|None|115|None|best	external_bridge	b	ENSMUSG00000029171 via Pgm2 [MGI Symbol+NCBI gene+UniProtKB Gene Name] same release (99->99); distance other assembly
 d4|538|4	all	retired_none|ENSMUSG00000041717|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -217,7 +217,7 @@ d4|673|98	best	retired_none|ENSMUSG00000089131|None|115|None|best	external_bridg
 d4|709|4	all	retired_none|ENSMUSG00000118882|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|709|4	best	retired_none|ENSMUSG00000118882|None|115|None|best	external_bridge	b	ENSMUSG00000119783 via LOC115487661 [NCBI gene (formerly Entrezgene)] next release (103->104); distance other sequence
 d4|728|97	all	retired_none|ENSMUSG00000116411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|728|97	best	retired_none|ENSMUSG00000116411|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|728|97	best	retired_none|ENSMUSG00000116411|None|115|None|best	external_bridge	b	ENSMUSG00000118837 via 115487687 [EntrezGene] same release (99->99); distance other assembly
 d4|730|50	all	retired_none|ENSMUSG00000109048|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|730|50	best	retired_none|ENSMUSG00000109048|None|115|None|best	external_bridge	b	ENSMUSG00000044252 via synonym_id::Orp1 [synonym_id::EntrezGene+synonym_id::UniProtKB Gene Name] same release (86->86); distance other assembly
 d4|737|98	all	retired_none|ENSMUSG00000065628|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -236,7 +236,7 @@ d4|792|9	all	retired_none|ENSMUSG00000084581|None|115|None|best	not_classified_b
 d4|803|95	all	retired_none|ENSMUSG00000079129|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|803|95	best	retired_none|ENSMUSG00000079129|None|115|None|best	external_bridge	b	ENSMUSG00000010609 via synonym_id::PS2 [synonym_id::EntrezGene+synonym_id::UniProtKB Gene Name] same release (67->67); distance other assembly
 d4|849|20	all	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|849|20	best	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|849|20	best	retired_none|ENSMUSG00000116233|None|115|None|best	external_bridge	b	ENSMUSG00000079593 via 4933416I08Rik [MGI Symbol+NCBI gene (formerly Entrezgene)] same release (102->102); distance other assembly
 d4|849|6	all	retired_none|ENSMUSG00000079591|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|849|6	best	retired_none|ENSMUSG00000079591|None|115|None|best	external_bridge	b	ENSMUSG00000067909 via Slxl1 [MGI Symbol] same release (59->59); distance other assembly
 d4|850|2	all	retired_none|ENSMUSG00000078476|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -261,7 +261,7 @@ d4|96|2	all	retired_none|ENSMUSG00000101488|None|115|None|best	not_classified_by
 d4|974|8	all	retired_none|ENSMUSG00000091026|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|974|8	best	retired_none|ENSMUSG00000091026|None|115|None|best	external_bridge	b	ENSMUSG00000058622 via Gm5265 [EntrezGene+MGI Symbol] same release (66->66); distance other assembly
 d4|977|57	all	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|977|57	best	retired_none|ENSMUSG00000116233|None|115|None|best	not_classified_by_single	?	no classified single call in this view
+d4|977|57	best	retired_none|ENSMUSG00000116233|None|115|None|best	external_bridge	b	ENSMUSG00000079593 via 4933416I08Rik [MGI Symbol+NCBI gene (formerly Entrezgene)] same release (102->102); distance other assembly
 d4|98|42	all	retired_none|ENSMUSG00000066452|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|98|42	best	retired_none|ENSMUSG00000066452|None|115|None|best	external_bridge	b	ENSMUSG00000043716 via synonym_id::Surf-3 [synonym_id::EntrezGene+synonym_id::UniProtKB Gene Name] same release (67->67); distance other assembly
 d4|9|4	all	retired_none|ENSMUSG00000072829|None|115|None|best	not_classified_by_single	?	no classified single call in this view

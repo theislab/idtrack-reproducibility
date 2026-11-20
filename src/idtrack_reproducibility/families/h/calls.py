@@ -19,7 +19,9 @@ stratum, seeded; the corpora hold about 7,500 to 8,100, so 10,000 is all of them
 - S: batch scaling: batches of each size of `--batch-sizes` (the first identifiers of the sample, warm caches): time
   per identifier and resident memory after each.
 
-The bounded per-node caches of the graph are reported at the end (`cache_info`, where the tree exposes them).
+The bounded per-node caches of the graph are reported at the end (`cache_info`, where the tree exposes them). Every
+call timed in A and F is also a row of the record beside the report (`<out>.calls.parquet`: the call, its seconds,
+the answer's status or the error's class; `records.load_h`).
 """
 
 import argparse
@@ -41,6 +43,29 @@ def outcome_of(tree, r):
     best = r.view("best")
     return {"no_corresponding": r.status in ("not_found", "unknown_version"), "no_conversion": r.status == "no_conversion",
             "no_target": bool(r.no_target), "ambiguous": len({c.target for c in best}) > 1, "tie": bool(r.tie)}
+
+
+def status_of(flags):
+    """The answer's status in the record's words (docs/records.md) from its outcome flags."""
+    if not flags:
+        return None
+    if flags.get("no_conversion"):
+        return "no_conversion"
+    if flags.get("no_corresponding"):
+        return "not_found"
+    if flags.get("no_target"):
+        return "no_target"
+    return "tie" if flags.get("tie") else "converted"
+
+
+def call_row(report, measure, qid, stratum, query, seconds, result=None, error=None):
+    """One timed call as a row of the record."""
+    return dict(record_version=1, subject_kind="tree", subject=report["tree"], subject_version=report.get("commit"),
+                graph_digest=report.get("content_digest"), python=report.get("python"), part="h",
+                organism=report["organism"], family="h", qid=qid, view="best", stratum=stratum, kind=measure,
+                query=json.dumps(query, sort_keys=True, default=str), judge="none (no truth)", outcome="unjudged",
+                status=status_of(result) if error is None else None, error_type=error, seconds=round(seconds, 6),
+                calls=1, scored_at=report.get("date"))
 
 
 def main(argv=None):
@@ -67,18 +92,21 @@ def main(argv=None):
     gct = H.GCTimer()
 
     # A: one call per identifier, cold caches
-    times, results_a, errors, outcomes = [], [], {}, {}
+    times, results_a, errors, outcomes, rows = [], [], {}, {}, []
     gct.reset()
     t.lap()
     for i in ids:
         t0 = time.perf_counter()
+        err = None
         try:
             r = tree.convert(api, i)
         except Exception as error:  # noqa: BLE001 - recorded
             r = {"error": f"{type(error).__name__}: {error}"}
-            errors[type(error).__name__] = errors.get(type(error).__name__, 0) + 1
+            err = type(error).__name__
+            errors[err] = errors.get(err, 0) + 1
         times.append(time.perf_counter() - t0)
         results_a.append(r)
+        rows.append((i, times[-1], r, err))
     report["A_wall_s"] = t.lap()
     report["A_latency"] = H.latency(times)
     report["A_gc"] = gct.take()
@@ -89,6 +117,8 @@ def main(argv=None):
             outcomes[k] = outcomes.get(k, 0) + int(v)
     report["A_outcomes"] = outcomes
     report["rss_after_A"] = H.statm()
+    rows = [call_row(report, "A", f"h|A|{i}", None, {"id": i}, dt, None if err else outcome_of(tree, r), err)
+            for i, dt, r, err in rows]
 
     # B: one batch, warm caches
     gct.reset()
@@ -143,12 +173,16 @@ def main(argv=None):
         args = dict(c["args"])
         identifier = args.pop("identifier")
         t0 = time.perf_counter()
+        err, r = None, None
         try:
-            tree.convert(api, identifier, **args)
+            r = tree.convert(api, identifier, **args)
         except Exception as error:  # noqa: BLE001 - recorded
-            ferr[type(error).__name__] = ferr.get(type(error).__name__, 0) + 1
+            err = type(error).__name__
+            ferr[err] = ferr.get(err, 0) + 1
         dt = time.perf_counter() - t0
         ftimes.append(dt)
+        rows.append(call_row(report, "F", c["qid"], c["stratum"], dict(c["args"]), dt,
+                             None if err else outcome_of(tree, r), err))
         slow.append((round(dt * 1e3, 1), c["qid"], c["stratum"]))
         if k % 2000 == 0:
             rss_trace.append([k, H.rss_gb()])
@@ -179,6 +213,7 @@ def main(argv=None):
     report["rss_end"] = H.statm()
     report["peak_GB"] = H.peak_gb()
     H.dump(a.out, report)
+    H.dump_calls(a.out, rows)
     print(json.dumps({k: v for k, v in report.items() if not k.endswith("slowest")}, default=str)[:4000])
 
 

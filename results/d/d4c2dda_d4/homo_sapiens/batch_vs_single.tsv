@@ -1,23 +1,23 @@
-stratum	view	items	both_right	both_undetermined	both_wrong	list_undetermined_alone_no_single	list_undetermined_alone_wrong	list_wrong_alone_no_single	list_wrong_alone_undetermined	outcome_differs_same_answer	outcome_differs_unknown	right_in_list_only	right_no_single
-*	all	78141	350	0	0	1293	0	98	0	0	0	0	76400
-*	best	78141	75905	770	73	473	54	0	1	55	134	134	731
-d4_id_current	all	9842	350	0	0	0	0	0	0	0	0	0	9492
-d4_id_current	best	9842	9492	0	0	0	0	0	0	0	0	0	350
-d4_id_old	all	10103	0	0	0	754	0	94	0	0	0	0	9255
-d4_id_old	best	10103	9126	723	70	0	54	0	1	55	129	129	0
-d4_issue85	all	3	0	0	0	0	0	0	0	0	0	0	3
-d4_issue85	best	3	2	0	0	0	0	0	0	0	0	0	1
-d4_missing	all	853	0	0	0	473	0	0	0	0	0	0	380
-d4_missing	best	853	0	0	0	473	0	0	0	0	0	0	380
-d4_ncbi	all	9263	0	0	0	0	0	0	0	0	0	0	9263
-d4_ncbi	best	9263	9263	0	0	0	0	0	0	0	0	0	0
-d4_nothing	all	10049	0	0	0	0	0	0	0	0	0	0	10049
-d4_nothing	best	10049	10049	0	0	0	0	0	0	0	0	0	0
-d4_refseq	all	9268	0	0	0	0	0	0	0	0	0	0	9268
-d4_refseq	best	9268	9268	0	0	0	0	0	0	0	0	0	0
-d4_symbol	all	9101	0	0	0	66	0	4	0	0	0	0	9031
-d4_symbol	best	9101	9046	47	3	0	0	0	0	0	5	5	0
-d4_transcript	all	9719	0	0	0	0	0	0	0	0	0	0	9719
-d4_transcript	best	9719	9719	0	0	0	0	0	0	0	0	0	0
-d4_uniprot	all	9940	0	0	0	0	0	0	0	0	0	0	9940
-d4_uniprot	best	9940	9940	0	0	0	0	0	0	0	0	0	0
+stratum	view	items	both_right	both_undetermined	both_wrong	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_same_answer	outcome_differs_unknown	right_in_list_only	right_no_single
+*	all	78141	350	0	0	1293	98	0	0	0	76400
+*	best	78141	75880	824	74	473	0	24	135	159	731
+d4_id_current	all	9842	350	0	0	0	0	0	0	0	9492
+d4_id_current	best	9842	9492	0	0	0	0	0	0	0	350
+d4_id_old	all	10103	0	0	0	754	94	0	0	0	9255
+d4_id_old	best	10103	9126	777	71	0	0	0	129	129	0
+d4_issue85	all	3	0	0	0	0	0	0	0	0	3
+d4_issue85	best	3	2	0	0	0	0	0	0	0	1
+d4_missing	all	853	0	0	0	473	0	0	0	0	380
+d4_missing	best	853	0	0	0	473	0	0	0	0	380
+d4_ncbi	all	9263	0	0	0	0	0	0	0	0	9263
+d4_ncbi	best	9263	9258	0	0	0	0	4	1	5	0
+d4_nothing	all	10049	0	0	0	0	0	0	0	0	10049
+d4_nothing	best	10049	10049	0	0	0	0	0	0	0	0
+d4_refseq	all	9268	0	0	0	0	0	0	0	0	9268
+d4_refseq	best	9268	9262	0	0	0	0	6	0	6	0
+d4_symbol	all	9101	0	0	0	66	4	0	0	0	9031
+d4_symbol	best	9101	9033	47	3	0	0	13	5	18	0
+d4_transcript	all	9719	0	0	0	0	0	0	0	0	9719
+d4_transcript	best	9719	9719	0	0	0	0	0	0	0	0
+d4_uniprot	all	9940	0	0	0	0	0	0	0	0	9940
+d4_uniprot	best	9940	9939	0	0	0	0	1	0	1	0

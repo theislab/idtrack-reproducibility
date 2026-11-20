@@ -26,7 +26,7 @@ The design of the whole programme (principles, needs, coverage, the families F a
 
 | path | what |
 | --- | --- |
-| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `results.py`, `records.py` (the record's loader), `manifests.py`, `check.py` |
+| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `results.py`, `records.py` (the record's loader), `rescore.py` (scoring again), `manifests.py`, `check.py` |
 | `docs/` | the methods of each benchmark, the rules, the data, how to add a benchmark |
 | `results/` | the current results: tables per benchmark, tree and organism, `index.tsv` (one row per family, stratum, organism and tree) and `provenance.tsv` (what generated each file, from which source) |
 | `results.toml` | the registry of the scored runs whose tables are the results |
@@ -57,7 +57,7 @@ One TOML file and environment variables; nothing is a path of a particular machi
 
 - `[data]`: the data root (`root`, default `./data`) and, if they lie elsewhere, each location (`truth`, `harness`, `families`, `corpus`, `hunts`, `performance`, `graphs`, `cache`); variables `IDTRACK_REPRO_DATA_ROOT`, `IDTRACK_REPRO_<LOCATION>`;
 - `[trees.<name>]`: `commit`, `source` (the checkout), `python`, `[trees.<name>.graphs]` per organism;
-- `[jobs]`: `runner` = `local` (every job runs at once, here) or `slurm` (`sbatch`, with `[jobs.slurm]` `partition`, `qos`, `extra`; variables `IDTRACK_REPRO_RUNNER`, `IDTRACK_REPRO_SLURM_PARTITION`, `IDTRACK_REPRO_SLURM_QOS`), `name_prefix` of the jobs' names, `[jobs.memory_gb]` per organism.
+- `[jobs]`: `runner` = `local` (every job runs at once, here) or `slurm` (`sbatch`, with `[jobs.slurm]` `partition`, `qos`, `extra`; variables `IDTRACK_REPRO_RUNNER`, `IDTRACK_REPRO_SLURM_PARTITION`, `IDTRACK_REPRO_SLURM_QOS`), `name_prefix` of the jobs' names, `[jobs.memory_gb]` per organism (a job that holds a graph and asks it) and `[jobs.modest_memory_gb]` (a job of the modest set: its largest part's measured peak, [docs/modest.md](docs/modest.md)).
 
 `idtrack-repro config` prints the configuration as a process reads it.
 
@@ -71,6 +71,7 @@ One TOML file and environment variables; nothing is a path of a particular machi
 | make the query sets | the harness: `idtrack-repro make-queries --organism <o> --set <name>`; a family: `idtrack-repro family <family> <generator> --organism <o>` (e.g. `family a gen_a`) |
 | run a tree on its graphs | `idtrack-repro run --family <family> --organism <o> --clone <checkout> --graph <graph> --out <run folder> --submit <shards> --score` (the harness: `idtrack-repro harness-score ... --submit <shards>`) |
 | score | `idtrack-repro score --family <family> --organism <o> --run <run folder>` (in partitions: `--parts P --part p`, then `--parts P --merge`) |
+| score again | `idtrack-repro rescore [--parts ...] --workers N`: every registered scoring under today's judge (the revision sets published since, the judge's code), from its stored answers; resumable ([the record](docs/records.md#scoring-again)) |
 | compare two trees | `idtrack-repro compare <scored a> <scored b> --moved <file>` |
 | causes of the wrong answers | `idtrack-repro explain ...` on the tree, then `idtrack-repro causes --organism <o> --scored <folder> [--plugin <family module>]` |
 | known limitations | `idtrack-repro known-limitations` (every family's rows from its current runs, `results/limitations/`); one family's rows: `idtrack-repro limitations --family <family> --scored <folders> --out <tsv>` |

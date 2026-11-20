@@ -104,9 +104,9 @@ c4_rfam_label_at	best,from	3942	3942	0	0	0	0	1.0000	0.9990	1.0000
 c4_rfam_label_default	*	106	106	0	0	0	0	1.0000	0.9650	1.0000
 c4_rfam_label_default	all,default	53	53	0	0	0	0	1.0000	0.9324	1.0000
 c4_rfam_label_default	best,default	53	53	0	0	0	0	1.0000	0.9324	1.0000
-c4_rfam_label_retired	*	1592	1510	38	44	0	0	0.9755	0.9665	0.9821
-c4_rfam_label_retired	all,default	796	755	19	22	0	0	0.9755	0.9620	0.9842
-c4_rfam_label_retired	best,default	796	755	19	22	0	0	0.9755	0.9620	0.9842
+c4_rfam_label_retired	*	1592	1510	1	81	0	0	0.9993	0.9963	0.9999
+c4_rfam_label_retired	all,default	796	755	1	40	0	0	0.9987	0.9925	0.9998
+c4_rfam_label_retired	best,default	796	755	0	41	0	0	1.0000	0.9949	1.0000
 c4_rnacentral	*	30114	30114	0	0	0	0	1.0000	0.9999	1.0000
 c4_rnacentral	all,default	15057	15057	0	0	0	0	1.0000	0.9997	1.0000
 c4_rnacentral	best,default	15057	15057	0	0	0	0	1.0000	0.9997	1.0000

@@ -2,12 +2,13 @@
 `open` (`open_within`), `or_error` and `contains`.
 
 Usage:
-  scorer.py --family <f> --organism <o> --run <run folder>/<organism> [--sets a,b] [--strata x] [--kinds k]
-            [--judge revised|published] [--scores-to <folder>] [--parts P] [--limit N]
+  scorer.py --family <f> --organism <o> --run <run folder>/<organism> [--sets a,b] [--within a] [--strata x]
+            [--kinds k] [--judge revised|published] [--scores-to <folder>] [--parts P] [--limit N]
   scorer.py ... --parts P --part p     one partition (crc32(qid) % P == p), e.g. P jobs in parallel; then
   scorer.py ... --parts P --merge      the relation lines, run.json and the reports
 
-Reads the family's lines (lines.load: the latest line of every qid) and the runner's answers
+Reads the family's lines (lines.load: the latest line of every qid; `--within`: only the qids of these sets) and the
+runner's answers
 (`<run>/answers/*.parquet`, one row per line and view), and writes into `--scores-to` (default: the run folder):
 
   outcomes/part_<p>_of_<P>.parquet  one row per line and view: qid, view, family, stratum, kind, variant, unit, set,
@@ -34,8 +35,10 @@ The rules (docs/harness.md "Scoring rules" and the corrected judge; docs/methods
   before every other rule but `or_error` (a timeout or an error stays what it is: no answer was given). With
   `open_within` (a list of ids) beside it, only an answer within those ids (or empty) is undetermined; an answer with
   an id outside them is `wrong` (reason `open: <reason>; outside the place: <ids>`; ids compared after `cmp`).
-- `names_read_at` (a line field: the releases whose synonyms the truth reads): a wrong answer that read the string as
-  a synonym at another release is `undetermined` (the truth cannot say what it named there).
+- `names_read_at` (a line field: the releases whose synonyms the truth reads): a wrong answer that read the string
+  itself as a synonym (`synonym:exact`) at another release is `undetermined` (the truth cannot say what it named
+  there); a string read through the case or separator step (`synonym:case`, `synonym:separator`) is another string,
+  judged as it is.
 - `contains` (rule; or family E's published field `e_rule: contains`): an answer is right when it is not empty and
   every expected value is among its values (e.g. source inference: the band of releases holds the release).
 - `relation` (rule; family E8): no truth; the line's `relation` = {"op": equal|subset|superset|disjoint,
@@ -135,13 +138,13 @@ def is_contains(line):
 
 def score_line(line, view, ans, places):
     """(outcome, reason) of one line and view; ans is the answer row (dict) or None. Then `names_read_at` (a line field:
-    the releases whose synonyms the truth reads): a wrong answer that read the string as a synonym at another release
-    is `undetermined` (the truth cannot say what the string named there)."""
+    the releases whose synonyms the truth reads): a wrong answer that read the string itself as a synonym
+    (`synonym:exact`) at another release is `undetermined` (the truth cannot say what the string named there)."""
     o, why = _score_line(line, view, ans, places)
     within = line.get("names_read_at")
     if o == "wrong" and within is not None and ans:
         rel, m = ans.get("from_release"), ans.get("match") or ""
-        if "synonym" in m and rel is not None and not (isinstance(rel, float) and math.isnan(rel)) and \
+        if m == "synonym:exact" and rel is not None and not (isinstance(rel, float) and math.isnan(rel)) and \
                 int(rel) not in {int(x) for x in within}:
             return "undetermined", (f"read as a synonym ({m}) at {int(rel)}, a release whose synonyms the truth does not "
                                     f"read; {why}")
@@ -221,7 +224,7 @@ def score_part(a, part, nparts, places):
     import pyarrow.parquet as pq
 
     lines, shas, excluded = L.load(a.family, a.organism, a.sets, a.strata, a.kinds, shard=(part, nparts) if nparts > 1 else None,
-                                   judge=a.judge, limit=a.limit)
+                                   judge=a.judge, limit=a.limit, within=a.within)
     ans = read_answers(a.run, part, nparts)
     ans_by = {(q, v): i for i, (q, v) in enumerate(zip(ans["qid"].tolist(), ans["view"].tolist()))}
     cols = {c: ans[c].tolist() for c in ans.columns} if len(ans) else {}
@@ -230,8 +233,22 @@ def score_part(a, part, nparts, places):
         i = ans_by.get((qid, view))
         return None if i is None else {c: cols[c][i] for c in cols}
 
-    rows, deferred, missing = [], [], {}
+    out_dir = a.scores_to
+    os.makedirs(os.path.join(out_dir, "outcomes"), exist_ok=True)
+    path = os.path.join(out_dir, "outcomes", f"part_{part}_of_{nparts}.parquet")
+    writer = pq.ParquetWriter(path + ".tmp", out_schema(), compression="zstd")
+    rows, deferred, missing, n = [], [], {}, 0
+
+    def flush():
+        nonlocal rows, n
+        if rows:
+            writer.write_table(pa.Table.from_pylist(rows, schema=out_schema()))
+            n += len(rows)
+            rows = []
+
     for line in lines:
+        if len(rows) >= 500_000:
+            flush()  # the rows of the record are written in chunks: a part holds one chunk, not all its rows
         st = L.stratum_of(line)
         unit = L.unit_of(line)
         rule_label = L.judged_by(line)
@@ -260,12 +277,10 @@ def score_part(a, part, nparts, places):
                 continue
             o, why = score_line(line, view, answer(line["qid"], view), places)
             rows.append(_row(base, line, o, why, got, sec, calls, own))
-    out_dir = a.scores_to
-    os.makedirs(os.path.join(out_dir, "outcomes"), exist_ok=True)
-    path = os.path.join(out_dir, "outcomes", f"part_{part}_of_{nparts}.parquet")
-    pq.write_table(pa.Table.from_pylist(rows, schema=out_schema()), path + ".tmp", compression="zstd")
+    flush()
+    writer.close()
     os.replace(path + ".tmp", path)
-    return dict(n=len(rows), missing=missing, excluded=excluded, sets=shas, deferred=deferred)
+    return dict(n=n, missing=missing, excluded=excluded, sets=shas, deferred=deferred)
 
 
 def _text(x):
@@ -323,11 +338,29 @@ def _part_stats_path(a, p, n):
     return os.path.join(a.scores_to, "outcomes", f"part_{p}_of_{n}.json")
 
 
+JUDGE_MODULES = ("families/scorer.py", "families/lines.py", "families/common.py", "harness/score.py", "harness/harness_lib.py")
+
+
+def scoring_key(a):
+    """What makes a scoring: the family, organism, judge, sets and selection, the record version and the code of the
+    judge. A partition or a scoring stored under the same key need not be scored again (`rescore` resumes by it)."""
+    import hashlib
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    code = {m: L.sha256(os.path.join(here, m)) for m in JUDGE_MODULES}
+    names = L.resolve_sets(a.family, a.organism, a.sets, a.judge)
+    sets = {n: L.manifest(a.family, a.organism, n)["sha256"] for n in names if not L.is_panel(a.family, a.organism, n)}
+    doc = dict(family=a.family, organism=a.organism, judge=a.judge, sets=sets, panels=[n for n in names if n not in sets],
+               within=a.within, strata=a.strata, kinds=a.kinds, limit=a.limit, parts=a.parts, record_version=RECORD_VERSION,
+               code=code)
+    return hashlib.sha256(json.dumps(doc, sort_keys=True).encode()).hexdigest()
+
+
 def run_part(a, p, places):
     """Score one partition; its counts and its relation lines go beside its outcomes (for the merge)."""
     r = score_part(a, p, a.parts, places)
     deferred = [dict(line=line, view=view, base=base) for line, view, base in r.pop("deferred")]
-    json.dump(dict(r, deferred=deferred), open(_part_stats_path(a, p, a.parts) + ".tmp", "w"), default=str)
+    json.dump(dict(r, deferred=deferred, record_version=RECORD_VERSION, key=scoring_key(a)),
+              open(_part_stats_path(a, p, a.parts) + ".tmp", "w"), default=str)
     os.replace(_part_stats_path(a, p, a.parts) + ".tmp", _part_stats_path(a, p, a.parts))
     sys.stderr.write(f"part {p}/{a.parts}: {r['n']} rows\n")
 
@@ -354,18 +387,28 @@ def merge(a):
         if m and int(m.group(1)) != a.parts:
             os.remove(old)  # a partition of an earlier scoring with another number of parts
     nrel = score_relations(a, deferred)
+    from idtrack_reproducibility import config as CFG
     loads = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(a.run, "answers", "load_*.json")))]
-    clones = sorted({x.get("idtrack_file", "") for x in loads})
+    clones = sorted({c for c in (CFG.in_root(x.get("idtrack_file", ""), None) for x in loads) if c})
     digests = sorted({str(x.get("content_digest")) for x in loads})
-    info = dict(record_version=RECORD_VERSION, family=a.family, organism=a.organism, run=a.run, judge=a.judge, sets=sets, strata=a.strata, kinds=a.kinds,
+    prev_path = os.path.join(a.scores_to, "run.json")
+    prev = json.load(open(prev_path)) if os.path.exists(prev_path) else {}
+    keys = {r.get("key") for r in stats}
+    info = dict(record_version=RECORD_VERSION, key=keys.pop() if len(keys) == 1 else None, family=a.family,
+                organism=a.organism, run=CFG.in_root(a.run), judge=a.judge, sets=sets, within=a.within, strata=a.strata, kinds=a.kinds,
                 limit=a.limit, n_rows=tot + nrel, n_relations=nrel, n_missing=sum(missing.values()), missing=missing,
                 n_excluded=sum(excluded.values()), excluded=excluded, parts=a.parts,
                 scored_at=datetime.datetime.now().isoformat(timespec="seconds"), idtrack_files=clones, graph_digests=digests,
-                load=[{k: x.get(k) for k in ("generation", "load_seconds", "files_written_in_repo", "pythonhashseed", "graph_real",
-                                             "python", "shard", "slurm_job")} for x in loads])
+                load=[dict({k: x.get(k) for k in ("generation", "load_seconds", "files_written_in_repo", "pythonhashseed",
+                                                  "python", "shard", "slurm_job")},
+                           graph_real=CFG.in_root(x.get("graph_real"), None)) for x in loads])
     if loads:
         clone = os.path.dirname(os.path.dirname(loads[0]["idtrack_file"]))
-        info["clone"], (info["commit"], info["clone_modified"]) = clone, C.git_commit(clone)
+        info["clone"], (info["commit"], info["clone_modified"]) = CFG.in_root(clone, None), C.git_commit(clone)
+        if not info["commit"] and prev.get("commit"):
+            # the checkout that answered is gone: the commit the earlier scoring of this folder (the same answers,
+            # perhaps at an earlier place of the data root) read from it
+            info["commit"], info["clone_modified"] = prev["commit"], prev.get("clone_modified")
     json.dump(info, open(os.path.join(a.scores_to, "run.json"), "w"), indent=1)
     from idtrack_reproducibility.families import report
     report.write(a.scores_to, a.family, a.organism)
@@ -383,6 +426,7 @@ def main():
     ap.add_argument("--organism", required=True)
     ap.add_argument("--run", required=True, help="the run folder of this organism (holds answers/)")
     ap.add_argument("--sets", default=None)
+    ap.add_argument("--within", default=None, help="only the qids these sets publish (default: every line of the sets)")
     ap.add_argument("--strata", default=None)
     ap.add_argument("--kinds", default=None)
     ap.add_argument("--limit", type=int, default=None)
@@ -394,7 +438,7 @@ def main():
     a = ap.parse_args()
     a.run = os.path.abspath(a.run)
     a.scores_to = os.path.abspath(a.scores_to or a.run)
-    for k in ("sets", "strata", "kinds"):
+    for k in ("sets", "within", "strata", "kinds"):
         setattr(a, k, getattr(a, k).split(",") if getattr(a, k) else None)
     if a.limit:
         a.parts = 1  # the first N lines of each stratum, as a runner of one shard took them

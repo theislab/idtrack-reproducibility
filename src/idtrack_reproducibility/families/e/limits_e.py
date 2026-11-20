@@ -78,16 +78,16 @@ MAP = {
                                  "`synonym_id::<database>` is accepted as `final_database`", "use the database itself", "decided: rule `no_synonym_target`"),
     "separator_group_one_taken": ("L-separator-groups", "names", "names equal up to separators",
                                   "a third spelling takes one of several names silently", "type the exact spelling", "decided: rule `one_case_schemes`"),
-    "docs_case_rule_judge_short": ("L-truth-case-rule", "truth", "the judge's reading of the docs' case rule",
-                                   "judge `now` reads the exact-synonym-first rule from 115's tables only; idtrack's tie also "
-                                   "holds genes of other releases' synonyms", "none needed", "none (the judge's reach)"),
+    # the limitation F0 measures on the harness's names (families/limitations.py): the same row
+    "synonym_spelling_merged": ("L-spellings", "names", "two genes with one string in two letter cases",
+                                "the exact step cannot tell `Tc` from `tc`", "type the exact spelling (decided: rule `spelling_per_edge`)",
+                                "decided: rule `spelling_per_edge`"),
     "infer_duplicates_counted": ("L-infer-duplicates", "source inference", "repeated identifiers count once each time",
                                  "a list with repeated identifiers can be placed at another release than the same list without "
                                  "repeats", "remove repeated identifiers before inferring", "decided: rule `inference_distinct_ids`"),
-    "lrg_gene_version_form": ("L-truth-lrg-form", "truth", "LRG gene ids of NCBI36 GTFs",
-                              "the GTF writes `LRG_<n>_g1`, the graph `LRG_<n>_g1.1`: the same gene", "none needed",
-                              "corrected in the judge (its stable id form reads LRG gene ids, harness_lib.STABLE_ID_FORM); "
-                              "the stored scoring predates it"),
+    "lrg_record_not_its_gene": ("L-lrg-records", "identifiers", "LRG ids answer the LRG record",
+                                "an LRG gene id is answered with the LRG record, not the Ensembl gene it describes",
+                                "convert the Ensembl gene id", "decided: rule `lrg_answers_gene`"),
     "mouse_hgnc_projection": ("L-mouse-hgnc-names", "names", "human symbols projected onto mouse genes",
                               "a mouse gene whose display name is a human HGNC symbol (no MGI symbol) is not found by that name",
                               "use the Ensembl id", "none (the graph holds no HGNC symbols for mouse)"),

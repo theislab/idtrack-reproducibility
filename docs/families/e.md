@@ -41,7 +41,7 @@ Lines whose `generations` leave out a tree's api generation are not asked on it 
 
 ## The sets
 
-Per organism (manifests `<families>/e/queries/<organism>/<set>.manifest.json`; `judge` is the judge a set belongs to; a `_dec` or `_dec<k>` set revises its base set for the judge `decided`, an `_r<k>` set for both judges):
+Per organism (manifests `<families>/e/queries/<organism>/<set>.manifest.json`; `judge` is the judge a set belongs to; a `_dec` or `_dec<k>` set revises its base set for the judge `decided`, an `_r<k>` set for both judges). The judge `now` reads the sets that are no `_dec` set in the order they were published; the judge `decided` reads the same, then the `_dec` sets in the order they were published (`score_e.sets_for`): a revision of the truth is published for both judges (`<set>_r<k>` and the decided judge's line revised alike, `<set>_dec<k>`), so the decided line stays the decided judge's truth even where the `_r<k>` set came after it:
 
 | set | judge | revises | pig | mouse | human | rhesus | cynomolgus | what |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -67,6 +67,7 @@ Per organism (manifests `<families>/e/queries/<organism>/<set>.manifest.json`; `
 | `e8_identity_dec` | decided | `e8_identity` | – | – | 11 | – | – | an LRG gene id answers its gene (rule `lrg_answers_gene`) |
 | `e2_r1`, `e2_all_r1`, `hunt_inputs_r1` | now | their base set | 2,750 · 49,101 · – | 2,750 · 231,585 · – | 2,750 · 114,246 · 3 | 2,750 · 53,745 · – | 2,500 · 47,538 · – | the truth's reach (`e2_names_every_release`): every made-unique line records the releases whose synonyms the truth reads (`names_read_at`); a form Ensembl gives exactly to other genes at a release of the window expects them too (pig 4, mouse 35, human 230, rhesus 2 forms) |
 | `e2_dec2`, `e2_all_dec2`, `hunt_inputs_dec2` | decided | their base set and its `_dec` | as `_r1` | as `_r1` | as `_r1` | as `_r1` | as `_r1` | the same revision of the decided judge's lines |
+| `e2_case_r1` | now | `e2_case` | – | 9 | – | – | – | revision `e2_case_r1`: the documented rule (an exact name or synonym before a match without letter case) names every gene that carries the form exactly at 115, read from Ensembl's synonyms of every cross-reference (`core_synonyms/115.tsv.gz`) beside BioMart's, the MGI symbol's own gene too (1 `e2_case_upper_competing`, `ESP1`; 8 `e2_case_*_folded` lines no longer open); the decided judge's lines are unchanged (rule `single_case_symbols`: the MGI symbol's gene) |
 
 Each manifest gives the lines per stratum (`counts`); the strata are named `<set>_<form>_<kind of identifier>` (for example `e2_zw_name`: zero-width characters in names; `e2_punct_gv`: stray punctuation on versioned gene ids).
 
@@ -261,25 +262,24 @@ Every wrong answer and error of both judges on both trees has a cause (`causes_e
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | `long_version_value_error`: a version of more than 4,300 digits raises Python's `ValueError` (IN-8) | a | `bounded_arguments` | 450 · 450 | 450 · 450 | 451 · 451 | 450 · 450 | 450 · 450 |
 | `stray_punctuation_artifact_name`: `X;`, `X.`, `'X'` reach another gene through names of Ensembl's tables that carry the same stray character (IN-11) | a | `stray_punctuation` | 27 · 27 | 499 · 499 | 180 · 180 | 0 · 0 | 0 · 0 |
-| `separator_joins_suffix`: `X-1`, `X.1`, `X_1` joined by the case or separator step into another gene's name (IN-3) | b | `made_unique_copies` | 91 · 91 | 28 · 28 | 34 · 34 | 93 · 93 | 79 · 79 |
-| `suffix_form_is_name_at_unread_release`: the suffixed form is exactly another gene's name at a release whose tables the truth does not read | e | – | 26 · 26 | 5 · 5 | 10 · 10 | 30 · 30 | 26 · 26 |
+| `separator_joins_suffix`: `X-1`, `X.1`, `X_1` joined by the case or separator step into another gene's name (IN-3) | b | `made_unique_copies` | 89 · 89 | 28 · 28 | 34 · 34 | 93 · 93 | 79 · 79 |
 | `internal_name_accepted`: `synonym_id::X` read as an identifier (IN-6) | a | `no_synonym_target` | 14 · 192 | 10 · 172 | 7 · 178 | 17 · 224 | 10 · 113 |
-| `docs_case_rule_judge_short`: the judge reads the documented case rule from release 115's tables only | e | – | 0 · 0 | 12 · 0 | 0 · 0 | 0 · 0 | 0 · 0 |
-| `lrg_gene_version_form`: human NCBI36 LRG ids, the judge's form (corrected from 2026-11-20: the judge reduces LRG gene ids) | d | – | 0 · 0 | 0 · 0 | 11 · 11 | 0 · 0 | 0 · 0 |
+| `synonym_spelling_merged`: the asked string is carried in two letter cases at the release read (Ensembl's synonyms of every cross-reference); the graph keeps one spelling per database and release, so the exact match holds the genes of both cases, or the case step answers where an exact synonym exists | c | `spelling_steps`; `spelling_per_edge` (decided) | 0 · 0 | 13 · 0 | 0 · 0 | 0 · 0 | 0 · 0 |
+| `lrg_record_not_its_gene`: an LRG gene id answers the LRG record, not the Ensembl gene it describes | a | `lrg_answers_gene` | 0 · 0 | 0 · 0 | 0 · 11 | 0 · 0 | 0 · 0 |
 | `source_inference_reads_names_at_snapshot`: name lists placed at a later release (IN-7) | a | `inference_per_release` | 0 · 0 | 2 · 2 | 4 · 4 | 0 · 0 | 0 · 0 |
 | `infer_duplicates_counted`: a list with repeats placed at another release than without them | a | `inference_distinct_ids` | 0 · 0 | 1 · 1 | 1 · 1 | 1 · 1 | 0 · 0 |
 | `lowercase_exact_synonym_other_organism`: a lower-case symbol that is exactly another gene's synonym (pig `afp`, `Has2`) | b | – (`single_case_symbols` covers mixed-case organisms only) | 2 · 2 | 0 · 0 | 0 · 0 | 0 · 0 | 0 · 0 |
 | `mouse_hgnc_projection`: a mouse gene whose display name is a projected human HGNC symbol | d | – | 0 · 0 | 2 · 2 | 0 · 0 | 0 · 0 | 0 · 0 |
 | `nonalnum_name_in_graph`: mouse `_` reaches a gene through an NCBI synonym `.` by the separator step | a | `missing_values` (the graph part) | 0 · 0 | 1 · 1 | 0 · 0 | 0 · 0 | 0 · 0 |
-| `missing_value_read_as_name`, `missing_value_not_refused` (IN-1) | a | `missing_values` | 0 · 213 | 0 · 214 | 0 · 216 | 0 · 212 | 0 · 212 |
+| `missing_value_read_as_name`, `missing_value_not_refused` (IN-1) | a | `missing_values` | 0 · 225 | 0 · 226 | 0 · 228 | 0 · 224 | 0 · 224 |
 | `stray_punctuation_not_read` (IN-11) | a | `stray_punctuation` | 0 · 59,128 | 0 · 227,609 | 0 · 108,378 | 0 · 64,245 | 0 · 57,688 |
 | `unicode_not_normalised` (IN-4) | a | `unicode_normalised` | 0 · 12,720 | 0 · 12,776 | 0 · 12,964 | 0 · 12,616 | 0 · 12,096 |
 | `long_input_not_refused` (IN-8) | a | `bounded_arguments` | 0 · 456 | 0 · 456 | 0 · 456 | 0 · 456 | 0 · 456 |
 | `unversioned_tx_case_not_found` (IN-5) | a | `one_case_schemes` | 0 · 306 | 0 · 284 | 0 · 297 | 0 · 296 | 0 · 318 |
-| `case_exact_synonym_first` (IN-2) | a | `single_case_symbols` | 0 · 0 | 0 · 148 | 0 · 0 | 0 · 0 | 0 · 0 |
+| `case_exact_synonym_first` (IN-2) | a | `single_case_symbols` | 0 · 0 | 0 · 150 | 0 · 0 | 0 · 0 | 0 · 0 |
 | `synonym_database_offered`: the synonym database accepted as a target | a | `no_synonym_target` | 0 · 1 | 0 · 1 | 0 · 1 | 0 · 1 | 0 · 1 |
 
-On `d4c2dda` the causes and their counts are the same but `source_inference_reads_names_at_snapshot`, whose lines its api does not have. Every class a cause under `now` is one that a decided rule removes (`infer_duplicates_counted`: rule `inference_distinct_ids`, which the line's relation already expects under both judges, since `71690ab`'s documentation states it); under `decided` the classes a are, by construction, the decided rules not yet built.
+Scored again on 2026-11-20 under the judge of today: the suffixed forms that are exactly another gene's name or synonym at a release the truth read only through the revision `e2_names_every_release` are undetermined or right (the cause `suffix_form_is_name_at_unread_release`, 26 · 5 · 10 · 30 · 26 answers before, is gone; a form read through the case or separator step stays `separator_joins_suffix`); the human LRG identity lines are right under `now` (the judge reads LRG ids) and wrong under `decided` (rule `lrg_answers_gene`, not built); mouse's letter-case lines are judged with `e2_case_r1`, their 13 wrong answers the graph's merged spellings; pandas' missing-value spellings (`e1_dec2`) add 12 wrong answers per organism under `decided`. On `d4c2dda` the causes and their counts are the same but `source_inference_reads_names_at_snapshot`, whose lines its api does not have. Every class a cause under `now` is one that a decided rule removes (`infer_duplicates_counted`: rule `inference_distinct_ids`, which the line's relation already expects under both judges, since `71690ab`'s documentation states it); under `decided` the classes a are, by construction, the decided rules not yet built.
 
 ## Known limitations
 
@@ -289,7 +289,7 @@ E's rows of [the known-limitations table](../../results/limitations/limitations.
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | `L-internal-names` | `synonym_id::X` and `<id>.Void` are read as identifiers | do not type them | the decided rule `no_synonym_target` | 14 of 400 | 10 of 550 | 7 of 403 | 17 of 400 | 10 of 400 |
 | `L-long-inputs` | a version of more than 4,300 digits raises Python's `ValueError` | none needed (no real input) | the decided rule `bounded_arguments` | 450 of 1,200 | 450 of 1,200 | 451 of 1,201 | 450 of 1,200 | 450 of 1,200 |
-| `L-make-unique` | `X-1`, `X.1`, `X_1` are read through the case and separator steps as another gene's name | convert the names before making them unique | the decided rule `made_unique_copies` | 91 of 51,851 | 28 of 231,585 | 34 of 114,999 | 93 of 54,495 | 79 of 48,038 |
+| `L-make-unique` | `X-1`, `X.1`, `X_1` are read through the case and separator steps as another gene's name | convert the names before making them unique | the decided rule `made_unique_copies` | 89 of 51,851 | 28 of 231,585 | 34 of 114,999 | 93 of 54,495 | 79 of 48,038 |
 | `L-stray-punctuation` | `X;`, `X.`, `'X'` match names of Ensembl's tables that carry the same stray character | strip quotes and trailing punctuation | the decided rule `stray_punctuation` | 27 of 50,151 | 499 of 235,436 | 180 of 118,097 | – | – |
 | `L-missing-values` | the rule's spellings of a missing value that answer a gene (single calls) | drop missing values before converting | the decided rule `missing_values` | 35 of 53 | 28 of 53 (and 1 of 7: `_`) | 35 of 53 | 29 of 53 | 23 of 53 |
 | `L-infer-names` | lists of names placed at a later release | infer the release from Ensembl ids | the decided rule `inference_per_release` | – | 2 of 3 | 4 of 5 | – | – |
@@ -305,9 +305,7 @@ E's rows of [the known-limitations table](../../results/limitations/limitations.
 | `L-number-forms` | `07157`, `7157.0`, `7.157e+03`, `GeneID:7157`: not found | write NCBI ids as integers | none | 1,600 of 1,600 | 1,600 of 1,600 | 1,600 of 1,600 | 1,600 of 1,600 | 1,600 of 1,600 |
 | `L-version-forms` | `ENSG...-5`, `ENSG..._5`, `ENSG....v5`: not found | write `<id>.<version>` | none | 450 of 750 | 450 of 750 | 450 of 750 | 450 of 750 | 450 of 750 |
 | `L-mouse-hgnc-names` | a mouse gene whose display name is a human HGNC symbol is not found by that name | use the Ensembl id | none (the graph holds no HGNC symbols for mouse) | – | 2 of 4 | – | – | – |
-| `L-truth-names-unread` | the suffixed form is exactly another gene's name at a release whose name tables the truth does not read | none needed | the revision `e2_names_every_release` (from 2026-11-20): names of every release read from the core cross-references and the GTF; a form read as a synonym at a release whose synonyms the truth does not hold is undetermined (`names_read_at`); the stored scorings predate it | 26 of 49,851 | 5 of 231,585 | 10 of 114,246 | 30 of 54,495 | 26 of 48,038 |
-| `L-truth-case-rule` | the judge reads the exact-synonym-first rule from release 115's tables only | none needed | none (the judge's reach) | – | 12 of 145 | – | – | – |
-| `L-truth-lrg-form` | the GTF writes `LRG_<n>_g1`, the graph `LRG_<n>_g1.1`: the same gene | none needed | corrected in the judge (its stable id form reads LRG gene ids, from 2026-11-20); the stored scoring predates it | – | – | 11 of 1,494,120 | – | – |
+| `L-spellings` | a string carried in two letter cases (mouse `GC` and `gc`): the graph keeps one spelling per database and release, so one case answers the genes of both, or the symbol matched without letter case | type the exact spelling | decided: rule `spelling_per_edge` | – | 13 of 6,143 | – | – | – |
 
 The rows generated from the `d4c2dda` runs are the same, but `L-infer-names`, whose lines `d4c2dda`'s api does not have.
 

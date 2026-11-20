@@ -42,13 +42,11 @@ A6_forward_handoff	copies_apart_before_82	d	rule `judge_copies_apart` (its limit
 A6_forward_handoff	event_version_contradicts_tables	c	rule `event_version`	168	1
 A6_forward_handoff	external_bridge	b	rule `external_bridge`	65496	103
 A7_tl_115	external_bridge	b	rule `external_bridge`	5041	845
-A7_tl_at	lrg_version_not_normalised	d	judge: common.base_id	12	11
 A7_tl_at	unexplained	?	-	1	1
 A7_tl_sample	external_bridge	b	rule `external_bridge`	279	137
 A7_tx_115	core_version_on_versionless_release	d	A*'s TruthA (core-only genes, human 48-51)	5	2
 A7_tx_115	external_bridge	b	rule `external_bridge`	7682	1450
 A7_tx_115	transcript_read_elsewhere	a	family A's reading of its wrong answers	4	2
-A7_tx_at	lrg_version_not_normalised	d	judge: common.base_id	12	11
 A7_tx_at	transcript_read_elsewhere	a	family A's reading of its wrong answers	5	5
 A7_tx_at	unexplained	?	-	1	1
 A7_tx_sample	core_version_on_versionless_release	d	A*'s TruthA (core-only genes, human 48-51)	1	1

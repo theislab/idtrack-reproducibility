@@ -9,7 +9,7 @@ What is built:
 - the fetcher of Ensembl's cross-references and of each database's own files (`fetch_c`), the truth readers (`truth_c`: the graph's scope, Ensembl's cross-references, the authorities), the generator of the parts c1 to c7 (`gen_c`), the check of the truth against Ensembl's other publications (`check_truth_c`), the authority measure (`authority_c`), the selection of the wrong answers to explain (`explain_qids`), the plugin of the common classifier (`causes_c`) and the corrections of the judge as revision sets (`revise_c`);
 - the truth of all five organisms, each file in `SOURCES.tsv` (files of no single organism in `<truth>/_shared/SOURCES.tsv`): extracts of the cross-references of every release of each window from Ensembl's MySQL dumps (`core_xref/<release>.tsv.gz`: human, mouse and rhesus 48 to 116, pig 56 to 116, cynomolgus 91 to 116), Ensembl's FTP `tsv/` tables of 87 to 116, NCBI's `gene2ensembl`, `gene2refseq` and `gene_history`, RefSeq release 238 (catalog, accessions to gene ids, removed records), UniProt 2026_04 (`idmapping_selected`, `sec_ac`, `delac_sp`, `delac_tr`, Swiss-Prot isoforms), RFAM's family list, RNAcentral release 28 (its Ensembl and miRBase mappings), miRBase 23.1 (`hairpin.fa`, `mature.fa`, the genome files of human, mouse and rhesus; pig's and cynomolgus's do not answer), CCDS (human, mouse);
 - the check of the core reading against BioMart and the FTP `tsv/` tables for cynomolgus, pig and rhesus (`<families>/c/truth_check/<organism>.tsv`);
-- the published sets: c1 to c7 of cynomolgus, pig and rhesus; c1 and c2 of mouse and human ([the sets](#the-sets)).
+- the published sets: c1 to c7 of cynomolgus, pig and rhesus; c1 and c2 of mouse and human, with their revision for the releases added to the truth (mouse 89, human 112) and the corrections of the judge ([the sets](#the-sets)).
 
 What was run and scored, on the reference tree `d4c2dda` and its graphs:
 
@@ -17,15 +17,16 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 | --- | --- | --- | --- | --- |
 | `runs/d4c2dda/macaca_fascicularis/` | `c1_v1` to `c7_v1` | yes | yes (`causes.tsv.gz`, `causes_summary.tsv`) | yes (`authority.tsv`) |
 | `runs/d4c2dda/macaca_mulatta/` | `c1_v1` to `c7_v1` | yes | yes | yes |
-| `runs/d4c2dda/sus_scrofa/` | `c1_v1` to `c7_v1` | yes | explained (`explain_wrong.jsonl.gz`), not classified | no |
+| `runs/d4c2dda/sus_scrofa/` | `c1_v1` to `c7_v1` | yes | yes | yes |
 | mouse, human | – | not run | – | – |
 
 What is not built:
 
-- the sets of mouse and human: their `c1_v1` and `c2_v1` were published before the extracts of mouse release 89 and human release 112 existed (human 112's folder holds a GRCh37 database beside the release's own, mouse 89's listing a file beside its folder; the fetcher now takes the folder of the newest assembly), so their lines of those releases need a revision set (`gen_c --revise-from`) before they are run; c3 to c7 of mouse and human are not generated;
-- the classification and the authority measure of pig;
-- (published 2026-11-19/20, after the runs) the corrections of the judge `rfam_label_accession` (sets `rfam_label_accession_v1`: cynomolgus 26 lines, rhesus 22, pig 13) and `other_database_broad` (`other_database_broad_v1`: pig 848, rhesus 1; `other_database_broad_v2`: rhesus 13; cynomolgus none): the results below were judged before them; a scoring again, the modest set and every later run judge with them ([Known limitations](#known-limitations));
-- the check of the truth for mouse and human, and the family's panel ([Measurement design](../methods.md#measurement-design)); C's modest selection is built (`panels/<organism>/modest_v1`, [the modest set](../modest.md)).
+- c3 to c7 of mouse and human, and their runs; the check of the truth for mouse and human, and the family's panel ([Measurement design](../methods.md#measurement-design)); C's modest selection is built (`panels/<organism>/modest_v1`, [the modest set](../modest.md)).
+
+Mouse's and human's `c1_v1` and `c2_v1` were published before the extracts of mouse release 89 and human release 112 existed (human 112's folder holds a GRCh37 database beside the release's own, mouse 89's dumps are `.txt.gz.bz2`); `gen_c --revise-from` published the lines a generation reading every release changes (2026-11-20; the explanations in words, `note` and `q2`, are no part of the comparison: `gen_c.WORDING`): mouse `c1_r1_new` 21,109 new lines at 89, `c2_r1` 4,777 (lines retired after 88 now read where last held, at 89) and `c2_r1_new` 309,356; human `c1_r1` 543 and `c1_r1_new` 27,648 at 112, `c2_r1` 8,368 (1,071 at 112; 7,297 lines of the sampled version strata left out, `excluded`, because the sample drawn from the population with 112 is another) and `c2_r1_new` 653,136.
+
+The corrections of the judge (revision sets of the latest lines; the results below are judged with them, scored again on 2026-11-20): `rfam_label_accession` (`rfam_label_accession_v1`: cynomolgus 26 lines, rhesus 22, pig 13) and `other_database_broad` (`other_database_broad_v1`: pig 848, rhesus 1, mouse 58,577, human 16,522; `other_database_broad_v2`: rhesus 13, and mouse 26,684, the same correction made again (`revise_c --redo`) once it no longer counted the copies a line expects apart (a gene on a patch carrying the same value, rule `judge_copies_apart`) as other genes; cynomolgus none). In mouse most of its lines are NCBI gene ids that are also numeric accessions of `Vega_translation` of other genes at the release read.
 
 ## What it measures
 
@@ -98,6 +99,8 @@ python -m idtrack_reproducibility.families.c.gen_c <o> --part c1|c2|c3|c4|c5|c6|
 python -m idtrack_reproducibility.families.c.gen_c <o> --part <part> --set <revision set> --revise-from <part>_v1
 # corrections of the judge, as revision sets of the latest lines
 python -m idtrack_reproducibility.families.c.revise_c <o> --correction rfam_label_accession|other_database_broad --set <revision set> [--dry-run]
+# a correction fixed after its set was published: its lines corrected anew from the lines before it, the differing ones published
+python -m idtrack_reproducibility.families.c.revise_c <o> --correction <name> --set <revision set> --redo <its published set>
 # a tree's run and its scoring (F0's runner)
 python -m idtrack_reproducibility.families.runner --family c --organism <o> --clone <source> --graph <graph> \
     --out <families>/c/runs/<tree>/<o> --submit <n> --score --score-parts <P> [--tag c_<tree>_<o>]
@@ -115,14 +118,14 @@ A rescoring after a correction of the judge reads the stored answers (`runner ..
 
 ## Results
 
-Runs `<families>/c/runs/d4c2dda/<organism>/` of cynomolgus, pig and rhesus (the reference graphs, every set of version 1); result files `results/c/d4c2dda/<organism>/report.tsv` and `scores.tsv`, for cynomolgus and rhesus also `causes_summary.tsv` and `authority.tsv`. No answer timed out. The corrections of the judge are not published, mouse and human are not run, and pig's wrong answers are not classified.
+Runs `<families>/c/runs/d4c2dda/<organism>/` of cynomolgus, pig and rhesus (the reference graphs, every set of version 1); result files `results/c/d4c2dda/<organism>/report.tsv`, `scores.tsv`, `causes_summary.tsv` and `authority.tsv`. No answer timed out. The results are judged with the corrections of the judge (scored again on 2026-11-20 from the stored answers); mouse and human are not run.
 
-Every stratum read at a release and by default is right on every answer in the three organisms (`c1_at`, `c1_default`, `c2_at_v`, `c2_default`, `c2_default_v`, `c3_at`, `c3_at_v`, `c3_default`, `c3_default_v`, the RFAM accessions and labels at R and by default, pig's Havana ids), but pig's `c2_at` (42 wrong of 6,583,242 answers) and clone-based names (below); so are NCBI's discontinued ids (nothing), the versions above every version of a held accession and the catalog's newer versions (the gene), and every database the graph does not hold but miRBase's names (`safe`: nothing or the gene). Rate, cluster-bootstrap interval and wrong answers of the other strata (row `*` of `report.tsv`; – : no such stratum):
+Every stratum read at a release and by default is right on every answer in the three organisms (`c1_at`, `c1_default`, `c2_at_v`, `c2_default`, `c2_default_v`, `c3_at`, `c3_at_v`, `c3_default`, `c3_default_v`, the RFAM accessions and labels at R and by default, pig's Havana ids), and pig's `c2_at` and clone-based names read at a release, whose 42 and 718 answers once wrong are undetermined under the correction `other_database_broad` (the string is also another database's value of the answered gene); so are NCBI's discontinued ids (nothing), the versions above every version of a held accession and the catalog's newer versions (the gene), and every database the graph does not hold but miRBase's names (`safe`: nothing or the gene). Rate, cluster-bootstrap interval and wrong answers of the other strata (row `*` of `report.tsv`; – : no such stratum):
 
 | stratum | cynomolgus | pig | rhesus |
 | --- | ---: | ---: | ---: |
 | `c1_retired` | 1.0000 (1.0000–1.0000), 0 | 0.9980 (0.9971–0.9989), 35 | 1.0000 (1.0000–1.0000), 0 |
-| `c2_retired` | 1.0000 (1.0000–1.0000), 0 | 0.9986 (0.9983–0.9989), 155 | 0.9999 (0.9999–1.0000), 8 |
+| `c2_retired` | 1.0000 (1.0000–1.0000), 0 | 0.9987 (0.9984–0.9990), 150 | 1.0000 (0.9999–1.0000), 4 |
 | `c2_oldver` | 0.9989 (0.9987–0.9991), 278 | 0.9885 (0.9876–0.9893), 2,046 | 0.9935 (0.9930–0.9940), 1,464 |
 | `c2_ver_lower` | 0.0737 (0.0655–0.0820), 7,410 | 0.0280 (0.0230–0.0335), 7,776 | 0.0440 (0.0377–0.0505), 7,648 |
 | `c2_ver_gap` | 0.0030 (0.0015–0.0048), 7,910 | 0.0032 (0.0015–0.0050), 7,974 | 0.0016 (0.0000–0.0048), 1,246 |
@@ -134,62 +137,66 @@ Every stratum read at a release and by default is right on every answer in the t
 | `c3_ver_lower` | 0.0772 (0.0688–0.0855), 7,382 | 0.0190 (0.0150–0.0230), 7,848 | 0.0000 (0.0000–0.0000), 8,000 |
 | `c3_ver_higher_retired` | 0.2318 (0.2190–0.2450), 6,146 | 0.0838 (0.0752–0.0927), 7,330 | 0.0000 (0.0000–0.0000), 7,894 |
 | `c4_mirbase_label` | – | 0.9905 (0.9778–1.0000), 6 | 0.9387 (0.9158–0.9595), 56 |
-| `c4_rfam_label_retired` | 0.9755 (0.9637–0.9857), 38 | 0.9862 (0.9767–0.9945), 20 | 0.9776 (0.9674–0.9876), 36 |
-| `c5_clone_at` | – | 0.9935 (0.9920–0.9948), 718 | – |
-| `c5_clone_retired` | – | 0.9977 (0.9970–0.9983), 83 | – |
+| `c4_rfam_label_retired` | 0.9993 (0.9980–1.0000), 1 | 0.9986 (0.9965–1.0000), 2 | 0.9987 (0.9968–1.0000), 2 |
+| `c5_clone_retired` | – | 0.9990 (0.9986–0.9993), 37 | – |
 | `c6:EntrezGene` | 1.0000 (1.0000–1.0000), 0 | 0.9341 (0.9335–0.9349), 127,392 | 0.9546 (0.9541–0.9550), 95,808 |
 | `c6:NCBI gene (formerly Entrezgene)` | 0.8187 (0.8169–0.8204), 309,084 | 0.6563 (0.6542–0.6583), 361,076 | 0.5739 (0.5716–0.5762), 65,068 |
 | `c7_ncbi` | 1.0000 (1.0000–1.0000), 0 | 0.9951 (0.9945–0.9957), 5,107 | 1.0000 (1.0000–1.0000), 0 |
-| `c7_refseq` | 1.0000 (1.0000–1.0000), 0 | 0.9971 (0.9969–0.9973), 18,068 | 1.0000 (1.0000–1.0000), 0 |
+| `c7_refseq` | 1.0000 (1.0000–1.0000), 0 | 0.9971 (0.9969–0.9973), 18,056 | 1.0000 (1.0000–1.0000), 0 |
 | `c7_uniprot` | 1.0000 (1.0000–1.0000), 0 | 0.9974 (0.9969–0.9979), 236 | 1.0000 (1.0000–1.0000), 0 |
 
 The only errors are in `c6:NCBI gene (formerly Entrezgene)`: pig 303,864 and rhesus 833,476 answers raise a `ValueError` naming the database (`errors.tsv` of the run), where `d4c2dda` does not hold that name at the release asked. Every other gene-to-database conversion of c6 (RefSeq, UniProt, RFAM, Havana, clone-based names) is right on every answer.
 
 ### Causes
 
-Every wrong answer of cynomolgus and rhesus classified by F0's classifier with C's plugin (the strata of c6 and of the versions need no explained path; of the others at most 5 answers per unit and stratum are explained); answers summed over the strata of `results/c/d4c2dda/<organism>/causes_summary.tsv`:
+Every wrong answer of the three organisms classified by F0's classifier with C's plugin (the strata of c6 and of the versions need no explained path; of the others at most 5 answers per unit and stratum are explained; the classifier meets the rows release by release, so a release's cross-references are read once: pig's 560,027 rows take minutes); answers summed over the strata of `results/c/d4c2dda/<organism>/causes_summary.tsv`:
 
-| cause | class | cynomolgus | rhesus |
-| --- | --- | ---: | ---: |
-| `ncbi_label_name_by_release`: a gene converted to `NCBI gene (formerly Entrezgene)` before 100, where the graph files the NCBI symbols under `EntrezGene` (to 87) or `NCBI gene` (88 to 99) (rule `one_kind_per_database`, decided) | a | 309,084 | 65,068 |
-| `entrezgene_label_rows`: `EntrezGene` up to 87 returns the NCBI labels beside the numbers (rule `one_kind_per_database`) | a | – | 95,808 |
-| `accession_version_never_had`: an accession version never had in the window is answered with the accession's gene ([Q2](../methods.md#open-methodological-choices)) | a | 35,602 | 32,418 |
-| `accession_old_version_read_at_target`: a version had at an older release is read at the target without its version | a | 1,408 | 1,214 |
-| `mirbase_not_in_graph`: miRBase names are not in the graph (rule `mirbase_genes`, decided) | c | – | 56 |
-| `rfam_label_is_accession`: the RFAM label line's string is the entry's accession (the truth's) | d | 38 | 36 |
-| `external_bridge`: no successor in Ensembl's history, answered through an external id with a gene elsewhere | b | – | 17 |
-| `value_of_another_database`: the string is also another database's value of the answered gene at the release read | e | – | 8 |
-| `unexplained` (old versions of `c2_oldver` and `c3_oldver` that no test explains) | – | 182 | 233 |
+| cause | class | cynomolgus | pig | rhesus |
+| --- | --- | ---: | ---: | ---: |
+| `ncbi_label_name_by_release`: a gene converted to `NCBI gene (formerly Entrezgene)` before 100, where the graph files the NCBI symbols under `EntrezGene` (to 87) or `NCBI gene` (88 to 99) (rule `one_kind_per_database`, decided) | a | 309,084 | 361,076 | 65,068 |
+| `entrezgene_label_rows`: `EntrezGene` up to 87 returns the NCBI labels beside the numbers (rule `one_kind_per_database`) | a | – | 127,392 | 95,808 |
+| `accession_version_never_had`: an accession version never had in the window is answered with the accession's gene ([Q2](../methods.md#open-methodological-choices)) | a | 35,602 | 38,488 | 32,418 |
+| `accession_old_version_read_at_target`: a version had at an older release is read at the target without its version | a | 1,408 | 6,634 | 1,214 |
+| `no_successor_answer_elsewhere`: no successor in Ensembl's history and the answer lies elsewhere, without an explained path (the class of `external_bridge`) | b | – | 14,903 | – |
+| `external_bridge`: no successor in Ensembl's history, answered through an external id with a gene elsewhere | b | – | 8,827 | 17 |
+| `value_of_another_database`: the string is also another database's value of the answered gene at the release read | e | – | 1,377 | 4 |
+| `mirbase_not_in_graph`: miRBase names are not in the graph (rule `mirbase_genes`, decided) | c | – | 6 | 56 |
+| `synonym_spelling_merged`: the string is carried in two letter cases | c | – | 2 | – |
+| `rfam_label_is_accession`: the RFAM label line's string is the entry's accession (the truth's; what the correction `rfam_label_accession` leaves) | d | 1 | 2 | 2 |
+| `unexplained` (old versions of `c2_oldver` and `c3_oldver`, and pig's 14 `c5_clone_retired`, that no test explains) | – | 182 | 1,320 | 233 |
 
-**Two rules give almost every wrong answer.** The NCBI symbols under one name at every release (rule `one_kind_per_database`, decided for idtrack's next version) and the versions of accessions (Q2) give every classified wrong answer of cynomolgus but the truth's 38 RFAM labels, and every one of rhesus but 56 miRBase names, 36 RFAM labels, 17 bridges and 8 values of another database; the old versions that no test explains (cynomolgus 182, rhesus 233) are read by hand. Pig's `c7_refseq` (18,068 wrong) and `c7_ncbi` (5,107), where Ensembl's history ends, are not yet classified.
+**Two rules give almost every wrong answer.** The NCBI symbols under one name at every release (rule `one_kind_per_database`, decided for idtrack's next version) and the versions of accessions (Q2) give every classified wrong answer of cynomolgus but one RFAM label, of rhesus but 56 miRBase names, 17 bridges, 4 values of another database and 2 RFAM labels; in pig 533,590 of 560,027, the rest mostly where Ensembl's history ends: carried to a gene elsewhere (23,730, class b: `c7_refseq`, `c7_ncbi`), and values of another database (1,377). The old versions that no test explains (cynomolgus 182, pig 1,306, rhesus 233) and pig's 14 clone-based names are read by hand.
 
 ### The authority beside Ensembl
 
 Where a database's own file and Ensembl's cross-references give an identifier at 115 other genes (`truths_differ`, `best` rows of `results/c/d4c2dda/<organism>/authority.tsv`; mostly the database attaching no gene, `auth_only_none`):
 
-| stratum | cynomolgus | rhesus |
-| --- | ---: | ---: |
-| `c1_default` (NCBI's `gene2ensembl`) | 7,158 of 13,563 (0.5278; no gene 6,554) | 2,695 of 21,446 (0.1257; no gene 2,582) |
-| `c2_default` (`gene2refseq` through `gene2ensembl`) | 18,724 of 41,811 (0.4478) | 51,416 of 129,010 (0.3985) |
-| `c3_default` (UniProt's `idmapping_selected`) | 2,786 of 51,341 (0.0543) | 6,924 of 48,212 (0.1436) |
-| `c3_deleted` (accessions UniProt deleted that Ensembl's tables still give a gene) | 11,662 of 16,828 (0.6930) | 19,434 of 30,557 (0.6360) |
+| stratum | cynomolgus | pig | rhesus |
+| --- | ---: | ---: | ---: |
+| `c1_default` (NCBI's `gene2ensembl`) | 7,158 of 13,563 (0.5278; no gene 6,554) | 16,477 of 16,477 (1.0000; no gene 1,747) | 2,695 of 21,446 (0.1257; no gene 2,582) |
+| `c2_default` (`gene2refseq` through `gene2ensembl`) | 18,724 of 41,811 (0.4478) | 115,991 of 115,991 (1.0000) | 51,416 of 129,010 (0.3985) |
+| `c3_default` (UniProt's `idmapping_selected`) | 2,786 of 51,341 (0.0543) | 27,281 of 70,701 (0.3859) | 6,924 of 48,212 (0.1436) |
+| `c3_deleted` (accessions UniProt deleted that Ensembl's tables still give a gene) | 11,662 of 16,828 (0.6930) | 49,989 of 62,652 (0.7979) | 19,434 of 30,557 (0.6360) |
+
+NCBI's `gene2ensembl` of pig names genes of another Ensembl annotation of the species (ids `ENSSSCG00220...`, not the reference assembly's `ENSSSCG000...`), so for pig no NCBI gene id and no RefSeq accession is given the reference gene by NCBI's own files: the pig rows of c1 and c2 measure that difference, not idtrack.
 
 idtrack follows Ensembl, as it should; these shares are the size of the limitation "Ensembl against the authority".
 
 ## Known limitations
 
-C's rows of [the known-limitations table](../../results/limitations/limitations.tsv) are generated by F0's builder with C's map (`families/c/limitations_map_c.tsv`) from the causes of rhesus and cynomolgus (pig's wrong answers are explained, not classified: its classification, 560,872 wrong rows, ran 4 h 45 min and was stopped before it ended; it needs a job of its own). Answers per organism:
+C's rows of [the known-limitations table](../../results/limitations/limitations.tsv) are generated by F0's builder with C's map (`families/c/limitations_map_c.tsv`) from the causes of the three organisms. Answers per organism:
 
-| limitation | what | user action | until | rhesus | cynomolgus |
-| --- | --- | --- | --- | ---: | ---: |
-| `L-ncbi-label-names` | Ensembl files the NCBI symbols under `EntrezGene` up to 87 and `NCBI gene` from 88 to 99, and under `NCBI gene (formerly Entrezgene)` from 100 on; a symbol asked under its name of 100 at an earlier release is not found | ask for the database by its name at the release asked (`final_databases(release)`) | decided: rule `one_kind_per_database` | 65,068 | 309,084 |
-| `L-ncbi-labels` | up to release 87 Ensembl's EntrezGene holds NCBI labels beside the numbers; a gene converted to EntrezGene at those releases also returns its label | ask for `NCBI gene (formerly Entrezgene)` or filter numeric ids | decided: rule `one_kind_per_database` | 95,808 | – |
-| `L-accession-versions` | every version of a RefSeq or UniProt accession is cut, so a version the accession never had in the window answers the accession's gene | drop accession versions you cannot vouch for, or check them against the database | decided: rule `accession_versions` | 33,632 | 37,010 |
-| `L-unexplained` | answers no test of the classifier explains (docs/families/c.md, "Causes") | - | - | 233 | 182 |
-| `L-truth-rfam-labels` | at some releases Ensembl writes an RFAM entry's accession as its label: the label line expects the accession's string; the truth should expect the entry's genes | none needed | none (the judge: a revision of the truth, not yet published) | 36 | 38 |
-| `L-mirbase` | miRNA genes whose display name is a miRBase name are not found by that name | use the Ensembl id or the HGNC/MGI symbol of the miRNA gene | decided: rule `mirbase_genes` | 56 | – |
-| `L-bridges` | an id Ensembl's history ends is carried through an external id to a gene that does not overlap it | `allow_bridges=False`; check the answer's place (explain) | decided: rule `bridge_same_place` | 17 | – |
-| `L-other-database-values` | the string is also a value or name of the returned gene in another database at the release read; without `from_database` it names both | pass `from_database` | none (Ensembl's data; undeterminable) | 8 | – |
+| limitation | what | user action | until | pig | rhesus | cynomolgus |
+| --- | --- | --- | --- | ---: | ---: | ---: |
+| `L-ncbi-label-names` | Ensembl files the NCBI symbols under `EntrezGene` up to 87 and `NCBI gene` from 88 to 99, and under `NCBI gene (formerly Entrezgene)` from 100 on; a symbol asked under its name of 100 at an earlier release is not found | ask for the database by its name at the release asked (`final_databases(release)`) | decided: rule `one_kind_per_database` | 361,076 | 65,068 | 309,084 |
+| `L-ncbi-labels` | up to release 87 Ensembl's EntrezGene holds NCBI labels beside the numbers; a gene converted to EntrezGene at those releases also returns its label | ask for `NCBI gene (formerly Entrezgene)` or filter numeric ids | decided: rule `one_kind_per_database` | 127,392 | 95,808 | – |
+| `L-accession-versions` | every version of a RefSeq or UniProt accession is cut, so a version the accession never had in the window answers the accession's gene | drop accession versions you cannot vouch for, or check them against the database | decided: rule `accession_versions` | 45,122 | 33,632 | 37,010 |
+| `L-bridges` | an id Ensembl's history ends is carried through an external id to a gene that does not overlap it | `allow_bridges=False`; check the answer's place (explain) | decided: rule `bridge_same_place` | 23,730 | 17 | – |
+| `L-other-database-values` | the string is also a value or name of the returned gene in another database at the release read; without `from_database` it names both | pass `from_database` | none (Ensembl's data; undeterminable) | 1,377 | 4 | – |
+| `L-unexplained` | answers no test of the classifier explains (docs/families/c.md, "Causes") | - | - | 1,320 | 233 | 182 |
+| `L-mirbase` | miRNA genes whose display name is a miRBase name are not found by that name | use the Ensembl id or the HGNC/MGI symbol of the miRNA gene | decided: rule `mirbase_genes` | 6 | 56 | – |
+| `L-spellings` | two genes with one string in two letter cases | type the exact spelling | decided: rule `spelling_per_edge` | 2 | – | – |
+| `L-truth-rfam-labels` | at some releases Ensembl writes an RFAM entry's accession as its label: the label line expects the accession's string | none needed | the correction `rfam_label_accession` (published; these are the lines it leaves) | 2 | 2 | 1 |
 
 What the results show beyond the classified causes, and what the truth cannot judge:
 
@@ -197,10 +204,10 @@ What the results show beyond the classified causes, and what the truth cannot ju
 | --- | --- | --- | --- |
 | NCBI symbols by release | converting to `NCBI gene (formerly Entrezgene)` before 100 gives nothing, or an error where `d4c2dda` does not hold the name at the release; `EntrezGene` up to 87 returns the labels beside the numbers | the decided rule `one_kind_per_database` | cause rows above; errors pig 303,864, rhesus 833,476 (`report.tsv`) |
 | accession versions | every accession version is cut: a version never had is answered with the gene, an old version is read at the target | the decided rule `accession_versions` (the answer to Q2) | `c2_ver_*`, `c3_ver_*`, `c2_oldver`, `c3_oldver` above |
-| bridges | an identifier whose genes Ensembl retired without successor is answered with a gene elsewhere | the decided rule `bridge_same_place` | rhesus 17; pig's `c7_*` not classified |
+| bridges | an identifier whose genes Ensembl retired without successor is answered with a gene elsewhere | the decided rule `bridge_same_place` | pig 23,730, rhesus 17 |
 | databases not in the graph | UniProt isoforms, entry names and secondary accessions, miRBase, RNAcentral, the authorities' ids are answered with nothing (right under `safe`; the gene is recovered nowhere) | the decided rule `mirbase_genes` for miRBase | the `safe` strata above |
-| RFAM labels written as accessions (the truth's) | Ensembl writes an entry's accession as its label at some releases; the label line expects only the label rows' genes | the correction `rfam_label_accession` (published: the entry's genes, at the release read and at the target, go to `broad`; the 38 and 36 answers become undetermined when scored again) | cynomolgus 38, rhesus 36 |
-| a value of several databases (the truth's) | a string that another database or the GTF gives other genes at the release read (pig's clone-based names such as `ABCA1`, RefSeq values written `LOC...`): without `from_database` it names both | the correction `other_database_broad` (published: the other genes the string names at the release read, or at the target for a line asked without a release and without a version, go to `broad`, or to `expect` of a `safe` line) | rhesus 8 classified; pig's `c5_clone_at` (718) not classified |
+| RFAM labels written as accessions (the truth's) | Ensembl writes an entry's accession as its label at some releases; the label line expected only the label rows' genes | the correction `rfam_label_accession` (published; the entry's genes, at the release read and at the target, go to `broad`): of cynomolgus's 38, pig's 20 and rhesus's 36 wrong answers, 37, 18 and 34 became undetermined | cynomolgus 1, pig 2, rhesus 2 left |
+| a value of several databases (the truth's) | a string that another database or the GTF gives other genes at the release read (pig's clone-based names such as `ABCA1`, RefSeq values written `LOC...`, mouse's NCBI ids that are numeric `Vega_translation` accessions): without `from_database` it names both | the correction `other_database_broad` (published: the other genes the string names at the release read, or at the target for a line asked without a release and without a version, go to `broad`, or to `expect` of a `safe` line; the copies a line expects apart are not other genes) | pig's `c5_clone_at` 718, `c2_at` 42, `c5_clone_retired` 46, `c7_clone` 3, `c2_retired` 5 and `c7_refseq` 12 wrong answers became undetermined, rhesus's `c2_retired` 4; classified as `value_of_another_database` still: pig 1,377, rhesus 4 |
 | the authority | where a database's own file and Ensembl disagree, the disagreement is Ensembl's | none (Ensembl's data) | [the authority beside Ensembl](#the-authority-beside-ensembl) |
 
 ## Reproducing from scratch

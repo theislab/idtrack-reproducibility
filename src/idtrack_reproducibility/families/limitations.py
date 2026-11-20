@@ -42,6 +42,10 @@ F0_MAP = {
     "rfam_family_label": ("L-rfam-labels", "names", "RFAM family labels name many genes",
                           "an RFAM family label attaches the string to genes whose name it is not",
                           "use the gene's own symbol", "decided: rule `rfam_display_label`"),
+    "rule_decided_after_tree": ("L-decided-rules", "rules", "rules decided for idtrack after the tree",
+                                "where a rule decided after the tree answers otherwise (the Y copy of a pseudoautosomal "
+                                "name apart, missing values refused, a lower-case symbol, stray punctuation), the tree "
+                                "answers as before", "use a tree that builds the rule", "decided: the rule the detail names"),
     "synonym_spelling_merged": ("L-spellings", "names", "two genes with one string in two letter cases",
                                 "the exact step cannot tell `Tc` from `tc`", "type the exact spelling (decided: rule `spelling_per_edge`)",
                                 "decided: rule `spelling_per_edge`"),

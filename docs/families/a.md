@@ -275,12 +275,13 @@ Every wrong answer explained on the tree that gave it (`explain_a`) and classifi
 | `d4c2dda` | `copies_apart_before_82`: copies on patches before release 82, which the truth labels primary | d | – | – | 11,639 | – | – |
 | `d4c2dda` | `gtf_lacks_core_gene`: the target's GTF lacks a gene the core has | d | – | – | 2,687 | – | – |
 | `d4c2dda` | `event_version_contradicts_tables`: one event whose version contradicts the tables (rule `event_version`) | c | – | – | 602 | – | – |
-| `d4c2dda` | `lrg_version_not_normalised`: the judge does not reduce LRG gene ids `LRG_<n>_g1.<v>` | d | – | – | 24 | – | – |
 | `d4c2dda` | `transcript_read_elsewhere`: a transcript id asked from a release is read at another release or through a synonym | a | – | – | 11 | – | – |
 | `d4c2dda` | `core_version_on_versionless_release`: the truth's version of a core-only gene at a release without versions | d | – | – | 6 | – | – |
 | `d4c2dda` | `unexplained`, read by hand: the translation id equal to a transcript id (A0 above) and a transcript read at another release | – | – | – | 2 | – | – |
 | `d4c2dda_s110` | `external_bridge` | b | 14,314 | – | 31,266 | – | – |
 | `d4c2dda_s110` | `event_version_contradicts_tables` | c | – | – | 84 | – | – |
+
+The 24 human answers of A7 that the judge once called wrong because it did not reduce LRG gene ids (`LRG_<n>_g1.<v>`) are right since the judge's stable id form reads LRG ids (`harness_lib.STABLE_ID_FORM`, 2026-11-20; A was scored again from its stored answers).
 
 **Where Ensembl's history has a successor, idtrack is right.** Every wrong answer of pig and rhesus, all of mouse's but the 180 read through a resurrection, and most of human's (cynomolgus has none) is an id whose strict walk reaches nothing, answered with a gene that a shared external id links to it and that does not overlap the old place (class b; rule [`external_bridge`](../rules.md#external_bridge), which the decided rule [`bridge_same_place`](../rules.md#bridge_same_place) restricts). The truth classes (c, d, e) are Ensembl's or the judge's. Over the whole family idtrack is wrong under its own rules (class a) in 11 answers of human transcripts read at another release or through a synonym, and in the 2 answers read by hand. A reproducer of the bridges: rhesus `convert_identifier("ENSMMUG00000036773", from_release=65, to_release=48)` on `d4c2dda` (`API.convert` from `71690ab` on) answers `ENSMMUG00000024688`, `ENSMMUG00000026611` and `ENSMMUG00000026730`, none at the id's place; Ensembl's history has no predecessor of the id, which is born at 58.
 
@@ -298,7 +299,6 @@ A's rows of [the known-limitations table](../../results/limitations/limitations.
 | `L-truth-gtf-short` | genes of a release missing from its GTF (the truth's) | wrong | – | – | 2,687 | – | – |
 | `L-unexplained` | wrong answers read by hand (above) | wrong | – | – | 2 | – | – |
 | `T-core-version` | the truth's version of a core-only gene at a release without versions (not idtrack's) | wrong | – | – | 6 | – | – |
-| `T-lrg-base` | the judge did not reduce LRG gene ids to their stable id (not idtrack's): corrected, the judge's stable id form (`harness_lib.STABLE_ID_FORM`) reads `LRG_<n>_g<k>`, `LRG_<n>t<k>`, `LRG_<n>p<k>` from 2026-11-20; the stored scoring predates it, a scoring again moves these rows | wrong | – | – | 24 | – | – |
 | `L-no-chain` | no successor and no assembly chain: the answer cannot be judged (Ensembl publishes no chain) | undetermined | 2,714,444 | – | – | 2,586,456 | 974,950 |
 | `L-bridge-at-place` | no successor; idtrack answers a gene at the same place (plausible, not Ensembl's statement; until `bridge_same_place`) | undetermined | 301,601 | 1,155,605 | 1,960,844 | – | – |
 | `L-chain-gap` | no successor and the place does not map through the chain | undetermined | 277,712 | 112,898 | 154,782 | – | – |

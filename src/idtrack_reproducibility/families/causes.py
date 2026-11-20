@@ -90,6 +90,9 @@ CAUSE_CLASS = {
                                  "largest version + 37, expecting nothing): rule `version_newer_than_graph` answers a version above every "
                                  "version of a living id with its gene, flagged; the kind is kept and left out of the acceptance"),
     "history_branch": ("e", "-", "(undetermined only) the answer follows Ensembl's history, a branch outside the strict walk"),
+    "rule_decided_after_tree": ("a", "rule `judge_follows_rules` (a rule idtrack decided after this tree)",
+                                "the line follows a rule decided for idtrack after this tree (the harness's judge `rules`); "
+                                "the answer is the one the judge before the rule expected"),
     "unexplained": ("?", "-", "no test holds"),
 }
 
@@ -561,7 +564,18 @@ def t_newer_version_kind_reversed(c):
     return f"{c.id}: answered {','.join(c.got) or 'nothing'} (rule `version_newer_than_graph`: a version newer than the graph)"
 
 
-TESTS = [t_newer_version_kind_reversed, t_entrezgene_label_rows, t_biomart75_swissprot_entry_name, t_one_spelling_per_db_release,
+def t_rule_decided_after_tree(c):
+    rules = [x for x in str(c.r.get("rule") or "").replace("revised:", "").split("+") if x in MQ.RULES_JUDGE]
+    before = c.r.get("_before")
+    if not rules or before is None:
+        return None
+    allowed = {base(x) for x in (before.get("expect") or []) + (before.get("broad") or [])}
+    if c.gotb <= allowed and (c.gotb or not before.get("expect")):
+        return f"rule {'+'.join(rules)}: the answer is the line's expectation before the rule"
+    return None
+
+
+TESTS = [t_rule_decided_after_tree, t_newer_version_kind_reversed, t_entrezgene_label_rows, t_biomart75_swissprot_entry_name, t_one_spelling_per_db_release,
          t_mirbase_not_in_graph, t_mouse_hgnc_projection, t_strict_walk_drops_living_id, t_copies_apart_before_82,
          t_gtf_lacks_core_gene, t_path_through_resurrection, t_event_version_contradicts_tables,
          t_vgnc_symbol_not_in_truth, t_name_in_db_not_in_truth, t_rfam_family_label,
@@ -579,11 +593,34 @@ def register(cause, cls, decision, text, test, before=None):
     TESTS.insert(i, test)
 
 
+def release_order(rows):
+    """The rows' indices in the order of the releases their queries read (the start release, then the target): the
+    truth's readers cache what they read per release (a release's tables are read once while its rows are classified),
+    so rows met in the order of the scored file (by the hash of the qid) would read a release's tables again for
+    nearly every row."""
+    def key(i):
+        q = json.loads(rows[i]["query"]) if rows[i].get("query") else {}
+        fr, to = q.get("from_release"), q.get("to_release")
+        return (fr is not None, fr or 0, to or 0)
+    return sorted(range(len(rows)), key=key)
+
+
 def classify_rows(org, rows, explain, und=False):
-    """(cause, detail) for each row (a wrong.tsv.gz or undetermined.tsv.gz row); explain: (qid, view) -> record."""
+    """(cause, detail) for each row (a wrong.tsv.gz or undetermined.tsv.gz row), in the rows' order; explain: (qid,
+    view) -> record. The rows are classified in the order of the releases they read (`release_order`); every row is
+    classified on its own, so the order changes no cause."""
     w = World(org)
-    out = []
-    for r in rows:
+    out = [None] * len(rows)
+    # lines that follow a rule decided after the tree (the harness's judge `rules`): their line before the rule
+    ruled = [r for r in rows if any(x in MQ.RULES_JUDGE for x in str(r.get("rule") or "").replace("revised:", "").split("+"))]
+    if ruled:
+        from idtrack_reproducibility.families import lines as L
+        sets = [n for n in L.set_names("harness", org) if L.manifest("harness", org, n).get("judge") != "rules"]
+        before = L.load_qids("harness", org, {r["qid"] for r in ruled}, sets=sets)
+        for r in ruled:
+            r["_before"] = before.get(r["qid"])
+    for i in release_order(rows):
+        r = rows[i]
         view = r["variant"].split(",")[0]
         c = Ctx(r, explain.get((r["qid"], view)), w)
         cause, detail = "unexplained", ""
@@ -602,7 +639,7 @@ def classify_rows(org, rows, explain, und=False):
             detail = (f"{'no explain record; ' if c.rec is None else ''}match {c.res.get('match')} read at {c.read_at}; "
                       f"extra {','.join(sorted(c.extra))[:120]}; missing {','.join(sorted(c.missing))[:120]}; "
                       f"reason {r['reason'][:80]}")
-        out.append((view, cause, detail, c.same_answer))
+        out[i] = (view, cause, detail, c.same_answer)
     return out
 
 

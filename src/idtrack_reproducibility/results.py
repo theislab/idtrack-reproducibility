@@ -180,10 +180,11 @@ def collect(root, only=None, dry=False):
 
 
 def rows_behind(root, data, problems):
-    """Every registered run's tables rest on rows in the data root: each scored folder holds its outcome rows (the
-    record, docs/records.md: `outcomes/*.parquet`, as many as its run.json counts, or the harness's
-    `outcomes.tsv.gz`), unless the registry says what it keeps instead (`rows = "<what>"`)."""
+    """Every registered run's tables rest on rows in the data root: each scored folder holds its rows of the record
+    (docs/records.md: `outcomes/*.parquet`, as many as its run.json counts, of the record's version), unless the
+    registry says what it keeps instead (`rows = "<what>"`)."""
     import pyarrow.parquet as pq
+    from .records import RECORD_VERSION
     for e in registry(root).get("run", []):
         if e.get("rows"):
             continue
@@ -193,15 +194,17 @@ def rows_behind(root, data, problems):
                 folder = os.path.dirname(os.path.join(base, rj))
                 rel = os.path.relpath(folder, data)
                 parts = glob.glob(os.path.join(folder, "outcomes", "*.parquet"))
-                if parts:
-                    n = sum(pq.ParquetFile(p).metadata.num_rows for p in parts)
-                    want = (json.load(open(os.path.join(folder, "run.json"))).get("n_rows")
-                            if os.path.exists(os.path.join(folder, "run.json")) else None)
-                    if not n or (want is not None and n != want):
-                        problems.append(("results", rel, f"{n} outcome rows where run.json counts {want}"))
-                elif not (os.path.exists(os.path.join(folder, "outcomes.tsv.gz")) and
-                          os.path.getsize(os.path.join(folder, "outcomes.tsv.gz")) > 0):
+                info = json.load(open(os.path.join(folder, "run.json"))) if os.path.exists(os.path.join(folder, "run.json")) else {}
+                if not parts:
                     problems.append(("results", rel, "no rows behind its tables (no outcomes in the data root)"))
+                    continue
+                n = sum(pq.ParquetFile(p).metadata.num_rows for p in parts)
+                want = info.get("n_rows")
+                if not n or (want is not None and n != want):
+                    problems.append(("results", rel, f"{n} outcome rows where run.json counts {want}"))
+                if int(info.get("record_version", 0)) != RECORD_VERSION:
+                    problems.append(("results", rel, f"rows of record version {info.get('record_version', 0)}, not "
+                                     f"{RECORD_VERSION}: score it again (idtrack-repro rescore)"))
 
 
 def check(root, problems, skipped):

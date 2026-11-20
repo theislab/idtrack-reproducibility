@@ -538,6 +538,20 @@ PARTS = {
 }
 
 
+# Fields of a line that explain it in words (the rule it follows, how it was made): a line whose other fields are
+# unchanged is the same truth, so `--revise-from` does not revise it for the wording of its explanation.
+WORDING = ("note", "q2")
+
+
+def truth_hash(row):
+    """A hash of a typed row (lines.to_row) without its explanations in words (`WORDING`) and its shard hash."""
+    import json
+    r = {k: v for k, v in row.items() if k not in WORDING and k != "h"}
+    if r.get("extra"):
+        r["extra"] = C.dumps({k: v for k, v in json.loads(r["extra"]).items() if k not in WORDING})
+    return hash(C.dumps(r))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("organism")
@@ -548,7 +562,8 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--show", type=int, default=0, help="with --dry-run: print the first N lines of every stratum")
     ap.add_argument("--revise-from", default=None,
-                    help="a published set of this part: publish the lines whose truth changed as a revision set "
+                    help="a published set of this part: publish the lines whose truth changed (the explanations in "
+                         "words aside, `WORDING`) as a revision set "
                          "`<set>` (revises it; base lines no longer generated are left out, `excluded`) and the new "
                          "qids as the set `<set>_new` (truth that gained releases after the base set was published)")
     a = ap.parse_args()
@@ -583,17 +598,14 @@ def main():
         base = {}
         for b in pq.ParquetFile(L._set_file(L.query_dir(FAMILY, org), a.revise_from)).iter_batches(batch_size=500_000):
             for r in b.to_pylist():
-                r.pop("h", None)
-                base[r["qid"]] = hash(C.dumps(r))
+                base[r["qid"]] = truth_hash(r)
         changed, new_lines, seen = [], [], set()
         for rec in all_lines():
-            row = L.to_row(rec)
-            row.pop("h", None)
             q = rec["qid"]
             seen.add(q)
             if q not in base:
                 new_lines.append(rec)
-            elif base[q] != hash(C.dumps(row)):
+            elif base[q] != truth_hash(L.to_row(rec)):
                 rec["revised_by"] = list(rec.get("revised_by") or []) + ["releases_added"]
                 changed.append(rec)
         gone = [q for q in base if q not in seen]
@@ -606,6 +618,9 @@ def main():
                 r["revised_by"] = list(r.get("revised_by") or []) + ["releases_added"]
                 changed.append(r)
         log("revise-from", a.revise_from, "changed", len(changed), "new", len(new_lines), "gone", len(gone))
+        at = lambda r: r.get("from_release") or r.get("read_at") or r.get("to_release")  # noqa: E731
+        log("by the release read: changed", dict(sorted(collections.Counter(at(r) for r in changed).items())),
+            "new", dict(sorted(collections.Counter(at(r) for r in new_lines).items())))
         man = None
         if changed:
             man = L.publish(FAMILY, org, a.set, changed,

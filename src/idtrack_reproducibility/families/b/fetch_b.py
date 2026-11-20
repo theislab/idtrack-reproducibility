@@ -10,7 +10,7 @@ Usage (standard library only):
   fetch_b.py mgi      MGI MRK_List1.rpt (markers with withdrawn symbols and synonyms), MRK_List2.rpt (current),
                       MRK_ENSEMBL.rpt (MGI's own Ensembl gene ids)                         [www.informatics.jax.org]
   fetch_b.py ncbi     NCBI gene_info of the five taxa (symbol, synonyms, dbXrefs)          [ftp.ncbi.nlm.nih.gov]
-  fetch_b.py synonyms [--releases 115|all|<r,r,...>]
+  fetch_b.py synonyms [--releases 115|all|<r,r,...>] [--organisms <o>,...]
                       Ensembl's synonyms of every xref of a release (core MySQL dumps: external_synonym, xref,
                       object_xref, external_db, gene, transcript, translation; read, not kept): `core_synonyms/<R>.tsv.gz`
                       (synonym, gene, the xref's database and label). BioMart's synonym table holds only the synonyms
@@ -146,98 +146,45 @@ def ncbi_all(missing):
         print("kept", path, counts[o])
 
 
-ENSEMBL = "https://ftp.ensembl.org/pub"
-
-
-class Dump:
-    """One table of a release's core MySQL dump, streamed: rows as dicts by the columns of its CREATE TABLE."""
-
-    def __init__(self, base, db, sql):
-        self.base, self.db, self.sql = base, db, sql
-        self.read = []  # (url, bytes, md5)
-
-    def columns(self, table):
-        m = re.search(r"CREATE TABLE `" + table + r"` \((.*?)\n\)", self.sql, re.S)
-        return [x.group(1) for x in re.finditer(r"^\s*`([^`]+)`", m.group(1), re.M)]
-
-    def rows(self, table, keep=None):
-        import zlib
-        cols = self.columns(table)
-        url = f"{self.base}/{table}.txt.gz"
-        h, n = hashlib.md5(), 0
-        dec, buf = zlib.decompressobj(16 + zlib.MAX_WBITS), b""
-        req = urllib.request.Request(url, headers={"User-Agent": "python-urllib"})
-        with urllib.request.urlopen(req, timeout=600) as r:
-            for b in iter(lambda: r.read(1 << 20), b""):
-                h.update(b)
-                n += len(b)
-                buf += dec.decompress(b)
-                *lines, buf = buf.split(b"\n")
-                pend = b""
-                for ln in lines:
-                    ln = pend + ln
-                    # a newline inside a field is written as a backslash before it (an odd number of them at the end)
-                    if (len(ln) - len(ln.rstrip(b"\\"))) % 2 == 1:
-                        pend = ln + b"\n"
-                        continue
-                    pend = b""
-                    row = dict(zip(cols, ln.decode("utf-8", "replace").split("\t")))
-                    if keep is None or keep(row):
-                        yield row
-                buf = pend + buf
-        self.read.append((url, n, h.hexdigest()))
-
-
 WINDOW = {"homo_sapiens": 48, "mus_musculus": 48, "sus_scrofa": 56, "macaca_mulatta": 48, "macaca_fascicularis": 91}
+ORGANISMS = ("macaca_fascicularis", "sus_scrofa", "macaca_mulatta", "mus_musculus", "homo_sapiens")  # smallest first
 
 
-def core_db(org, rel):
-    """The core database of a release: the store's own core dumps name it (release 115), else the release folder's
-    listing (the one `<org>_core_<rel>_<assembly>`; human from 112 holds `_37` beside it: the release's own is the
-    other one)."""
-    cores = sorted({f.split(".")[0] for f in os.listdir(os.path.join(TRUTH, org, "core")) if f.startswith(f"{org}_core_{rel}_")})
-    if len(cores) == 1:
-        return cores[0]
-    req = urllib.request.Request(f"{ENSEMBL}/release-{rel}/mysql/", headers={"User-Agent": "python-urllib"})
-    html = urllib.request.urlopen(req, timeout=300).read().decode()
-    dbs = sorted(set(re.findall(rf'href="({org}_core_{rel}_[0-9a-z]+)/"', html)))
-    if len(dbs) > 1:
-        dbs = [x for x in dbs if not x.endswith("_37")] if org == "homo_sapiens" else dbs
-    return dbs[0] if len(dbs) == 1 else None
-
-
-def synonyms(releases=(115,)):
-    """`core_synonyms/<R>.tsv.gz` of every organism: Ensembl's synonyms of every xref of the release, by gene."""
+def synonyms(releases=(115,), organisms=ORGANISMS):
+    """`core_synonyms/<R>.tsv.gz` of the organisms (default every one): Ensembl's synonyms of every xref of the
+    release, by gene. The core dumps are read by family C's reader (`fetch_c`: the release's core database, its
+    dumps as `.txt.gz` or `.txt.gz.bz2`, the stable-id tables before release 65), each recorded in SOURCES.tsv."""
+    import collections
     import gzip
-    for o in ("macaca_fascicularis", "sus_scrofa", "macaca_mulatta", "mus_musculus", "homo_sapiens"):  # smallest first
+    from idtrack_reproducibility.families.c import fetch_c as FC
+    for o in [x for x in ORGANISMS if x in organisms]:
         for rel in (range(WINDOW[o], 116) if releases == "all" else releases):
             rp = f"core_synonyms/{rel}.tsv.gz"
             dst = os.path.join(TRUTH, o, rp)
             if os.path.exists(dst):
                 print("have", dst)
                 continue
-            db = core_db(o, rel)
+            db = FC.core_db(o, rel)
             if db is None:
-                print(o, rel, "no single core database")
+                print(o, rel, "no core database")
                 continue
-            base = f"{ENSEMBL}/release-{rel}/mysql/{db}"
-            req = urllib.request.Request(f"{base}/{db}.sql.gz", headers={"User-Agent": "python-urllib"})
-            raw = urllib.request.urlopen(req, timeout=600).read()
-            import gzip as gz
-            d = Dump(base, db, gz.decompress(raw).decode())
-            d.read.append((f"{base}/{db}.sql.gz", len(raw), hashlib.md5(raw).hexdigest()))
+            base = f"{FC.ENSEMBL}/release-{rel}/mysql/{db}"
+            sd, sqlurl, sbz = FC.open_dump(f"{base}/{db}.sql.gz")
+            sql = "\n".join(sd.lines(True, sbz))
+            FC.add_source(o, f"{rp} (schema read from {sqlurl.rsplit('/', 1)[1]}; not kept)", sqlurl, sd.size,
+                          sd.md5.hexdigest(), FC.now())
             syn = collections.defaultdict(set)
-            for r in d.rows("external_synonym"):
+            for r in FC.dump_rows(o, rp, base, sql, "external_synonym"):
                 syn[r["xref_id"]].add(r["synonym"])
-            xr = {r["xref_id"]: (r["external_db_id"], r["display_label"]) for r in d.rows("xref", keep=lambda r: r["xref_id"] in syn)}
-            edb = {r["external_db_id"]: r["db_name"] for r in d.rows("external_db")}
-            obj = [(r["ensembl_object_type"], r["ensembl_id"], r["xref_id"]) for r in d.rows("object_xref", keep=lambda r: r["xref_id"] in xr)]
-            if "stable_id" in d.columns("gene"):
-                gst = {r["gene_id"]: r["stable_id"] for r in d.rows("gene")}
-            else:  # before release 65: stable ids in their own tables
-                gst = {r["gene_id"]: r["stable_id"] for r in d.rows("gene_stable_id")}
-            t2g = {r["transcript_id"]: r["gene_id"] for r in d.rows("transcript")}
-            p2t = {r["translation_id"]: r["transcript_id"] for r in d.rows("translation")}
+            xr = {r["xref_id"]: (r["external_db_id"], r["display_label"])
+                  for r in FC.dump_rows(o, rp, base, sql, "xref", keep=lambda r: r["xref_id"] in syn)}
+            edb = {r["external_db_id"]: r["db_name"] for r in FC.dump_rows(o, rp, base, sql, "external_db")}
+            obj = [(r["ensembl_object_type"], r["ensembl_id"], r["xref_id"])
+                   for r in FC.dump_rows(o, rp, base, sql, "object_xref", keep=lambda r: r["xref_id"] in xr)]
+            gene_table = "gene" if "stable_id" in (FC.columns(sql, "gene") or []) else "gene_stable_id"  # before 65
+            gst = {r["gene_id"]: r["stable_id"] for r in FC.dump_rows(o, rp, base, sql, gene_table)}
+            t2g = {r["transcript_id"]: r["gene_id"] for r in FC.dump_rows(o, rp, base, sql, "transcript")}
+            p2t = {r["translation_id"]: r["transcript_id"] for r in FC.dump_rows(o, rp, base, sql, "translation")}
             n = 0
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             with gzip.open(dst + ".tmp", "wt") as fo:
@@ -253,19 +200,22 @@ def synonyms(releases=(115,)):
                         n += 1
             os.replace(dst + ".tmp", dst)
             km = hashlib.md5(open(dst, "rb").read()).hexdigest()
-            fetched = datetime.datetime.now().isoformat(timespec="seconds")
-            for url, nb, md5 in d.read:
-                add_source(o, f"{rp} (read from {url.rsplit('/', 1)[1]}; not kept)", url, nb, md5, fetched)
-            add_source(o, f"{rp} (kept: {n:,} rows; md5 {km})", base, 0, km, fetched)
-            print("kept", dst, n)
+            FC.add_source(o, f"{rp} (kept: {n:,} rows; md5 {km})", base, 0, km, FC.now())
+            print("kept", dst, n, flush=True)
 
 
 if __name__ == "__main__":
-    import collections
     args = sys.argv[1:]
     rels = [115]
     if "--releases" in args:
         x = args[args.index("--releases") + 1]
         rels = "all" if x == "all" else [int(y) for y in x.split(",")]
-    for what in [x for x in args if not x.startswith("--") and not x[0].isdigit()]:
-        {"hgnc": hgnc, "mgi": mgi, "ncbi": ncbi, "synonyms": lambda: synonyms(rels)}[what]()
+    orgs = ORGANISMS
+    if "--organisms" in args:
+        orgs = args[args.index("--organisms") + 1].split(",")
+        unknown = set(orgs) - set(ORGANISMS)
+        if unknown:
+            raise SystemExit(f"unknown organisms: {sorted(unknown)}")
+    values = {args[i + 1] for i, x in enumerate(args[:-1]) if x in ("--releases", "--organisms")}
+    for what in [x for x in args if not x.startswith("--") and x not in values]:
+        {"hgnc": hgnc, "mgi": mgi, "ncbi": ncbi, "synonyms": lambda: synonyms(rels, orgs)}[what]()

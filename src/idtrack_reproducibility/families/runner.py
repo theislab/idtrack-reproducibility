@@ -19,6 +19,11 @@ Usage:
   `PYTHONHASHSEED=0` (the runner restarts itself with it when it is not set), a per-call budget (`--timeout`).
 - Answers (adapter.py: one row per line and view) go to `<out>/answers/shard_<i>_of_<n>.<k>.parquet`, a new part
   every `--flush` lines or 5 minutes (an interrupted shard loses at most one part; those lines are asked again).
+- Answers already in the data root are taken, not asked again (`reuse`): a line whose qid another run of the same
+  tree has answered (a run folder of the family, `<families>/<family>/runs/*/<organism>/`; for the harness's sets F0's
+  runs, `<families>/f0/runs/*/<organism>/`) is copied from it when that run's records match: the same commit, the same
+  graph content digest (its `run.json` against this shard's load record) and the line's set read there with the same
+  sha256. The load record says what was taken from where (`reused`).
 - The tree's Python is the configuration's (`[trees.<name>] python`, common.python_for); the scoring jobs run in this
   package's Python. Jobs go through the configured runner (jobs.submit).
 """
@@ -77,6 +82,63 @@ def write_part(out, i, n, rows):
     os.replace(path + ".tmp", path)
 
 
+def reuse(a, todo, shas, info, family=None):
+    """(the lines still to ask, {source run folder: lines taken}): the answers of `todo` that another run of the same
+    tree already holds (module docstring), copied into this run's answers. `family` is the family whose runs hold the
+    lines (default `a.family`; the harness's sets: F0's runs)."""
+    import pyarrow as pa
+    import pyarrow.compute as pc
+    import pyarrow.parquet as pq
+    from idtrack_reproducibility import config as CFG
+    commit, digest = C.git_commit(a.clone)[0], info.get("content_digest")
+    if not todo or not commit or not digest:
+        return todo, {}
+    fam = family or ("f0" if a.family == "harness" else a.family)
+    want = {q["qid"]: q for q in todo}
+    i, n = (int(x) for x in a.shard.split("/"))
+    me = os.path.realpath(a.out)
+    taken = {}
+    runs = sorted(glob.glob(os.path.join(C.family_dir(fam), "runs", "*", a.organism, "run.json")) +
+                  glob.glob(os.path.join(C.family_dir(fam), "runs", "*", a.organism, "scores_*", "run.json")))
+    seen = set()
+    for rj in runs:
+        src = os.path.dirname(rj)
+        if os.path.basename(src).startswith("scores_"):
+            src = os.path.dirname(src)
+        if os.path.realpath(src) == me or not os.path.isdir(os.path.join(src, "answers")):
+            continue
+        rec = json.load(open(rj))
+        if rec.get("commit") != commit or digest not in (rec.get("graph_digests") or []):
+            continue
+        sets = rec.get("sets") or {}
+        ok = [q for q, line in want.items() if line.get("set") in sets and sets[line["set"]] == shas.get(line["set"])
+              and (src, q) not in seen]
+        if not ok:
+            continue
+        vs = pa.array(sorted(ok), type=pa.string())
+        rows = []
+        for p in sorted(glob.glob(os.path.join(src, "answers", "*.parquet"))):
+            t = pq.read_table(p)
+            t = t.filter(pc.is_in(t.column("qid"), value_set=vs))
+            if t.num_rows:
+                rows += t.to_pylist()
+        by = {}
+        for r in rows:
+            by.setdefault(r["qid"], {})[r["view"]] = {k: r.get(k) for k in answer_schema().names}
+        got = [q for q in ok if q in by and set(L.views(want[q])) <= set(by[q])]
+        for q in ok:
+            seen.add((src, q))
+        if not got:
+            continue
+        out = [r for q in got for v, r in by[q].items() if v in L.views(want[q])]
+        for k in range(0, len(out), 200_000):
+            write_part(a.out, i, n, out[k:k + 200_000])
+        taken[CFG.in_root(src)] = len(got)
+        for q in got:
+            del want[q]
+    return [q for q in todo if q["qid"] in want], taken
+
+
 def run(a):
     i, n = (int(x) for x in a.shard.split("/"))
     mine, shas, excluded = L.load(a.family, a.organism, a.sets, a.strata, a.kinds, shard=(i, n), limit=a.limit)
@@ -90,7 +152,10 @@ def run(a):
     ad = adapter.Adapter(a.clone, a.graph, a.organism, a.release, a.out, timeout=a.timeout)
     info = dict(ad.info, shard=a.shard, sets=shas, host=os.uname().nodename, slurm_job=os.environ.get("SLURM_JOB_ID"),
                 started=time.strftime("%Y-%m-%d %H:%M:%S"), n_lines=len(mine), n_todo=len(todo))
+    todo, info["reused"] = reuse(a, todo, shas, info)
+    info["n_asked"] = len(todo)
     json.dump(info, open(os.path.join(a.out, "answers", f"load_{i}_of_{n}.json"), "w"), indent=1)
+    sys.stderr.write(f"shard {i}/{n}: reused {sum(info['reused'].values())} ({info['reused']}), {len(todo)} to ask\n")
     buf, t_all, t_flush = [], time.time(), time.time()
     for k, q in enumerate(todo):
         buf.extend(ad.ask(q))

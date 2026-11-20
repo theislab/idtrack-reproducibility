@@ -227,3 +227,39 @@ def test_an_accession_with_a_version_is_not_read_at_the_target():
     line = dict(qid="1", kind="c2_oldver", stratum="c2_oldver", id="NM_1.2", from_release=None, read_at=90,
                 to_release=115, expect=["G2.1"], broad=None, rule="set")
     assert list(RC.other_database_broad("x", [line], {"G": G(), "car": Car()})) == []
+
+
+def test_a_set_revised_from_a_published_one_compares_the_truth_not_its_wording():
+    from idtrack_reproducibility.families import lines as L
+    from idtrack_reproducibility.families.c import gen_c as G
+    line = dict(qid="c2_ver_gap|NM_1.3|-|115", kind="c2_ver_gap", id="NM_1.3", from_release=None, to_release=115,
+                final_database=None, strategy="both", rule="set", cmp="versioned", expect=[], broad=None,
+                note="a version never had", q2="nothing (an older wording of the rule)", read_at=115)
+    same = dict(line, note="another wording", q2="nothing (rule `version_newer_than_graph`'s rule)")
+    other = dict(line, read_at=89)
+    assert G.truth_hash(L.to_row(line)) == G.truth_hash(L.to_row(same))
+    assert G.truth_hash(L.to_row(line)) != G.truth_hash(L.to_row(other))
+    assert G.truth_hash(L.to_row(line)) != G.truth_hash(L.to_row(dict(line, expect=["ENSMUSG00000000001.1"])))
+
+
+def test_a_copy_the_line_expects_apart_is_no_other_carrier():
+    class Tr:
+        genes = {75: {"G1": 1, "G9": 1}}
+
+        @staticmethod
+        def vset(genes, rel):
+            return [f"{g}.1" for g in sorted(genes)]
+
+    class G:
+        tr = Tr()
+
+    class Car:
+        @staticmethod
+        def at(rel):
+            return {"100039209": {"G1", "G9"}}  # G9: the copy on a patch, carrying the same NCBI id
+
+    line = dict(qid="1", kind="c1_at", stratum="c1_at", id="100039209", from_release=75, to_release=75,
+                expect=["G1.1"], apart=["G9.1"], broad=None, rule="set")
+    assert list(RC.other_database_broad("x", [line], {"G": G(), "car": Car()})) == []
+    other = dict(line, apart=None)
+    assert [r["broad"] for r in RC.other_database_broad("x", [other], {"G": G(), "car": Car()})] == [["G1.1", "G9.1"]]

@@ -78,11 +78,13 @@ CAUSES = {
                                  "duplicates can be placed at another release than the same list without them"),
     "line_premise_wrong": ("d", "revision e5_r1", "the line assumed a name of the organism's symbol database that the truth "
                            "does not hold (revised)"),
-    "lrg_gene_version_form": ("d", "-", "a GTF of NCBI36 lists LRG genes as `LRG_<n>_g1`; the graph writes them `LRG_<n>_g1.1`; "
-                              "the judge's unversioned comparison does not take the `.1` off such ids: the same gene"),
-    "docs_case_rule_judge_short": ("e", "-", "judge `now` reads the docs' rule (an exact synonym before the case step) from the "
-                                   "tables of 115 only; idtrack reads every release's synonyms, so its tie holds other genes "
-                                   "too (the MGI symbol's gene is in neither): the judge cannot reproduce the docs' answer"),
+    "lrg_record_not_its_gene": ("a", "rule `lrg_answers_gene` (decided)",
+                                "an LRG gene id answers the LRG record itself, not the Ensembl gene the record describes"),
+    "synonym_spelling_merged": ("c", "rules `spelling_steps` and `spelling_of_release` (9d point 3)",
+                                "genes carry the asked string at the release read in two letter cases (Ensembl's synonyms of "
+                                "every cross-reference): the graph has one node for every case of a string and one spelling "
+                                "per database and release, so the exact match also holds the genes of the other case, and "
+                                "an exact form whose node keeps the other spelling is matched by the case step"),
     "unexplained": ("?", "-", "read by hand"),
 }
 
@@ -98,6 +100,54 @@ def answers_of(run, qids):
         for r in t.to_pylist():
             out[(r["qid"], r["view"])] = r
     return out
+
+
+_CASES = {}
+
+
+def case_carriers(org, rel):
+    """lower-case string -> {(gene base, the string as written)} of Ensembl's synonyms of every cross-reference of a
+    name database at a release (`core_synonyms/<release>.tsv.gz`) and the names of the GTF of that release; None where
+    the synonyms of the release are not fetched."""
+    if (org, rel) not in _CASES:
+        from idtrack_reproducibility.families.b import truth_b as TB
+        syn = TB.core_synonyms(org, rel)
+        if syn is None:
+            _CASES[(org, rel)] = None
+        else:
+            m = collections.defaultdict(set)
+            for v, gs in syn.items():
+                for g in gs:
+                    m[v.lower()].add((g, v))
+            for g, r in (H.gtf_genes(org, rel) or {}).items():
+                if r.get("gene_name"):
+                    m[r["gene_name"].lower()].add((g, r["gene_name"]))
+            _CASES[(org, rel)] = dict(m)
+    return _CASES[(org, rel)]
+
+
+def spellings_merged(line, got, a):
+    """A wrong answer to a string asked in one letter case where, at the release it was read, the genes the answer and
+    the line disagree on all carry the string (Ensembl's synonyms and the GTF's names), some only in another case:
+    the detail, or None."""
+    rel = a.get("from_release") or line.get("to_release")
+    f = str(line.get("id") or "")
+    if rel is None or not f:
+        return None
+    cc = case_carriers(line.get("organism") or ORG[0], int(rel))
+    if cc is None:
+        return None
+    by = collections.defaultdict(set)
+    for g, v in cc.get(f.lower(), ()):
+        by[g].add(v)
+    diff = {C.base_id(x) for x in got} ^ {C.base_id(x) for x in line.get("expect") or []}
+    other_case = {g for g in diff if by.get(g) and f not in by[g]}
+    if diff and all(by.get(g) for g in diff) and other_case:
+        return "; ".join(f"{g}:{'/'.join(sorted(by[g]))}" for g in sorted(diff))[:300] + f" at {rel}"
+    return None
+
+
+ORG = [None]  # the organism being classified (main)
 
 
 def classify(line, row, ans, judge, bm_rels):
@@ -132,7 +182,9 @@ def classify(line, row, ans, judge, bm_rels):
     if st.startswith("e2_txcase_") or st == "hunt_IN-5":
         return "unversioned_tx_case_not_found", line["id"]
     if st.startswith("e2_case_") and judge == "now":
-        return "docs_case_rule_judge_short", f"{line['id']} -> {','.join(got[:3])} ({m}); judge expected {','.join(line.get('expect', [])[:3])}"
+        merged = spellings_merged(line, got, a)
+        if merged:
+            return "synonym_spelling_merged", merged
     if st.startswith("e2_case_") or (st == "hunt_IN-2" and C.ENS_ID.match(got[0] if got else "") and "ENSMUSG" in (got[0] if got else "")):
         return "case_exact_synonym_first", f"{line['id']} -> {','.join(got[:3])} ({m})"
     if st == "hunt_IN-2":
@@ -148,8 +200,9 @@ def classify(line, row, ans, judge, bm_rels):
         disp = [r for r in (H.biomart_genes("mus_musculus", 115) or []) if r["name"] == line["id"]]
         if disp and all(r["source"] == "HGNC Symbol" for r in disp):
             return "mouse_hgnc_projection", f"{line['id']} is the HGNC display name of {line['expect'][0]}"
-    if st.startswith("e8_identity") and got == [f"{line['id']}.1"] and line["id"].startswith("LRG_"):
-        return "lrg_gene_version_form", f"{line['id']} -> {got[0]}"
+    if st.startswith("e8_identity") and judge == "decided" and line["id"].startswith("LRG_") and \
+            all(str(g).startswith("LRG_") for g in got):
+        return "lrg_record_not_its_gene", f"{line['id']} -> {','.join(got[:3])}; the record describes {','.join(line.get('expect', [])[:3])}"
     if st == "e8_infer_duplicates":
         return "infer_duplicates_counted", (row.get("reason") or "")[:150]
     if st == "e5_database_spelling" and "from_database|name_db" in row["qid"]:
@@ -166,6 +219,7 @@ def main():
     ap.add_argument("--judges", default="now,decided")
     a = ap.parse_args()
     bm_rels = set(H.biomart_releases(a.organism))
+    ORG[0] = a.organism
     for judge in a.judges.split(","):
         folder = os.path.join(a.run, f"scores_{judge}")
         rows = []

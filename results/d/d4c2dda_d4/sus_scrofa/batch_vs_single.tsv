@@ -1,12 +1,12 @@
 stratum	view	items	both_right	both_undetermined	both_wrong	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_unknown	right_in_list_only	right_no_single
-*	all	76164	710	0	0	1171	613	0	0	73670
-*	best	76164	73134	1079	138	0	472	203	203	1138
+*	all	76164	710	0	0	1643	141	0	0	73670
+*	best	76164	73134	1079	138	472	0	203	203	1138
 d4_id_current	all	9151	710	0	0	0	0	0	0	8441
 d4_id_current	best	9151	8441	0	0	0	0	0	0	710
 d4_id_old	all	9377	0	0	0	1058	25	0	0	8294
 d4_id_old	best	9377	8107	1059	24	0	0	187	187	0
-d4_missing	all	900	0	0	0	0	472	0	0	428
-d4_missing	best	900	0	0	0	0	472	0	0	428
+d4_missing	all	900	0	0	0	472	0	0	0	428
+d4_missing	best	900	0	0	0	472	0	0	0	428
 d4_ncbi	all	9234	0	0	0	0	0	0	0	9234
 d4_ncbi	best	9234	9234	0	0	0	0	0	0	0
 d4_nothing	all	9600	0	0	0	0	0	0	0	9600

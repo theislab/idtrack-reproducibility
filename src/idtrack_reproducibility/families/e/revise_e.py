@@ -18,8 +18,15 @@ Usage: revise_e.py --organism <o> --revision <name> [--dry]
   reads every release's core cross-references (`core_xref/<release>.tsv.gz`) and GTF: those genes (walked to the
   target) join `expect` (rule `safe`: the string names them). Synonyms are read only at the releases that have
   BioMart's synonym table or a core synonym extract (`core_synonyms/<release>.tsv.gz`): every such line records them
-  (`names_read_at`), and the scorer calls an answer that read the form as a synonym at another release undetermined.
+  (`names_read_at`), and the scorer calls an answer that read the form itself as a synonym (`synonym:exact`) at another release undetermined.
   Published as `<set>_r1` (judge `now`) and `<set>_dec2` (the decided judge's line, revised alike).
+- `e2_case_r1` (judge `now`): the documented rule of mouse's letter case (an exact name or synonym before a match
+  without letter case; `e2_case`) names every gene that carries the form exactly at the release read (115: lines
+  without a release): the generator read BioMart's synonyms (those of a gene's display cross-reference only) and left
+  the MGI symbol's own gene out of the exact carriers. The revision reads Ensembl's synonyms of every cross-reference
+  of a name database at 115 (`core_synonyms/115.tsv.gz`, fetch_b.py synonyms) beside them: a line whose form some
+  gene carries exactly expects every such gene (the symbol's own gene too); `open` is left only where no gene
+  carries it exactly. Published as `e2_case_r1`.
 - `e8_identity_dec` (judge `decided`): rule `lrg_answers_gene` (decided): an LRG id answers the Ensembl gene
   the LRG record describes. A line asked by an LRG gene id (`LRG_<n>_g<k>`) at a release expects, under the decided
   judge, the gene that Ensembl's core database of that release links to the record (the gene's xref of database
@@ -125,6 +132,37 @@ def e1_dec2(org):
     return out
 
 
+def e2_case_r1(org):
+    """The `now` judge's `e2_case` lines that Ensembl's synonyms of every cross-reference at 115 change (module
+    docstring), and the truth files read."""
+    from idtrack_reproducibility.families.b import truth_b as TB
+    from idtrack_reproducibility.families.e import truth_e as T
+    lines, _, _ = L.load("e", org, ["e2_case"])
+    if not lines:
+        return [], []
+    dec = {q["qid"]: q for q in L.load("e", org, ["e2_case", "e2_case_dec"])[0]}
+    names = T.Names(org)
+    core = TB.core_synonyms(org, 115) or {}
+    cur = T.Current(org)
+    out = []
+    for q in lines:
+        f = str(q["id"])
+        exact = set(names.exact115.get(f, set())) | {cur.versioned.get(g, g) for g in core.get(f, set())}
+        if not exact:
+            continue
+        own = (dec.get(q["qid"]) or {}).get("expect") or []
+        want = sorted(exact)
+        if want == sorted(q.get("expect") or []) and not q.get("open"):
+            continue
+        r = dict(q, expect=want, open=None, revised_by=list(q.get("revised_by") or []) + ["e2_case_r1"],
+                 note=((q.get("note") or "") + "; " if q.get("note") else "") +
+                 f"genes carrying the form exactly at 115 (BioMart and Ensembl's synonyms of every xref)"
+                 + ("; the MGI symbol's own gene among them" if set(own) & exact else ""))
+        r.pop("set", None)
+        out.append(r)
+    return out, [os.path.join(H.truth_dir(org), "core_synonyms", "115.tsv.gz")]
+
+
 MAKE_UNIQUE = ("e2_makeunique_", "e2_all_makeunique", "hunt_IN-3")
 
 
@@ -185,7 +223,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
     ap.add_argument("--revision", required=True, choices=["e5_r1", "e5_r2", "e1_dec2", "e8_identity_dec",
-                                                         "e2_names_every_release"])
+                                                         "e2_names_every_release", "e2_case_r1"])
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
     if a.revision == "e2_names_every_release":
@@ -201,6 +239,18 @@ def main():
                           judge=which, sources=[os.path.join(H.truth_dir(a.organism), "core_xref"),
                                                 os.path.join(H.truth_dir(a.organism), "gtf")], dry=a.dry)
             print(a.organism, name, m["n"])
+        return
+    if a.revision == "e2_case_r1":
+        rev, files = e2_case_r1(a.organism)
+        if not rev:
+            print(a.organism, a.revision, "no line changes")
+            return
+        import collections as _c
+        print(a.organism, a.revision, len(rev), dict(_c.Counter(r["stratum"] for r in rev)))
+        m = L.publish("e", a.organism, a.revision, rev, "E2 mouse case: every gene carrying the form exactly at 115 "
+                      "(Ensembl's synonyms of every cross-reference beside BioMart's)", __file__, revises=["e2_case"],
+                      judge="now", sources=files, dry=a.dry)
+        print(a.organism, a.revision, m["n"])
         return
     if a.revision == "e1_dec2":
         rev = e1_dec2(a.organism)

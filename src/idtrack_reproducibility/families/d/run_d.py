@@ -36,7 +36,11 @@ def run(a):
     ad = adapter_e.AdapterE(a.clone, a.graph, a.organism, a.release, a.out, timeout=a.timeout)
     info = dict(ad.info, shard=a.shard, sets=shas, host=os.uname().nodename, slurm_job=os.environ.get("SLURM_JOB_ID"),
                 started=time.strftime("%Y-%m-%d %H:%M:%S"), n_lines=len(mine), n_todo=len(todo), adapter="e/adapter_e.py")
+    a.family = FAMILY
+    todo, info["reused"] = R.reuse(a, todo, shas, info)
+    info["n_asked"] = len(todo)
     json.dump(info, open(os.path.join(a.out, "answers", f"load_{i}_of_{n}.json"), "w"), indent=1)
+    sys.stderr.write(f"shard {i}/{n}: reused {sum(info['reused'].values())} ({info['reused']}), {len(todo)} to ask\n")
     buf, t0, tf = [], time.time(), time.time()
     for k, q in enumerate(todo):
         buf.extend(ad.ask(q))

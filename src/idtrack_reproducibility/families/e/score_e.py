@@ -29,14 +29,18 @@ DEC = re.compile(r"^(?P<base>.+)_dec(?P<k>\d*)$")  # a revision set of the decid
 
 
 def sets_for(organism, judge, only=None):
-    """The sets of a judge in publication order: `now` the base sets, `decided` with their revision sets `<set>_dec<k>`."""
+    """The sets of a judge, in the order whose last line of a qid is its truth: `now` the sets that are no `_dec`
+    revision (the base sets and their revisions of the truth, `<set>_r<k>`), in publication order; `decided` the same,
+    then their revision sets `<set>_dec<k>` in publication order. A decided revision is the decided judge's line of
+    its qid even where a revision of the truth for the judge `now` was published after it: every revision of the
+    truth is published for both judges (`<set>_r<k>` and `<set>_dec<k>`, revise_e.py), so the decided line holds it."""
     names = L.set_names(FAMILY, organism)
     base = [s for s in names if not DEC.match(s)]
     if only:
         base = [s for s in base if s in only]
     if judge == "now":
         return base
-    return [s for s in names if s in base or (DEC.match(s) and DEC.match(s).group("base") in base)]
+    return base + [s for s in names if DEC.match(s) and DEC.match(s).group("base") in base]
 
 
 def summary(run, organism, judges):

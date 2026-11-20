@@ -204,17 +204,20 @@ def resolve_sets(family, organism, sets=None, judge="revised"):
     return names
 
 
-def load(family, organism, sets=None, strata=None, kinds=None, shard=None, judge="revised", limit=None):
+def load(family, organism, sets=None, strata=None, kinds=None, shard=None, judge="revised", limit=None, within=None):
     """The latest line of every qid over the sets (default: every published set, in order).
 
     Returns (lines, sha256 per set, excluded counts). Lines left out (`excluded` field; for the harness also
     `harness_lib.EXCLUDED`) are counted, never returned. `limit`: the first N lines of each stratum (smoke runs).
+    `within` (set names): only the qids these sets publish (a run that asked some sets only, scored with the revision
+    sets of those sets, which may also revise lines of sets the run did not ask).
     """
     pnames, plain = split_panels(family, organism, sets) if sets else ([], None)
     sel = set().union(*(panel_qids(family, organism, p) for p in pnames)) if pnames else None
     names = resolve_sets(family, organism, plain or None, judge)
     d = query_dir(family, organism)
     by_qid, shas = {}, {}
+    bound = set() if within else None
     for p in pnames:  # a panel selects qids; their lines are the latest of the sets (all, or those named beside it)
         shas[p] = json.load(open(os.path.join(panel_dir(family, organism), f"{p}.manifest.json")))["sha256"]
     for s in names:
@@ -232,6 +235,10 @@ def load(family, organism, sets=None, strata=None, kinds=None, shard=None, judge
             rec["set"] = s
             rec.setdefault("family", family)
             by_qid[rec["qid"]] = rec
+            if bound is not None and s in within:
+                bound.add(rec["qid"])
+    if bound is not None:
+        by_qid = {q: r for q, r in by_qid.items() if q in bound}
     excluded = {}
     out = []
     ex_h = {}

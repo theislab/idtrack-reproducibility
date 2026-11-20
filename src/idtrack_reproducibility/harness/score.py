@@ -14,12 +14,16 @@ When all shards are complete (or without --shard), the results are scored and wr
 
   scores.tsv      kind, variant (`*` = all variants of the kind; else `<strategy>,<from|default>`), n, right, wrong, undetermined, timeout, error, rate, ci_low, ci_high
                   rate = right / (right + wrong + error); undetermined and timeout are left out of the rate
-  outcomes.tsv.gz one line per query: qid, kind, variant, outcome, reason, got, seconds (compare_scores.py reads it)
+  outcomes/part_0_of_1.parquet   the record (docs/records.md): one row per query with the query, the truth, the
+                  answer and the verdict, in the columns of the common scorer (families/scorer.py, `OUT_COLS`)
+  outcomes.tsv.gz one line per query: qid, kind, variant, outcome, reason, got, seconds (derived from the record; what
+                  compare_scores.py and travel_report.py read)
   wrong.tsv       every wrong answer: qid, kind, variant, query, expected, broad, got, reason
   errors.tsv      every exception: qid, kind, variant, query, error
   timeouts.tsv    every query over the limit
   undetermined.tsv  every answer that Ensembl's data neither confirm nor refute, with the reason
-  run.json        clone commit, graph file, sets and their sha256, time limit, times
+  run.json        the record's version, the commit of the checkout that answered (from the answers' load records),
+                  the graph, sets and their sha256, time limit, times
 """
 import argparse
 import datetime
@@ -50,17 +54,19 @@ def _alarm(signum, frame):
     raise QueryTimeout()
 
 
-def load_queries(org, sets, kinds, judge="revised"):
+def load_queries(org, sets, kinds, judge="revised", within=None):
     """The latest line of every qid over the sets named (default: every published set, in order). With judge
     `published`, the revision sets of the corrected judge and of the judge following idtrack's decided rules (manifest
-    `judge` `78` or `rules`: harness_lib.REVISED_JUDGES) are left out: the judge as it was before."""
+    `judge` `78` or `rules`: harness_lib.REVISED_JUDGES) are left out: the judge as it was before. `within` (set
+    names): only the qids these sets publish (the kinds of a run, scored with revision sets that also revise the
+    travel matrix's lines)."""
     d = H.query_dir(org)
     if not sets:
         sets = H.set_names(d)
         if judge == "published":
             sets = [x for x in sets if json.load(open(os.path.join(d, f"{x}.manifest.json"))).get("judge")
                     not in H.REVISED_JUDGES]
-    by_qid, man = {}, {}
+    by_qid, man, bound = {}, {}, set()
     for s in sets:
         p = os.path.join(d, f"{s}.jsonl.gz")
         m = json.load(open(os.path.join(d, f"{s}.manifest.json")))
@@ -75,6 +81,10 @@ def load_queries(org, sets, kinds, judge="revised"):
                 # qid: the line of the later set is the truth, at the place of the earlier line. A query is asked
                 # once, and its stored answer is scored under whichever sets are named with --sets.
                 by_qid[rec["qid"]] = rec
+                if within and s in within:
+                    bound.add(rec["qid"])
+    if within:
+        by_qid = {q: r for q, r in by_qid.items() if q in bound}
     return list(by_qid.values()), man
 
 
@@ -343,6 +353,33 @@ def write_tsv(path, header, rows):
     os.replace(path + ".tmp", path)
 
 
+def status_of(r):
+    """The answer's status in the record's words (docs/records.md) from the d4c2dda answer's flags."""
+    if not r or "got" not in r:
+        return None
+    f = r.get("flags") or {}
+    if f.get("no_conversion"):
+        return "no_conversion"
+    if f.get("no_corresponding"):
+        return "not_found"
+    if f.get("no_target"):
+        return "no_target"
+    return "converted"
+
+
+def harness_key(a, man):
+    """What makes a scoring of this scorer (as `scorer.scoring_key`): the organism, judge, sets with their checksums,
+    kinds, limit, the record version and the code of the judge; `rescore` leaves a scoring of the same key as it is."""
+    import hashlib
+    from idtrack_reproducibility.families import lines as L
+    from idtrack_reproducibility.families import scorer as SC
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    doc = dict(scorer="harness", organism=a.organism, judge=a.judge, sets=man, kinds=sorted(a.kinds.split(",")) if a.kinds else None,
+               within=a.within, limit=a.limit, record_version=SC.RECORD_VERSION,
+               code={m: L.sha256(os.path.join(here, m)) for m in SC.JUDGE_MODULES})
+    return hashlib.sha256(json.dumps(doc, sort_keys=True).encode()).hexdigest()
+
+
 def merge_and_score(a, queries, man):
     res = {}
     for p in sorted(glob.glob(os.path.join(a.out, "results", "shard_*.jsonl"))):
@@ -359,7 +396,12 @@ def merge_and_score(a, queries, man):
     missing = 0
     apart = dict(expected=0, checked=0, unchecked=0)
     stored, a.out = a.out, (a.scores_to or a.out)  # the tables of this scoring; the stored answers stay where they are
-    os.makedirs(a.out, exist_ok=True)
+    os.makedirs(os.path.join(a.out, "outcomes"), exist_ok=True)
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from idtrack_reproducibility.families import lines as FL
+    from idtrack_reproducibility.families import scorer as SC
+    record, rows_path = [], os.path.join(a.out, "outcomes", "part_0_of_1.parquet")
     with gzip.open(os.path.join(a.out, "outcomes.tsv.gz.tmp"), "wt") as fo:
         fo.write("qid\tkind\tvariant\toutcome\treason\tgot\tseconds\trule\n")
         for rec in queries:
@@ -378,6 +420,12 @@ def merge_and_score(a, queries, man):
             got = ",".join(r.get("got", [])) if r else ""
             rule = judged_by(rec)
             fo.write("\t".join([rec["qid"], rec["kind"], v, o, why.replace("\t", " "), got, str(r.get("seconds", "")), rule]) + "\n")
+            base = dict(qid=rec["qid"], view=rec["strategy"], family="harness", stratum=rec["kind"], kind=rec["kind"], variant=v,
+                        unit=FL.unit_of(rec), set=rec.get("set"),
+                        rule=rule)
+            record.append(SC._row(base, rec, o, why, list(r.get("got") or []) if r else [], r.get("seconds") if r else None,
+                                  1 if r else 0, dict(status=status_of(r), match=None,
+                                                      error_type=(r.get("error") or "").split(":", 1)[0] or None if r else None)))
             for key in ((rec["kind"], "*"), (rec["kind"], v)):
                 c = tab.setdefault(key, dict(right=0, wrong=0, undetermined=0, timeout=0, error=0))
                 c[o] += 1
@@ -391,6 +439,10 @@ def merge_and_score(a, queries, man):
             elif o == "undetermined":
                 und.append([rec["qid"], rec["kind"], v, qtxt, ",".join(rec["expect"]), got, why, rule])
     os.replace(os.path.join(a.out, "outcomes.tsv.gz.tmp"), os.path.join(a.out, "outcomes.tsv.gz"))
+    pq.write_table(pa.Table.from_pylist(record, schema=SC.out_schema()), rows_path + ".tmp", compression="zstd")
+    os.replace(rows_path + ".tmp", rows_path)
+    n_record = len(record)
+    del record
     rows = []
     for (k, v), c in sorted(tab.items(), key=lambda kv: (kv[0][0], kv[0][1] != "*", kv[0][1])):
         n = sum(c.values())
@@ -406,21 +458,27 @@ def merge_and_score(a, queries, man):
     write_tsv(os.path.join(a.out, "timeouts.tsv"), ["qid", "kind", "variant", "query", "seconds"], timeouts)
     write_tsv(os.path.join(a.out, "undetermined.tsv"), ["qid", "kind", "variant", "query", "expected", "got", "reason", "rule"], und)
     loads = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(stored, "results", "load_*.json")))]
-    try:
-        commit = subprocess.run(["git", "-C", a.clone, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-        dirty = subprocess.run(["git", "-C", a.clone, "status", "--porcelain", "--untracked-files=no"], capture_output=True,
-                               text=True).stdout.strip()
-    except Exception:  # noqa: BLE001
-        commit, dirty = "", ""
+    from idtrack_reproducibility import config as CFG
+    from idtrack_reproducibility.families import common as FC
+    prev_path = os.path.join(a.out, "run.json")
+    prev = json.load(open(prev_path)) if os.path.exists(prev_path) else {}
+    # the checkout that answered (the answers' load records name it), not the one this scoring was started with
+    clone = os.path.dirname(os.path.dirname(loads[0]["idtrack_file"])) if loads and loads[0].get("idtrack_file") else a.clone
+    commit, dirty = FC.git_commit(clone) if os.path.isdir(clone) else ("", False)
+    if not commit and prev.get("commit"):  # that checkout is gone: the commit the earlier scoring of these answers read
+        commit, dirty = prev["commit"], prev.get("clone_modified")
+    if loads and loads[0].get("repo"):
+        a.graph = loads[0]["repo"] if os.path.exists(loads[0]["repo"]) else a.graph
     g = os.path.realpath(a.graph)
-    info = dict(clone=os.path.abspath(a.clone), commit=commit, clone_modified=bool(dirty), graph=os.path.abspath(a.graph),
-                graph_real=g, graph_bytes=(os.path.getsize(g) if os.path.isfile(g) else None),
+    info = dict(record_version=SC.RECORD_VERSION, key=harness_key(a, man), family="harness", n_rows=n_record,
+                clone=CFG.in_root(clone, None), commit=commit, clone_modified=bool(dirty), graph=CFG.in_root(a.graph, None),
+                graph_real=CFG.in_root(g, None), graph_bytes=(os.path.getsize(g) if os.path.isfile(g) else None),
                 graph_mtime=(datetime.datetime.fromtimestamp(os.path.getmtime(g)).isoformat(timespec="seconds")),
                 organism=a.organism, release=a.release, sets=man, timeout=a.timeout, n_queries=len(queries),
                 n_excluded=getattr(a, "n_excluded", 0), excluded=getattr(a, "excluded", {}), judge=a.judge,
                 n_missing=missing, scored_at=datetime.datetime.now().isoformat(timespec="seconds"),
-                answers=stored, copies_apart=apart,
-                load=[{k: x.get(k) for k in ("load_seconds", "files_written_in_repo", "pythonhashseed")} for x in loads],
+                answers=CFG.in_root(stored), run=CFG.in_root(stored), copies_apart=apart,
+                load=[{k: x.get(k) for k in ("load_seconds", "files_written_in_repo", "pythonhashseed", "python")} for x in loads],
                 query_seconds_total=round(sum(r.get("seconds", 0) for r in res.values()), 1))
     json.dump(info, open(os.path.join(a.out, "run.json"), "w"), indent=1)
     print(open(os.path.join(a.out, "scores.tsv")).read())
@@ -453,6 +511,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--sets", default=None, help="comma-separated query sets (default: every published set)")
     ap.add_argument("--kinds", default=None)
+    ap.add_argument("--within", default=None, help="only the qids these sets publish (default: every line of the sets)")
     ap.add_argument("--judge", default="revised", choices=["revised", "published"],
                     help="without --sets: `published` leaves out the revision sets of the corrected judge")
     ap.add_argument("--limit", type=int, default=None, help="smoke test: only the first N queries of each kind")
@@ -477,8 +536,9 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     if a.submit:
         return submit(a)
+    a.within = a.within.split(",") if a.within else None
     queries, man = load_queries(a.organism, a.sets.split(",") if a.sets else None, set(a.kinds.split(",")) if a.kinds else None,
-                                a.judge)
+                                a.judge, a.within)
     n_all = len(queries)
     a.excluded = {}
     for q in queries:

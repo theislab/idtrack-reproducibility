@@ -2,15 +2,17 @@ stratum	cause	class	rule	answers	units
 e1_batch_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	75	25
 e1_batch_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	48	16
 e1_batch_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	36	12
+e1_batch_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	9	3
 e1_single_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	25	25
 e1_single_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	16	16
 e1_single_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	12	12
+e1_single_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	3	3
 e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	28	11
-e2_all_makeunique	suffix_form_is_name_at_unread_release	e	-	5	5
 e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	493	489
 e2_all_punct	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	217278	77195
 e2_case_lower_competing	case_exact_synonym_first	a	rule `single_case_symbols` (finding IN-2; decided)	12	12
 e2_case_upper_competing	case_exact_synonym_first	a	rule `single_case_symbols` (finding IN-2; decided)	131	131
+e2_case_upper_folded	case_exact_synonym_first	a	rule `single_case_symbols` (finding IN-2; decided)	2	2
 e2_dash_name	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	112	14
 e2_dash_syn	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	264	33
 e2_fullwidth_gu	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	150	150
@@ -52,7 +54,7 @@ e2_zw_tx	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decid
 e2_zw_uniprot	unicode_not_normalised	a	rule `unicode_normalised` (finding IN-4; decided)	700	100
 e4_symbol_exact	mouse_hgnc_projection	d	harness_lib.EXCLUDED (mouse HGNC Symbol); the corrected judge	2	2
 e5_database_synonym	synonym_database_offered	a	rule `no_synonym_target` (decided)	1	1
-e8_infer_duplicates	infer_duplicates_counted	a	docs/methods.md E8 (the relation); docs: 'each identifier counts once'	1	1
+e8_infer_duplicates	infer_duplicates_counted	a	rule `inference_distinct_ids` (the relation of docs/methods.md E8)	1	1
 hunt_IN-1	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	2	1
 hunt_IN-11	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	1	1
 hunt_IN-2	case_exact_synonym_first	a	rule `single_case_symbols` (finding IN-2; decided)	5	1

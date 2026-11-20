@@ -1,22 +1,25 @@
 stratum	cause	class	rule	answers	units
-cross_assembly	copies_apart_before_82	d	rule `judge_copies_apart` (its limit)	1	1
 cross_assembly	external_bridge	b	rule `external_bridge`	19	10
 name_ambiguous_to_set	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	63	25
+name_ambiguous_to_set	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	99	33
 name_changed_gene	external_bridge	b	rule `external_bridge`	39	31
 name_changed_gene	name_in_other_source	e	rule `names_before_synonyms`	1	1
 name_old_to_current	external_bridge	b	rule `external_bridge`	2	1
 name_old_to_current	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	4	2
+name_old_to_current	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	2	1
 name_unique_to_gene	mirbase_not_in_graph	c	rule `mirbase_genes`	4	2
 name_unique_to_gene	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	10	5
+ncbi_to_gene	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	52	24
 nonexistent_version	newer_version_kind_reversed	d	rule `version_newer_than_graph`	1000	1000
 old_gene_to_db	entrezgene_label_rows	a	rule `one_kind_per_database`	262	262
+refseq_to_gene	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	4	2
 retired_none	external_bridge	b	rule `external_bridge`	267	101
 retired_split	event_version_contradicts_tables	c	rule `event_version`	1	1
-reverse_absent	copies_apart_before_82	d	rule `judge_copies_apart` (its limit)	1	1
 reverse_absent	external_bridge	b	rule `external_bridge`	134	70
 reverse_absent	gtf_lacks_core_gene	d	-	2	1
 reverse_present	gtf_lacks_core_gene	d	-	3	3
 separator_variant	mirbase_not_in_graph	c	rule `mirbase_genes`	2	2
+synonym_to_gene	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	18	7
 synonym_to_gene	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	4	2
 synonym_to_gene	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	3	1
 travel_born_late	external_bridge	b	rule `external_bridge`	131	2
@@ -25,5 +28,5 @@ travel_merged	external_bridge	b	rule `external_bridge`	584	10
 travel_name	external_bridge	b	rule `external_bridge`	40	1
 travel_renamed	external_bridge	b	rule `external_bridge`	484	9
 travel_retired_none	external_bridge	b	rule `external_bridge`	215	1
-travel_split	copies_apart_before_82	d	rule `judge_copies_apart` (its limit)	145	2
 travel_split	external_bridge	b	rule `external_bridge`	153	2
+uniprot_to_gene	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	3	1

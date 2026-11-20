@@ -38,7 +38,19 @@ from idtrack_reproducibility.families.c import truth_c as TC
 
 VER_NOTHING = {"c2_ver_lower", "c2_ver_gap", "c2_ver_higher_retired", "c3_ver_lower", "c3_ver_gap",
                "c3_ver_higher_retired"}
-_XREF = {}
+_XREF = collections.OrderedDict()  # what the truth's readers read per release, least recently used first
+XREF_CACHE = 6  # releases' tables held at once (each a few hundred MB for the largest organisms)
+
+
+def _cached(key, build):
+    """`build()` cached under `key`, keeping the `XREF_CACHE` most recently used entries."""
+    if key in _XREF:
+        _XREF.move_to_end(key)
+        return _XREF[key]
+    while len(_XREF) >= XREF_CACHE:
+        _XREF.popitem(last=False)
+    _XREF[key] = build()
+    return _XREF[key]
 
 
 def accession_version_never_had(c):
@@ -60,15 +72,12 @@ def ncbi_label_name_by_release(c):
 
 def _xref(org, rel):
     """gene base -> {(db_name, db_display_name, acc, label, object type)} of a release (cached)."""
-    k = (org, rel)
-    if k not in _XREF:
-        if len(_XREF) > 4:
-            _XREF.clear()
+    def build():
         m = collections.defaultdict(set)
         for ot, oid, gid, db, disp, acc, lab, ver, it in TC.read_xref(org, rel):
             m[gid].add((db, disp, acc, lab, ot.lower()))
-        _XREF[k] = m
-    return _XREF[k]
+        return m
+    return _cached(("xref", org, rel), build)
 
 
 SCOPE = {}
@@ -114,10 +123,7 @@ def db_not_held_at_release(c):
 
 def _strings(org, rel):
     """value -> genes (base) of every database of the extract at a release, and the GTF's gene names (cached)."""
-    k = ("strings", org, rel)
-    if k not in _XREF:
-        if len(_XREF) > 4:
-            _XREF.clear()
+    def build():
         m = collections.defaultdict(set)
         for ot, oid, gid, db, disp, acc, lab, ver, it in TC.read_xref(org, rel):
             for v in (acc, lab):
@@ -127,8 +133,8 @@ def _strings(org, rel):
         for g, r in (H.gtf_genes(org, rel) or {}).items():
             if r.get("gene_name"):
                 m[r["gene_name"]].add(g)
-        _XREF[k] = m
-    return _XREF[k]
+        return m
+    return _cached(("strings", org, rel), build)
 
 
 def value_of_another_database(c):
