@@ -38,6 +38,8 @@ Time: the harness's answers of `d4c2dda` took 116 to 372 seconds of query time p
 
 `modest organism ... --score-only` scores a run's stored answers again (the judge of today: revision sets published since the run, the judge's code), asking nothing and running no reproducer; it records its steps in `modest_scored_again.json`, beside the run's own `modest.json`. A run of an organism again (to complete a part) keeps the earlier run's record as `modest.earlier_<k>.json`.
 
+`modest organism ... --again <part>=<revision set>` asks the lines of a revision set again on one tree: a revision that changes a line's question for a tree, not only its truth (family C's `rfam_label_rows_v1`: a label line is asked under the graph's name of the labels where the graph records one, `RFAM label` from idtrack's next version on), makes that tree's stored answers answers to another question. Only the named parts run: the runner asks the set's lines of the selection whatever the folder holds, into `answers/again_<set>_<i>_of_<n>.<k>.parquet` (taking nothing from other runs), and every reader takes a folder's answer files in `common.answer_files` order (the runner's parts, then the `again_` parts), so the answer to the new question wins; the steps are recorded in `modest_again_<k>.json` beside the run's own record. On 2026-11-20: C's label lines on `next` (pig, rhesus, cynomolgus; `d4c2dda` and `71690ab` hold labels and accessions under one name and ask as before), and D2's lines on `next` (`d2_r4`: asked again so that the answer keeps the order `infer_source` returned, `flags.order`, which the band's price reads; the question is the same).
+
 A part killed by a signal (the scheduler's SIGKILL when the job exceeds its memory) stops the organism's run: `modest.json` names it (`killed`: the part, the command, the signal), the parts after it are not run, and the job ends with an error; a part that fails otherwise skips the rest of its own commands and the run goes on (`modest.json` records every exit).
 
 ## What it can and cannot detect
@@ -54,6 +56,9 @@ idtrack-repro modest build                      # --per-stratum 500 by default; 
 # measure a tree: one job per organism (the configured runner); the reference too, once, for the comparison
 idtrack-repro modest run --tree d4c2dda --out <folder>/d4c2dda
 idtrack-repro modest run --tree <tree> --out <folder>/<tree>
+
+# a revision that changed the question of its lines for one tree: those lines asked again on that tree, then scored
+idtrack-repro modest organism --tree <tree> --organism <o> --out <folder>/<tree> --again c=rfam_label_rows_v1
 
 # compare the tree with the reference, part by part (exit 1 on a regression: right -> wrong or right -> error)
 idtrack-repro modest compare <folder>/d4c2dda <folder>/<tree> --out <folder>/<tree>/compare.tsv

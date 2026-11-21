@@ -36,6 +36,7 @@ def test_shards_depend_on_the_qid_only():
 class _Record:
     content_digest = "abc"
     package_commit = "0f88cf1"
+    label_names = {"RFAM": "RFAM label"}
 
 
 class _GraphFormat3:
@@ -66,6 +67,43 @@ def test_a_database_the_graph_records_as_renamed_is_asked_under_the_graph_s_name
     assert ad.database("EntrezGene") == "EntrezGene" and ad.database(None) is None
     ad.renamed = A.renamed_databases(_GraphBefore())
     assert ad.database("NCBI gene") == "NCBI gene"
+
+
+def test_a_line_asking_a_database_s_labels_is_asked_under_the_graph_s_name_of_the_labels():
+    """Rule `one_kind_per_database`: a graph that records a name of their own for a database's labels is asked under it
+    by a line that says it asks the labels; a graph without the record, and a line that asks the accessions, under the
+    database's name. Fails if a label line asks the accession rows on a graph that names its labels apart."""
+    from idtrack_reproducibility.families import adapter as A
+    ad = A.Adapter.__new__(A.Adapter)
+    ad.renamed, ad.label_names = {}, A.label_names(_GraphFormat3())
+    assert ad.from_database({"from_database": "RFAM", "from_database_rows": "labels"}) == "RFAM label"
+    assert ad.from_database({"from_database": "RFAM"}) == "RFAM"
+    ad.label_names = A.label_names(_GraphBefore())
+    assert ad.label_names == {} and ad.from_database({"from_database": "RFAM", "from_database_rows": "labels"}) == "RFAM"
+
+
+def test_lines_asked_again_win_over_their_earlier_answers(tmp_path, monkeypatch):
+    """runner `--again`: a revision set's lines are asked again whatever the folder holds, into `again_<set>_*` parts that
+    every reader takes after the shard parts. Fails if the stale answer wins or the lines are skipped as answered."""
+    from types import SimpleNamespace
+    from idtrack_reproducibility.families import runner as R
+    from idtrack_reproducibility.families import scorer as S
+    (tmp_path / "answers").mkdir()
+    rows = [dict(qid=q, view="best", outcome="answer", got=["old"]) for q in ("a", "b")]
+    R.write_part(str(tmp_path), 0, 1, rows)
+    R.write_part(str(tmp_path), 0, 1, [dict(qid="a", view="best", outcome="answer", got=["new"])], "again_s_r1")
+    files = [p.rsplit("/", 1)[1] for p in C.answer_files(str(tmp_path))]
+    assert files == ["shard_0_of_1.0.parquet", "again_s_r1_0_of_1.0.parquet"]
+    got = S.read_answers(str(tmp_path), 0, 1).set_index("qid")["got"]
+    assert list(got["a"]) == ["new"] and list(got["b"]) == ["old"]
+    monkeypatch.setattr(L, "_qid_column", lambda path: __import__("pyarrow").array(["a", "b"]))
+    monkeypatch.setattr(L, "_set_file", lambda d, name: "x")
+    monkeypatch.setattr(L, "query_dir", lambda f, o: "d")
+    a = SimpleNamespace(out=str(tmp_path), again="s_r1", family="f", organism="o")
+    todo, prefix = R.to_ask(a, [{"qid": "a"}, {"qid": "b"}, {"qid": "c"}], 0, 1)
+    assert prefix == "again_s_r1" and [q["qid"] for q in todo] == ["b"]  # a: asked again already; c: not in the set
+    todo, prefix = R.to_ask(SimpleNamespace(out=str(tmp_path), again=None), [{"qid": "a"}, {"qid": "c"}], 0, 1)
+    assert prefix == "shard" and [q["qid"] for q in todo] == ["c"]
 
 
 def test_causes_written_again_under_the_current_names(tmp_path):

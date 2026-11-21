@@ -44,8 +44,9 @@ F0_MAP = {
                           "use the gene's own symbol", "decided: rule `rfam_display_label`"),
     "rule_decided_after_tree": ("L-decided-rules", "rules", "rules decided for idtrack after the tree",
                                 "where a rule decided after the tree answers otherwise (the Y copy of a pseudoautosomal "
-                                "name apart, missing values refused, a lower-case symbol, stray punctuation), the tree "
-                                "answers as before", "use a tree that builds the rule", "decided: the rule the detail names"),
+                                "name apart, missing values refused, a lower-case symbol, stray punctuation, an RFAM label "
+                                "only for the gene it is the display name of, a release counted on the assembly that "
+                                "serves it), the tree answers as before", "use a tree that builds the rule", "decided: the rule the detail names"),
     "synonym_spelling_merged": ("L-spellings", "names", "two genes with one string in two letter cases",
                                 "the exact step cannot tell `Tc` from `tc`", "type the exact spelling (decided: rule `spelling_per_edge`)",
                                 "decided: rule `spelling_per_edge`"),

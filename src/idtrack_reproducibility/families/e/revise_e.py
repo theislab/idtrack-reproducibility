@@ -27,6 +27,12 @@ Usage: revise_e.py --organism <o> --revision <name> [--dry]
   of a name database at 115 (`core_synonyms/115.tsv.gz`, fetch_b.py synonyms) beside them: a line whose form some
   gene carries exactly expects every such gene (the symbol's own gene too); `open` is left only where no gene
   carries it exactly. Published as `e2_case_r1`.
+- `stray_decided` (judge `decided`; published as `e1_dec3`, `e2_dec3`): rule `stray_punctuation` (decided, built in
+  idtrack's next version) composed with the others: punctuation that ends a sentence and quotes at the ends of a string
+  are no part of an identifier, so a string that is a missing value once they are cut (`None.`; strata
+  `e1_single_other`, `e1_batch_other`, no source database named) expects `MissingValueError`, as the missing value
+  itself does; and E2's junk strings whose cut form is a name (`CLEC1?`: stratum `e2_junk_wild`, the wildcard `?` is
+  terminal punctuation) expect the genes the harness's revision `stray_punctuation` gives them (`make_queries`).
 - `e8_identity_dec` (judge `decided`): rule `lrg_answers_gene` (decided): an LRG id answers the Ensembl gene
   the LRG record describes. A line asked by an LRG gene id (`LRG_<n>_g<k>`) at a release expects, under the decided
   judge, the gene that Ensembl's core database of that release links to the record (the gene's xref of database
@@ -132,6 +138,35 @@ def e1_dec2(org):
     return out
 
 
+def stray_decided(org):
+    """{set name: revised lines} of `stray_decided` (the module's docstring), from the decided judge's latest lines."""
+    from idtrack_reproducibility.families.e import score_e as SE
+    from idtrack_reproducibility.harness import make_queries as MQ
+    lines, _, _ = L.load("e", org, SE.sets_for(org, "decided", only=["e1", "e2"]))
+    out = collections.defaultdict(list)
+    junk = []
+    for q in lines:
+        st, s = q.get("stratum"), q.get("id")
+        if not isinstance(s, str) or MQ.strip_stray_punctuation(s) == s.strip():
+            continue
+        if st in ("e1_single_other", "e1_batch_other") and not q.get("from_database") and \
+                MQ.is_missing_value(MQ.strip_stray_punctuation(s)) and q.get("expect_error") != G.E_MISSING:
+            r = dict(q, open=None, expect_error=G.E_MISSING, revised_by=list(q.get("revised_by") or []) + ["stray_decided"],
+                     note=((q.get("note") or "") + "; " if q.get("note") else "") + "a missing value once stray "
+                          "punctuation is cut (rules `stray_punctuation`, `missing_values`)")
+            r.pop("set", None)
+            out["e1_dec3"].append(r)
+        elif st == "e2_junk_wild":
+            junk.append(q)
+    if junk:
+        C = MQ.Ctx78(org, H.ORGANISMS[org][2])
+        for v in MQ.rev_stray_punctuation(org, junk, C).values():
+            for r in v:
+                r["revised_by"] = [x for x in r["revised_by"] if x != "stray_punctuation"] + ["stray_decided"]
+                out["e2_dec3"].append(r)
+    return out
+
+
 def e2_case_r1(org):
     """The `now` judge's `e2_case` lines that Ensembl's synonyms of every cross-reference at 115 change (module
     docstring), and the truth files read."""
@@ -223,9 +258,21 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
     ap.add_argument("--revision", required=True, choices=["e5_r1", "e5_r2", "e1_dec2", "e8_identity_dec",
-                                                         "e2_names_every_release", "e2_case_r1"])
+                                                         "e2_names_every_release", "e2_case_r1", "stray_decided"])
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
+    if a.revision == "stray_decided":
+        for name, rev in sorted(stray_decided(a.organism).items()):
+            if name in L.set_names("e", a.organism):
+                print(a.organism, name, "published")
+                continue
+            base = name.rsplit("_dec", 1)[0]
+            revises = [x for x in L.set_names("e", a.organism) if x == base or x.startswith(base + "_")]
+            m = L.publish("e", a.organism, name, rev, "E: stray punctuation cut before the other decided rules (judge: "
+                          "the decided rule `stray_punctuation` as built)", __file__, revises=revises, judge="decided",
+                          sources=["make_queries.strip_stray_punctuation", "the harness's truth (name genes)"], dry=a.dry)
+            print(a.organism, name, m["n"] if m else len(rev), collections.Counter(r["stratum"] for r in rev))
+        return
     if a.revision == "e2_names_every_release":
         from idtrack_reproducibility.families.e import score_e as SE
         for (name, base, which), rev in sorted(e2_names_every_release(a.organism).items()):

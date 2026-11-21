@@ -3,12 +3,12 @@ e1_batch_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; de
 e1_batch_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	87	29
 e1_batch_d81	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	18	6
 e1_batch_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	18	6
-e1_batch_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	9	3
+e1_batch_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	12	4
 e1_single_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	12	12
 e1_single_d52	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	29	29
 e1_single_d81	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	6	6
 e1_single_d81	missing_value_read_as_name	a	rule `missing_values` (finding IN-1; decided)	6	6
-e1_single_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	3	3
+e1_single_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	4	4
 e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	82	36
 e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	26	26
 e2_all_punct	stray_punctuation_not_read	a	rule `stray_punctuation` (finding IN-11; decided)	48640	16367

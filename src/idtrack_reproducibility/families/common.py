@@ -5,6 +5,7 @@ Every family's code is a package `idtrack_reproducibility.families.<family>`; it
 `<families>/<family>/` of the data root and the one truth store is `<truth>/<organism>/` (README, "Configuration").
 The locations are read from the configuration when they are used (`BENCH`, `TRUTH`, `HARNESS_QUERIES`, `HARNESS`).
 """
+import glob
 import json
 import os
 import re
@@ -64,6 +65,17 @@ def shard_of(qid, n):
 
 def crc(qid):
     return zlib.crc32(qid.encode())
+
+
+AGAIN_PREFIX = "again_"
+
+
+def answer_files(run):
+    """A run folder's answer files in the order they are read, the last answer of a (qid, view) winning: the runner's
+    shard parts (`shard_<i>_of_<n>.<k>.parquet`), then the parts of lines asked again because a revision set changed
+    their question (`again_<set>_<i>_of_<n>.<k>.parquet`, runner `--again`), in the order of the sets' names."""
+    files = glob.glob(os.path.join(run, "answers", "*.parquet"))
+    return sorted(files, key=lambda p: (os.path.basename(p).startswith(AGAIN_PREFIX), os.path.basename(p)))
 
 
 def base_id(x):

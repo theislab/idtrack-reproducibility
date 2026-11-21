@@ -1,2 +1,24 @@
 stratum	cause	class	rule	answers	units
+d2_matrix_ids_measured	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	4	2
+d2_matrix_ids_stated	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	1	1
 d2_matrix_symbols_measured	d2_names_read_at_last_release	a	rule `inference_per_release`	18	7
+d2_synth_5000_junk20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	20	11
+d2_synth_5000_junk5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	26	13
+d2_synth_5000_none	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	25	15
+d2_synth_5000_other20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	100	47
+d2_synth_5000_other5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	86	36
+d2_synth_500_junk20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	41	19
+d2_synth_500_junk5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	39	23
+d2_synth_500_none	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	36	20
+d2_synth_500_other20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	100	48
+d2_synth_500_other5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	77	41
+d2_synth_50_junk20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	16	10
+d2_synth_50_junk5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	21	11
+d2_synth_50_none	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	19	11
+d2_synth_50_other20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	72	42
+d2_synth_50_other5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	57	30
+d2_synth_all_junk20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	3	3
+d2_synth_all_junk5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	2	2
+d2_synth_all_none	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	2	2
+d2_synth_all_other20	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	26	26
+d2_synth_all_other5	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	10	10

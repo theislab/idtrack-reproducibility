@@ -1,21 +1,21 @@
-stratum	view	items	both_right	both_undetermined	both_wrong	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_unknown	right_in_list_only	right_no_single
-*	all	76391	728	0	0	1068	89	0	0	74506
-*	best	76391	73966	575	86	500	0	105	105	1159
-d4_id_current	all	9173	728	0	0	0	0	0	0	8445
-d4_id_current	best	9173	8445	0	0	0	0	0	0	728
-d4_id_old	all	9442	0	0	0	557	0	0	0	8885
-d4_id_old	best	9442	8799	557	0	0	0	86	86	0
-d4_missing	all	931	0	0	0	500	0	0	0	431
-d4_missing	best	931	0	0	0	500	0	0	0	431
-d4_ncbi	all	9534	0	0	0	0	0	0	0	9534
-d4_ncbi	best	9534	9534	0	0	0	0	0	0	0
-d4_nothing	all	9161	0	0	0	0	0	0	0	9161
-d4_nothing	best	9161	9161	0	0	0	0	0	0	0
-d4_refseq	all	9409	0	0	0	0	0	0	0	9409
-d4_refseq	best	9409	9409	0	0	0	0	0	0	0
-d4_symbol	all	9736	0	0	0	11	89	0	0	9636
-d4_symbol	best	9736	9613	18	86	0	0	19	19	0
-d4_transcript	all	9568	0	0	0	0	0	0	0	9568
-d4_transcript	best	9568	9568	0	0	0	0	0	0	0
-d4_uniprot	all	9437	0	0	0	0	0	0	0	9437
-d4_uniprot	best	9437	9437	0	0	0	0	0	0	0
+stratum	view	items	both_right	both_undetermined	both_wrong	list_error_alone_no_single	list_error_alone_undetermined	list_error_alone_wrong	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_unknown	right_alone_only	right_no_single
+*	all	76391	607	0	0	10235	0	0	1068	89	121	121	64271
+*	best	76391	63836	575	86	121	87	18	500	0	10235	10130	1038
+d4_id_current	all	9173	607	0	0	1373	0	0	0	0	121	121	7072
+d4_id_current	best	9173	7072	0	0	121	0	0	0	0	1373	1373	607
+d4_id_old	all	9442	0	0	0	1326	0	0	557	0	0	0	7559
+d4_id_old	best	9442	7559	557	0	0	86	0	0	0	1326	1240	0
+d4_missing	all	931	0	0	0	0	0	0	500	0	0	0	431
+d4_missing	best	931	0	0	0	0	0	0	500	0	0	0	431
+d4_ncbi	all	9534	0	0	0	1228	0	0	0	0	0	0	8306
+d4_ncbi	best	9534	8306	0	0	0	0	0	0	0	1228	1228	0
+d4_nothing	all	9161	0	0	0	1236	0	0	0	0	0	0	7925
+d4_nothing	best	9161	7925	0	0	0	0	0	0	0	1236	1236	0
+d4_refseq	all	9409	0	0	0	1215	0	0	0	0	0	0	8194
+d4_refseq	best	9409	8194	0	0	0	0	0	0	0	1215	1215	0
+d4_symbol	all	9736	0	0	0	1244	0	0	11	89	0	0	8392
+d4_symbol	best	9736	8388	18	86	0	1	18	0	0	1244	1225	0
+d4_transcript	all	9568	0	0	0	1265	0	0	0	0	0	0	8303
+d4_transcript	best	9568	8303	0	0	0	0	0	0	0	1265	1265	0
+d4_uniprot	all	9437	0	0	0	1348	0	0	0	0	0	0	8089
+d4_uniprot	best	9437	8089	0	0	0	0	0	0	0	1348	1348	0

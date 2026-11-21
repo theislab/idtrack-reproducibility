@@ -19,6 +19,8 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 | `runs/d4c2dda/mus_musculus/` | incomplete: shards 0 to 24 of 29 complete (8,464,522 lines; `partial.json` says so), shards 25 to 28 not asked, not scored; the answers are kept in the data root (manifested), and the runner, which asks only what has no answer, finishes them with `--shard 25/29` to `28/29` |
 | `runs/d4c2dda/sus_scrofa/`, `runs/d4c2dda/homo_sapiens/` | not run (no answer) |
 
+The judge following idtrack's decided rules (judge `rules`, [`judge_follows_rules`](../rules.md#judge_follows_rules); published 2026-11-20): `<set>_rules1`, the accuracy harness's revisions `missing_values`, `capitals_mgi` and `lower_case_symbols` (rule `single_case_symbols`), `stray_punctuation` and `par_shared_names` applied to B's latest lines (`revise_b --rules`, B's truth context): pig `b5_rules1` 12 (missing values, left out of the scoring); mouse `b4_rules1` 21, `b5_rules1` 1,156, `b6_rules1` 2,312, `b1_rules1` 105 (capitals and lower case read as MGI's symbol, missing values, stray punctuation); human `b4_rules1` 35, `b5_rules1` 415, `b6_rules1` 168, `b1_rules1` 464 (the names the X and Y copies of a pseudoautosomal gene share: the Y copy apart; missing values; stray punctuation); rhesus and cynomolgus none. B6's decided judge reads its `_dec` sets after the `now` sets, so its lines get the same revisions in `b6_rules1_dec` (mouse 2,270: the decided lines of the qids `b6_rules1` holds, published again after it so that the decided truth stands in publication order too; human 23 with the Y copy apart). On the modest selection every revised line `next` answers is right but one (mouse `MUP1` from 105, `all`: the second gene its capitals reach, wrong on every tree).
+
 What is not built:
 
 - Ensembl's synonyms of every release for the organisms other than mouse (`fetch_b synonyms --releases all`; release 115 is fetched for all five, every release for mouse), and B's truth read from them (it reads release 115's);
@@ -98,6 +100,9 @@ python -m idtrack_reproducibility.families.b.gen_b --organism <o> [--sets b1,b8]
 python -m idtrack_reproducibility.families.b.gen_b2 --organism <o> [--sets b4,b5,b6,b7] [--dry]
 # revision sets when the truth changes: only the lines whose truth changed, under their published qids
 python -m idtrack_reproducibility.families.b.revise_b --organism <o> --name r1 --why "<what changed>" [--sets b4,b5,b6,b7,b8,b1] [--dry]
+# the harness's revisions of decided rules on B's lines (judge `rules`; with `_dec` sets for B6 and B7)
+python -m idtrack_reproducibility.families.b.revise_b --organism <o> --name rules1 \
+    --rules missing_values,capitals_mgi,lower_case_symbols,stray_punctuation,par_shared_names
 # a tree's run (F0's runner), then the scoring of each judge into its own folder
 python -m idtrack_reproducibility.families.runner --family b --organism <o> --clone <source> --graph <graph> \
     --out <families>/b/runs/<tree>/<o> --sets <every set> --submit <n> [--tag b_<tree>_<o>]

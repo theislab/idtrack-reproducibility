@@ -15,6 +15,12 @@ Usage:
 - A line belongs to shard `crc32(qid) % n` (as the harness's score.py); a shard skips every qid that has an answer in
   any answer file of the folder, whatever its sharding, so a resubmission (any n, or after a new set is published)
   asks only what is missing.
+- `--again <set>`: a revision set that changed the question of its lines (not only their truth: e.g. the database a
+  line names, `from_database_rows`) makes the answers a tree gave to the old question stale where the tree asks the
+  new one otherwise. The lines of that set (within `--sets`) are asked again, whatever answers the folder holds, into
+  `<out>/answers/again_<set>_<i>_of_<n>.<k>.parquet`; a shard skips only what such files already hold, and takes
+  nothing from other runs. Readers take the folder's files in `common.answer_files` order, so the answer to the new
+  question wins.
 - The graph is loaded once per shard (adapter.Adapter: the file linked into `<out>/repo/`), `gc.freeze()` after;
   `PYTHONHASHSEED=0` (the runner restarts itself with it when it is not set), a per-call budget (`--timeout`).
 - Answers (adapter.py: one row per line and view) go to `<out>/answers/shard_<i>_of_<n>.<k>.parquet`, a new part
@@ -64,12 +70,31 @@ def answered(out, shard=None):
     return done
 
 
-def write_part(out, i, n, rows):
+def to_ask(a, mine, i, n):
+    """(the lines of shard i/n still to ask, the prefix of its answer files): every line without an answer in the folder;
+    with `a.again` (a revision set) the lines of that set without an answer in its `again_<set>_*` files."""
+    if not getattr(a, "again", None):
+        done = answered(a.out, (i, n))
+        return [q for q in mine if q["qid"] not in done], "shard"
+    again = set(L._qid_column(L._set_file(L.query_dir(a.family, a.organism), a.again)).to_pylist())
+    prefix = f"{C.AGAIN_PREFIX}{a.again}"
+    done = set()
+    for p in glob.glob(os.path.join(a.out, "answers", f"{prefix}_*.parquet")):
+        done.update(q for q in pq_qids(p) if C.shard_of(q, n) == i)
+    return [q for q in mine if q["qid"] in again and q["qid"] not in done], prefix
+
+
+def pq_qids(path):
+    import pyarrow.parquet as pq
+    return pq.read_table(path, columns=["qid"]).column("qid").to_pylist()
+
+
+def write_part(out, i, n, rows, prefix="shard"):
     import pyarrow as pa
     import pyarrow.parquet as pq
     d = os.path.join(out, "answers")
-    k = len(glob.glob(os.path.join(d, f"shard_{i}_of_{n}.*.parquet")))
-    while os.path.exists(os.path.join(d, f"shard_{i}_of_{n}.{k}.parquet")):
+    k = len(glob.glob(os.path.join(d, f"{prefix}_{i}_of_{n}.*.parquet")))
+    while os.path.exists(os.path.join(d, f"{prefix}_{i}_of_{n}.{k}.parquet")):
         k += 1
     for r in rows:
         r["h"] = C.crc(r["qid"])
@@ -77,7 +102,7 @@ def write_part(out, i, n, rows):
             r["flags"] = C.dumps(r["flags"])
         if r.get("from_release") is not None:
             r["from_release"] = int(r["from_release"])
-    path = os.path.join(d, f"shard_{i}_of_{n}.{k}.parquet")
+    path = os.path.join(d, f"{prefix}_{i}_of_{n}.{k}.parquet")
     pq.write_table(pa.Table.from_pylist(rows, schema=answer_schema()), path + ".tmp", compression="zstd")
     os.replace(path + ".tmp", path)
 
@@ -117,7 +142,7 @@ def reuse(a, todo, shas, info, family=None):
             continue
         vs = pa.array(sorted(ok), type=pa.string())
         rows = []
-        for p in sorted(glob.glob(os.path.join(src, "answers", "*.parquet"))):
+        for p in C.answer_files(src):
             t = pq.read_table(p)
             t = t.filter(pc.is_in(t.column("qid"), value_set=vs))
             if t.num_rows:
@@ -143,8 +168,7 @@ def run(a):
     i, n = (int(x) for x in a.shard.split("/"))
     mine, shas, excluded = L.load(a.family, a.organism, a.sets, a.strata, a.kinds, shard=(i, n), limit=a.limit)
     os.makedirs(os.path.join(a.out, "answers"), exist_ok=True)
-    done = answered(a.out, (i, n))
-    todo = [q for q in mine if q["qid"] not in done]
+    todo, prefix = to_ask(a, mine, i, n)
     sys.stderr.write(f"shard {i}/{n}: {len(mine)} lines, {len(todo)} to ask\n")
     if not todo:
         return
@@ -152,20 +176,23 @@ def run(a):
     ad = adapter.Adapter(a.clone, a.graph, a.organism, a.release, a.out, timeout=a.timeout)
     info = dict(ad.info, shard=a.shard, sets=shas, host=os.uname().nodename, slurm_job=os.environ.get("SLURM_JOB_ID"),
                 started=time.strftime("%Y-%m-%d %H:%M:%S"), n_lines=len(mine), n_todo=len(todo))
-    todo, info["reused"] = reuse(a, todo, shas, info)
+    if a.again:
+        info["again"], info["reused"] = a.again, {}
+    else:
+        todo, info["reused"] = reuse(a, todo, shas, info)
     info["n_asked"] = len(todo)
-    json.dump(info, open(os.path.join(a.out, "answers", f"load_{i}_of_{n}.json"), "w"), indent=1)
+    json.dump(info, open(os.path.join(a.out, "answers", f"load_{prefix + '_' if a.again else ''}{i}_of_{n}.json"), "w"), indent=1)
     sys.stderr.write(f"shard {i}/{n}: reused {sum(info['reused'].values())} ({info['reused']}), {len(todo)} to ask\n")
     buf, t_all, t_flush = [], time.time(), time.time()
     for k, q in enumerate(todo):
         buf.extend(ad.ask(q))
         if len(buf) >= a.flush or time.time() - t_flush > 300:
-            write_part(a.out, i, n, buf)
+            write_part(a.out, i, n, buf, prefix)
             buf, t_flush = [], time.time()
         if k % 5000 == 0:
             sys.stderr.write(f"{k}/{len(todo)} {time.time() - t_all:.0f}s\n")
     if buf:
-        write_part(a.out, i, n, buf)
+        write_part(a.out, i, n, buf, prefix)
     sys.stderr.write(f"shard {i}/{n} done in {time.time() - t_all:.0f}s\n")
 
 
@@ -227,6 +254,7 @@ def main():
     ap.add_argument("--release", type=int, default=None)
     ap.add_argument("--shard", default="0/1")
     ap.add_argument("--flush", type=int, default=20000)
+    ap.add_argument("--again", default=None, help="a revision set whose lines are asked again (their question changed)")
     ap.add_argument("--submit", type=int, default=0)
     ap.add_argument("--score", action="store_true", help="with --submit: a scoring job after the shards")
     ap.add_argument("--score-mem", type=int, default=32)

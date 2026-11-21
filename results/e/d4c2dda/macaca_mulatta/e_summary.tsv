@@ -3,7 +3,7 @@ decided	macaca_mulatta	e1_batch_blank	27	0	27	0	0	0	0	1.0000	0.8754	1.0000	0	0
 decided	macaca_mulatta	e1_batch_d52	123	0	0	123	0	0	0	0.0000	0.0000	0.0303	69	0
 decided	macaca_mulatta	e1_batch_d81	36	0	0	36	0	0	0	0.0000	0.0000	0.0964	18	0
 decided	macaca_mulatta	e1_batch_neighbour	438	438	0	0	0	0	0	1.0000	0.9913	1.0000	438	0
-decided	macaca_mulatta	e1_batch_other	60	0	0	9	51	0	0	0.0000	0.0000	0.2991	3	3
+decided	macaca_mulatta	e1_batch_other	60	0	0	12	48	0	0	0.0000	0.0000	0.2425	3	3
 decided	macaca_mulatta	e1_fromdb_blank	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
 decided	macaca_mulatta	e1_fromdb_d52	82	0	0	0	82	0	0				0	0
 decided	macaca_mulatta	e1_fromdb_d81	24	0	0	0	24	0	0				0	0
@@ -11,7 +11,7 @@ decided	macaca_mulatta	e1_fromdb_other	40	0	0	0	40	0	0				0	0
 decided	macaca_mulatta	e1_single_blank	9	0	9	0	0	0	0	1.0000	0.7009	1.0000	0	0
 decided	macaca_mulatta	e1_single_d52	41	0	0	41	0	0	0	0.0000	0.0000	0.0857	23	0
 decided	macaca_mulatta	e1_single_d81	12	0	0	12	0	0	0	0.0000	0.0000	0.2425	6	0
-decided	macaca_mulatta	e1_single_other	20	0	0	3	17	0	0	0.0000	0.0000	0.5615	1	1
+decided	macaca_mulatta	e1_single_other	20	0	0	4	16	0	0	0.0000	0.0000	0.4899	1	1
 decided	macaca_mulatta	e2_acc_refseq	200	199	0	0	1	0	0	1.0000	0.9811	1.0000	100	1
 decided	macaca_mulatta	e2_acc_uniprot	200	192	0	0	8	0	0	1.0000	0.9804	1.0000	200	8
 decided	macaca_mulatta	e2_all_makeunique	53745	53625	0	87	33	0	0	0.9984	0.9980	0.9987	150	30
@@ -86,7 +86,7 @@ decided	macaca_mulatta	e2_junk_num	9	9	0	0	0	0	0	1.0000	0.7009	1.0000	0	0
 decided	macaca_mulatta	e2_junk_rtl	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
 decided	macaca_mulatta	e2_junk_sep	4	4	0	0	0	0	0	1.0000	0.5101	1.0000	0	0
 decided	macaca_mulatta	e2_junk_surrogates	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-decided	macaca_mulatta	e2_junk_wild	7	7	0	0	0	0	0	1.0000	0.6457	1.0000	0	0
+decided	macaca_mulatta	e2_junk_wild	7	6	0	1	0	0	0	0.8571	0.4869	0.9743	0	0
 decided	macaca_mulatta	e2_junk_zw	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
 decided	macaca_mulatta	e2_long	8	2	0	6	0	0	0	0.2500	0.0715	0.5907	0	0
 decided	macaca_mulatta	e2_long_padded	2	2	0	0	0	0	0	1.0000	0.3424	1.0000	2	0

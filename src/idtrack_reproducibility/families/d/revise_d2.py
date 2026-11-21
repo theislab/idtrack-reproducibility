@@ -21,6 +21,12 @@ Every line is generated again by gen_d2.py (its current truth: synthetic, matric
 - `versionless_releases` (2026-11-19, `--truth-only`): lists of versioned ids (`d2_v2`) from releases near 77 were
   expected at the releases whose GTF writes the versions, but pig and human GTFs write no versions before 77, while
   idtrack's graph holds the versions there (from the core tables; finding hh-5): such lines are open with the reason.
+- `band_rule` (2026-11-20, `--truth-only`, set `d2_r4`): idtrack answers the band of releases the list
+  cannot tell apart (rule `inference_per_release`, a one-sided sign test at 0.05), and in mode `release` counts a release on the
+  assembly that serves it. Every line gets the exact tie (`expect`) and the band (`band`) from Ensembl's records alone,
+  rule `within_band` (all of the tie, nothing outside the band); the GRCh37 site no longer counts for human 76 to 115
+  (what `d2_r1` added); a symbol counts where a symbol database of Ensembl's core cross-references names a gene with it
+  at that release, beside the GTF's display name; each distinct item counts once.
 - `symbols_fold` (2026-11-19): a mouse table of symbols written in capitals (nowotschin2019_gutendoderm: 0610007P14RIK)
   was judged by Ensembl's names exactly as written (`Erg28`-style mixed case), so almost no item was a name of any
   release (best share 0.023); rosetta reads such a table without letter case, and so does the truth now.
@@ -45,10 +51,12 @@ def truth_kind(q):
 
 def retruth(q, P):
     """The published line `q` (its question unchanged: batch, kwargs) with the truth computed again on its own items."""
-    keep = {k: v for k, v in q.items() if k not in ("expect", "open", "best_share", "drawn_share", "drawn_in_expected", "stated_share",
-                                                    "stated_in_expected", "set", "revised_by")}
-    E, shares = P.truth(q["batch"], truth_kind(q))
+    keep = {k: v for k, v in q.items() if k not in ("expect", "band", "open", "best_share", "drawn_share", "drawn_in_expected",
+                                                    "stated_share", "stated_in_expected", "set", "revised_by")}
+    E, B, shares = P.truth(q["batch"], truth_kind(q))
     keep["expect"] = [str(r) for r in E]
+    keep["band"] = [str(r) for r in B]
+    keep["rule"] = "within_band"
     keep["best_share"] = round(shares[E[0]], 6)
     for k in ("drawn", "stated"):
         if keep.get(k) is not None:
@@ -58,6 +66,9 @@ def retruth(q, P):
         why = G.versionless_open(P, q["batch"], E, shares)
         if why:
             keep["open"] = why
+    if truth_kind(q) in ("symbols", "symbols_fold", "mixed") and P.no_xref:
+        keep["open"] = (f"releases {','.join(map(str, P.no_xref))} have no core xref extract: which symbols named genes "
+                        "there Ensembl's records read cannot say")
     if keep.get("stated") is not None and keep["stated"] not in E:
         keep["open"] = (f"the stated release {keep['stated']} fits the list worse ({keep['stated_share']:.4f}) than "
                         f"{E[0]}..{E[-1]} ({keep['best_share']:.4f}) by Ensembl's GTFs")
@@ -67,30 +78,35 @@ def retruth(q, P):
 def main_truth_only(a):
     """`--truth-only`: every line's truth computed again on the items of its first publication (the question never
     changes); lines whose latest published truth or items differ are published."""
-    d2_sets = [s for s in L.set_names("d", a.organism) if s.startswith("d2")]
-    first, latest = {}, {}
-    for s in d2_sets:
-        for q in L.load("d", a.organism, [s])[0]:
-            if q["qid"].startswith("d2"):
-                first.setdefault(q["qid"], q)
-                latest[q["qid"]] = q
-    P = G.Presence(a.organism)
-    import itertools  # noqa: F401
-    G.synthetic_more.__globals__  # the versioned ids' truth needs P.index["ids_versioned"]: built by synthetic_more
-    for _ in G.synthetic_more(a.organism, P):
-        break
-    out = []
-    for qid, q0 in first.items():
-        new = retruth(q0, P)
-        p = latest[qid]
-        if new.get("expect") != p.get("expect") or new.get("open") != p.get("open") or new.get("batch") != p.get("batch"):
-            new["revised_by"] = list(p.get("revised_by") or []) + [a.revision]
-            out.append(new)
+    out, d2_sets = truth_only_lines(a.organism, a.revision)
     print(f"{a.organism}: {len(out)} lines revised ({a.revision}, truth only)")
     if out and not a.dry:
         L.publish("d", a.organism, a.set, out, description=f"D2 revision {a.revision}, truth only (revise_d2.py docstring)",
                   generator=os.path.abspath(__file__), revises=d2_sets)
         print("published", a.set)
+
+
+def truth_only_lines(organism, revision):
+    """(the revised lines of `--truth-only`, the D2 sets read)."""
+    d2_sets = [s for s in L.set_names("d", organism) if s.startswith("d2")]
+    first, latest = {}, {}
+    for s in d2_sets:
+        for q in L.load("d", organism, [s])[0]:
+            if q["qid"].startswith("d2"):
+                first.setdefault(q["qid"], q)
+                latest[q["qid"]] = q
+    P = G.Presence(organism)
+    # the versioned ids' truth needs P.index["ids_versioned"]: built by synthetic_more before its first line
+    for _ in G.synthetic_more(organism, P):
+        break
+    out = []
+    for qid, q0 in first.items():
+        p = latest[qid]
+        new = retruth(dict(p, batch=q0["batch"]), P)  # the latest line's fields, its first publication's items
+        if any(new.get(k) != p.get(k) for k in ("expect", "band", "rule", "open", "batch")):
+            new["revised_by"] = list(p.get("revised_by") or []) + [revision]
+            out.append(new)
+    return out, d2_sets
 
 
 def main():

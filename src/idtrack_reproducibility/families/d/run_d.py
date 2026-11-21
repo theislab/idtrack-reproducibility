@@ -28,29 +28,31 @@ def run(a):
     i, n = (int(x) for x in a.shard.split("/"))
     mine, shas, _ = L.load(FAMILY, a.organism, a.sets, a.strata, None, shard=(i, n), limit=a.limit)
     os.makedirs(os.path.join(a.out, "answers"), exist_ok=True)
-    done = R.answered(a.out, (i, n))
-    todo = [q for q in mine if q["qid"] not in done]
+    a.family = FAMILY
+    todo, prefix = R.to_ask(a, mine, i, n)
     sys.stderr.write(f"shard {i}/{n}: {len(mine)} lines, {len(todo)} to ask\n")
     if not todo:
         return
     ad = adapter_e.AdapterE(a.clone, a.graph, a.organism, a.release, a.out, timeout=a.timeout)
     info = dict(ad.info, shard=a.shard, sets=shas, host=os.uname().nodename, slurm_job=os.environ.get("SLURM_JOB_ID"),
                 started=time.strftime("%Y-%m-%d %H:%M:%S"), n_lines=len(mine), n_todo=len(todo), adapter="e/adapter_e.py")
-    a.family = FAMILY
-    todo, info["reused"] = R.reuse(a, todo, shas, info)
+    if a.again:  # asked again (runner `--again`): nothing is taken from other runs
+        info["again"], info["reused"] = a.again, {}
+    else:
+        todo, info["reused"] = R.reuse(a, todo, shas, info)
     info["n_asked"] = len(todo)
-    json.dump(info, open(os.path.join(a.out, "answers", f"load_{i}_of_{n}.json"), "w"), indent=1)
+    json.dump(info, open(os.path.join(a.out, "answers", f"load_{prefix + '_' if a.again else ''}{i}_of_{n}.json"), "w"), indent=1)
     sys.stderr.write(f"shard {i}/{n}: reused {sum(info['reused'].values())} ({info['reused']}), {len(todo)} to ask\n")
     buf, t0, tf = [], time.time(), time.time()
     for k, q in enumerate(todo):
         buf.extend(ad.ask(q))
         if len(buf) >= a.flush or time.time() - tf > 300:
-            R.write_part(a.out, i, n, buf)
+            R.write_part(a.out, i, n, buf, prefix)
             buf, tf = [], time.time()
         if k % 200 == 0:
             sys.stderr.write(f"{k}/{len(todo)} {time.time() - t0:.0f}s\n")
     if buf:
-        R.write_part(a.out, i, n, buf)
+        R.write_part(a.out, i, n, buf, prefix)
     sys.stderr.write(f"shard {i}/{n} done in {time.time() - t0:.0f}s\n")
 
 
@@ -86,6 +88,7 @@ def main():
     ap.add_argument("--mem", type=int, default=None)
     ap.add_argument("--time", default="08:00:00")
     ap.add_argument("--tag", default=None)
+    ap.add_argument("--again", default=None, help="a revision set whose lines are asked again (runner `--again`)")
     a = ap.parse_args()
     if os.environ.get("PYTHONHASHSEED") != "0" and not a.submit:
         os.environ["PYTHONHASHSEED"] = "0"

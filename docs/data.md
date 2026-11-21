@@ -50,16 +50,16 @@ The areas' sizes, summed from their manifests (`manifests/`; the family areas li
 | families/f0 | 460 | 0.16 |
 | families/astar | 16,698 | 8.07 |
 | families/a | 22,035 | 12.13 |
-| families/e | 3,085 | 4.28 |
+| families/e | 3,103 | 4.28 |
 | graphs | 4,884 | 9.21 |
 | hunts | 295 | 3.72 |
 | corpus | 170 | 0.12 |
 | performance | 117 | 0.11 |
-| families/b | 1,504 | 0.92 |
-| families/c | 7,204 | 5.36 |
-| families/d | 1,429 | 0.74 |
+| families/b | 1,526 | 0.92 |
+| families/c | 7,212 | 5.36 |
+| families/d | 1,465 | 1.01 |
 | families/d_atlas_inputs | 151 | 0.04 |
-| **total** | **61,096** | **50.6** |
+| **total** | **61,180** | **50.9** |
 
 ## Publication
 
@@ -69,7 +69,7 @@ The data root is to be published with the manuscript in a data repository that g
 | --- | --- | --- |
 | truth | `truth` | 5.0 GB: Ensembl's and the authorities' files as fetched (their own licences: Ensembl's data are free to use; the authorities' terms are at the URLs in `SOURCES.tsv`) |
 | harness | `harness/*` | 0.7 GB: the fixed query sets, the reference tree's answers and their scoring |
-| families | `families/*` | 31.7 GB: the families' sets, answers, scorings and causes (the answers are most of it; Parquet, compressed) |
+| families | `families/*` | 32.0 GB: the families' sets, answers, scorings and causes (the answers are most of it; Parquet, compressed) |
 | graphs | `graphs` | 9.2 GB: the reference tree's graphs and the tables they were built from (equal graphs have equal content digests, so a rebuilt graph is checked against the digest the runs record) |
 | corpus, hunts, performance | `corpus`, `hunts`, `performance` | 4.0 GB: the regression corpus and its references, the hunts' outputs, the performance measurements |
 

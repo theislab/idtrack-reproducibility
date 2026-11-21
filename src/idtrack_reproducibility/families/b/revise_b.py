@@ -12,6 +12,14 @@ For each set family S (`b1`, ...):
   `S_<name>`, `S_<name>_dec`): every qid whose decided line (its regenerated `_dec` line, else its regenerated line)
   differs from what that order gives;
 - `S_v2`: lines with qids not published before (none expected; a new set, never a revision).
+
+`--rules <revision>,...` (with `--name`): instead of regenerating, the latest lines of each set family (judge `now`)
+are revised by the accuracy harness's revisions of decided rules (`make_queries.REVISIONS`, judge `rules`:
+`par_shared_names`, `capitals_mgi` and `lower_case_symbols` (rule `single_case_symbols`), `missing_values`,
+`stray_punctuation`), read with B's truth context (`truth_b.NamesB.C`), and the lines they change are published as
+`S_<name>`, judge `rules`. A family with a decided judge (`S_dec`: B6, B7) also gets `S_<name>_dec`: the latest lines
+of its `_dec` sets with the same revisions, and every one of them whose qid `S_<name>` holds, so that the decided
+truth and the rule both stand whichever order the sets are read in (the decided judge's, or publication order).
 The `now` judge reads the sets without `_dec` in their name, the `decided` judge every set (the family's methods, docs/families/b.md).
 """
 import argparse
@@ -140,14 +148,70 @@ def revise(cx, S, name, why, dry):
                       revises=fam + ([f"{S}_{name}"] if changed else []), judge=f"b_{name}_dec", dry=dry)
 
 
+def revise_rules(org, nb, S, name, rules, dry):
+    """`--rules`: the harness's revisions of decided rules applied to the latest `now` lines of set family S."""
+    from idtrack_reproducibility.harness import make_queries as M
+    fam = family_sets(org, S)
+    if not fam:
+        log(org, S, "no published set")
+        return
+    now_sets = [s for s in fam if "_dec" not in s]
+    if f"{S}_{name}" in fam:
+        log(org, S, f"{S}_{name} published before")
+    else:
+        _rules_set(org, S, f"{S}_{name}", latest(org, now_sets), now_sets, name, rules, dry, nb)
+    dec_sets = [s for s in fam if "_dec" in s]
+    if dec_sets and f"{S}_{name}_dec" not in fam:
+        # the decided judge reads the `now` sets, then the `_dec` sets: its lines get the same revisions, published last,
+        # with every decided line of a qid the `now` revision holds (read in publication order, the `now` revision would
+        # otherwise replace the decided truth)
+        pub_dec = latest(org, sorted(dec_sets, key=lambda x: L.manifest(FAMILY, org, x)["seq"]))
+        now_rev = family_sets(org, S)
+        must = {ln["qid"] for ln in L.iter_set(L._set_file(L.query_dir(FAMILY, org), f"{S}_{name}"))} \
+            if f"{S}_{name}" in now_rev else set()
+        _rules_set(org, S, f"{S}_{name}_dec", pub_dec, now_rev, name, rules, dry, nb, must=must)
+
+
+def _rules_set(org, S, set_name, pub, revises, name, rules, dry, nb, judge="rules", must=()):
+    """Publish `set_name`: the lines of `pub` the revisions change, and every line of `pub` whose qid is in `must`
+    (a decided line read after the `now` revision of its qid, revised or not)."""
+    from idtrack_reproducibility.harness import make_queries as M
+    before = {q: canon(ln) for q, ln in pub.items()}
+    lines = [dict(ln) for ln in pub.values() if not ln.get("excluded")]
+    for ln in lines:
+        ln.pop("set", None)
+    out = []
+    for ln in M.apply_revisions(org, lines, nb.C, names=rules):
+        if canon(ln) != before[ln["qid"]] or ln["qid"] in must:
+            out.append(ln)
+    by = {}
+    for ln in out:
+        for r in ln.get("revised_by") or []:
+            if r in rules:
+                by[r] = by.get(r, 0) + 1
+    log(org, S, f"{set_name}: lines {len(lines):,}; revised {len(out):,} {by}")
+    if out:
+        L.publish(FAMILY, org, set_name, out, f"{S}: the accuracy harness's revisions of decided rules ({', '.join(rules)})"
+                  + (" on the decided judge's lines" if set_name.endswith("_dec") else ""),
+                  __file__, revises=revises, judge=judge, dry=dry, manifest_extra=dict(revision=name, rules=rules, revised=by))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
     ap.add_argument("--name", required=True)
-    ap.add_argument("--why", required=True)
+    ap.add_argument("--why", default=None, help="what changed in the truth (required without --rules)")
     ap.add_argument("--sets", default="b4,b5,b6,b7,b8,b1")
     ap.add_argument("--dry", action="store_true")
+    ap.add_argument("--rules", default=None, help="the harness's revisions of decided rules to apply (no regeneration)")
     a = ap.parse_args()
+    if a.rules:
+        nb = TB.NamesB(a.organism, log=log)
+        for S in a.sets.split(","):
+            revise_rules(a.organism, nb, S, a.name, a.rules.split(","), a.dry)
+        return
+    if not a.why:
+        ap.error("--why is required without --rules")
     cx = G2.Ctx(a.organism)
     for S in a.sets.split(","):
         t0 = time.time()

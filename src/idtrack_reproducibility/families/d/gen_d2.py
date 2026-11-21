@@ -16,20 +16,25 @@ samples, one draw for the lists of all ids (no sampling; one noise draw each, to
 **Rosetta's matrices** (stratum `d2_matrix_<ids|symbols|mixed>_<stated|measured>`): each source's feature list as rosetta asks
 it (gen_d1.reduce; Ensembl ids unversioned, symbols as written), all features and only those with counts.
 
-**Truth**: per release r of the window, the share of the list's items that are genes of r (an id: a gene id of r's GTF,
-both regions, and for human from 76 on also of Ensembl's GRCh37 site served with r (fetch_grch37.py: 64,102 genes at every
-release 76 to 115, the gene ids of 75 and 425 more), which idtrack's graph holds as assembly 37 at those releases and
-which release mode merges (revision `d2_r1`; the site's names are not read: names of its releases 76 to 81 have no
-GTF; and the genes of the core database that a GTF lacks, human 48 to 51 and cynomolgus 112, as A*'s `TruthA` reads
-them, revision `d2_r3`); a symbol: the `gene_name` of a gene of r's GTF, without letter case for a mouse table written in
-capitals (rosetta's rule: `MIXED_CASE`, `CAPITALS`); a list of both, as sterr2025's: either); the expected answer is the set of releases of the
-largest share (the releases whose GTF lists fit equally: a tie is right only as that set; rule `set_exact`). A line of a
-matrix with a stated release (the authors' statement or the Cell Ranger reference named in rosetta's config) whose
-stated release is not in that set is `open` (the statement and the data disagree), with both recorded; `drawn` (the
-synthetic list's release), `stated`, the shares at the expected and the drawn release are kept.
+**Truth**: per release r of the window, the distinct items of the list that are genes of r, on the
+assembly that serves r (mode `release`: a release is its own annotation): an id is a gene id of r's GTF (both regions),
+or a gene of the core database that the GTF lacks (human 48 to 51, cynomolgus 112, as A*'s `TruthA` reads them); a
+symbol is a name of a gene of r: the GTF's `gene_name` or the label of a cross-reference of a symbol database of r
+(`SYMBOL_DBS`, Ensembl's core xrefs, `core_xref/<r>.tsv.gz`), without letter case for a mouse table written in
+capitals (rosetta's rule: `MIXED_CASE`, `CAPITALS`); a list of both, as sterr2025's: either. `expect` is the exact tie
+`T` (the releases where the most items are genes) and `band` the band `B` of the documented one-sided sign test at
+`SIGNIFICANCE` (`band`: the best release is the lowest of `T`; another release is in `B` unless the items found at the
+best and not there significantly outnumber those found there and not at the best); rule `within_band`: an answer is
+right when it holds all of `T` and nothing outside `B`. A symbol list whose window holds a release without a core xref
+extract is `open` (Ensembl's records read cannot say which names that release had). A line of a matrix with a stated
+release (the authors' statement or the Cell Ranger reference named in rosetta's config) whose stated release is not in
+`T` is `open` (the statement and the data disagree), with both recorded; `drawn` (the synthetic list's release),
+`stated`, the shares at the best and the drawn release are kept.
 """
 import argparse
 import collections
+import gzip
+import math
 import os
 import random
 import sys
@@ -75,20 +80,40 @@ STATED = {
 }
 
 
-def grch37_site(org):
-    """{release: gene ids of Ensembl's GRCh37 site served with that release} (human 76 to 115; fetch_grch37.py), else {}:
-    idtrack's human graph holds that site as assembly 37 at those releases, and release mode merges the assemblies."""
-    d = os.path.join(H.truth_dir(org), "grch37_site")
-    if not os.path.isdir(d):
-        return {}
-    import gzip
-    out = {}
-    for f in os.listdir(d):
-        if f.startswith("genes_") and f.endswith(".tsv.gz"):
-            with gzip.open(os.path.join(d, f), "rt") as fh:
-                next(fh)
-                out[int(f[6:-7])] = {line.split("\t")[0] for line in fh}
+# The databases of Ensembl's core cross-references whose labels are gene symbols (a symbol counts at a
+# release where Ensembl's records name a gene with it, not only the GTF's display name)
+SYMBOL_DBS = {"HGNC", "MGI", "VGNC", "EntrezGene", "Uniprot_gn", "WikiGene"}
+SIGNIFICANCE = 0.05  # the level of the one-sided sign test of the band (idtrack's documented `SOURCE_SIGNIFICANCE`)
+
+
+def xref_symbols(org, rel):
+    """The labels of the symbol databases' cross-references of a release (any object; core xref extract), or None
+    where the release has no extract."""
+    p = os.path.join(H.truth_dir(org), "core_xref", f"{rel}.tsv.gz")
+    if not os.path.exists(p):
+        return None
+    out = set()
+    with gzip.open(p, "rt") as fh:
+        next(fh)
+        for line in fh:
+            f = line.rstrip("\n").split("\t")
+            if len(f) >= 9 and f[3] in SYMBOL_DBS and f[6].strip():
+                out.add(f[6].strip())
     return out
+
+
+def significantly_fewer(fewer, more):
+    """The documented sign test: whether `fewer` (items found at the best and not at the other) exceeds `more` (found
+    there and not at the best) more than chance would at SIGNIFICANCE (exact binomial up to 1,000, else normal)."""
+    n = fewer + more
+    if fewer <= more:
+        return False
+    if n <= 1000:
+        p = sum(math.comb(n, k) for k in range(fewer, n + 1)) / 2 ** n
+    else:
+        z = (fewer - 0.5 - n / 2) / math.sqrt(n / 4)
+        p = 0.5 * math.erfc(z / math.sqrt(2))
+    return p < SIGNIFICANCE
 
 
 def window(org):
@@ -101,15 +126,18 @@ class Presence:
     def __init__(self, org):
         self.org, self.rels = org, window(org)
         self.ids, self.ids_main, self.kept, self.names = {}, {}, {}, {}
-        site = grch37_site(org)
+        self.no_xref = []  # releases without a core xref extract: their names are the GTF's only
         from idtrack_reproducibility.families.astar.truth import CORE_GENES, core_gene_ids  # A*'s: genes of the core database a GTF lacks (human 48-51, cynomolgus 112)
         for r in self.rels:
             g = H.gtf_genes(org, r)
             self.ids_main[r] = set(g)  # the main GTF's ids: the pool the published lists' noise was drawn from
             core = set(core_gene_ids(org, r) or ()) if r in CORE_GENES.get(org, {}) else set()
-            self.ids[r] = set(g) | site.get(r, set()) | core
+            self.ids[r] = set(g) | core
             self.kept[r] = sorted(x for x, row in g.items() if row["region"] == "primary" and row["gene_biotype"] in KEEP)
-            self.names[r] = {row["gene_name"] for row in g.values() if row["gene_name"]}
+            sym = xref_symbols(org, r)
+            if sym is None:
+                self.no_xref.append(r)
+            self.names[r] = {row["gene_name"] for row in g.values() if row["gene_name"]} | (sym or set())
         self.every = set().union(*self.ids.values())
         import numpy as np
         self.np = np
@@ -123,18 +151,37 @@ class Presence:
                 m[[ix[x] for x in sets[r]], j] = 1
             self.index[kind], self.matrix[kind] = ix, m
 
-    def truth(self, items, kind):
-        """(expected releases, shares) of a list: the releases at which the largest share of items are genes."""
-        n = max(len(items), 1)
-        counts = 0
-        for k in (("ids", "symbols") if kind == "mixed" else (kind,)):  # a mixed list: an item is a gene id or a name of r
-            ix, m = self.index[k], self.matrix[k]
+    def presence(self, items, kind):
+        """Boolean matrix (distinct items x releases): the item is a gene of the release (a mixed list: a gene id or a
+        name of r)."""
+        items = list(dict.fromkeys(items))
+        m = 0
+        for k in (("ids", "symbols") if kind == "mixed" else (kind,)):
+            ix, mat = self.index[k], self.matrix[k]
             key = (lambda x: x.lower()) if k == "symbols_fold" else (lambda x: x)
-            rows = self.np.fromiter((ix.get(key(x), len(m) - 1) for x in items), dtype=self.np.int64, count=len(items))
-            counts = counts + m[rows].sum(axis=0)
+            rows = self.np.fromiter((ix.get(key(x), len(mat) - 1) for x in items), dtype=self.np.int64, count=len(items))
+            m = m + mat[rows]
+        return self.np.asarray(m) > 0
+
+    def truth(self, items, kind):
+        """(the exact tie T, the band B, shares) of a list: T the releases at which the most distinct items are genes,
+        B those the sign test cannot tell from the best (the lowest release of T); shares per release."""
+        pres = self.presence(items, kind)
+        n = max(pres.shape[0], 1)
+        counts = pres.sum(axis=0)
         shares = {r: int(c) / n for r, c in zip(self.rels, counts)}
-        best = max(shares.values())
-        return sorted(r for r, s in shares.items() if s == best), shares
+        top = counts.max()
+        tie = [r for r, c in zip(self.rels, counts) if c == top]
+        b = self.rels.index(tie[0])
+        band = []
+        for j, r in enumerate(self.rels):
+            if counts[j] == 0:  # a release no item names is no origin of the list
+                continue
+            fewer = int((pres[:, b] & ~pres[:, j]).sum())
+            more = int((pres[:, j] & ~pres[:, b]).sum())
+            if j == b or not significantly_fewer(fewer, more):
+                band.append(r)
+        return tie, band, shares
 
 
 def versionless_open(P, items, E, shares):
@@ -146,7 +193,7 @@ def versionless_open(P, items, E, shares):
     if not P.versionless:
         return None
     base = [x.rsplit(".", 1)[0] for x in items]
-    _, sb = P.truth(base, "ids")
+    _, _, sb = P.truth(base, "ids")
     best = shares[E[0]]
     hold = [r for r in P.versionless if sb[r] >= best]
     if hold:
@@ -156,11 +203,11 @@ def versionless_open(P, items, E, shares):
 
 
 def line(org, qid, stratum, items, P, kind, **extra):
-    E, shares = P.truth(items, kind)
+    E, B, shares = P.truth(items, kind)
     q = dict(qid=qid, family=FAMILY, kind=f"d2_{extra.pop('label', kind)}", stratum=stratum, unit=extra.pop("unit"), id=f"<list of {len(items)}>",
              call="infer_source", batch=list(items), kwargs={"mode": "release"}, from_release=None, to_release=None,
-             final_database=None, strategy="best", rule="set_exact", cmp="versioned", expect=[str(r) for r in E], broad=None,
-             best_share=round(shares[E[0]], 6), n_items=len(items), **extra)
+             final_database=None, strategy="best", rule="within_band", cmp="versioned", expect=[str(r) for r in E],
+             band=[str(r) for r in B], broad=None, best_share=round(shares[E[0]], 6), n_items=len(items), **extra)
     for k in ("drawn", "stated"):
         if q.get(k) is not None:
             q[f"{k}_share"] = round(shares.get(q[k], 0.0), 6)
@@ -169,6 +216,9 @@ def line(org, qid, stratum, items, P, kind, **extra):
         why = versionless_open(P, items, E, shares)
         if why:
             q["open"] = why
+    if kind in ("symbols", "symbols_fold", "mixed") and P.no_xref:
+        q["open"] = (f"releases {','.join(map(str, P.no_xref))} have no core xref extract: which symbols named genes there "
+                     "Ensembl's records read cannot say")
     if q.get("stated") is not None and q["stated"] not in E:
         q["open"] = (f"the stated release {q['stated']} fits the list worse ({q['stated_share']:.4f}) than "
                      f"{E[0]}..{E[-1]} ({q['best_share']:.4f}) by Ensembl's GTFs")

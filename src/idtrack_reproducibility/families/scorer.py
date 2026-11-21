@@ -27,6 +27,9 @@ The rules (docs/harness.md "Scoring rules" and the corrected judge; docs/methods
   (README) is that the harness's sets scored here equal score.py's outcomes line by line.
 - `expect_error` (a line field: the error class the docs promise; `A|B` for alternatives, e.g. the class of each api
   generation): that class (or a subclass: the answer's `error_mro`) raised -> `expected_error` (counted as right in the rate); another class, or an answer -> `wrong`.
+- `within_band` (rule; family D2): the answer holds every release of `expect` (the exact tie of the
+  largest share) and nothing outside `band` (the releases a one-sided sign test cannot tell from the best); else
+  wrong, with the releases missing from the tie and those outside the band.
 - `safe` (rule): nothing, or a non-empty part of `expect`, is right (reason `nothing` / `recovered`); another gene
   is wrong. Coverage (the share recovered) is read from `n_got`.
 - `or_error` (a line field, `A|B`): an error of one of these classes (or a subclass) is `expected_error`; an answer
@@ -90,7 +93,7 @@ def read_answers(run, part, nparts):
     import pyarrow as pa
     import pyarrow.parquet as pq
     tabs = []
-    for p in sorted(glob.glob(os.path.join(run, "answers", "*.parquet"))):
+    for p in C.answer_files(run):
         t = pq.read_table(p, columns=[c for c in pq.ParquetFile(p).schema_arrow.names if c not in ("path", "traceback")])
         if nparts > 1:
             t = t.filter(pa.array(t.column("h").to_numpy() % nparts == part))
@@ -129,6 +132,10 @@ def open_outcome(line, got):
     if not out:
         return "undetermined", f"open: {line['open']}"
     return "wrong", f"open: {line['open']}; outside the place: {','.join(sorted(out)[:5])}"
+
+
+def _release_key(x):
+    return (0, int(x)) if str(x).isdigit() else (1, str(x))
 
 
 def is_contains(line):
@@ -178,6 +185,13 @@ def _score_line(line, view, ans, places):
         return "error", ans.get("error") or ""
     got = _list(ans["got"])
     rule = line.get("rule")
+    if rule == "within_band":  # rule `within_band` (D2): every release of the exact tie, nothing outside the band
+        g, T, B = set(map(str, got)), set(map(str, line.get("expect") or [])), set(map(str, line.get("band") or []))
+        if T <= g <= B:
+            return "right", ""
+        miss, out = sorted(T - g, key=_release_key), sorted(g - B, key=_release_key)
+        return "wrong", ("missing from the tie: " + ",".join(miss[:5]) if miss else "") + \
+            (" " if miss and out else "") + ("outside the band: " + ",".join(out[:5]) if out else "")
     if is_contains(line):
         g = set(got)
         if g and set(line.get("expect") or []) <= g:
@@ -312,7 +326,7 @@ def score_relations(a, deferred):
         return 0
     want = {d[0]["qid"] for d in deferred} | {d[0]["relation"]["with"] for d in deferred}
     tabs = []
-    for p in sorted(glob.glob(os.path.join(a.run, "answers", "*.parquet"))):
+    for p in C.answer_files(a.run):
         t = pq.read_table(p)
         tabs.append(t.filter(pc.is_in(t.column("qid"), value_set=pa.array(sorted(want)))))
     by = {}

@@ -98,9 +98,9 @@ c4_rfam_acc_default	best,default	53	53	0	0	0	0	1.0000	0.9324	1.0000
 c4_rfam_acc_retired	*	744	722	0	22	0	0	1.0000	0.9947	1.0000
 c4_rfam_acc_retired	all,default	372	361	0	11	0	0	1.0000	0.9895	1.0000
 c4_rfam_acc_retired	best,default	372	361	0	11	0	0	1.0000	0.9895	1.0000
-c4_rfam_label_at	*	7884	7884	0	0	0	0	1.0000	0.9995	1.0000
-c4_rfam_label_at	all,from	3942	3942	0	0	0	0	1.0000	0.9990	1.0000
-c4_rfam_label_at	best,from	3942	3942	0	0	0	0	1.0000	0.9990	1.0000
+c4_rfam_label_at	*	7868	7796	45	27	0	0	0.9943	0.9923	0.9957
+c4_rfam_label_at	all,from	3934	3898	24	12	0	0	0.9939	0.9909	0.9959
+c4_rfam_label_at	best,from	3934	3898	21	15	0	0	0.9946	0.9918	0.9965
 c4_rfam_label_default	*	106	106	0	0	0	0	1.0000	0.9650	1.0000
 c4_rfam_label_default	all,default	53	53	0	0	0	0	1.0000	0.9324	1.0000
 c4_rfam_label_default	best,default	53	53	0	0	0	0	1.0000	0.9324	1.0000

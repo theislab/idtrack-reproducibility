@@ -18,6 +18,7 @@ c3_secondary_held	external_bridge	b	rule `external_bridge`	10	7
 c3_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	7330	3665
 c3_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	7848	3924
 c4_mirbase_label	mirbase_not_in_graph	c	rule `mirbase_genes`	6	3
+c4_rfam_label_at	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	8	4
 c4_rfam_label_retired	rfam_label_is_accession	d	-	2	2
 c5_clone_retired	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
 c5_clone_retired	unexplained	?	-	14	14

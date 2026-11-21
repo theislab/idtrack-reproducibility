@@ -14,7 +14,6 @@ exactly its genes) and its share.
 """
 import argparse
 import collections
-import glob
 import json
 import os
 import sys
@@ -49,7 +48,7 @@ def main():
                                    set() if auth == ["none"] else set(auth))
     stats = collections.defaultdict(collections.Counter)
     seen = set()
-    for f in sorted(glob.glob(os.path.join(a.run, "answers", "*.parquet"))):
+    for f in reversed(C.answer_files(a.run)):  # the last answer of a (qid, view) wins: read it first
         t = pq.read_table(f, columns=["qid", "view", "outcome", "got"]).to_pylist()
         for r in t:
             ln = lines.get(r["qid"])

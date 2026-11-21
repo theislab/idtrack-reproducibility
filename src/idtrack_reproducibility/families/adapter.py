@@ -34,6 +34,12 @@ Database names: from graph format 3 on, a graph records the names Ensembl gives 
 graph gives another name (`graph.renamed_databases`, rule `one_kind_per_database`). A line's `final_database` and
 `from_database` are asked under the graph's name where the graph records the line's name so; the comparison of the
 answer's database uses the name asked. A graph without the record (d4c2dda, 71690ab) is asked as the line names it.
+
+Label rows: from graph format 3 on, a database whose label rows and accession rows Ensembl gives one name (`RFAM`) has
+its labels under a name of their own (rule `one_kind_per_database`; the graph's `record.label_names`, by Ensembl's
+database name). A line that asks a database's labels says so (`from_database_rows: labels`) and is asked under the
+graph's name for those labels where the graph records one; a graph without the record (d4c2dda, 71690ab) holds labels
+and accessions under Ensembl's one name and is asked under it.
 """
 import gc
 import json
@@ -79,6 +85,17 @@ def graph_manifest(graph):
                     package_commit=getattr(record, "package_commit", None))
     inner = getattr(graph, "graph", None)
     return (inner.get("manifest") if isinstance(inner, dict) else None) or {}
+
+
+def label_names(graph):
+    """{Ensembl's database name: the graph's name for its label rows} as the graph records it (graph format 3 on); {}
+    for a graph without the record."""
+    try:
+        record = getattr(graph, "record", None)
+        names = getattr(record, "label_names", None) if record is not None and not callable(record) else None
+    except Exception:  # noqa: BLE001  a graph of an older format may raise on a missing record field
+        return {}
+    return dict(names) if isinstance(names, dict) else {}
 
 
 def renamed_databases(graph):
@@ -131,6 +148,7 @@ class Adapter:
         self.budget_error = Budget
         manifest = graph_manifest(self.graph)
         self.renamed = renamed_databases(self.graph)
+        self.label_names = label_names(self.graph)
         gc.collect()
         gc.freeze()  # a full collection over the loaded graph pauses for seconds; it would be counted as query time
         signal.signal(signal.SIGALRM, _alarm)
@@ -138,12 +156,20 @@ class Adapter:
                          python=sys.version.split()[0], load_seconds=round(time.time() - t0, 1), graph=os.path.abspath(graph),
                          graph_real=os.path.realpath(graph), files_written_in_repo=sorted(set(os.listdir(repo)) - before),
                          content_digest=manifest.get("content_digest"), package_commit=manifest.get("package_commit"),
-                         renamed_databases=dict(sorted(self.renamed.items())))
+                         renamed_databases=dict(sorted(self.renamed.items())), label_names=dict(sorted(self.label_names.items())))
 
     def database(self, name):
         """The name a line's database is asked under in this graph (the graph's own name where it records the line's
         name as renamed; else the name itself)."""
         return self.renamed.get(name, name) if isinstance(name, str) else name
+
+    def from_database(self, line):
+        """The name a line's `from_database` is asked under: a line asking a database's labels
+        (`from_database_rows: labels`) under the graph's name for them where the graph records one; else `database`."""
+        name = line["from_database"]
+        if line.get("from_database_rows") == "labels" and isinstance(name, str) and name in self.label_names:
+            return self.label_names[name]
+        return self.database(name)
 
     # ---------------- one line ----------------
 
@@ -226,7 +252,7 @@ class Adapter:
         if explain:
             kw["explain"] = True
         if line.get("from_database") is not None:
-            kw["from_database"] = self.database(line["from_database"])
+            kw["from_database"] = self.from_database(line)
         ident = decode_id(line)
         res, fail, sec = self._call(lambda: self.api.convert(ident, **kw))
         out = []

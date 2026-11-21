@@ -1,23 +1,23 @@
-stratum	view	items	both_right	both_undetermined	both_wrong	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_same_answer	outcome_differs_unknown	right_in_list_only	right_no_single
-*	all	78141	350	0	0	1293	98	0	0	0	76400
-*	best	78141	75880	824	74	473	0	24	135	159	731
-d4_id_current	all	9842	350	0	0	0	0	0	0	0	9492
-d4_id_current	best	9842	9492	0	0	0	0	0	0	0	350
-d4_id_old	all	10103	0	0	0	754	94	0	0	0	9255
-d4_id_old	best	10103	9126	777	71	0	0	0	129	129	0
-d4_issue85	all	3	0	0	0	0	0	0	0	0	3
-d4_issue85	best	3	2	0	0	0	0	0	0	0	1
-d4_missing	all	853	0	0	0	473	0	0	0	0	380
-d4_missing	best	853	0	0	0	473	0	0	0	0	380
-d4_ncbi	all	9263	0	0	0	0	0	0	0	0	9263
-d4_ncbi	best	9263	9258	0	0	0	0	4	1	5	0
-d4_nothing	all	10049	0	0	0	0	0	0	0	0	10049
-d4_nothing	best	10049	10049	0	0	0	0	0	0	0	0
-d4_refseq	all	9268	0	0	0	0	0	0	0	0	9268
-d4_refseq	best	9268	9262	0	0	0	0	6	0	6	0
-d4_symbol	all	9101	0	0	0	66	4	0	0	0	9031
-d4_symbol	best	9101	9033	47	3	0	0	13	5	18	0
-d4_transcript	all	9719	0	0	0	0	0	0	0	0	9719
-d4_transcript	best	9719	9719	0	0	0	0	0	0	0	0
-d4_uniprot	all	9940	0	0	0	0	0	0	0	0	9940
-d4_uniprot	best	9940	9939	0	0	0	0	1	0	1	0
+stratum	view	items	both_right	both_undetermined	both_wrong	list_error_alone_no_single	list_error_alone_undetermined	list_error_alone_wrong	list_undetermined_alone_no_single	list_wrong_alone_no_single	outcome_differs_same_answer	outcome_differs_unknown	right_alone_only	right_in_list_only	right_no_single
+*	all	78141	310	0	0	9103	0	0	1293	98	0	40	40	0	67297
+*	best	78141	66912	824	74	40	124	11	473	0	24	9103	8968	24	691
+d4_id_current	all	9842	310	0	0	1118	0	0	0	0	0	40	40	0	8374
+d4_id_current	best	9842	8374	0	0	40	0	0	0	0	0	1118	1118	0	310
+d4_id_old	all	10103	0	0	0	1235	0	0	754	94	0	0	0	0	8020
+d4_id_old	best	10103	8020	777	71	0	120	9	0	0	0	1235	1106	0	0
+d4_issue85	all	3	0	0	0	0	0	0	0	0	0	0	0	0	3
+d4_issue85	best	3	2	0	0	0	0	0	0	0	0	0	0	0	1
+d4_missing	all	853	0	0	0	0	0	0	473	0	0	0	0	0	380
+d4_missing	best	853	0	0	0	0	0	0	473	0	0	0	0	0	380
+d4_ncbi	all	9263	0	0	0	1027	0	0	0	0	0	0	0	0	8236
+d4_ncbi	best	9263	8232	0	0	0	0	1	0	0	4	1027	1026	4	0
+d4_nothing	all	10049	0	0	0	1326	0	0	0	0	0	0	0	0	8723
+d4_nothing	best	10049	8723	0	0	0	0	0	0	0	0	1326	1326	0	0
+d4_refseq	all	9268	0	0	0	1066	0	0	0	0	0	0	0	0	8202
+d4_refseq	best	9268	8196	0	0	0	0	0	0	0	6	1066	1066	6	0
+d4_symbol	all	9101	0	0	0	1041	0	0	66	4	0	0	0	0	7990
+d4_symbol	best	9101	7997	47	3	0	4	1	0	0	13	1041	1036	13	0
+d4_transcript	all	9719	0	0	0	1045	0	0	0	0	0	0	0	0	8674
+d4_transcript	best	9719	8674	0	0	0	0	0	0	0	0	1045	1045	0	0
+d4_uniprot	all	9940	0	0	0	1245	0	0	0	0	0	0	0	0	8695
+d4_uniprot	best	9940	8694	0	0	0	0	0	0	0	1	1245	1245	1	0

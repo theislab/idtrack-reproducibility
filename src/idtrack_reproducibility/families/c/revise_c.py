@@ -9,6 +9,11 @@ Corrections:
   with `display_label` = `dbprimary_acc`), so the string is also the entry's accession and names every gene of the
   entry; the label line expected only the genes of the label rows: the entry's other genes go to `broad` (not
   refuted). Evidence: the core xref extracts (`core_xref/<release>.tsv.gz`).
+- `rfam_label_rows`: RFAM label lines under the decided rules `one_kind_per_database` and `rfam_display_label`: the
+  line asks the label rows (`from_database_rows: labels`) and expects only the genes whose display name the label is
+  (the function's docstring).
+- `par_shared_names`: rule `par_shared_names` on C's lines (the harness's revision of that name; the function's
+  docstring).
 - `other_database_broad`: a line without `from_database` whose string is also a value (accession or label) of another
   Ensembl database, or the GTF's gene name, of other genes at the release read, or, for a line asked without a
   release and without a version, at the target where the string is then read (rule `start_release`; an accession
@@ -157,7 +162,120 @@ def other_database_broad(org, lines, ctx):
         yield new
 
 
-CORRECTIONS = {"rfam_label_accession": rfam_label_accession, "other_database_broad": other_database_broad}
+class LabelNames:
+    """Per release: the GTF's gene names, and label -> genes of the gene-level cross-references of every database but
+    `RFAM` (core xref extract): what tells which RFAM label is a gene's display name."""
+
+    def __init__(self, org):
+        self.org, self.cache = org, {}
+
+    def at(self, rel):
+        if rel not in self.cache:
+            if len(self.cache) > 2:
+                self.cache.clear()
+            from idtrack_reproducibility.harness import harness_lib as H
+            other = collections.defaultdict(set)
+            for ot, oid, gid, db, disp, acc, lab, ver, it in TC.read_xref(self.org, rel):
+                if ot == "Gene" and db != "RFAM" and lab:
+                    other[lab].add(gid)
+            names = {g: r.get("gene_name") for g, r in (H.gtf_genes(self.org, rel) or {}).items()}
+            self.cache[rel] = (names, other)
+        return self.cache[rel]
+
+
+def rfam_label_rows(org, lines, ctx):
+    """Rules `one_kind_per_database` and `rfam_display_label` (decided, built from idtrack's next version on): an RFAM
+    label line (`c4_rfam_label_*`, `c7_rfam_label`) asks the label rows of `RFAM`, which a graph that records a name
+    of their own (`record.label_names`) holds under that name (`RFAM label`): the line says so (`from_database_rows:
+    labels`; the adapter asks the graph's name, a graph without the record `RFAM`). A label written as the entry's
+    accession (`RF00003`) stays with the accession rows (rule `one_kind_per_database`: a label that repeats its
+    accession is no row of its own where Ensembl names the labels like the accessions) and is not touched. And a
+    label names only the gene whose display name it is (Ensembl's `gene.display_xref_id`): of the genes whose RFAM
+    row carries the label at the release read, a gene whose display name in the GTF of that release is another
+    string is no gene of the label (it leaves `expect`; recorded in `label_not_display`); a gene whose display name
+    is the label while a cross-reference of another database of the gene carries the same label (an HGNC symbol
+    projected to a snoRNA) has a display cross-reference the extract cannot tell (`broad`, recorded in
+    `label_display_unknown`); the truth is computed again by C's generator (`gen_c.GenC.at_release`, `walked`) on
+    the remaining genes. Where no gene is left, the label is no row of that release: the line is `excluded` (C's
+    generator makes no line of a value not held at the release read), or `open` where only genes of the unknown kind
+    carry it. A label the graph never holds (`c4_rfam_label_not_held`) keeps its truth. Evidence: the core xref
+    extracts (`core_xref/<release>.tsv.gz`) and the GTFs (`gtf/genes_<release>.tsv.gz`)."""
+    from idtrack_reproducibility.families.c import gen_c as GC
+    names_of = ctx["names"] if "names" in ctx else ctx.setdefault("names", LabelNames(org))
+    for rec in sorted(lines, key=lambda r: (r.get("from_release") or r.get("read_at") or r["to_release"])):
+        k = rec["kind"]
+        if "rfam_label_rows" in (rec.get("revised_by") or []) or rec.get("excluded") or \
+                not (k.startswith("c4_rfam_label") or k == "c7_rfam_label") or re.match(r"^RF\d{5}$", str(rec["id"])):
+            continue
+        gc = ctx["gc"] if "gc" in ctx else ctx.setdefault("gc", GC.GenC(org, 115, ["rfam_label"], authority=False))
+        lab = str(rec["id"])
+        R = rec.get("from_release") or rec.get("read_at") or rec["to_release"]
+        t = rec["to_release"]
+        new = dict(rec)
+        new["from_database_rows"] = "labels"
+        new["revised_by"] = list(rec.get("revised_by") or []) + ["rfam_label_rows"]
+        h = gc.X.at("rfam_label", lab, R)
+        genes = set(h[0]) if h else set()
+        names, other = names_of.at(R)
+        display = {g for g in genes if names.get(g) == lab and g not in other.get(lab, ())}
+        unknown = {g for g in genes if names.get(g) == lab and g in other.get(lab, ())}
+        not_display = genes - display - unknown
+        if k.endswith("_not_held") or not genes or not (unknown or not_display):
+            # a label the graph never holds (`_not_held`: nothing, or its gene, is right) or one whose genes all carry it
+            # as their display name: the truth stands
+            yield new
+            continue
+        tr = gc.tr
+        new["label_not_display"] = sorted(not_display)[:50]
+        if unknown:
+            new["label_display_unknown"] = sorted(unknown)[:50]
+        if not display and not unknown:
+            # the label is no gene's display name at the release read: the graph holds no row of it there, and C's
+            # generator makes no line of a value not held at that release (`gen_c.GenC.held_strata`)
+            new["excluded"] = (f"rule `rfam_display_label`: {lab} is the display name of no gene at {R} (the genes whose "
+                               f"RFAM row carries it are named otherwise), so no label row of it is held there")
+            yield new
+            continue
+        if not display:
+            new["open"] = (f"rule `rfam_display_label`: at {R} {lab} is the display name only of genes where another "
+                           "database's cross-reference carries the same label; which is the display cross-reference, and so "
+                           "whether a label row is held there, the extract cannot tell")
+            for f in ("open_within",):
+                new.pop(f, None)
+            yield new
+            continue
+        tru = gc.at_release(display, R) if R == t else gc.walked(display, R, t)
+        if R == t:
+            unk = set(tr.vset({g for g in unknown if g in (tr.genes.get(R) or {})}, t))
+        else:
+            unk = set()
+            for g in sorted(unknown):
+                if g in (tr.genes.get(R) or {}):
+                    E, B = gc.G.walks(g, R, [t])
+                    unk |= set(tr.vset(E.get(t, set()) | B.get(t, set()), t))
+        for f in ("expect", "broad", "apart", "open", "open_within", "locus", "locus_mapped", "locus_projected", "exceptions"):
+            new.pop(f, None)
+        new.update({f: x for f, x in tru.items() if x is not None})
+        unk -= set(new.get("expect") or []) | set(new.get("apart") or [])
+        if unk:
+            new["broad"] = sorted(set(new.get("broad") or []) | set(new.get("expect") or []) | unk)
+        yield new
+
+
+def par_shared_names(org, lines, ctx):
+    """Rule `par_shared_names` (decided, built from idtrack's next version on): a value that the X and Y copies of a
+    pseudoautosomal gene share names the X gene, the Y copy reported apart: the accuracy harness's revision of the
+    same name (`make_queries.rev_par_shared_names`, Ensembl's assembly exceptions and GTF places) applied to C's lines."""
+    from idtrack_reproducibility.harness import make_queries as M
+    from idtrack_reproducibility.harness import harness_lib as H
+    C78 = ctx["C78"] if "C78" in ctx else ctx.setdefault("C78", M.Ctx78(org, H.ORGANISMS[org][2]))
+    todo = [r for r in lines if "par_shared_names" not in (r.get("revised_by") or [])]
+    for v in M.rev_par_shared_names(org, todo, C78).values():
+        yield from v
+
+
+CORRECTIONS = {"rfam_label_accession": rfam_label_accession, "other_database_broad": other_database_broad,
+               "rfam_label_rows": rfam_label_rows, "par_shared_names": par_shared_names}
 
 
 def main():

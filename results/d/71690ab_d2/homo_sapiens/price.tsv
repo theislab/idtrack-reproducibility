@@ -1,0 +1,5 @@
+stratum	lines	right	wrong	rate	width_mean	width_median	tie_mean	band_mean	holds_drawn	first_is_drawn	is_tie
+*	603	304	299	0.5041	1.71	1	1.44	2.46	0.5257	0.4046	0.4876
+d2_synth_names_500	340	90	250	0.2647	1.92	1	1.44	3.11	0.3029	0.2382	0.2353
+d2_synth_names_all	68	19	49	0.2794	1.01	1	1.03	1.04	0.2794	0.2794	0.2794
+d2_synth_versioned_500	195	195	0	1.0000	1.57	1	1.57	1.82	1.0000	0.7385	1.0000

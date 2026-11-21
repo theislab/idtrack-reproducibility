@@ -3,7 +3,7 @@ decided	sus_scrofa	e1_batch_blank	27	0	27	0	0	0	0	1.0000	0.8754	1.0000	0	0
 decided	sus_scrofa	e1_batch_d52	123	0	0	123	0	0	0	0.0000	0.0000	0.0303	87	0
 decided	sus_scrofa	e1_batch_d81	36	0	0	36	0	0	0	0.0000	0.0000	0.0964	18	0
 decided	sus_scrofa	e1_batch_neighbour	438	438	0	0	0	0	0	1.0000	0.9913	1.0000	438	0
-decided	sus_scrofa	e1_batch_other	60	0	0	9	51	0	0	0.0000	0.0000	0.2991	3	3
+decided	sus_scrofa	e1_batch_other	60	0	0	12	48	0	0	0.0000	0.0000	0.2425	3	3
 decided	sus_scrofa	e1_fromdb_blank	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
 decided	sus_scrofa	e1_fromdb_d52	82	0	0	0	82	0	0				0	0
 decided	sus_scrofa	e1_fromdb_d81	24	0	0	0	24	0	0				0	0
@@ -11,7 +11,7 @@ decided	sus_scrofa	e1_fromdb_other	40	0	0	0	40	0	0				0	0
 decided	sus_scrofa	e1_single_blank	9	0	9	0	0	0	0	1.0000	0.7009	1.0000	0	0
 decided	sus_scrofa	e1_single_d52	41	0	0	41	0	0	0	0.0000	0.0000	0.0857	29	0
 decided	sus_scrofa	e1_single_d81	12	0	0	12	0	0	0	0.0000	0.0000	0.2425	6	0
-decided	sus_scrofa	e1_single_other	20	0	0	3	17	0	0	0.0000	0.0000	0.5615	1	1
+decided	sus_scrofa	e1_single_other	20	0	0	4	16	0	0	0.0000	0.0000	0.4899	1	1
 decided	sus_scrofa	e2_acc_refseq	200	194	0	0	6	0	0	1.0000	0.9806	1.0000	100	6
 decided	sus_scrofa	e2_acc_uniprot	200	194	0	0	6	0	0	1.0000	0.9806	1.0000	200	6
 decided	sus_scrofa	e2_all_makeunique	49101	48984	0	82	35	0	0	0.9983	0.9979	0.9987	147	32

@@ -208,8 +208,8 @@ commit = "d4c2dda25b61cf0b33b0a178bed22f745de676d6"
 graphs = "d4c2dda"
 organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
 folder = "families/d/runs/d4c2dda_d2/{organism}"
-generator = "family d run_d; idtrack-repro score --family d; family d report_d2"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "synthetic.tsv" = "d2/synthetic.tsv", "matrices.tsv" = "d2/matrices.tsv" }
+generator = "family d run_d; idtrack-repro score --family d; family d report_d2 (and --price)"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "synthetic.tsv" = "d2/synthetic.tsv", "matrices.tsv" = "d2/matrices.tsv", "price.tsv" = "d2/price.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]  # a run without wrong answers has no causes (pig)
 
@@ -244,7 +244,7 @@ commit = "71690abe044f19afcc97f146d5e6c35cf4873962"
 graphs = "d4c2dda"
 organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
 folder = "families/d/runs/71690ab_d2/{organism}"
-generator = "family d run_d; idtrack-repro score --family d; family d report_d2"
-files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv" }
+generator = "family d run_d; idtrack-repro score --family d; family d report_d2 --price"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "price.tsv" = "d2/price.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]

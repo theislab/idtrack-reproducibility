@@ -91,7 +91,7 @@ CAUSE_CLASS = {
                                  "version of a living id with its gene, flagged; the kind is kept and left out of the acceptance"),
     "history_branch": ("e", "-", "(undetermined only) the answer follows Ensembl's history, a branch outside the strict walk"),
     "rule_decided_after_tree": ("a", "rule `judge_follows_rules` (a rule idtrack decided after this tree)",
-                                "the line follows a rule decided for idtrack after this tree (the harness's judge `rules`); "
+                                "the line follows a rule decided for idtrack after this tree (a revision of `DECIDED_RULE_REVISIONS`); "
                                 "the answer is the one the judge before the rule expected"),
     "unexplained": ("?", "-", "no test holds"),
 }
@@ -564,8 +564,36 @@ def t_newer_version_kind_reversed(c):
     return f"{c.id}: answered {','.join(c.got) or 'nothing'} (rule `version_newer_than_graph`: a version newer than the graph)"
 
 
+# The revisions that make a judge follow a rule decided for idtrack after the reference tree: the accuracy harness's
+# (judge `rules`, which family B's `<set>_rules1` and C's and D3's `par_shared_names` apply too) and the families' own
+# (C `rfam_label_rows`, D2 `band_rule` and D4 `blank_item_error` (rules `inference_per_release`, `within_band`, `missing_values`), E `stray_decided`); docs/rules.md,
+# `judge_follows_rules`. The line before such a revision is the judge before the rule.
+DECIDED_RULE_REVISIONS = set(MQ.RULES_JUDGE) | {"rfam_label_rows", "band_rule", "blank_item_error", "stray_decided"}
+
+
+def follows_decided_rule(row):
+    """The revisions of decided rules a scored row's line carries (its `rule` column: `revised:<a>+<b>`)."""
+    return [x for x in str(row.get("rule") or "").replace("revised:", "").split("+") if x in DECIDED_RULE_REVISIONS]
+
+
+def lines_before_last_revision(family, org, qids):
+    """{qid: the line before its latest one} over the family's sets in publication order (the harness: every set but
+    those of judge `rules`, as before)."""
+    from idtrack_reproducibility.families import lines as L
+    if family == "harness":
+        sets = [n for n in L.set_names("harness", org) if L.manifest("harness", org, n).get("judge") != "rules"]
+        return L.load_qids("harness", org, qids, sets=sets)
+    prev, last = {}, {}
+    for n in L.set_names(family, org):
+        for q, line in L.load_qids(family, org, qids, sets=[n]).items():
+            if q in last:
+                prev[q] = last[q]
+            last[q] = line
+    return prev
+
+
 def t_rule_decided_after_tree(c):
-    rules = [x for x in str(c.r.get("rule") or "").replace("revised:", "").split("+") if x in MQ.RULES_JUDGE]
+    rules = follows_decided_rule(c.r)
     before = c.r.get("_before")
     if not rules or before is None:
         return None
@@ -605,18 +633,16 @@ def release_order(rows):
     return sorted(range(len(rows)), key=key)
 
 
-def classify_rows(org, rows, explain, und=False):
+def classify_rows(org, rows, explain, und=False, family="harness"):
     """(cause, detail) for each row (a wrong.tsv.gz or undetermined.tsv.gz row), in the rows' order; explain: (qid,
     view) -> record. The rows are classified in the order of the releases they read (`release_order`); every row is
     classified on its own, so the order changes no cause."""
     w = World(org)
     out = [None] * len(rows)
     # lines that follow a rule decided after the tree (the harness's judge `rules`): their line before the rule
-    ruled = [r for r in rows if any(x in MQ.RULES_JUDGE for x in str(r.get("rule") or "").replace("revised:", "").split("+"))]
+    ruled = [r for r in rows if follows_decided_rule(r)]
     if ruled:
-        from idtrack_reproducibility.families import lines as L
-        sets = [n for n in L.set_names("harness", org) if L.manifest("harness", org, n).get("judge") != "rules"]
-        before = L.load_qids("harness", org, {r["qid"] for r in ruled}, sets=sets)
+        before = lines_before_last_revision(family, org, {r["qid"] for r in ruled})
         for r in ruled:
             r["_before"] = before.get(r["qid"])
     for i in release_order(rows):
@@ -711,7 +737,9 @@ def main():
             for x in fh:
                 d = json.loads(x)
                 explain[(d["qid"], d["view"])] = d
-    res = classify_rows(a.organism, rows, explain, und=a.und) if rows else []  # nothing to classify: empty tables
+    rj = os.path.join(a.scored, "run.json")
+    family = (json.load(open(rj)).get("family") if os.path.exists(rj) else None) or "harness"
+    res = classify_rows(a.organism, rows, explain, und=a.und, family=family) if rows else []  # nothing to classify: empty tables
     suffix = "_und" if a.und else ""
     summ = collections.defaultdict(lambda: [0, set()])
     out = os.path.join(a.scored, f"causes{suffix}.tsv.gz")  # written beside, then renamed: never in place

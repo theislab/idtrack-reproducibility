@@ -1,5 +1,5 @@
 stratum	cause	class	rule	answers	units
 d2_matrix_symbols_measured	d2_names_read_at_last_release	a	rule `inference_per_release`	6	3
 d2_matrix_symbols_stated	d2_names_read_at_last_release	a	rule `inference_per_release`	2	1
-d2_synth_names_500	d2_names_read_at_last_release	a	rule `inference_per_release`	326	67
+d2_synth_names_500	d2_names_read_at_last_release	a	rule `inference_per_release`	324	67
 d2_synth_names_all	d2_names_read_at_last_release	a	rule `inference_per_release`	66	66

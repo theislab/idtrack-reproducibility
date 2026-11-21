@@ -114,7 +114,7 @@ def test_a_symbol_of_several_genes_a_made_unique_name_and_an_unknown_name(source
 def presence(rels, kinds):
     """D2's presence matrices of invented releases: kind -> {release: items}."""
     P = object.__new__(G2.Presence)
-    P.rels, P.np, P.index, P.matrix = rels, np, {}, {}
+    P.rels, P.np, P.index, P.matrix, P.no_xref = rels, np, {}, {}, []
     for kind, sets in kinds.items():
         keys = sorted(set().union(*sets.values()))
         ix = {x: i for i, x in enumerate(keys)}
@@ -125,18 +125,61 @@ def presence(rels, kinds):
     return P
 
 
-def test_the_release_of_a_list_is_the_set_of_releases_that_fit_it_best():
+def test_the_release_of_a_list_is_its_tie_and_its_band():
     P = presence([1, 2, 3], {"ids": {1: {"A", "B", "C"}, 2: {"A", "B", "C", "D"}, 3: {"A", "D", "E"}},
                              "symbols": {1: {"X"}, 2: {"Y"}, 3: {"Y"}}})
     assert P.truth(["A", "B", "C"], "ids")[0] == [1, 2]  # a tie is the whole set
     assert P.truth(["A", "B", "C", "D"], "ids")[0] == [2]
-    E, shares = P.truth(["A", "B", "NOT_A_GENE_1"], "ids")
+    E, B, shares = P.truth(["A", "B", "NOT_A_GENE_1"], "ids")
     assert E == [1, 2] and shares[1] == pytest.approx(2 / 3) and shares[3] == pytest.approx(1 / 3)
+    assert B == [1, 2, 3]  # 3 lacks one item of the best: no significant difference
+    assert P.truth(["A", "B", "B", "C"], "ids")[2][1] == pytest.approx(1.0)  # a distinct item counts once
     assert P.truth(["A", "X"], "mixed")[0] == [1]  # an item counts as an id or as a name of the release
     q = G2.line("sus_scrofa", "d2m|x|0|all", "d2_matrix_ids_stated", ["A", "B", "C", "D"], P, "ids", unit="x", stated=3)
     assert q["expect"] == ["2"] and q["open"] and q["stated_in_expected"] is False and q["call"] == "infer_source"
     q = G2.line("sus_scrofa", "d2m|x|0|all", "d2_matrix_ids_stated", ["A", "B", "C"], P, "ids", unit="x", stated=2)
-    assert q["expect"] == ["1", "2"] and "open" not in q and q["rule"] == "set_exact"
+    assert q["expect"] == ["1", "2"] and "open" not in q and q["rule"] == "within_band" and q["band"][:2] == ["1", "2"]
+
+
+def test_the_band_is_the_documented_sign_test():
+    """Rule `inference_per_release`: a release is out of the band when the items found at the best and not there significantly outnumber
+    those found there and not at the best (one-sided sign test at 0.05). Fails if a lone missing item drops a release, or
+    if many missing items keep it."""
+    items = [f"I{k}" for k in range(20)]
+    P = presence([1, 2, 3], {"ids": {1: set(items), 2: set(items[:-4]), 3: set(items[:-5])}})
+    T, B, _ = P.truth(items, "ids")
+    assert T == [1] and B == [1, 2]  # 4 items against none: p = 1/16, kept; 5: p = 1/32, out
+    assert not G2.significantly_fewer(4, 0) and G2.significantly_fewer(5, 0) and not G2.significantly_fewer(3, 3)
+    assert G2.significantly_fewer(2000, 1800) and not G2.significantly_fewer(1810, 1800)  # the normal approximation
+
+
+def test_within_band_accepts_the_tie_and_the_band_and_nothing_else():
+    """Rule `within_band`: an answer holds every release of the tie and none outside the band. Fails if the tie alone or the
+    band is wrong, or if a release outside the band or a missing tied release passes."""
+    from idtrack_reproducibility.families import scorer as S
+    line = dict(qid="d2s|x", rule="within_band", expect=["10", "11"], band=["9", "10", "11", "12"], strategy="best", cmp="versioned")
+
+    def ans(got):
+        return dict(outcome="answer", got=got)
+    assert S.score_line(line, "best", ans(["10", "11"]), None)[0] == "right"
+    assert S.score_line(line, "best", ans(["9", "10", "11", "12"]), None)[0] == "right"
+    assert S.score_line(line, "best", ans(["10"]), None) == ("wrong", "missing from the tie: 11")
+    assert S.score_line(line, "best", ans(["10", "11", "13"]), None) == ("wrong", "outside the band: 13")
+
+
+def test_a_blank_is_an_error_of_its_own_item(sources):
+    """Revision d4_r3: the items of a list holding a blank expect their own truth again; the blank keeps the error.
+    Fails if an item keeps the whole list's error, or the blank loses it."""
+    R4 = sources("revise_d4")
+    first = {"d4|1|0": dict(qid="d4|1|0", id="TP53", expect=["ENSG00000141510"]), "d4|1|1": dict(qid="d4|1|1", id=" ", expect=[], expect_error=R4.ERR),
+             "d4|1|2": dict(qid="d4|1|2", id="nan", expect=[], expect_error="MissingValueError")}
+    latest = [dict(first["d4|1|0"], expect=[], expect_alone=["ENSG00000141510"], expect_error=R4.ERR, revised_by=["blank_refuses_batch"]),
+              dict(first["d4|1|1"], revised_by=["blank_refuses_batch"]),
+              dict(first["d4|1|2"], expect_alone=[], expect_error=R4.ERR, revised_by=["blank_refuses_batch"])]
+    out = {q["qid"]: q for q in R4.revise_blank_items("homo_sapiens", latest, first)}
+    assert out["d4|1|0"]["expect"] == ["ENSG00000141510"] and "expect_error" not in out["d4|1|0"]
+    assert out["d4|1|1"]["expect_error"] == R4.ERR
+    assert out["d4|1|2"]["expect_error"] == "MissingValueError" and out["d4|1|2"]["open"] == R4.OPEN_52
 
 
 def test_a_marker_list_is_read_at_the_latest_release_published_before_its_date(sources):

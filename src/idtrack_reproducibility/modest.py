@@ -201,9 +201,15 @@ def cmd_organism(a):
     os.makedirs(base, exist_ok=True)
     log = os.path.join(base, "modest.log")
     done, killed = [], None
+    again = dict(x.split("=", 1) for x in (getattr(a, "again", None) or "").split(",") if x.strip())
     for part, cmds in organism_parts(a.tree, a.organism, a.out, a.families, shards_of(getattr(a, "shards", None))):
         if getattr(a, "score_only", False):  # the stored answers scored again (the judge of today); nothing asked
             cmds = [c for c in cmds if isinstance(c, str) and "families.scorer" in c]
+        elif again:  # only the parts named, their lines of the revision set asked again (runner `--again`), then scored
+            if part not in again:
+                continue
+            cmds = [[x + f" --again {again[part]}" for x in c] if isinstance(c, list) else
+                    (c + f" --again {again[part]}" if "families.scorer" not in c else c) for c in cmds]
         for c in cmds:
             rc, secs = run_shards(c, log) if isinstance(c, list) else run(c, log)
             first = c[0] if isinstance(c, list) else c
@@ -221,13 +227,19 @@ def cmd_organism(a):
             break
     tr = CFG.get().tree(a.tree)
     rec = os.path.join(base, "modest.json")
-    if not getattr(a, "score_only", False) and os.path.exists(rec):  # an earlier run of this organism keeps its record
+    if again:  # a part asked again keeps the run's own record; its steps are recorded beside it
+        k = len(glob.glob(os.path.join(base, "modest_again_*.json"))) + 1
+        json.dump(dict(tree=a.tree, commit=tr["commit"], organism=a.organism, again=again, parts=done, killed=killed,
+                       finished=time.strftime("%Y-%m-%d %H:%M:%S")),
+                  open(os.path.join(base, f"modest_again_{k}.json"), "w"), indent=1)
+    elif not getattr(a, "score_only", False) and os.path.exists(rec):  # an earlier run of this organism keeps its record
         k = len(glob.glob(os.path.join(base, "modest.earlier_*.json"))) + 1
         os.replace(rec, os.path.join(base, f"modest.earlier_{k}.json"))
-    json.dump(dict(tree=a.tree, commit=tr["commit"], organism=a.organism, parts=done, killed=killed,
-                   finished=time.strftime("%Y-%m-%d %H:%M:%S")),
-              open(os.path.join(base, "modest_scored_again.json" if getattr(a, "score_only", False) else "modest.json"), "w"),
-              indent=1)  # a scoring again keeps the run's own record
+    if not again:
+        json.dump(dict(tree=a.tree, commit=tr["commit"], organism=a.organism, parts=done, killed=killed,
+                       finished=time.strftime("%Y-%m-%d %H:%M:%S")),
+                  open(os.path.join(base, "modest_scored_again.json" if getattr(a, "score_only", False) else "modest.json"),
+                       "w"), indent=1)  # a scoring again keeps the run's own record
     if killed:
         sys.stderr.write(f"{a.organism}: part {killed['part']} ({killed['command']}) was killed by signal {killed['signal']} "
                          f"(SIGKILL: most often the job's memory; see `modest run` and [jobs.modest_memory_gb]); "
@@ -309,6 +321,8 @@ def main(argv=None):
     o.add_argument("--shards", default=None)
     o.add_argument("--score-only", action="store_true", help="score the stored answers again (today's judge); ask nothing, "
                    "run no reproducer")
+    o.add_argument("--again", default=None, help="`<part>=<revision set>,...`: only these parts, the lines of the revision "
+                   "set asked again (it changed their question; runner `--again`), then scored; record modest_again_<k>.json")
     c = sub.add_parser("compare")
     c.add_argument("a")
     c.add_argument("b")

@@ -20,7 +20,7 @@ d4|1258|66	best	retired_none|ENSG00000233501|None|115|None|best	external_bridge	
 d4|1269|9	all	retired_none|ENSG00000278117|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|1269|9	best	retired_none|ENSG00000278117|None|115|None|best	external_bridge	b	ENSG00000264115 via MIR3180-4 [EntrezGene+HGNC Symbol] same release (84->84); distance other sequence
 d4|1285|13	all	name_ambiguous_to_set|U3|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|1285|13	best	name_ambiguous_to_set|U3|None|115|None|best	rfam_family_label	b	6 extra genes entered through RFAM only; their display names {'SNORD3D': 1, 'SNORD3J': 1, 'SNORD3P1': 1, 'SNORD3G': 1}
+d4|1285|13	best	name_ambiguous_to_set|U3|None|115|None|best	rfam_family_label	b	6 extra genes entered through RFAM only; their display names {'SNORD3D': 1, 'SNORD3J': 1, 'SNORD3E': 1, 'SNORD3P1': 1}
 d4|1328|64	all	retired_none|ENSG00000182230|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|1328|64	best	retired_none|ENSG00000182230|None|115|None|best	external_bridge	b	ENSG00000251623 via 202134 [EntrezGene] same release (106->106); distance 7991
 d4|135|13	all	retired_none|ENSG00000257774|None|115|None|best	not_classified_by_single	?	no classified single call in this view
@@ -141,7 +141,7 @@ d4|657|4	best	retired_none|ENSG00000284578|None|115|None|best	external_bridge	b	
 d4|662|30	all	retired_none|ENSG00000206182|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|662|30	best	retired_none|ENSG00000206182|None|115|None|best	external_bridge	b	ENSG00000288631 via TCEB3CL [HGNC Symbol] next release (49->50); distance other assembly
 d4|719|88	all	name_ambiguous_to_set|5_8S_rRNA|None|115|None|best	not_classified_by_single	?	no classified single call in this view
-d4|719|88	best	name_ambiguous_to_set|5_8S_rRNA|None|115|None|best	rfam_family_label	b	10 extra genes entered through RFAM only; their display names {'RNA5-8SP4': 1, 'RNA5-8SN5': 1, 'RNA5-8SP6': 1, 'RNA5-8SP2': 1}
+d4|719|88	best	name_ambiguous_to_set|5_8S_rRNA|None|115|None|best	rfam_family_label	b	10 extra genes entered through RFAM only; their display names {'RNA5-8SP5': 1, 'RNA5-8SP4': 1, 'RNA5-8SP6': 1, 'RNA5-8SP7': 1}
 d4|71|6	all	retired_none|ENSG00000285441|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|728|7	all	retired_none|ENSG00000163486|None|115|None|best	not_classified_by_single	?	no classified single call in this view
 d4|728|7	best	retired_none|ENSG00000163486|None|115|None|best	external_bridge	b	ENSG00000171943 via SRGAP2C [EntrezGene+HGNC Symbol] same release (75->75); distance other assembly

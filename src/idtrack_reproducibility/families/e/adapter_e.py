@@ -336,7 +336,8 @@ class AdapterE(F0.Adapter):
             else:
                 a["got"] = sorted(canonical(x) for x in res)
                 a["status"] = "inferred"
-                a["flags"] = dict(digest=digest(res), n=len(res))
+                # `order`: the origins as the call returned them (the first is the best origin, every tree's docs)
+                a["flags"] = dict(digest=digest(res), n=len(res), order=[canonical(x) for x in res])
             out.append(a)
         return out
 

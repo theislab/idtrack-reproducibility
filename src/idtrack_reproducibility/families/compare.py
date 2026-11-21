@@ -13,12 +13,12 @@ Streaming: the outcomes and answers of both runs are read in hash buckets of qid
 runs of family A's size compare in the memory of one bucket; only the changed answers are kept.
 """
 import argparse
-import glob
 import json
 import os
 import sys
 from collections import Counter
 
+from idtrack_reproducibility.families import common as C
 from idtrack_reproducibility.families import report
 
 
@@ -49,7 +49,7 @@ def answers_bucket(folder, b, k):
     import pyarrow.parquet as pq
     info = json.load(open(os.path.join(folder, "run.json")))
     out = []
-    for p in sorted(glob.glob(os.path.join(info.get("run", folder), "answers", "*.parquet"))):
+    for p in C.answer_files(info.get("run", folder)):
         df = pq.read_table(p, columns=["qid", "view", "got"]).to_pandas()
         out.append(df[bucket(df["qid"], k) == b] if k > 1 else df)
     if not out:

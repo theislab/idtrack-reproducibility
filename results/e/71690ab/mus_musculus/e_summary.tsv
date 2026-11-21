@@ -3,7 +3,7 @@ decided	mus_musculus	e1_batch_blank	27	0	27	0	0	0	0	1.0000	0.8754	1.0000	0	0
 decided	mus_musculus	e1_batch_d52	123	0	0	123	0	0	0	0.0000	0.0000	0.0303	48	0
 decided	mus_musculus	e1_batch_d81	36	0	0	36	0	0	0	0.0000	0.0000	0.0964	36	0
 decided	mus_musculus	e1_batch_neighbour	438	438	0	0	0	0	0	1.0000	0.9913	1.0000	438	0
-decided	mus_musculus	e1_batch_other	60	0	0	9	51	0	0	0.0000	0.0000	0.2991	6	6
+decided	mus_musculus	e1_batch_other	60	0	0	12	48	0	0	0.0000	0.0000	0.2425	6	6
 decided	mus_musculus	e1_fromdb_blank	18	0	18	0	0	0	0	1.0000	0.8241	1.0000	0	0
 decided	mus_musculus	e1_fromdb_d52	82	0	0	0	82	0	0				0	0
 decided	mus_musculus	e1_fromdb_d81	24	0	0	0	24	0	0				0	0
@@ -11,7 +11,7 @@ decided	mus_musculus	e1_fromdb_other	40	0	0	0	40	0	0				0	0
 decided	mus_musculus	e1_single_blank	9	0	9	0	0	0	0	1.0000	0.7009	1.0000	0	0
 decided	mus_musculus	e1_single_d52	41	0	0	41	0	0	0	0.0000	0.0000	0.0857	16	0
 decided	mus_musculus	e1_single_d81	12	0	0	12	0	0	0	0.0000	0.0000	0.2425	12	0
-decided	mus_musculus	e1_single_other	20	0	0	3	17	0	0	0.0000	0.0000	0.5615	2	2
+decided	mus_musculus	e1_single_other	20	0	0	4	16	0	0	0.0000	0.0000	0.4899	2	2
 decided	mus_musculus	e2_acc_refseq	200	199	0	0	1	0	0	1.0000	0.9811	1.0000	100	1
 decided	mus_musculus	e2_acc_uniprot	200	196	0	0	4	0	0	1.0000	0.9808	1.0000	200	4
 decided	mus_musculus	e2_all_makeunique	231585	231180	0	28	377	0	0	0.9999	0.9998	0.9999	344	223
@@ -92,7 +92,7 @@ decided	mus_musculus	e2_junk_num	9	9	0	0	0	0	0	1.0000	0.7009	1.0000	0	0
 decided	mus_musculus	e2_junk_rtl	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
 decided	mus_musculus	e2_junk_sep	4	4	0	0	0	0	0	1.0000	0.5101	1.0000	0	0
 decided	mus_musculus	e2_junk_surrogates	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
-decided	mus_musculus	e2_junk_wild	7	6	0	1	0	0	0	0.8571	0.4869	0.9743	1	0
+decided	mus_musculus	e2_junk_wild	7	5	0	2	0	0	0	0.7143	0.3589	0.9178	1	0
 decided	mus_musculus	e2_junk_zw	1	1	0	0	0	0	0	1.0000	0.2065	1.0000	0	0
 decided	mus_musculus	e2_long	8	2	0	6	0	0	0	0.2500	0.0715	0.5907	0	0
 decided	mus_musculus	e2_long_padded	2	2	0	0	0	0	0	1.0000	0.3424	1.0000	2	0

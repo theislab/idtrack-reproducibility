@@ -5,19 +5,24 @@ d3_cellmarker_default	d3_read_elsewhere	e	rule `start_release`	1082	292
 d3_cellmarker_default	name_in_db_not_in_truth	d	-	30	12
 d3_cellmarker_default	name_in_other_source	e	rule `names_before_synonyms`	2168	471
 d3_cellmarker_default	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	36	14
+d3_cellmarker_default	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	246	25
 d3_cellmarker_default	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	104	35
 d3_cellmarker_from	d3_name_in_other_source	e	rule `names_before_synonyms`	1118	423
 d3_cellmarker_from	d3_part_of_several	c	rule `mirbase_genes`	15	14
 d3_cellmarker_from	name_in_db_not_in_truth	d	-	2	1
 d3_cellmarker_from	name_in_other_source	e	rule `names_before_synonyms`	8	6
 d3_cellmarker_from	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	17	9
+d3_cellmarker_from	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	52	19
 d3_cellmarker_from	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	21	14
 d3_msigdb_default	d3_name_in_other_source	e	rule `names_before_synonyms`	2	1
 d3_msigdb_default	name_in_other_source	e	rule `names_before_synonyms`	179	164
 d3_msigdb_default	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	8	5
+d3_msigdb_default	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	30	15
 d3_msigdb_from	d3_name_in_other_source	e	rule `names_before_synonyms`	180	168
 d3_msigdb_from	rfam_family_label	b	rule `one_kind_per_database` renames, does not remove; rule `rfam_display_label`	10	6
+d3_msigdb_from	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	30	15
 d3_panglaodb_default	name_in_other_source	e	rule `names_before_synonyms`	25	22
+d3_panglaodb_default	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	10	5
 d3_panglaodb_from	d3_name_in_other_source	e	rule `names_before_synonyms`	22	21
 d3_rosetta_lineage_default	name_in_other_source	e	rule `names_before_synonyms`	1	1
 d3_rosetta_lineage_from	name_in_other_source	e	rule `names_before_synonyms`	1	1
