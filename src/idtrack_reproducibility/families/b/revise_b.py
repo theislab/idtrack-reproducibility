@@ -2,7 +2,7 @@
 published; only the lines whose truth changed are published, under their qids (F0's rule: a published set is never
 rewritten).
 
-Usage: revise_b.py --organism <o> --name r1 --why "<what changed in the truth>" [--sets b1,b4,b5,b6,b7,b8] [--dry]
+Usage: revise_b.py --organism <o> --name r1 --why "<what changed in the truth>" [--sets b1,b4,b5,b6,b7,b8,b9] [--dry]
 
 For each set family S (`b1`, ...):
 - `S_<name>`: the lines of the `now` judge (every set of S whose name holds no `_dec`) whose regenerated line differs
@@ -27,6 +27,7 @@ import json
 import os
 import sys
 import time
+import types
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 from idtrack_reproducibility.families.b import gen_b as GB
@@ -39,7 +40,10 @@ log = GB.log
 
 
 def canon(line):
-    r = L.to_row({k: v for k, v in line.items() if k not in ("set", "revised_by")})
+    """A line as compared between its published and its regenerated form: the truth and the question, without the
+    bookkeeping of the revisions that published it (`revised_by`, `revision_note`), so that a later revision does not
+    publish again the lines an earlier one revised."""
+    r = L.to_row({k: v for k, v in line.items() if k not in ("set", "revised_by", "revision_note")})
     r.pop("h", None)
     r.pop("revised_by", None)
     if r.get("extra"):
@@ -71,6 +75,9 @@ def regenerate(cx, S):
         return GB.GenB1(cx.nb).lines(), []
     if S == "b8":
         return GB.b8_lines(cx.nb), []
+    if S == "b9":
+        from idtrack_reproducibility.families.b import gen_b9 as B9
+        return list(B9.GenB9(cx.org).lines()), []
     got = {}
 
     def capture(cx_, name, lines_, desc, dry, revises=None):
@@ -212,8 +219,10 @@ def main():
         return
     if not a.why:
         ap.error("--why is required without --rules")
-    cx = G2.Ctx(a.organism)
-    for S in a.sets.split(","):
+    sets = a.sets.split(",")
+    # B9 reads its own truth (gen_b9): the context of the other sets (the history, BioMart) only where they are asked
+    cx = G2.Ctx(a.organism) if set(sets) - {"b9"} else types.SimpleNamespace(org=a.organism, nb=types.SimpleNamespace(_walk={}))
+    for S in sets:
         t0 = time.time()
         revise(cx, S, a.name, a.why, a.dry)
         cx.nb._walk.clear()

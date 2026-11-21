@@ -24,6 +24,7 @@ A family is run **exhaustively** (every line of every published set) on two tree
 - every line that was ever `wrong` or `undetermined` on any tree measured so far (where a stage can most plausibly move an answer, in either direction);
 - every reproducer of the weakness hunts that belongs to the family ([Weakness hunts](#weakness-hunts));
 - a seeded sample, stratified by stratum and organism, of about 50,000 of the other lines per stratum and organism.
+- the line each chosen relation line is judged against (a relation compares two answers; family E's relations).
 
 Why: an exhaustive pass of the families is hundreds of millions of lines per tree (A alone about 400 million rows of answers on `d4c2dda`), hours of query time and days of a shared queue, while a stage changes a small part of the answers. The panel keeps every line a stage has reason to move and bounds what it can break unseen: if a stage made a share p of the right lines of a stratum wrong, the sample of 50,000 would show none of them with probability (1 - p)^50,000, under 5 % for p of 6 in 100,000 or more. The final tree is then measured exhaustively, so that no published rate rests on a panel; the results index says of every row whether it is a panel result or an exhaustive one (`scope`). A smaller check for any tree, in a few hours on one job per organism, is the [modest set](modest.md): the harness's published sets, every hunt reproducer and 500 sampled lines per stratum of each family.
 

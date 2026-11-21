@@ -13,6 +13,7 @@ rules = [
   ['/rest/', "none: Ensembl REST's answer on the date fetched (release 116); a later fetch answers for a later release"],
   ['/check_rest\.json$', "generate: idtrack-repro check-truth"],
   ['/SOURCES\.tsv$', "generate: written by the fetchers"],
+  ['/core_(display|synonyms)/', "fetch: python -m idtrack_reproducibility.families.b.fetch_b display (synonyms: or fetch_b synonyms) --releases all; the core dumps are read, the extract written (Ensembl's FTP of the release, `source`)"],
 ]
 
 [[area]]

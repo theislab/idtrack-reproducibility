@@ -16,21 +16,23 @@ A family's part is a published selection of qids, `<families>/<family>/panels/<o
 
 ## Size
 
-`idtrack-repro modest size` computes the samples' size from the sets' manifests (no set is read); `modest build` adds each family's hunt lines (for A* and A the lines of the ids A*'s selection took from the weakness hunts, every line of a set or stratum named `hunt*` in the others). The selections built on 2026-11-19 (`modest_v1` of every family and organism; 500 lines per stratum; one job, 13 minutes, 1.0 GB):
+`idtrack-repro modest size` computes the samples' size from the sets' manifests (no set is read); `modest build` adds each family's hunt lines (for A* and A the lines of the ids A*'s selection took from the weakness hunts, every line of a set or stratum named `hunt*` in the others). The selections built on 2026-11-19 (`modest_v1` of every family and organism; 500 lines per stratum; one job, 13 minutes, 1.0 GB), with B and E built again on 2026-11-21 (`modest_v2`, below):
 
 | part | pig | mouse | human | rhesus | cynomolgus | five organisms | of them hunt lines |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | harness (every line of every published set) | | | | | | 2,615,211 | |
 | A* | 8,500 | 37,526 | 192,006 | 62,867 | 17,505 | 318,404 | 276,007 |
 | A | 15,000 | 22,159 | 30,862 | 18,283 | 17,604 | 103,908 | 33,745 |
-| B | 10,557 | 13,076 | 13,370 | 10,832 | 9,242 | 57,077 | 0 |
+| B (`modest_v2`) | 19,349 | 23,390 | 24,159 | 20,974 | 12,242 | 100,114 | 0 |
 | C | 32,052 | 8,000 | 7,625 | 27,333 | 23,505 | 98,515 | 0 |
 | D | 12,859 | 16,560 | 21,528 | 4,500 | 4,500 | 59,947 | 0 |
-| E | 50,375 | 52,347 | 51,095 | 50,300 | 49,507 | 253,624 | 38 |
-| hunt reproducers | | | | | | 29 findings | |
-| **total** | | | | | | **3,506,686 lines** | |
+| E (`modest_v2`) | 57,864 | 61,280 | 60,164 | 57,096 | 54,740 | 291,144 | 38 |
+| hunt reproducers | | | | | | 34 findings | |
+| **total** | | | | | | **3,587,243 lines** | |
 
-Each selection's manifest (`<families>/<family>/panels/<organism>/modest_v1.manifest.json`) holds its counts per stratum and reason, the seed and the sha256 of its file; the data manifests list them.
+`modest_v2` of B and E (2026-11-21; one job, 5 minutes) adds the strata of the sets published for the attack on idtrack's next version: B9's `b9_*` (pig 8,792 lines in 19 strata, mouse 10,314 in 27, human 10,789 in 28, rhesus 10,142 in 24, cynomolgus 3,000 in 6) and E8's `e8_batch_*` and `e8_onerelease_*` (pig 6,838, mouse 8,177, human 8,379, rhesus 6,133, cynomolgus 4,543 lines in 10 or 11 strata, their reference lines among them); every qid of `modest_v1` is in it (the sample is a hash of the qid). A relation line is judged against the line it names, so a selection now holds that line too (reason `relation`: E pig 3,269, mouse 4,031, human 4,169, rhesus 2,973, cynomolgus 2,533, for E8's earlier pairs as well; in `modest_v1` a sampled pair whose partner was not sampled had no outcome). A line of `e8_batch` names a whole-release list, converted once per list and arguments: the E part converts up to every list of the organism twice (68 lists of up to 77,000 names in human and mouse).
+
+Each selection's manifest (`<families>/<family>/panels/<organism>/modest_v1.manifest.json`, `modest_v2`) holds its counts per stratum and reason, the seed and the sha256 of its file; the data manifests list them.
 
 Time: the harness's answers of `d4c2dda` took 116 to 372 seconds of query time per organism (`query_seconds_total` of the stored scorings: pig 204, mouse 372, human 346, rhesus 170, cynomolgus 116); the families' selections add 891,475 lines (most asked under both views: two calls each on `d4c2dda`, one from `71690ab` on); loading a graph takes seconds to a minute and is repeated per part, and scoring the harness's sets takes minutes per organism. One job per organism is expected to finish in one to two hours (an estimate from these measurements, not yet a measured run). Its parts run one after another, so a job needs the largest part's peak: the configuration's `[jobs.modest_memory_gb]` of the organism (default `config.MODEST_MEMORY_GB`; or `--mem`). The largest part is the scoring of the harness's sets, one partition of every line: its peak, read by the kernel for the scorer's process (`wait4`), was 3.52 GB (pig), 5.45 (mouse), 6.14 (human), 2.52 (rhesus) and 1.65 (cynomolgus) on 2026-11-20; the query shards of `d4c2dda` peaked at 3.5, 4.6, 4.8, 3.7 and 3.2 GB (the scheduler's sampled peaks of family A*'s and A's shards), and trees from `71690ab` on hold the graph in less memory (load peaks 0.2 to 1.2 GB, [H](families/h.md#load)); the modest jobs of 2026-11-20 peaked at 2.2 (pig), 5.6 (mouse), 5.7 (human), 2.1 (rhesus) and 2.1 GB (cynomolgus), the scheduler's samples. A job asks for the largest of these plus a quarter: 5, 7, 8, 5 and 4 GB. (The first modest run asked for the query shards' peak alone, and the harness scoring of human was killed at 6.19 GB.)
 

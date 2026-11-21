@@ -61,6 +61,49 @@ def core_synonyms(org, R):
     return out
 
 
+def core_names(org, R):
+    """(name -> {gene ids}, name -> {gene ids} without HGNC's databases, gene -> {db_name: {labels}}) from the core
+    xref extract of R (name databases only), or None where it is not fetched."""
+    p = os.path.join(H.truth_dir(org), "core_xref", f"{R}.tsv.gz")
+    if not os.path.exists(p):
+        return None
+    out, non_hgnc, by_gene = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(dict)
+    with gzip.open(p, "rt") as fh:
+        next(fh)
+        for line in fh:
+            c = line.rstrip("\n").split("\t")
+            if len(c) < 7 or not NAME_DB.match(c[3]):
+                continue
+            lab, gid = c[6], C.base_id(c[2])
+            if lab and gid and not lab.isdigit():
+                out[lab].add(gid)
+                if not c[3].startswith("HGNC"):
+                    non_hgnc[lab].add(gid)
+                by_gene[gid].setdefault(c[3], set()).add(lab)
+    return out, non_hgnc, by_gene
+
+
+def core_display(org, R):
+    """{gene id (no version): (db_name, label)} of the genes' display cross-references at R (`core_display/<R>.tsv.gz`,
+    `fetch_b display`: Ensembl's `gene.display_xref_id`), or None where not fetched."""
+    p = os.path.join(H.truth_dir(org), "core_display", f"{R}.tsv.gz")
+    if not os.path.exists(p):
+        return None
+    out = {}
+    with gzip.open(p, "rt") as fh:
+        next(fh)
+        for line in fh:
+            c = line.rstrip("\n").split("\t")
+            if len(c) >= 5 and c[0]:
+                out[C.base_id(c[0])] = (c[1], c[4])
+    return out
+
+
+def core_display_releases(org):
+    d = os.path.join(H.truth_dir(org), "core_display")
+    return sorted(int(f[:-7]) for f in os.listdir(d) if f.endswith(".tsv.gz") and f[:-7].isdigit()) if os.path.isdir(d) else []
+
+
 class NamesB:
     def __init__(self, org, log=print):
         self.org, self.log = org, log
@@ -112,25 +155,8 @@ class NamesB:
         return self._slot(self._disp, R, make)
 
     def core_names(self, R):
-        """(name -> {gene ids}, name -> {gene ids} without HGNC's databases, gene -> {db_name: {labels}}) from the
-        core xref extract of R (name databases only), or None."""
-        if R not in self.xref_rels:
-            return None
-        p = os.path.join(H.truth_dir(self.org), "core_xref", f"{R}.tsv.gz")
-        out, non_hgnc, by_gene = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(dict)
-        with gzip.open(p, "rt") as fh:
-            next(fh)
-            for line in fh:
-                c = line.rstrip("\n").split("\t")
-                if len(c) < 7 or not NAME_DB.match(c[3]):
-                    continue
-                lab, gid = c[6], C.base_id(c[2])
-                if lab and gid and not lab.isdigit():
-                    out[lab].add(gid)
-                    if not c[3].startswith("HGNC"):
-                        non_hgnc[lab].add(gid)
-                    by_gene[gid].setdefault(c[3], set()).add(lab)
-        return out, non_hgnc, by_gene
+        """`core_names` of the organism at R where the extract exists (None elsewhere)."""
+        return core_names(self.org, R) if R in self.xref_rels else None
 
     def sources(self, R):
         """(name -> {genes} in the other name sources at R, what was read: `biomart`, `core_xref`, both, or None,

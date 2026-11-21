@@ -27,6 +27,9 @@ Rules of the judge (the truth's reading) are marked **judge**.
 ### string_at_release
 *d4c2dda.* Between the nodes a typed string can mean, one that exists at the release asked from (without `from_release`: the graph's last release) is taken before one that does not; an Ensembl stable id is never passed over for a synonym spelt the same.
 
+### one_release_reading
+*decided.* One release decides what a string means: the release the question is about (`from_release`; without it the target, `to_release`; without any release the latest of the graph), and only where no reading of the string exists there, the latest release at which a reading exists; so `convert(s, to_release=r)` and `convert(s, from_release=r, to_release=r)` answer alike. A reading that holds only at other releases is reported in the result's `other_readings` with its releases (reason `other_release`). `d4c2dda` to `next` choose the reading by existence at the graph's last release and read it at `to_release` (rule `string_at_release`), so a string that is a name at `r` and a synonym of another gene today (or the reverse) is answered two ways. Family E measures it as a relation (`e8_onerelease`, [family E](families/e.md)).
+
 ### serving_assembly
 *d4c2dda.* A string exists at a release only on the assembly that serves that release; a frozen parallel assembly (human GRCh37, listed at every release from 76) never keeps an old name alive.
 
@@ -59,6 +62,9 @@ Rules of the judge (the truth's reading) are marked **judge**.
 
 ### made_unique_copies
 *decided.* A name made unique by a single-cell tool (`X-1`, `X.1`, `X_1`) is a copy of `X`, never another gene: a separator variant never joins such a suffix into another gene's name; in a batch or the harmonizer such a feature is reported as a copy.
+
+### batch_agrees_with_single
+*decided.* Every item of a batch (`convert_many`, and the harmonizer) is answered as `convert` answers it alone with the same arguments, but for the copies rule `made_unique_copies` defines (another item of the batch with a numbered suffix that is no name of the organism where it is read: a string that is Ensembl's display name or a label of a name database there is never such a copy); an Ensembl id with such a suffix beside the id (`ENSG00000141510-1` beside `ENSG00000141510`) stays not found, neither a copy nor a version. `next` makes some of Ensembl's own names copies (`mml-mir-129-2` beside `mml-mir-129`, `OCLN_2` beside `OCLN`). Family E measures it as a relation on whole-release lists of display names and on mixed lists (`e8_batch`, [family E](families/e.md)).
 
 ### stray_punctuation
 *decided.* Stray punctuation and quotes at the ends of an identifier (`A1BG;`, `'AGT'`) are no part of it; a match made after removing them has its own match kind.
@@ -169,7 +175,10 @@ Rules of the judge (the truth's reading) are marked **judge**.
 *decided.* One database name means one kind of identifier at every release: where Ensembl gives the label rows and the accession rows of a database one name (`EntrezGene` up to release 87, `RFAM` at every release), the label rows take a name of their own.
 
 ### mirbase_genes
-*decided.* Gene-level miRBase names are in the graph for genes of a miRNA biotype.
+*decided.* Gene-level miRBase names are in the graph for genes of a miRNA biotype. An entry that Ensembl gives to genes at two places at one release is left out; an entry that one gene holds at a time (also where Ensembl annotated the gene again with a new id at an assembly change) is kept: the genes of an entry are counted release by release, not over the whole window (`next` counts them over every release and assembly, and keeps or removes the wrong entries: the attack finding AT-3, [the hunts](hunts.md)).
+
+### display_names_at_release
+*decided.* Every display name of every release is a name of its gene at that release, whatever database Ensembl filed it under (the gene's display cross-reference: `HGNC_curated_gene`, `MGI` before 52, `RFAM_gene_name`, a UniProt entry name, ...): the external databases of the graph are resolved by the role they play at each release, not by today's database names, and the database each name was filed under is kept. `d4c2dda` to `next` hold only the databases an organism's selection names, so a display name of an early release is read at its latest release (rule `from_release_fallback`) and carried back. Family B's set `b9_v1` measures it by the database of the display cross-reference ([family B](families/b.md)).
 
 ### rfam_display_label
 *decided.* An RFAM family label names only the gene whose display name it is.

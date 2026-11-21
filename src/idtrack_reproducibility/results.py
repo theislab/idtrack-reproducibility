@@ -9,7 +9,8 @@ rate and its interval). Regenerating replaces: files of the registry's benchmark
 are removed, so `results/` holds only the current results.
 
 Index columns: family, stratum, organism, tree, scope (`exhaustive`: every line of the family's sets; `panel`: the
-family's panel, docs/methods.md "Measurement design"; a registry entry says `scope`, default `exhaustive`), commit,
+family's panel, docs/methods.md "Measurement design"; `sets`: every line of the sets the entry names in `sets`, the
+others not asked on that tree; a registry entry says `scope`, default `exhaustive`), commit,
 graph_digest, n, right, wrong, undetermined, timeout, error, rate, low, high, interval (`cluster` for the cluster
 bootstrap over the stratum's units, `wilson` where the table has no clustered interval), file.
 """
@@ -28,7 +29,9 @@ from . import config as CFG
 
 INDEX_COLS = ["family", "stratum", "organism", "tree", "scope", "commit", "graph_digest", "n", "right", "wrong",
               "undetermined", "timeout", "error", "rate", "low", "high", "interval", "file"]
-SCOPES = ("exhaustive", "panel")  # every line of the family's sets, or its panel (docs/methods.md, "Measurement design")
+# every line of the family's sets, its panel (docs/methods.md, "Measurement design"), or every line of the sets the
+# entry names (`sets`; the family's other sets not asked on that tree)
+SCOPES = ("exhaustive", "panel", "sets")
 PROV_COLS = ["file", "sha256", "generated_by", "source", "source_sha256", "scored_at", "commit", "graph_digest",
              "generated_at"]
 OWN = {"index.tsv", "provenance.tsv"}

@@ -183,9 +183,10 @@ class Adapter:
             a["calls"] = len(vs) if self.gen == "d4c2dda" else 1
         return out
 
-    def _call(self, fn):
-        """Run fn() under the budget; returns (result, None) or (None, failure dict)."""
-        limit = self.timeout if self.gen == "d4c2dda" else self.timeout + 30
+    def _call(self, fn, limit=None):
+        """Run fn() under the budget (or `limit` seconds of the whole call: a batch of many items); returns (result,
+        None) or (None, failure dict)."""
+        limit = limit or (self.timeout if self.gen == "d4c2dda" else self.timeout + 30)
         t0 = time.perf_counter()
         try:
             signal.setitimer(signal.ITIMER_REAL, limit)

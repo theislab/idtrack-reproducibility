@@ -1,0 +1,31 @@
+family	organism	stratum	view	n	right	expected_error	wrong	undetermined	timeout	error	not_supported	missing	rate	wilson_low	wilson_high	boot_low	boot_high	units	units_wrong	units_error	recovered	s_p50	s_p95	s_p99	s_max
+e	macaca_fascicularis	e8_batch_mixed	*	7200	7200	0	0	0	0	0	0	0	1.0000	0.9995	1.0000	1.0000	1.0000	2986	0	0	0	0.10722	0.23267	0.23267	0.2327
+e	macaca_fascicularis	e8_batch_mixed	all	3600	3600	0	0	0	0	0	0		1.0000	0.9989	1.0000	1.0000	1.0000	2986	0	0	0	0.10722	0.23267	0.23267	0.2327
+e	macaca_fascicularis	e8_batch_mixed	best	3600	3600	0	0	0	0	0	0		1.0000	0.9989	1.0000	1.0000	1.0000	2986	0	0	0	0.10722	0.23267	0.23267	0.2327
+e	macaca_fascicularis	e8_batch_mixed_copy	*	800	800	0	0	0	0	0	0	0	1.0000	0.9952	1.0000	1.0000	1.0000	397	0	0	0	0.10727	0.20217	0.23267	0.2327
+e	macaca_fascicularis	e8_batch_mixed_copy	all	400	400	0	0	0	0	0	0		1.0000	0.9905	1.0000	1.0000	1.0000	397	0	0	0	0.10727	0.20217	0.23267	0.2327
+e	macaca_fascicularis	e8_batch_mixed_copy	best	400	400	0	0	0	0	0	0		1.0000	0.9905	1.0000	1.0000	1.0000	397	0	0	0	0.10727	0.20217	0.23267	0.2327
+e	macaca_fascicularis	e8_batch_release_atR	*	49994	49994	0	0	0	0	0	0	0	1.0000	0.9999	1.0000	1.0000	1.0000	13847	0	0	0	3.63799	3.98436	5.48098	5.4810
+e	macaca_fascicularis	e8_batch_release_atR	all	24997	24997	0	0	0	0	0	0		1.0000	0.9998	1.0000	1.0000	1.0000	13847	0	0	0	3.63799	3.98436	5.48098	5.4810
+e	macaca_fascicularis	e8_batch_release_atR	best	24997	24997	0	0	0	0	0	0		1.0000	0.9998	1.0000	1.0000	1.0000	13847	0	0	0	3.63799	3.98436	5.48098	5.4810
+e	macaca_fascicularis	e8_batch_release_atR_suffix	*	98	98	0	0	0	0	0	0	0	1.0000	0.9623	1.0000	1.0000	1.0000	49	0	0	0	3.43634	3.98436	3.98436	3.9844
+e	macaca_fascicularis	e8_batch_release_atR_suffix	all	49	49	0	0	0	0	0	0		1.0000	0.9273	1.0000	1.0000	1.0000	49	0	0	0	3.43634	3.98436	3.98436	3.9844
+e	macaca_fascicularis	e8_batch_release_atR_suffix	best	49	49	0	0	0	0	0	0		1.0000	0.9273	1.0000	1.0000	1.0000	49	0	0	0	3.43634	3.98436	3.98436	3.9844
+e	macaca_fascicularis	e8_batch_release_default	*	49996	49996	0	0	0	0	0	0	0	1.0000	0.9999	1.0000	1.0000	1.0000	13868	0	0	0	3.80977	4.48468	6.38713	6.3871
+e	macaca_fascicularis	e8_batch_release_default	all	24998	24998	0	0	0	0	0	0		1.0000	0.9998	1.0000	1.0000	1.0000	13868	0	0	0	3.80977	4.48468	6.38713	6.3871
+e	macaca_fascicularis	e8_batch_release_default	best	24998	24998	0	0	0	0	0	0		1.0000	0.9998	1.0000	1.0000	1.0000	13868	0	0	0	3.80977	4.48468	6.38713	6.3871
+e	macaca_fascicularis	e8_batch_release_default_suffix	*	98	4	0	94	0	0	0	0	0	0.0408	0.0160	0.1003	0.0000	0.1020	49	47	0	0	4.32471	4.32471	4.43125	4.4312
+e	macaca_fascicularis	e8_batch_release_default_suffix	all	49	2	0	47	0	0	0	0		0.0408	0.0113	0.1371	0.0000	0.1020	49	47	0	0	4.32471	4.32471	4.43125	4.4312
+e	macaca_fascicularis	e8_batch_release_default_suffix	best	49	2	0	47	0	0	0	0		0.0408	0.0113	0.1371	0.0000	0.1020	49	47	0	0	4.32471	4.32471	4.43125	4.4312
+e	macaca_fascicularis	e8_batch_single	*	81056	0	0	0	81056	0	0	0	0	nan	nan	nan	nan	nan	18739	0	0	0	0.00021	0.00029	0.00086	0.5911
+e	macaca_fascicularis	e8_batch_single	all	40528	0	0	0	40528	0	0	0		nan	nan	nan	nan	nan	18739	0	0	0	0.00021	0.00029	0.00086	0.5911
+e	macaca_fascicularis	e8_batch_single	best	40528	0	0	0	40528	0	0	0		nan	nan	nan	nan	nan	18739	0	0	0	0.00021	0.00029	0.00086	0.5911
+e	macaca_fascicularis	e8_onerelease_name_then_synonym	*	24	20	0	4	0	0	0	0	0	0.8333	0.6415	0.9332	0.5833	1.0000	12	2	0	0	0.00017	0.00028	0.00030	0.0003
+e	macaca_fascicularis	e8_onerelease_name_then_synonym	all	12	10	0	2	0	0	0	0		0.8333	0.5520	0.9530	0.5833	1.0000	12	2	0	0	0.00017	0.00028	0.00030	0.0003
+e	macaca_fascicularis	e8_onerelease_name_then_synonym	best	12	10	0	2	0	0	0	0		0.8333	0.5520	0.9530	0.5833	1.0000	12	2	0	0	0.00017	0.00028	0.00030	0.0003
+e	macaca_fascicularis	e8_onerelease_reference	*	202	0	0	0	202	0	0	0	0	nan	nan	nan	nan	nan	101	0	0	0	0.00020	0.00024	0.00633	0.0135
+e	macaca_fascicularis	e8_onerelease_reference	all	101	0	0	0	101	0	0	0		nan	nan	nan	nan	nan	101	0	0	0	0.00020	0.00024	0.00633	0.0135
+e	macaca_fascicularis	e8_onerelease_reference	best	101	0	0	0	101	0	0	0		nan	nan	nan	nan	nan	101	0	0	0	0.00020	0.00024	0.00633	0.0135
+e	macaca_fascicularis	e8_onerelease_synonym_then_name	*	178	137	0	41	0	0	0	0	0	0.7697	0.7025	0.8254	0.6796	0.8539	89	21	0	0	0.00022	0.00069	0.00296	0.0169
+e	macaca_fascicularis	e8_onerelease_synonym_then_name	all	89	68	0	21	0	0	0	0		0.7640	0.6661	0.8402	0.6742	0.8430	89	21	0	0	0.00022	0.00069	0.00296	0.0169
+e	macaca_fascicularis	e8_onerelease_synonym_then_name	best	89	69	0	20	0	0	0	0		0.7753	0.6782	0.8496	0.6854	0.8539	89	20	0	0	0.00022	0.00069	0.00296	0.0169

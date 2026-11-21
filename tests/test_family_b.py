@@ -163,3 +163,117 @@ def test_names_of_several_genes_are_reported_as_b3():
     assert RB.group_of("b1_atR_shared") == RB.group_of("b1_default_shared") == "b3"
     assert RB.group_of("b1_atR_unique") == "b1" and RB.group_of("b2_moved_from") == "b2"
     assert RB.group_of("b8_core_xref") == "b8" and RB.group_of("b5_alias_ncbi") == "b5"
+
+
+# ---------------- B9: display names at their own release (gen_b9) ----------------
+
+def _core(truth_store, sub, R, header, rows):
+    from tests.conftest import write_gz
+    write_gz(str(truth_store / sub / f"{R}.tsv.gz"), header, rows)
+
+
+DISPLAY_COLS = ["gene_id", "db_name", "db_display_name", "acc", "label", "info_type"]
+XREF_COLS = ["object_type", "object_id", "gene_id", "db_name", "db_display_name", "acc", "label", "version", "info_type"]
+
+
+def test_the_era_starts_where_every_display_database_is_one_of_today():
+    from idtrack_reproducibility.families.b import gen_b9 as B9
+    assert B9.era_boundary({1: {"HGNC_curated_gene"}, 2: {"HGNC"}, 3: {"HGNC", "RFAM"}}, 3) == 2
+    # a database of the past in the middle of the window keeps every release before it early
+    assert B9.era_boundary({1: {"HGNC"}, 2: {"Uniprot/SPTREMBL"}, 3: {"HGNC"}}, 3) == 3
+    assert B9.db_code("Uniprot/SPTREMBL") == "uniprot_sptrembl" and B9.db_code("HGNC_curated_gene") == "hgnc_curated_gene"
+
+
+def test_b9_asks_each_display_name_at_its_release_by_its_filing_database(truth_store):
+    from idtrack_reproducibility.families.b import gen_b9 as B9
+    G1, G2, G3, G9 = "ENSSSCG00000000001", "ENSSSCG00000000002", "ENSSSCG00000000003", "ENSSSCG00000000009"
+    _core(truth_store, "core_display", 1, DISPLAY_COLS, [(f"{G1}.1", "HGNC_curated_gene", "HGNC", "1", "GA", "PROJ"),
+                                                         (f"{G3}.1", "HGNC", "HGNC", "3", "GC", "DIRECT"),
+                                                         ("ENSSSCG00000000077.1", "HGNC", "HGNC", "7", "GX", "DIRECT")])
+    _core(truth_store, "core_display", 2, DISPLAY_COLS, [(f"{G1}.1", "HGNC", "HGNC", "1", "GA", "DIRECT"),
+                                                         (f"{G9}.1", "HGNC", "HGNC", "1", "GA", "DIRECT"),
+                                                         (f"{G2}.1", "HGNC", "HGNC", "2", "ENSSSCG00000000002", "DIRECT")])
+    _core(truth_store, "core_display", 3, DISPLAY_COLS, [(f"{G2}.2", "HGNC", "HGNC", "2", "GB", "DIRECT")])
+    # at 1 another gene carries GA as an NCBI label and GC as a synonym: both go to broad, never to expect
+    _core(truth_store, "core_xref", 1, XREF_COLS, [("Gene", f"{G9}.1", f"{G9}.1", "EntrezGene", "NCBI gene", "5", "GA", "0", "DEPENDENT")])
+    _core(truth_store, "core_synonyms", 1, ["synonym", "gene_id", "db_name", "label", "object_type"], [("GC", G9, "HGNC", "GB0", "Gene")])
+    g = B9.GenB9("sus_scrofa")
+    lines = {q["qid"]: q for q in g.lines()}
+    assert g.era_from == 2 and g.era(1) == "early" and g.era(3) == "late"
+    ga1 = lines["b9|GA|1"]
+    assert ga1["stratum"] == "b9_early_hgnc_curated_gene" and ga1["expect"] == [G1] and ga1["broad"] == [G1, G9]
+    assert ga1["from_release"] == ga1["to_release"] == 1 and ga1["rule"] == "set" and ga1["cmp"] == "base"
+    assert ga1["strategy"] == "both" and ga1["db"] == "HGNC_curated_gene"
+    assert lines["b9|GC|1"]["broad"] == [G3, G9]
+    # a name two genes carry at once: one line, every carrier expected (rule `set`: any part under best, all under all)
+    ga2 = lines["b9|GA|2"]
+    assert ga2["stratum"] == "b9_shared_late" and ga2["expect"] == [G1, G9]
+    assert "b9|GB|3" in lines and lines["b9|GB|3"]["stratum"] == "b9_late_hgnc"
+    # a gene's own id as its label is no name; a carrier the GTF lacks is no question
+    assert not any(q.startswith("b9|ENSSSCG") for q in lines) and "b9|GX|1" not in lines
+    assert g.excluded["display carriers not in the GTF of the release"] == 1
+
+
+def test_b9_puts_patch_copies_apart_and_keeps_a_name_only_copies_carry(truth_store):
+    from idtrack_reproducibility.families.b import gen_b9 as B9
+    from tests.conftest import GENE_COLS, write_gz
+    write_gz(str(truth_store / "gtf" / "genes_3.tsv.gz"), GENE_COLS, [
+        ("ENSSSCG00000000002", 2, "GB", "protein_coding", "1", 1000, 1250, "+", "primary"),
+        ("ENSSSCG00000000004", 1, "GB", "protein_coding", "CHR_P1", 1000, 1250, "+", "patch"),
+        ("ENSSSCG00000000006", 1, "GF", "protein_coding", "CHR_P2", 5, 50, "+", "patch")])
+    _core(truth_store, "core_display", 3, DISPLAY_COLS, [("ENSSSCG00000000002.2", "HGNC", "HGNC", "2", "GB", "DIRECT"),
+                                                         ("ENSSSCG00000000004.1", "HGNC", "HGNC", "2", "GB", "DIRECT"),
+                                                         ("ENSSSCG00000000006.1", "HGNC", "HGNC", "6", "GF", "DIRECT")])
+    lines = {q["qid"]: q for q in B9.GenB9("sus_scrofa").lines()}
+    gb = lines["b9|GB|3"]
+    assert gb["expect"] == ["ENSSSCG00000000002"] and gb["apart"] == ["ENSSSCG00000000004"]
+    assert lines["b9|GF|3"]["stratum"] == "b9_late_patchonly" and lines["b9|GF|3"]["expect"] == ["ENSSSCG00000000006"]
+
+
+def test_b9_puts_copies_apart_before_82_by_the_assembly_exceptions(truth_store):
+    """Before release 82 the GTF marks no copy: a gene on a haplotype (Ensembl's assembly exceptions) that carries a
+    name beside the reference gene goes apart (the corrected judge's `copies_apart_early`); the line is then a name of
+    one gene, in its database's stratum."""
+    from idtrack_reproducibility.families.b import gen_b9 as B9
+    from tests.conftest import GENE_COLS, write_gz
+    write_gz(str(truth_store / "gtf" / "genes_2.tsv.gz"), GENE_COLS, [
+        ("ENSSSCG00000000001", 1, "GA", "protein_coding", "1", 100, 200, "+", "primary"),
+        ("ENSSSCG00000000005", 1, "GA", "protein_coding", "HAP1", 100, 200, "+", "primary")])
+    (truth_store / "exceptions").mkdir()
+    with open(truth_store / "exceptions" / "2.tsv", "w") as fo:
+        fo.write("seqname\tstart\tend\ttype\tref_seqname\tref_start\tref_end\tori\tseq_length\tref_length\tfrom_release\n")
+        fo.write("HAP1\t50\t300\tHAP\t1\t50\t300\t1\t1000\t1000\t2\n")
+    _core(truth_store, "core_display", 2, DISPLAY_COLS, [("ENSSSCG00000000001.1", "HGNC", "HGNC", "1", "GA", "DIRECT"),
+                                                         ("ENSSSCG00000000005.1", "HGNC", "HGNC", "1", "GA", "DIRECT")])
+    g = B9.GenB9("sus_scrofa", releases=[2])
+    ga = {q["qid"]: q for q in g.lines()}["b9|GA|2"]
+    assert ga["expect"] == ["ENSSSCG00000000001"] and ga["apart"] == ["ENSSSCG00000000005"]
+    assert ga["stratum"].startswith("b9_") and "shared" not in ga["stratum"] and ga["revised_by"] == ["copies_apart_early"]
+
+
+def test_b9_expects_the_gene_an_lrg_record_describes(truth_store):
+    """Rule `lrg_answers_gene`: a display name that is an LRG record's expects the Ensembl gene Ensembl's core database
+    links to the LRG gene (`ENS_LRG_gene`), not the LRG gene; without such a link the line keeps the LRG gene."""
+    from idtrack_reproducibility.families.b import gen_b9 as B9
+    from tests.conftest import GENE_COLS, write_gz
+    write_gz(str(truth_store / "gtf" / "genes_2.tsv.gz"), GENE_COLS, [
+        ("ENSSSCG00000000001", 1, "GA", "protein_coding", "1", 100, 200, "+", "primary"),
+        ("LRG_1_g1", 1, "LRG_1", "LRG_gene", "LRG_1", 1, 100, "+", "primary"),
+        ("LRG_2_g1", 1, "LRG_2", "LRG_gene", "LRG_2", 1, 100, "+", "primary")])
+    _core(truth_store, "core_display", 2, DISPLAY_COLS, [("LRG_1_g1.1", "LRG", "LRG", "LRG_1", "LRG_1", "DIRECT"),
+                                                         ("LRG_2_g1.1", "LRG", "LRG", "LRG_2", "LRG_2", "DIRECT")])
+    _core(truth_store, "core_xref", 2, XREF_COLS, [("Gene", "ENSSSCG00000000001.1", "ENSSSCG00000000001.1", "ENS_LRG_gene",
+                                                    "LRG display in Ensembl", "LRG_1_g1", "LRG_1", "0", "DIRECT")])
+    g = B9.GenB9("sus_scrofa", releases=[2])
+    by = {q["qid"]: q for q in g.lines()}
+    assert by["b9|LRG_1|2"]["expect"] == ["ENSSSCG00000000001"] and "lrg_answers_gene" in by["b9|LRG_1|2"]["note"]
+    assert by["b9|LRG_2|2"]["expect"] == ["LRG_2_g1"] and g.lrg_lines == 1
+
+
+def test_a_revision_compares_the_truth_not_the_revisions_bookkeeping():
+    from idtrack_reproducibility.families.b import revise_b as RB
+    line = dict(qid="b9|GA|2", kind="b9_display_at_release", id="GA", from_release=2, to_release=2, expect=["G1"],
+                rule="set", cmp="base", strategy="both")
+    published = RB.tag(dict(line, set="b9_r1"), "r1", "copies apart before 82")
+    assert RB.canon(published) == RB.canon(line)
+    assert RB.canon(dict(line, expect=["G2"])) != RB.canon(published)

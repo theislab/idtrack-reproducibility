@@ -202,13 +202,15 @@ def test_table_is_well_formed():
         assert f["angle"] in R.ANGLES and (f["angle"], f["id"]) not in seen and f["calls"] and f["title"]
         seen.add((f["angle"], f["id"]))
         for c in f["calls"]:
-            assert c["kind"] in ("convert", "infer", "truth")
+            assert c["kind"] in ("convert", "convert_many", "infer", "truth")
             assert c["organism"] in CFG.ORGANISMS
             assert c["expected"] and c["source"] and c["recorded"]
             assert set(c["recorded"]) <= set(R.FIELDS)
-            if c["kind"] == "convert":
+            if c["kind"] in ("convert", "convert_many"):
                 assert c["view"] in ("best", "all")
                 assert set(c["kwargs"]) <= {"from_release", "to_release", "final_database", "from_database"}
+            if c["kind"] == "convert_many":
+                assert 0 <= c["pos"] < len(c["items"]) and c["id"] == c["items"][c["pos"]]
 
 
 @pytest.mark.parametrize("angle", R.ANGLES)
@@ -237,3 +239,22 @@ def test_every_finding_with_a_reproducer_is_in_the_table(angle):
         runnable = r["reproducer"].startswith(f"reproduce {angle} {r['id']}")
         assert runnable == (r["id"] in table), r["id"]
     assert table <= {r["id"] for r in rows}
+
+
+def test_a_batch_call_is_described_and_asked_as_one_item_of_the_list():
+    c = R.conv_many("homo_sapiens", ["OCLN", "OCLN_2"], 1, dict(got_base=["ENSG00000197822"]), "ENSG00000230847",
+                    "Ensembl's GTF of release 61", from_release=61, to_release=61)
+    assert R.describe(c) == 'convert_many(["OCLN", "OCLN_2"], from_release=61, to_release=61)[1]'
+    asked = []
+
+    class Ad:
+        def ask(self, line):
+            asked.append(line)
+            return [dict(outcome="answer", status="converted", match="copy:exact", got=["ENSG00000197822.5"], apart=[])]
+    sess = R.Session.__new__(R.Session)
+    sess.adapter = lambda org: Ad()
+    obs = sess.answer(dict(angle="attack", id="AT-2"), 0, c)
+    line = asked[0]
+    assert line["call"] == "convert_many" and line["batch"] == ["OCLN", "OCLN_2"] and line["pos"] == 1
+    assert line["kwargs"] == {"from_release": 61, "to_release": 61}
+    assert R.compare(c["recorded"], obs) == []

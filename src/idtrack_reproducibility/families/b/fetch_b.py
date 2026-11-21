@@ -15,6 +15,10 @@ Usage (standard library only):
                       object_xref, external_db, gene, transcript, translation; read, not kept): `core_synonyms/<R>.tsv.gz`
                       (synonym, gene, the xref's database and label). BioMart's synonym table holds only the synonyms
                       of a gene's display xref (cynomolgus 115: 113); idtrack reads those of every xref  [ftp.ensembl.org]
+  fetch_b.py display [--releases all|<r,r,...>] [--organisms <o>,...]
+                      every gene's display cross-reference of a release (core dumps gene, xref, external_db; read, not
+                      kept): `core_display/<R>.tsv.gz` (the gene, the database Ensembl filed its display name under, the
+                      accession, the label); `core_synonyms/<R>.tsv.gz` in the same pass where not fetched [ftp.ensembl.org]
 VGNC's gene sets (pig, rhesus, cynomolgus) are in the store already (`vgnc/`, fetched by the harness).
 A kept file that exists is skipped.
 """
@@ -204,6 +208,101 @@ def synonyms(releases=(115,), organisms=ORGANISMS):
             print("kept", dst, n, flush=True)
 
 
+def display(releases="all", organisms=ORGANISMS):
+    """`core_display/<R>.tsv.gz` of the organisms: every gene's display cross-reference of the release, as Ensembl's
+    core database holds it (`gene.display_xref_id` -> `xref` -> `external_db`): the gene (stable id with its
+    version), the database Ensembl filed the name under (`db_name`, `db_display_name`), the accession, the label (the
+    display name), `info_type`. In the same pass (the `xref` dump is read once), `core_synonyms/<R>.tsv.gz` where it
+    is not fetched yet (as `synonyms` writes it). The dumps are read by family C's reader, each recorded in
+    SOURCES.tsv; genes without a display cross-reference have no row."""
+    import collections
+    import gzip
+    from idtrack_reproducibility.families.c import fetch_c as FC
+    for o in [x for x in ORGANISMS if x in organisms]:
+        for rel in (range(WINDOW[o], 116) if releases == "all" else releases):
+            rp_d, rp_s = f"core_display/{rel}.tsv.gz", f"core_synonyms/{rel}.tsv.gz"
+            dst_d, dst_s = os.path.join(TRUTH, o, rp_d), os.path.join(TRUTH, o, rp_s)
+            want_s = not os.path.exists(dst_s)
+            if os.path.exists(dst_d) and not want_s:
+                print("have", dst_d, dst_s)
+                continue
+            if os.path.exists(dst_d):
+                synonyms([rel], [o])
+                continue
+            db = FC.core_db(o, rel)
+            if db is None:
+                print(o, rel, "no core database")
+                continue
+            base = f"{FC.ENSEMBL}/release-{rel}/mysql/{db}"
+            rp = rp_d + (f" and {rp_s}" if want_s else "")
+            sd, sqlurl, sbz = FC.open_dump(f"{base}/{db}.sql.gz")
+            sql = "\n".join(sd.lines(True, sbz))
+            FC.add_source(o, f"{rp} (schema read from {sqlurl.rsplit('/', 1)[1]}; not kept)", sqlurl, sd.size,
+                          sd.md5.hexdigest(), FC.now())
+            in_gene = "stable_id" in (FC.columns(sql, "gene") or [])  # before release 65: gene_stable_id
+
+            def sid(r):
+                v = r.get("version")
+                return r["stable_id"] + (f".{v}" if v not in (None, "", "\\N") else "")
+            disp, gst, gsv = {}, {}, {}
+            for r in FC.dump_rows(o, rp, base, sql, "gene"):
+                x = r.get("display_xref_id")
+                if x not in (None, "", "\\N", "0"):
+                    disp[r["gene_id"]] = x
+                if in_gene:
+                    gst[r["gene_id"]], gsv[r["gene_id"]] = r["stable_id"], sid(r)
+            if not in_gene:
+                for r in FC.dump_rows(o, rp, base, sql, "gene_stable_id"):
+                    gst[r["gene_id"]], gsv[r["gene_id"]] = r["stable_id"], sid(r)
+            syn = collections.defaultdict(set)
+            if want_s:
+                for r in FC.dump_rows(o, rp, base, sql, "external_synonym"):
+                    syn[r["xref_id"]].add(r["synonym"])
+            need = set(disp.values()) | set(syn)
+            xr = {r["xref_id"]: (r["external_db_id"], r["dbprimary_acc"], r["display_label"], r.get("info_type", ""))
+                  for r in FC.dump_rows(o, rp, base, sql, "xref", keep=lambda r: r["xref_id"] in need)}
+            edb = {r["external_db_id"]: (r["db_name"], r.get("db_display_name", ""))
+                   for r in FC.dump_rows(o, rp, base, sql, "external_db")}
+            os.makedirs(os.path.dirname(dst_d), exist_ok=True)
+            n = 0
+            with gzip.open(dst_d + ".tmp", "wt") as fo:
+                fo.write("gene_id\tdb_name\tdb_display_name\tacc\tlabel\tinfo_type\n")
+                for g, x in disp.items():
+                    if g not in gsv or x not in xr:
+                        continue
+                    dbid, acc, lab, it = xr[x]
+                    name, dname = edb.get(dbid, ("", ""))
+                    fo.write(f"{gsv[g]}\t{name}\t{dname}\t{acc}\t{lab}\t{it}\n")
+                    n += 1
+            os.replace(dst_d + ".tmp", dst_d)
+            km = hashlib.md5(open(dst_d, "rb").read()).hexdigest()
+            FC.add_source(o, f"{rp_d} (kept: {n:,} rows of {len(disp):,} genes with a display xref; md5 {km})", base, 0,
+                          km, FC.now())
+            print("kept", dst_d, n, flush=True)
+            if not want_s:
+                continue
+            obj = [(r["ensembl_object_type"], r["ensembl_id"], r["xref_id"])
+                   for r in FC.dump_rows(o, rp_s, base, sql, "object_xref", keep=lambda r: r["xref_id"] in syn)]
+            t2g = {r["transcript_id"]: r["gene_id"] for r in FC.dump_rows(o, rp_s, base, sql, "transcript")}
+            p2t = {r["translation_id"]: r["transcript_id"] for r in FC.dump_rows(o, rp_s, base, sql, "translation")}
+            n = 0
+            with gzip.open(dst_s + ".tmp", "wt") as fo:
+                fo.write("synonym\tgene_id\tdb_name\tlabel\tobject_type\n")
+                for typ, eid, xid in obj:
+                    g = eid if typ == "Gene" else t2g.get(eid) if typ == "Transcript" else t2g.get(p2t.get(eid))
+                    gid = gst.get(g)
+                    if not gid or xid not in xr:
+                        continue
+                    dbid, _, lab, _ = xr[xid]
+                    for sy in sorted(syn[xid]):
+                        fo.write(f"{sy}\t{gid}\t{edb.get(dbid, ('', ''))[0]}\t{lab}\t{typ}\n")
+                        n += 1
+            os.replace(dst_s + ".tmp", dst_s)
+            km = hashlib.md5(open(dst_s, "rb").read()).hexdigest()
+            FC.add_source(o, f"{rp_s} (kept: {n:,} rows; md5 {km})", base, 0, km, FC.now())
+            print("kept", dst_s, n, flush=True)
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     rels = [115]
@@ -218,4 +317,5 @@ if __name__ == "__main__":
             raise SystemExit(f"unknown organisms: {sorted(unknown)}")
     values = {args[i + 1] for i, x in enumerate(args[:-1]) if x in ("--releases", "--organisms")}
     for what in [x for x in args if not x.startswith("--") and x not in values]:
-        {"hgnc": hgnc, "mgi": mgi, "ncbi": ncbi, "synonyms": lambda: synonyms(rels, orgs)}[what]()
+        {"hgnc": hgnc, "mgi": mgi, "ncbi": ncbi, "synonyms": lambda: synonyms(rels, orgs),
+         "display": lambda: display(rels, orgs)}[what]()

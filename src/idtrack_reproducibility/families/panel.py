@@ -14,7 +14,9 @@ the family's panel. The panel of an organism is the union of
   from the weakness hunts);
 - **a seeded stratified random sample**: per stratum (of the family's own sets, revision sets left out: they repeat
   qids) the `--per-stratum` lines (default 50,000) with the smallest hash of (seed, family, organism, qid) -- all of a
-  stratum that is smaller. The sample does not depend on the order of reading and is the same in every run.
+  stratum that is smaller. The sample does not depend on the order of reading and is the same in every run;
+- **the lines the others are related to**: a line of rule `relation` is judged against the line it names (its
+  `relation.with`), which joins the selection with it (reason `relation`), so that every relation chosen is scored.
 
 A panel is a **selection of qids, not copies of lines**: `<families>/<family>/panels/<organism>/panel_v<k>.parquet` (`qid`,
 `h`, `stratum`, `why`: `failure`, `hunt`, `sample`, joined by `+`) with `panel_v<k>.manifest.json` (counts per stratum
@@ -161,6 +163,14 @@ def run_info(d):
                 judge=info.get("judge"), scored_at=info.get("scored_at"), sets=list(info.get("sets") or []))
 
 
+def relation_partners(family, organism, qids):
+    """{qid: stratum} of the lines that the relation lines among `qids` are judged against and `qids` lacks."""
+    lines = L.load_qids(family, organism, qids)
+    want = {q["relation"]["with"] for q in lines.values() if q.get("rule") == "relation" and q.get("relation")}
+    want -= set(qids)
+    return {q: L.stratum_of(x) for q, x in L.load_qids(family, organism, want).items()}
+
+
 def build(family, organism, folders=None, per_stratum=50_000, seed=C.SEED, dry=False, log=print, kind="panel"):
     """A new selection `<kind>_v<k>`: `panel` (failures, hunt reproducers, the sample) or `modest` (the modest set's
     part of the family: hunt reproducers and the sample only, docs/modest.md)."""
@@ -178,6 +188,9 @@ def build(family, organism, folders=None, per_stratum=50_000, seed=C.SEED, dry=F
         for q, st in d.items():
             why[q].add(src)
             strat.setdefault(q, st)
+    for q, st in relation_partners(family, organism, set(why)).items():
+        why[q].add("relation")
+        strat.setdefault(q, st)
     pdir = L.panel_dir(family, organism)
     prev = [n for n in L.panel_names(family, organism) if n.startswith(f"{kind}_v")]
     if prev:

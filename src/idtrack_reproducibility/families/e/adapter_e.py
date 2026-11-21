@@ -11,7 +11,11 @@ A line of family E is F0's line (docs/families/f0.md, "The query line") plus:
 - `id_codec`: F0's codecs (`str`, `json`, `bytes_hex`, `float_nan`) plus `enc` (`id` is the JSON of an encoded value).
 - `batch` (a list of encoded values) and `batch_container` (`list` default, `tuple`, `np_object`, `np_str`,
   `pd_series`, `pd_series_string`, `pd_index`, `pd_categorical`, `generator`, `set`, `str`: the batch argument as
-  that container; `str` passes the first item alone as the batch), `pos`.
+  that container; `str` passes the first item alone as the batch), `pos`; or `batch_ref` = {"set": <set>, "key": <k>}
+  in place of `batch`: the list `<k>` of the set's published lists (`<set>.lists.json.gz` beside the set, its sha256
+  in the set's manifest), for lists of tens of thousands of items that many lines share (one line per item asked).
+  A batch of a `batch_ref` is converted once per set of arguments and its result kept for the lines that follow
+  (the two latest batches; a set holds the lines of one list together), each such line's `flags.batch_cached` says so.
 - `generations`: the api generations the line is asked on (default both; a line whose argument only one generation
   has names it). A line not asked is left out by `run_e.py` and counted in its log.
 
@@ -27,6 +31,7 @@ of a d4c2dda error are tagged `d4c2dda:<class>` in `error_mro` beside the plain 
 `MissingValueError|d4c2dda:ValueError` is then strict on both trees); an item of a batch whose conversion raised
 (status `error`) is the outcome `error` with the item's error class and its classes (looked up in `idtrack.errors`).
 """
+import collections
 import decimal
 import hashlib
 import json
@@ -39,6 +44,9 @@ from idtrack_reproducibility.families import adapter as F0
 from idtrack_reproducibility.families import common as C
 
 GENERATIONS = ("d4c2dda", "convert")
+# The whole-call limit of a `batch_ref` batch: the per-call budget and half a minute, and this much per item (a list of
+# a release's display names holds up to tens of thousands; the measured cost is under a millisecond per item)
+BATCH_ITEM_SECONDS = 0.05
 # d4c2dda's names of the infer_source modes (71690ab renamed two)
 MODE_D4C2DDA = {"release": "ensembl_release", "assembly_release": "assembly_ensembl_release"}
 
@@ -268,13 +276,48 @@ class AdapterE(F0.Adapter):
             out.append(a)
         return out
 
+    def _lists(self, name):
+        """{key: [items]} of a set's published lists (`batch_ref`)."""
+        cache = self.__dict__.setdefault("_lists_cache", {})
+        if name not in cache:
+            import gzip
+            from idtrack_reproducibility.families import lines as L
+            with gzip.open(os.path.join(L.query_dir("e", self.organism), f"{name}.lists.json.gz"), "rt") as fh:
+                cache[name] = json.load(fh)
+        return cache[name]
+
     def _batch(self, line):
+        if line.get("batch_ref"):
+            ref = line["batch_ref"]
+            return container(list(self._lists(ref["set"])[ref["key"]]), line.get("batch_container"))
         return container([decode(x) for x in line["batch"]], line.get("batch_container"))
+
+    def _n_items(self, line):
+        if line.get("batch_ref"):
+            ref = line["batch_ref"]
+            return len(self._lists(ref["set"])[ref["key"]])
+        return len(line["batch"])
+
+    def _kept_batch(self, line, kw, fn):
+        """(result, failure, seconds, cached) of a batch call; a `batch_ref` batch is called once per arguments (the two
+        latest kept)."""
+        if not line.get("batch_ref"):
+            return fn(None) + (False,)
+        key = canonical([line["batch_ref"], line.get("batch_container"), {k: repr(v) for k, v in sorted(kw.items())}])
+        kept = self.__dict__.setdefault("_batch_kept", collections.OrderedDict())
+        if key in kept:
+            kept.move_to_end(key)
+            return kept[key] + (True,)
+        out = fn(self.timeout + 30 + BATCH_ITEM_SECONDS * self._n_items(line))
+        kept[key] = out
+        while len(kept) > 2:
+            kept.popitem(last=False)
+        return out + (False,)
 
     def _ask_convert_many(self, line, views, explain):
         kw = self._kwargs(line)
         pos = line.get("pos")
-        n_items = len(line["batch"])
+        n_items = self._n_items(line)
         out = []
         if self.gen == "d4c2dda":
             for x in ("budget_states", "budget_seconds", "allow_bridges", "progress"):
@@ -283,8 +326,8 @@ class AdapterE(F0.Adapter):
             for v in views:
                 k2 = dict(kw)
                 k2.setdefault("strategy", v)
-                batch = self._batch(line)
-                res, fail, sec = self._call(lambda: self.api.convert_identifier_multiple(batch, **k2))
+                res, fail, sec, cached = self._kept_batch(line, k2, lambda lim: self._call(
+                    lambda: self.api.convert_identifier_multiple(self._batch(line), **k2), lim))
                 a = self._blank(line, v)
                 a["seconds"] = round(sec, 6)
                 if fail:
@@ -295,12 +338,14 @@ class AdapterE(F0.Adapter):
                 else:
                     self._fill_d4c2dda(a, res[pos], line, v)
                     a["flags"]["n_items"] = len(res)
+                    if cached:
+                        a["flags"]["batch_cached"] = True
                 a["calls"] = len(views)
                 out.append(a)
             return out
         kw.setdefault("budget_seconds", self.timeout)
-        batch = self._batch(line)
-        res, fail, sec = self._call(lambda: self.api.convert_many(batch, **kw))
+        res, fail, sec, cached = self._kept_batch(line, kw, lambda lim: self._call(
+            lambda: self.api.convert_many(self._batch(line), **kw), lim))
         for v in views:
             a = self._blank(line, v)
             a["seconds"] = round(sec, 6)
@@ -313,6 +358,8 @@ class AdapterE(F0.Adapter):
             else:
                 self._fill_convert(a, res[pos], line, v)
                 a["flags"]["n_items"] = len(res)
+                if cached:
+                    a["flags"]["batch_cached"] = True
             out.append(a)
         _ = n_items
         return out

@@ -16,7 +16,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 | E, robustness | missing values, malformed strings, types, other organisms' ids, arguments, budgets, determinism and concurrency, metamorphic relations, the web layer | [docs/families/e.md](docs/families/e.md) | `families.e` |
 | H, performance | build, load, memory, per-call latency, batch scaling, harmonization | [docs/families/h.md](docs/families/h.md) | `families.h` |
 | the regression corpus | whether an answer changed between two idtrack trees (no truth) | [docs/corpus.md](docs/corpus.md) | `idtrack_reproducibility.corpus` |
-| the weakness hunts | findings of three hunts (inputs, history, regions), with runnable reproducers | [docs/hunts.md](docs/hunts.md) | `idtrack_reproducibility.hunts` |
+| the weakness hunts | findings of the hunts (inputs, history, regions; the attack on idtrack's next version), with runnable reproducers | [docs/hunts.md](docs/hunts.md) | `idtrack_reproducibility.hunts` |
 
 Every benchmark keeps one row per query line, view and subject (a tree or another tool): [the record](docs/records.md) (its columns, how to load it, a worked example). How the move into this package was verified (the stored scorings scored again, line by line) is [docs/verification.md](docs/verification.md). A measurement of any tree in a few hours is the [modest set](docs/modest.md).
 
@@ -84,7 +84,7 @@ Each benchmark's document says how to reproduce it from an empty data root ("Rep
 
 ## Results
 
-`results/index.tsv` lists every current result: family, stratum, organism, tree, scope (`exhaustive`, or `panel`: a development stage measured by the family's panel, [docs/methods.md](docs/methods.md#measurement-design)), idtrack commit, the graph's content digest, n, the outcomes, the rate (right / (right + wrong + error); `undetermined` and `timeout` apart, never counted) and its 95 % interval (the cluster bootstrap over the units that generated the lines where the table has it, else Wilson), and the file. `results/provenance.tsv` names, for every file, the scored folder of the data root it was generated from with its sha256 and scoring time. Regenerating replaces: only the latest results of each tree are kept; git keeps the past.
+`results/index.tsv` lists every current result: family, stratum, organism, tree, scope (`exhaustive`; `panel`: a development stage measured by the family's panel, [docs/methods.md](docs/methods.md#measurement-design); `sets`: only the sets the registry entry names were asked on that tree, every line of them), idtrack commit, the graph's content digest, n, the outcomes, the rate (right / (right + wrong + error); `undetermined` and `timeout` apart, never counted) and its 95 % interval (the cluster bootstrap over the units that generated the lines where the table has it, else Wilson), and the file. `results/provenance.tsv` names, for every file, the scored folder of the data root it was generated from with its sha256 and scoring time. Regenerating replaces: only the latest results of each tree are kept; git keeps the past.
 
 The known limitations, measured by the families, are one table: `results/limitations/limitations.tsv`.
 

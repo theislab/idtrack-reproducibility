@@ -7,12 +7,15 @@ Usage:
   python -m idtrack_reproducibility.hunts.reproduce <angle|all> <id|all> --submit [--tree d4c2dda,71690ab] [--out d]
                                                    one job per organism (jobs.submit), each tree in turn
 
-Each finding of the hunts (angles `inputs`, `history`, `regions`) has here the calls the hunt made, the answer the
+Each finding of the hunts (angles `inputs`, `history`, `regions`, and `attack`: the audit by attack of idtrack's next
+version, recorded on the tree `next`) has here the calls the hunt made, the answer the
 truth expects with the truth's source, and the answer the hunt recorded. A call is
 
 - `convert`: one conversion asked through the families' adapter (`families.adapter`, as widened by family E's
   `families.e.adapter_e`), so that `d4c2dda`'s api (`convert_identifier`) and `71690ab`'s (`convert`) are read
   alike: the ids of the view asked (`best` or `all`), the status, the match, the copies reported apart, the error;
+- `convert_many`: one item (`pos`) of a batch conversion of a list (`convert_many`; `convert_identifier_multiple` on
+  `d4c2dda`), read as a conversion;
 - `infer`: source inference on a list read from the truth store (the gene names of Ensembl's GTF of a release, one
   per gene of the primary assembly, as the hunt read them), `infer_identifier_source` on `d4c2dda`, `infer_source`
   on `71690ab`;
@@ -42,7 +45,7 @@ import time
 from idtrack_reproducibility import config as CFG
 from idtrack_reproducibility.harness import harness_lib as H
 
-ANGLES = ("inputs", "history", "regions")
+ANGLES = ("inputs", "history", "regions", "attack")
 HS, MM, SS, MMU, MFA = "homo_sapiens", "mus_musculus", "sus_scrofa", "macaca_mulatta", "macaca_fascicularis"
 FIELDS = ("outcome", "status", "match", "error_type", "got", "got_base", "got_has", "n_got", "apart_any", "present")
 ENS_VERSIONED = re.compile(rf"^({H.STABLE_ID_FORM})\.\d+$")
@@ -52,6 +55,12 @@ def conv(org, ident, rec, expect, source, view="best", **kw):
     """A conversion: `convert(ident, **kw)` read in view `view`."""
     return dict(kind="convert", organism=org, id=ident, view=view, kwargs=kw, recorded=rec, expected=expect,
                 source=source)
+
+
+def conv_many(org, items, pos, rec, expect, source, view="best", **kw):
+    """One item of a batch: `convert_many(items, **kw)[pos]` read in view `view`."""
+    return dict(kind="convert_many", organism=org, id=items[pos], items=list(items), pos=pos, view=view, kwargs=kw,
+                recorded=rec, expected=expect, source=source)
 
 
 def infer(org, release, mode, rec, expect, source):
@@ -314,6 +323,97 @@ FINDINGS = [
              "Ensembl's assembly_exception of release 75 (GTFs before 82 have no patch file)", view="all",
              from_release=75, to_release=75),
     ]),
+    # ---- attack (the audit by attack of idtrack's next version; recorded on the tree `next`) ----
+    dict(angle="attack", id="AT-1", title="a display name asked at its own release is not read there when its "
+         "database is not in the graph", calls=[
+             conv(SS, "SMURF1", dict(status="no_conversion", got_base=[]), "ENSSSCG00000007608",
+                  "Ensembl's core database of release 56: the gene's display xref SMURF1 (HGNC_curated_gene 16807); GTF 56",
+                  from_release=56, to_release=56),
+             conv(SS, "FBL", dict(status="converted", got_base=["ENSSSCG00000005747"]), "ENSSSCG00000017013 (chromosome 16)",
+                  "Ensembl's core database of release 56: the gene's display xref FBL; GTF 56", from_release=56,
+                  to_release=56),
+             conv(SS, "F1RP48_PIG", dict(status="not_found", got_base=[]), "ENSSSCG00000009504",
+                  "Ensembl's core database of release 63: the gene's display xref, a UniProt entry name (Uniprot/SPTREMBL)",
+                  from_release=63, to_release=63),
+             conv(MMU, "CMTM4", dict(status="converted", got_base=["ENSMMUG00000011268"]), "ENSMMUG00000020848",
+                  "Ensembl's core database of release 48: the gene's display xref CMTM4 (an HGNC projection); GTF 48",
+                  from_release=48, to_release=48),
+             conv(MM, "Ugt3a2", dict(status="converted", got_base=["ENSMUSG00000072664"]), "ENSMUSG00000049152",
+                  "Ensembl's core database of release 48: the gene's display xref Ugt3a2; GTF 48", from_release=48,
+                  to_release=48),
+             conv(HS, "TRBV4-2", dict(status="converted", got_base=["ENSG00000211745"]), "ENSG00000211708",
+                  "Ensembl's core database of release 48: the gene's display xref TRBV4-2; GTF 48", from_release=48,
+                  to_release=48),
+             conv(HS, "hsa-mir-21", dict(status="converted", got_base=["ENSG00000062716"]), "ENSG00000199004 (the miRNA gene, not its host VMP1)",
+                  "Ensembl's core database of release 48: the gene's display xref hsa-mir-21 (miRBase); GTF 48",
+                  from_release=48, to_release=48),
+             conv(HS, "SNORA25.16", dict(status="not_found", got_base=[]), "ENSG00000252290",
+                  "Ensembl's core database of release 61: the gene's display xref SNORA25.16 (RFAM_gene_name); GTF 61",
+                  from_release=61, to_release=61),
+         ]),
+    dict(angle="attack", id="AT-2", title="a batch makes Ensembl's own names copies of another item", calls=[
+        conv_many(MMU, ["mml-mir-129", "mml-mir-129-2"], 1, dict(status="converted", got_base=["ENSMMUG00000026940"]), "ENSMMUG00000026956",
+                  "Ensembl's core database of release 58: miRBase mml-mir-129-2 is the display name of ENSMMUG00000026956",
+                  from_release=58, to_release=58),
+        conv(MMU, "mml-mir-129-2", dict(status="converted", got_base=["ENSMMUG00000026956"]), "ENSMMUG00000026956",
+             "Ensembl's core database of release 58 (the single call, for comparison)", from_release=58, to_release=58),
+        conv_many(MM, ["Krtap13", "Krtap13-1"], 1, dict(status="converted", got_base=["ENSMUSG00000050224"]), "ENSMUSG00000056350",
+                  "Ensembl's GTF of release 48: Krtap13-1 is the display name of ENSMUSG00000056350", from_release=48,
+                  to_release=48),
+        conv_many(HS, ["OCLN", "OCLN_2"], 1, dict(status="converted", got_base=["ENSG00000197822"]), "ENSG00000230847",
+                  "Ensembl's GTF of release 61: OCLN_2 is the display name of ENSG00000230847", from_release=61,
+                  to_release=61),
+        conv_many(SS, ["SLA", "SLA-10"], 1, dict(status="converted", got_base=["ENSSSCG00000005949"]), "ENSSSCG00000001229 (alive at 115)",
+                  "Ensembl's GTF of release 67: SLA-10 is the display name of ENSSSCG00000001229"),
+    ]),
+    dict(angle="attack", id="AT-3", title="miRBase entries: the one-gene rule removes labels of one gene and keeps "
+         "labels of two", calls=[
+             conv(MMU, "mml-mir-508", dict(status="no_conversion", got_base=[]), "ENSMMUG00000033318",
+                  "Ensembl's core database of release 115: miRBase MI0006612 mml-mir-508 on ENSMMUG00000033318 only, its "
+                  "display name", to_release=115),
+             conv(MMU, "mml-mir-509-1", dict(status="converted", got_base=["ENSMMUG00000049721"]), "ENSMMUG00000050523",
+                  "Ensembl's core database of release 115: miRBase mml-mir-509-1 on ENSMMUG00000050523 only",
+                  to_release=115),
+             conv(HS, "hsa-mir-451a", dict(status="converted", got_base=["ENSG00000264066"]), "ENSG00000284565",
+                  "Ensembl's core database of release 115: miRBase hsa-mir-451a on ENSG00000284565 only", to_release=115),
+             conv(SS, "ssc-mir-16-1", dict(status="converted", got_base=["ENSSSCG00000019389"]), "ENSSSCG00000019808",
+                  "Ensembl's core database of release 67: miRBase ssc-mir-16-1 on ENSSSCG00000019808", from_release=67,
+                  to_release=67),
+             conv(MM, "mmu-mir-486b", dict(status="not_found", got_base=[]), "ENSMUSG00000106471",
+                  "Ensembl's core database of release 115: miRBase mmu-mir-486b on ENSMUSG00000106471 only",
+                  to_release=115),
+             conv(MM, "mmu-mir-344h-1", dict(status="tie", got_base=["ENSMUSG00000119021", "ENSMUSG00000119456"]),
+                  "both genes (Ensembl gives the entry to two loci at once, 7:61389098 and 7:61392114); the documented "
+                  "rule leaves such an entry out", "Ensembl's core database and GTF of release 115",
+                  from_release=115, to_release=115),
+         ]),
+    dict(angle="attack", id="AT-4", title="a RefSeq accession with an old version, asked without a release, is read "
+         "where the accession last is", calls=[
+             conv(SS, "XM_003129161.3", dict(status="no_conversion", got_base=[]), "ENSSSCG00000026015 (version 3 was on it and on "
+                  "ENSSSCG00000009034 at 67 to 77; version 4 on ENSSSCG00000009034 only at 78 to 89)",
+                  "Ensembl's core databases of releases 67 to 89 (RefSeq_mRNA_predicted, accession and version)",
+                  to_release=115),
+             conv(SS, "NM_001044572.1", dict(status="converted", got_base=["ENSSSCG00000003691"]), "ENSSSCG00000058470 (version 1 last "
+                  "at 66)", "Ensembl's core databases (RefSeq_mRNA, accession and version)", to_release=115),
+             conv(MM, "NM_001008548.3", dict(status="converted", got_base=["ENSMUSG00000110195"]), "ENSMUSG00000030653 (version 3 last "
+                  "at 64; alive at 115)", "Ensembl's core databases (RefSeq_mRNA, accession and version)",
+                  to_release=115),
+         ]),
+    dict(angle="attack", id="AT-5", title="a gene on a patch whose history ends is carried by a bridge far from its "
+         "place", calls=[
+             conv(HS, "ENST00000639379", dict(status="converted", got_base=["ENSG00000251791"]), "nothing (its gene ENSG00000284083, on "
+                  "CHR_HG926_PATCH at chr16:22.69 Mb by the assembly exceptions, ends without successor); the answer "
+                  "lies on chr2:233.29 Mb", "Ensembl's stable_id_event; assembly_exception of release 97; GTFs",
+                  from_release=97, to_release=112),
+             conv(HS, "ENSG00000284083", dict(status="converted", got_base=["ENSG00000251791"]), "nothing (as above, the gene itself)",
+                  "Ensembl's stable_id_event; assembly_exception of release 97; GTFs", from_release=97, to_release=115),
+             conv(HS, "ENSG00000278092", dict(status="converted", got_base=["ENSG00000233024"]), "nothing (a CHR_HSCHR16_1_CTG1 copy at "
+                  "chr16:16.44 Mb without successor; the answer lies at chr16:18.36 Mb)",
+                  "Ensembl's stable_id_event; assembly_exception of release 80; GTFs", from_release=80, to_release=115),
+             conv(MM, "ENSMUSG00000108031", dict(status="converted", got_base=["ENSMUSG00000094739"]), "nothing (a CHR_MG4213_PATCH copy "
+                  "at Y:49.39 Mb without successor; the answer is another copy of an ampliconic family at Y:78.84 Mb)",
+                  "Ensembl's stable_id_event; assembly_exception of release 83; GTFs", from_release=83, to_release=84),
+         ]),
 ]
 
 
@@ -354,6 +454,11 @@ def describe(call):
         if call["view"] != "best":
             args.append(f'strategy="{call["view"]}"')
         return f"convert({', '.join(args)})"
+    if call["kind"] == "convert_many":
+        args = ["[" + ", ".join(literal(x) for x in call["items"]) + "]"] + [f"{k}={v!r}" for k, v in call["kwargs"].items()]
+        if call["view"] != "best":
+            args.append(f'strategy="{call["view"]}"')
+        return f"convert_many({', '.join(args)})[{call['pos']}]"
     if call["kind"] == "infer":
         return f'infer_source(<gene names of GTF {call["release"]}>, mode="{call["mode"]}")'
     return f'truth: {call["gene"]} in the {call["table"]} genes of release {call["release"]}'
@@ -516,6 +621,9 @@ class Session:
             names = gtf_names(call["organism"], call["release"])
             line = dict(qid=qid, id=f"names of GTF {call['release']}", call="infer_source", batch=names,
                         kwargs=dict(mode=call["mode"]), strategy="best")
+        elif call["kind"] == "convert_many":
+            line = dict(qid=qid, id=call["id"], call="convert_many", batch=call["items"], pos=call["pos"],
+                        strategy=call["view"], kwargs=dict(call["kwargs"]))
         else:
             kw = call["kwargs"]
             line = dict(qid=qid, id=call["id"], strategy=call["view"], from_release=kw.get("from_release"),

@@ -1,6 +1,6 @@
 # B: names over time
 
-Family B asks idtrack to read gene names as Ensembl wrote them at every release: every display name of every release read at that release, carried to the target release and read without a release; names that moved to another gene; names of several genes; the authorities' previous symbols, synonyms and aliases; the forms a name takes in pasted lists (letter case, white space, separators, invisible characters, full-width letters, spreadsheet dates, Greek letters, suffixes); and every named gene to its organism's name database at every release. Its code is `idtrack_reproducibility.families.b`; its data are `<families>/b/` (`queries/<organism>/`, `runs/<tree>/<organism>/` with the scorings `scores_now/` and `scores_decided/`); the design is in [the methods](../methods.md#b-names-over-time). It reads the history as A* does ([A*'s truth](astar.md#truth)) and runs on the common machinery ([F0](f0.md)).
+Family B asks idtrack to read gene names as Ensembl wrote them at every release: every display name of every release read at that release, carried to the target release and read without a release; every display name at its own release by the database Ensembl filed it under (B9); names that moved to another gene; names of several genes; the authorities' previous symbols, synonyms and aliases; the forms a name takes in pasted lists (letter case, white space, separators, invisible characters, full-width letters, spreadsheet dates, Greek letters, suffixes); and every named gene to its organism's name database at every release. Its code is `idtrack_reproducibility.families.b`; its data are `<families>/b/` (`queries/<organism>/`, `runs/<tree>/<organism>/` with the scorings `scores_now/` and `scores_decided/`); the design is in [the methods](../methods.md#b-names-over-time). It reads the history as A* does ([A*'s truth](astar.md#truth)) and runs on the common machinery ([F0](f0.md)).
 
 ## State
 
@@ -8,7 +8,8 @@ What is built:
 
 - the truth readers (`truth_b`), the generators of the sets (`gen_b`: B1 with B2 and B3 as strata, and B8; `gen_b2`: B4 to B7), the fetcher of the authorities' files and of Ensembl's synonyms (`fetch_b`), the builder of revision sets (`revise_b`), the report of a run (`report_b`) and the plugin of the common classifier (`causes_b`, which registers B's kinds of lines; B has no cause of its own yet);
 - the truth files B fetched, each in its organism's `SOURCES.tsv`: HGNC's complete set and withdrawn list (and the listing of HGNC's quarterly archive), MGI's `MRK_List1.rpt`, `MRK_List2.rpt` and `MRK_ENSEMBL.rpt`, NCBI's `gene_info` of the five taxa, and Ensembl's synonyms of every cross-reference of release 115 (`core_synonyms/115.tsv.gz`) and, for mouse, of every release of its window (48 to 115, fetched for family E's letter-case lines; Ensembl serves the core table `external_synonym` at every release, as `.txt.gz.bz2` at 89);
-- the published sets of all five organisms (version 1; [the sets](#the-sets)).
+- the published sets of all five organisms (version 1; [the sets](#the-sets));
+- B9 (`gen_b9`, set `b9_v1` of all five organisms, published 2026-11-21) and its truth, each gene's display cross-reference of every release (`core_display/<R>.tsv.gz`, `fetch_b display`), with Ensembl's synonyms of every cross-reference of every release fetched in the same pass for the four organisms that had only release 115's ([B9](#b9-display-names-at-their-own-release)).
 
 What was run and scored, on the reference tree `d4c2dda` and its graphs:
 
@@ -23,7 +24,7 @@ The judge following idtrack's decided rules (judge `rules`, [`judge_follows_rule
 
 What is not built:
 
-- Ensembl's synonyms of every release for the organisms other than mouse (`fetch_b synonyms --releases all`; release 115 is fetched for all five, every release for mouse), and B's truth read from them (it reads release 115's);
+- B's truth of the sets of version 1 read from Ensembl's synonyms of every release (fetched since 2026-11-21 for all five organisms; the sets of version 1 read release 115's; B9 reads every release's);
 - the revision sets of the truth the code writes since version 1 was published: Ensembl's synonyms of every cross-reference beside BioMart's synonyms, rule [`support_ranks_shared_name`](../rules.md#support_ranks_shared_name)'s support from Ensembl's cross-references at releases without a BioMart table, B8's `spellings` of one value, the original name's `broad` on B6's lines judged `set`, and B6's and B7's `safe` lines accepting the original name's genes in any name source. `revise_b` was tried on cynomolgus without publishing; until these revision sets are published, the published sets are the truth of the results below;
 - the runs of pig, mouse and human, the `decided` scorings, the explained paths and causes of the wrong answers, the family's limitations map and its rows of the known-limitations table, the authority measure (`report_b`, written, not run), and the family's panel ([Measurement design](../methods.md#measurement-design)).
 
@@ -37,6 +38,7 @@ What is not built:
 - **B6, forms** of every display name of 115: letter case, white space, separators, invisible characters, full-width letters.
 - **B7, spreadsheet and typography**: the dates a spreadsheet makes of date-like symbols, Greek letters, suffixes.
 - **B8, names to databases**: every gene with a display name at a release, converted to its organism's name database at that release.
+- **B9, display names at their own release**: every display name of every release as Ensembl's core database records it (each gene's display cross-reference, with the database Ensembl filed the name under), read at that release; stratified by the filing database and the release's era, so that a name source the graph does not hold at a release is seen by its database (rule [`display_names_at_release`](../rules.md#display_names_at_release)).
 
 The rate of right answers is right / (right + wrong + error), undetermined answers and timeouts apart, per stratum and organism, with Wilson intervals and a cluster bootstrap over the unit (the string; B8: the gene). Every line is scored under `best` and under `all` (`strategy: both`). Two judges read the same answers: `now` scores the sets without `_dec` in their name (what the reference trees document), `decided` scores every set, with `b6_dec` and `b7_dec` replacing their lines by the decided rules. Where an authority (HGNC, MGI, VGNC, NCBI) gives a line a gene, it rides along as the line's `authority` and is measured beside idtrack (how often Ensembl and the authority agree, how often idtrack gives the authority's gene), never as a wrong answer of idtrack (principle 2 of [the methods](../methods.md#principles)).
 
@@ -51,9 +53,10 @@ One set per family of strata and organism, published once (F0's `lines.publish`)
 | `b4_v1` | `b4_prev_default`, `b4_prev_from` | every previous symbol (HGNC `prev_symbol` and the withdrawn symbols merged into an approved one, MGI's withdrawn symbols, VGNC `prev_symbol`), without a release and from the last release whose GTF displays it | without a release: read at 115, names before synonyms; a string that no name or synonym of 115 holds is `open` within the walks of every gene that ever carried it (`open_within`), so a gene never linked to it is wrong; from a release: B1's truth of that string at that release |
 | `b5_v1` | `b5_syn_atR`, `b5_syn_at115`, `b5_syn_to115`, `b5_alias_<authority>` | every BioMart synonym of every BioMart release R, read at R, to R and to 115; every alias of HGNC, MGI, VGNC and NCBI without a release | the synonym's genes after rule [`name_before_synonym`](../rules.md#name_before_synonym), then their walks; aliases as B4's lines without a release |
 | `b6_v1`, `b6_dec` | `b6_case`, `b6_space` (every display name of 115), `b6_sep`, `b6_invisible`, `b6_fullwidth` (20,000 sampled (name, form) pairs per organism) | lower, upper and title case; the name with spaces around it and with a tab and CR/LF; dashes and underscores swapped, replaced by a dot or a space, or removed; a non-breaking space, a zero-width space, a byte-order mark; full-width letters | `set` with the original's genes for what the reference trees document (rule [`spelling_steps`](../rules.md#spelling_steps): letter case and the dash/underscore swap; white space trimmed); `safe` (nothing or the original name's genes) for forms no built rule reads; a form that is an exact name of 115 is left out (its own question), one that is an exact synonym of another gene expects that gene (rule [`names_before_synonyms`](../rules.md#names_before_synonyms)), one that another gene carries in another letter case is `open`. `b6_dec`: rule [`unicode_normalised`](../rules.md#unicode_normalised) (the gene) and, in mouse, rule [`single_case_symbols`](../rules.md#single_case_symbols) |
+| `b9_v1`, `b9_r1`, `b9_r2` | `b9_<era>_<db>` (a name of one gene; `<db>` the database of its display cross-reference, `patchonly` where only copies on patches carry it), `b9_shared_<era>` (a name several genes carry at once) | every display name of every release R whose core database is read, as each gene's display cross-reference at R gives it, read at R (`from_release=R`, `to_release=R`) | the genes of R's GTF on the primary assembly whose display cross-reference is the name (rule `set` for one gene and for several alike: under `best` a non-empty part of the carriers is right, under `all` exactly the carriers); copies on patches and haplotypes apart (before 82 by Ensembl's assembly exceptions) and the Y copy of a pseudoautosomal gene apart (`b9_r1`); a display name that is an LRG record's expects the Ensembl gene the record describes (rule `lrg_answers_gene`, `b9_r2`); `broad`: the other genes that carry it at R (a display name off the GTF, a label of a name database, a synonym of R); compared without versions ([B9](#b9-display-names-at-their-own-release)) |
 | `b7_v1`, `b7_dec` | `b7_date`, `b7_greek`, `b7_suffix` | the forms a spreadsheet writes of every date-like symbol (a month and a day: `SEPT7`, `MARCH1`, `DEC1`, `OCT4`) of any release or authority (`7-Sep`, `07-Sep`, `Sep-07`, `2007-09-07`, `9/7/2007`, the serial `39332`); a curated list of 51 Greek-letter spellings (`TNFα`, `IL-1β`, `IFN-γ`, `TGF-β1`, ...); `-AS1`, `_at`, `_s_at` on 2,000 sampled names of one gene | `safe`: the symbol's genes or nothing is right, another gene wrong; a form that is a name or synonym of 115 is left out. `b7_dec` (the dates and Greek letters): the one gene the form stands for, else nothing ([Q1](../methods.md#open-methodological-choices)) |
 
-qids: `b1|<name>|<R>|<R or 115>`, `b1|<name>|default|115`, `b8|<gene>|<R>|<database>`, `b4|<symbol>|default|115`, `b4|<symbol>|<R>|115`, `b5|syn|<synonym>|<R>|<R or 115>`, `b5|<authority>|<alias>|default|115`, `b6|<form kind>|<name>`, `b7|date|<form kind>|<month>|<day>`, `b7|greek|<form>`, `b7|suffix|<kind>|<name>`.
+qids: `b9|<name>|<R>`, `b1|<name>|<R>|<R or 115>`, `b1|<name>|default|115`, `b8|<gene>|<R>|<database>`, `b4|<symbol>|default|115`, `b4|<symbol>|<R>|115`, `b5|syn|<synonym>|<R>|<R or 115>`, `b5|<authority>|<alias>|default|115`, `b6|<form kind>|<name>`, `b7|date|<form kind>|<month>|<day>`, `b7|greek|<form>`, `b7|suffix|<kind>|<name>`.
 
 Lines per set and organism (manifests `<families>/b/queries/<organism>/<set>.manifest.json`):
 
@@ -66,6 +69,9 @@ Lines per set and organism (manifests `<families>/b/queries/<organism>/<set>.man
 | `b6_v1` | 85,648 | 333,059 | 185,817 | 92,300 | 83,608 |
 | `b6_dec` | 19,537 | 21,637 | 17,515 | 19,355 | 19,815 |
 | `b7_v1` | 6,201 | 6,255 | 6,203 | 6,201 | 6,171 |
+| `b9_v1` | 886,641 | 2,996,268 | 3,391,264 | 1,183,916 | 407,922 |
+| `b9_r1` | – | 395 | 32,012 | – | – |
+| `b9_r2` | – | – | 32,023 | – | – |
 | `b7_dec` | 202 | 255 | 303 | 201 | 172 |
 
 Cynomolgus has no `b4_v1`: its authority file lists no previous symbol. The human and mouse sets were generated before family C's extracts of Ensembl's cross-references of human release 112 and mouse release 89 existed, so those two releases are read through the reach ([the truth](#truth)); their revision sets will read them.
@@ -79,6 +85,7 @@ Nothing of idtrack; every file is in its organism's `SOURCES.tsv` (`truth_b.Name
 - **Synonyms at R**: BioMart's synonym table where an archive answers (it holds the synonyms of a gene's display cross-reference only), and Ensembl's synonyms of every cross-reference where `core_synonyms/<R>.tsv.gz` is fetched (B's published sets read release 115's).
 - **The reach**: where the synonyms of R are not read, the genes that carry the string as a synonym at any release read; where no name source of R is read, the genes that carry it as a name at any release. An answer within the reach is open, one outside it wrong; every line says what was read (`name_src`: `biomart`, `core_xref`, `none+reach`, with `+synonyms` or `+synonyms_reach`).
 - **The history**: A*'s walks (`astar.truth.TruthA`): the strict walk with living ids (rule [`id_lives_on`](../rules.md#id_lives_on)) is `expect`, the broad walk with ids brought back (rule [`resurrection`](../rules.md#resurrection)) goes into `broad`; where the history ends for a name of one gene, the locus rule with the corrected judge's places across assemblies, assembly exceptions and core places; one gene that split is judged `set` (the corrected judge's `split_name_set`); mouse display names that are projected HGNC symbols and no name in another source are left out (`projected_hgnc`).
+- **Display cross-references** (B9): each gene's display cross-reference of every release as the release's core database holds it (`gene.display_xref_id` -> `xref` -> `external_db`, read from the MySQL dumps, `core_display/<R>.tsv.gz`): the name, the gene and the database it is filed under; Ensembl's GTF writes this label as `gene_name`, and the two differ at a few releases only (genes of the GTF whose `gene_name` is not the label): mouse 49, where the GTF writes the MGI accession (`MGI:2687328`) of 21,182 genes for their symbol; release 78 of pig, mouse and human, where the label of a UniProt gene name ends in a stray `;` the GTF leaves out (418, 13, 26 genes); human 50, where the GTF adds a `.` to 412 HGNC projections; and where a GTF writes no name or an older one (cynomolgus 108: 15,619 genes; cynomolgus 112: 120; pig 105: 405; mouse 103 and 105: 24). B9 asks the label as the core database writes it.
 - **The authorities** (beside the truth, never the judge): HGNC's complete set (symbol, `prev_symbol`, `alias_symbol`, Ensembl gene id) and withdrawn list; MGI's `MRK_List1.rpt` (withdrawn symbols with their current marker, synonyms) and `MRK_ENSEMBL.rpt` (MGI's own Ensembl ids); VGNC's gene sets; NCBI's `gene_info` (synonyms, Ensembl ids of `dbXrefs`).
 
 ## Rules
@@ -95,9 +102,12 @@ Locations, trees, graphs and the job runner come from the configuration ([runnin
 # the authorities' files and Ensembl's synonyms (once; one host at a time)
 python -m idtrack_reproducibility.families.b.fetch_b hgnc|mgi|ncbi
 python -m idtrack_reproducibility.families.b.fetch_b synonyms --releases 115|all|<r,r,...> [--organisms <o>,...]
+# each gene's display cross-reference of every release (B9's truth; the synonyms of every release in the same pass)
+python -m idtrack_reproducibility.families.b.fetch_b display --releases all [--organisms <o>,...]
 # the sets (published once): B1 and B8 read every release's tables (a job of the configured runner)
 python -m idtrack_reproducibility.families.b.gen_b --organism <o> [--sets b1,b8] [--dry]
 python -m idtrack_reproducibility.families.b.gen_b2 --organism <o> [--sets b4,b5,b6,b7] [--dry]
+python -m idtrack_reproducibility.families.b.gen_b9 --organism <o> [--dry]
 # revision sets when the truth changes: only the lines whose truth changed, under their published qids
 python -m idtrack_reproducibility.families.b.revise_b --organism <o> --name r1 --why "<what changed>" [--sets b4,b5,b6,b7,b8,b1] [--dry]
 # the harness's revisions of decided rules on B's lines (judge `rules`; with `_dec` sets for B6 and B7)
@@ -173,9 +183,40 @@ Answers, wrong and undetermined of the largest strata and of those with the most
 
 In cynomolgus the names of one gene have 31 wrong answers in 748,620 read at their release and 17 in 724,836 carried to 115; its wrong answers lie in the names of several genes, the moved names and NCBI's aliases. In rhesus the names read at their own release are wrong 92,105 times (`b1_atR_unique`, 5,946 names behind them), against 31 in cynomolgus; which of these the graph and which the truth's reading of rhesus's older releases explains is open until the causes are classified. NCBI's aliases are the weakest stratum in both organisms; the truth reads BioMart's synonyms of display cross-references only, and Ensembl's synonyms of every cross-reference only at 115 ([Known limitations](#known-limitations)).
 
+### B9: display names at their own release
+
+Runs `<families>/b/runs/next/<organism>/` (the tree `next`, idtrack `4471396`, on its own graphs `graphs/next/<organism>/`; only B9 asked; scored by the judge `now` with the sets `b9_v1` and `b9_r1` (human also `b9_r2`) into `scores_now/`, 2026-11-21); result files `results/b/next/<organism>/now_report.tsv` and `now_scores.tsv` (scope `sets` in `results/index.tsv`). The reference tree was not run on B9 (the set is newer than its results), so these lines have no reference answers; `next` is measured before the fix of its first round, and the same sets on the fixed tree measure the fix. No answer timed out and none raised.
+
+`b9_r1` (`revise_b --name r1 --sets b9`: B9 regenerated, the lines that changed published under their qids) holds the lines of the copies the accuracy harness's revisions put apart, which `b9_v1` expected inside the answer: before release 82 the GTFs mark no copy on a haplotype or patch, so a name that the reference gene and its copies carried at once was a name of several genes; Ensembl's assembly exceptions tell them (the corrected judge's `copies_apart_early`), and the Y copy of a pseudoautosomal gene goes apart where the X gene carries the name (rule `par_shared_names`): human 32,012 lines, mouse 395, none in the other three (`<families>/b/queries/<organism>/b9_r1.manifest.json`; the regeneration reproduced every other line of `b9_v1`).
+
+`b9_r2` (human; `revise_b --name r2 --sets b9`) brings the judge up to the decided rule [`lrg_answers_gene`](../rules.md#lrg_answers_gene), which `next` builds: a display name that is an LRG record's (11 lines of release 58, `LRG_1` to `LRG_15`) expects the Ensembl gene the record describes, the gene Ensembl's core database of the release links to the LRG gene by its cross-reference of database `ENS_LRG_gene` ("LRG display in Ensembl", whose accession is the LRG gene id; `core_xref/58.tsv.gz`), where `b9_v1` expected the LRG gene itself. It holds 32,023 lines: the 11, and the 32,012 lines of `b9_r1` again with the same truth (the revision builder then compared the earlier revision's note with the regenerated line; it now compares the truth and the question only, so a later revision publishes only what changed).
+
+The question of every line is which gene a display name is at the release it is a name of. By era (`early`: the releases before every database filing a display name is one that files them at 115; pig before 90, rhesus 73, mouse 108, human 104, cynomolgus none), view `best`, lines (questions), from `now_report.tsv`:
+
+| organism | era | lines | wrong | undetermined | rate |
+| --- | --- | ---: | ---: | ---: | ---: |
+| pig | early | 462,826 | 47,672 | 3,256 | 0.8963 |
+| pig | late | 409,768 | 104 | 428 | 0.9997 |
+| pig | names of several genes, early · late | 11,784 · 2,263 | 1,342 · 76 | 93 · 0 | 0.8852 · 0.9664 |
+| mouse | early | 2,511,601 | 11,771 | 10,400 | 0.9953 |
+| mouse | late | 467,724 | 11 | 837 | 1.0000 |
+| mouse | names of several genes, early · late | 15,119 · 1,824 | 748 · 0 | 613 · 40 | 0.9484 · 1.0000 |
+| human | early | 2,882,208 | 17,959 | 8,646 | 0.9938 |
+| human | late | 483,000 | 14 | 448 | 1.0000 |
+| human | names of several genes, early · late | 22,443 · 3,613 | 971 · 0 | 1,588 · 39 | 0.9534 · 1.0000 |
+| rhesus | early | 442,974 | 41,878 | 1,252 | 0.9052 |
+| rhesus | late | 726,886 | 605 | 1,958 | 0.9992 |
+| rhesus | names of several genes, early · late | 6,570 · 7,486 | 697 · 95 | 158 · 21 | 0.8913 · 0.9873 |
+| cynomolgus | late | 405,748 | 0 | 205 | 1.0000 |
+| cynomolgus | names of several genes, late | 2,174 | 0 | 4 | 1.0000 |
+
+By the database the name is filed under, the strata of view `best` below 0.99 hold the fault (`now_report.tsv`): every UniProt entry name is lost (`b9_early_uniprot_sptrembl`, `_swissprot`, `_varsplic`: pig 43,017 lines, rhesus 18,759, mouse 885, human 4,726), every `RFAM_gene_name` and `miRBase_gene_name` of mouse and human 61 and 62 (mouse 6,784 lines all wrong; human 9,249 of 9,366 wrong, 5 right, 112 undetermined), and the HGNC projections of pig (`b9_early_hgnc_curated_gene` 0.9229 and `_automatic_gene` 0.9283 of 41,586 and 15,021 lines) and rhesus (0.9498 and 0.9363 of 99,994 and 58,273), rhesus's RefSeq and NCBI labels (`b9_early_refseq_dna_predicted` 0.5148 of 16,531, `b9_early_entrezgene` 0.9581 of 96,340), the miRBase names of every era (rhesus `b9_late_mirbase` 0.9675, human `b9_early_mirbase` 0.9101) and the immunoglobulin and T-cell receptor segments of IMGT (mouse 0.6498 of 1,628, human 0.8204 of 1,152). Of the wrong answers under `best`, those whose name was not read at its release (the answer says `from_release_fallback`, or the name is not found) are the class of the rule [`display_names_at_release`](../rules.md#display_names_at_release): pig 48,938 of 49,194 (46,660 lost, 2,278 another gene), rhesus 43,104 of 43,275, mouse 12,015 of 12,530, human 15,829 of 18,944; the rest are names the graph holds at the release that it answers with another gene (pig 256, mouse 515, human 3,115, rhesus 171): miRBase entries (rule [`mirbase_genes`](../rules.md#mirbase_genes)), names other genes carry in a source the truth does not read, RFAM accessions that are display labels of several genes (rule [`rfam_display_label`](../rules.md#rfam_display_label) names only those), and in human before 82 a haplotype copy answered for the reference gene, or the reference gene without its copies reported apart. Human 58's 11 display names that are LRG records' (`b9_early_lrg`) expect, by `b9_r2`, the Ensembl gene each record describes (rule [`lrg_answers_gene`](../rules.md#lrg_answers_gene)), and `next` answers all 11 so. Measured beside the audit that found the class on the same tree (every display name of the GTF of every release read at its release; lines lost or answered with another gene: pig 47,382, rhesus 42,176, mouse 30,483, human 15,391): B9 counts about as many for pig, rhesus and human (48,938, 43,104, 15,829: B9 reads the display label of the core database at every release and asks the names of several genes too), and fewer in mouse, where the GTF of release 49 writes the MGI accession for the symbol of 21,182 genes (`MGI:2687328` for Sly) that the audit read as names and B9, reading the core database's display label, does not ask.
+
+The rows of the known-limitations table these lines fall under until the fix lands (`results/limitations/b_next.tsv`; answers of both views): `L-display-name-not-held` (the name not read at its release: pig 98,738 answers, mouse 27,394, human 32,295, rhesus 89,181) and `L-display-name-other` (held, answered with another gene: pig 920, mouse 3,095, human 10,683, rhesus 505), measured from the scored outcomes and the answers by `limits_outcomes` with B's map (`families/b/limitations_map_outcomes.tsv`).
+
 ## Known limitations
 
-B has no rows in the known-limitations table yet: its wrong answers are not classified. What the truth cannot judge, and what the published sets leave open:
+B's rows of the known-limitations table are those of B9 on `next` (above: `L-display-name-not-held`, `L-display-name-other`); the wrong answers of the sets of version 1 are not classified. What the truth cannot judge, and what the published sets leave open:
 
 | limitation | what | size |
 | --- | --- | --- |
@@ -190,10 +231,10 @@ B has no rows in the known-limitations table yet: its wrong answers are not clas
 
 From an empty data root, with the configuration naming the tree `d4c2dda` and its graphs:
 
-1. **Fetch the truth**: the accuracy harness's fetches (GTFs of every release, BioMart's archive tables, the core tables of the history, VGNC's gene sets; [the accuracy harness](../harness.md#truth)), family C's extracts of Ensembl's cross-references of every release ([C's truth](c.md#truth)), then `fetch_b hgnc`, `fetch_b mgi`, `fetch_b ncbi` and `fetch_b synonyms --releases all`.
-2. **Publish the sets**: `gen_b --organism <o>` (B1, B8), `gen_b2 --organism <o>` (B4 to B7). A rebuild with the current code writes the truth of the revisions above; it is compared with the published sets and every difference is published as a revision set (`revise_b`), never by rewriting a set.
+1. **Fetch the truth**: the accuracy harness's fetches (GTFs of every release, BioMart's archive tables, the core tables of the history, VGNC's gene sets; [the accuracy harness](../harness.md#truth)), family C's extracts of Ensembl's cross-references of every release ([C's truth](c.md#truth)), then `fetch_b hgnc`, `fetch_b mgi`, `fetch_b ncbi`, `fetch_b synonyms --releases all` and `fetch_b display --releases all`.
+2. **Publish the sets**: `gen_b --organism <o>` (B1, B8), `gen_b2 --organism <o>` (B4 to B7), `gen_b9 --organism <o>` (B9). A rebuild with the current code writes the truth of the revisions above; it is compared with the published sets and every difference is published as a revision set (`revise_b`), never by rewriting a set.
 3. **Run** every set on `d4c2dda` for every organism (F0's runner).
 4. **Score** both judges: the sets without `_dec` into `scores_now/`, every set into `scores_decided/`.
 5. **Classify**: `explain` on the tree, then `causes` with B's plugin.
 6. **Report**: `report_b` (both judges, the authority measure, outcomes by `name_src`).
-7. **Results**: `idtrack-repro results` writes `results/b/d4c2dda/<organism>/` once the runs are in `results.toml`.
+7. **Results**: `idtrack-repro results` writes `results/b/d4c2dda/<organism>/` once the runs are in `results.toml`; B9's run on a tree (`--sets b9_v1`) is registered with scope `sets` and its limitation rows come from `limits_outcomes` (`limits = "outcomes"`).

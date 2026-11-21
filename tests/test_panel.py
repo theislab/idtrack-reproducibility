@@ -89,3 +89,20 @@ def test_panel(data_root):
         check("a published panel is read-only", True)
     bad = [n for n, c in ok if not c]
     assert not bad, bad
+
+
+def test_a_relation_chosen_brings_the_line_it_is_judged_against(data_root):
+    refs = [dict(line(i, "ref"), open="the reference") for i in range(200)]
+    rels = [dict(line(i, "rel"), qid=f"zz|rel|{i}", rule="relation", relation={"op": "equal", "with": f"zz|ref|{i}"})
+            for i in range(200)]
+    L.publish(F, O, "v1", refs + rels, "invented relations", __file__)
+    P.build(F, O, folders=[], per_stratum=5, kind="modest")
+    m = json.load(open(os.path.join(L.panel_dir(F, O), "modest_v1.manifest.json")))
+    q = L.panel_qids(F, O, "modest_v1")
+    chosen = {x for x in q if x.startswith("zz|rel|")}
+    assert len(chosen) == 5 and {x.replace("|rel|", "|ref|") for x in chosen} <= q
+    import pyarrow.parquet as pq
+    why = {r["qid"]: r["why"] for r in pq.read_table(os.path.join(L.panel_dir(F, O), "modest_v1.parquet")).to_pylist()}
+    assert sum("sample" in w for q_, w in why.items() if q_.startswith("zz|ref|")) == 5  # the stratum's own sample
+    only_partner = {q_ for q_, w in why.items() if w == "relation"}
+    assert only_partner <= {x.replace("|rel|", "|ref|") for x in chosen} and m["by_reason"]["relation"] == len(only_partner)

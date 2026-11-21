@@ -1,0 +1,4 @@
+kind	variant	n	right	wrong	undetermined	timeout	error	rate	ci_low	ci_high
+b9_display_at_release	*	815844	814965	0	879	0	0	1.0000	1.0000	1.0000
+b9_display_at_release	all,from	407922	407252	0	670	0	0	1.0000	1.0000	1.0000
+b9_display_at_release	best,from	407922	407713	0	209	0	0	1.0000	1.0000	1.0000

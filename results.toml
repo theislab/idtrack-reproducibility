@@ -2,8 +2,10 @@
 # the data root and the tables taken from it into results/<family>/<tree>/<organism>/. `index` names the tables whose
 # rows go into results/index.tsv (`report`: the common report.tsv; `scores`: the harness's scores.tsv). Only the
 # current scoring of each tree is named here; regenerating (`idtrack-repro results`) replaces the files.
-# `scope` is `exhaustive` (default: every line of the family's sets) or `panel` (a development stage measured by the
-# family's panel; docs/methods.md, "Measurement design"). `rows` says what a run keeps where it has no rows of the
+# `scope` is `exhaustive` (default: every line of the family's sets), `panel` (a development stage measured by the
+# family's panel; docs/methods.md, "Measurement design") or `sets` (every line of the sets named in `sets`, the family's
+# others not asked on that tree). `limits` names the builder of the run's rows of the known-limitations table where it
+# is not the family's own (known_limitations.py). `rows` says what a run keeps where it has no rows of the
 # record (docs/records.md, "Checks").
 
 # The content digests of the graphs each tree was run on (as idtrack computes them; the runs record them).
@@ -18,6 +20,14 @@ macaca_fascicularis = "466151e05e731fc0e6a7a92ac0bc786aaadce8362d55a6597cad20cfc
 [graphs.d4c2dda_s110]
 sus_scrofa = "50478cbfe559920f5bbe2aa975509a2bff998c9711d77afb6c5f50dab2ac455f"
 homo_sapiens = "50e06366c27378cc8687e64f734e0b9b8a883408c6d9e5ba6b253c904a695c85"
+
+# the graphs of the tree `next` (idtrack 4471396), built by its own builder (the data root's graphs/next/)
+[graphs.next]
+sus_scrofa = "5c7a3de88b57e8689f41660430da46181124b469183fc730808971a59335285a"
+mus_musculus = "a23f0d50e37cfe6c23e0a0450d16b0dbaa553d8b5df71c6442851b49296d2de9"
+homo_sapiens = "eb4fcfa05075473cacdbd21e794c5fe204d45ff86879660f689bf2f06147c260"
+macaca_mulatta = "b5d2b7b89c677f90ba8d3778871b1eaf091e26ce6220a1fd2d36dba431861949"
+macaca_fascicularis = "bba5f987330c8f5ee3fddac78640751b6f5828a9af0d4de7b3d9beb3f6e31f3f"
 
 # ---------------- the accuracy harness ----------------
 [[run]]
@@ -138,6 +148,22 @@ files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "sc
 optional = ["harm_report.tsv"]
 index = { "now_report.tsv" = "report" }
 
+# E8's relations of one question asked two ways on the tree `next` before the fix of its first round (only the sets
+# e8_batch and e8_onerelease asked; the decided rules are the judge of both judges, so one scoring)
+[[run]]
+family = "e"
+tree = "next"
+commit = "44713963fef26653921ca1323ffc7b5afc3fe76d"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/e/runs/next/{organism}"
+scored = ["scores_now/run.json"]
+scope = "sets"
+sets = ["e8_batch", "e8_onerelease"]
+limits = "outcomes"
+generator = "family e batch_e; family e run_e --sets e8_batch,e8_onerelease; idtrack-repro score --family e --sets e8_batch,e8_onerelease"
+files = { "now_report.tsv" = "scores_now/report.tsv" }
+index = { "now_report.tsv" = "report" }
+
 [[run]]
 family = "e"
 tree = "71690ab"
@@ -174,6 +200,22 @@ organisms = ["macaca_mulatta", "macaca_fascicularis"]
 folder = "families/b/runs/d4c2dda/{organism}"
 scored = ["scores_now/run.json"]
 generator = "idtrack-repro score --family b (the judge now: the sets without their _dec revisions)"
+files = { "now_report.tsv" = "scores_now/report.tsv", "now_scores.tsv" = "scores_now/scores.tsv" }
+index = { "now_report.tsv" = "report" }
+
+# B9 on the tree `next` before the fix of its first round (only the set b9_v1 asked; limitations by the class of the
+# answer: limits_outcomes with B's map)
+[[run]]
+family = "b"
+tree = "next"
+commit = "44713963fef26653921ca1323ffc7b5afc3fe76d"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/b/runs/next/{organism}"
+scored = ["scores_now/run.json"]
+scope = "sets"
+sets = ["b9_v1", "b9_r1", "b9_r2"]
+limits = "outcomes"
+generator = "family b gen_b9; idtrack-repro run --family b --sets b9_v1; family b revise_b --name r1 and r2 --sets b9; idtrack-repro score --family b --sets b9_v1,b9_r1(,b9_r2 human) (judge now)"
 files = { "now_report.tsv" = "scores_now/report.tsv", "now_scores.tsv" = "scores_now/scores.tsv" }
 index = { "now_report.tsv" = "report" }
 
