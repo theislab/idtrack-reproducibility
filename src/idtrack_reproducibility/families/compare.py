@@ -18,6 +18,7 @@ import os
 import sys
 from collections import Counter
 
+from idtrack_reproducibility import config as CFG
 from idtrack_reproducibility.families import common as C
 from idtrack_reproducibility.families import report
 
@@ -49,7 +50,7 @@ def answers_bucket(folder, b, k):
     import pyarrow.parquet as pq
     info = json.load(open(os.path.join(folder, "run.json")))
     out = []
-    for p in C.answer_files(info.get("run", folder)):
+    for p in C.answer_files(CFG.from_root(info.get("run")) or folder):  # run.json stores it relative to the data root
         df = pq.read_table(p, columns=["qid", "view", "got"]).to_pandas()
         out.append(df[bucket(df["qid"], k) == b] if k > 1 else df)
     if not out:

@@ -67,6 +67,10 @@ def sample(org, kind, population, k):
     return sorted(rng_for(org, kind).sample(pop, k))
 
 
+# Ensembl's biotypes of the genes of the mitochondrial genome (its two rRNAs and 22 tRNAs; `Truth.mito_seqs`)
+MITO_BIOTYPES = frozenset({"Mt_tRNA", "Mt_rRNA"})
+
+
 class Truth:
     """Ensembl's history of one organism: the GTF genes of every release up to `target` and the mapping sessions and
     gene events of the release's core database, walked from one release to another.
@@ -78,10 +82,14 @@ class Truth:
     mislabelled session (n not after o: pig 106 -> "104", human 114 -> "114") after o. `placement="old_release"` is
     the reading before 2026-11-18 (every session crossed between o and o + 1), kept to measure what the change moves
     (`rev_sessions_effective`).
+
+    `mito_cut` (the judge following rule `no_mito_nuclear_step`): a step of the walk between a gene of the
+    mitochondrial genome and a gene of a nuclear sequence is not followed, also where the stable id stays the same
+    (Ensembl gave the id of a mitochondrial gene to a nuclear gene, or the reverse: two genes, `mito_differs`).
     """
 
-    def __init__(self, org, target, placement="effective"):
-        self.org, self.T = org, target
+    def __init__(self, org, target, placement="effective", mito_cut=False):
+        self.org, self.T, self.mito_cut = org, target, mito_cut
         self.rels = [r for r in H.gtf_releases(org) if r <= target]
         self.genes = {r: H.gtf_genes(org, r) for r in self.rels}
         self.present = collections.defaultdict(set)
@@ -157,7 +165,75 @@ class Truth:
         pr = self.present.get(x, ())
         return any(r >= e for r in pr) if forward else any(r < e for r in pr)
 
+    def mito_seqs(self, r):
+        """The sequences of the mitochondrial genome at release r: those that hold the genes of Ensembl's
+        mitochondrial biotypes (`Mt_tRNA`, `Mt_rRNA`) in the GTF of r (not `Mt_tRNA_pseudogene`, the nuclear copies
+        of mitochondrial tRNAs that human's GTFs to 60 place on the chromosomes)."""
+        if not hasattr(self, "_mito"):
+            self._mito = {}
+        if r not in self._mito:
+            self._mito[r] = {g["seqname"] for g in self.genes.get(r, {}).values()
+                             if g.get("gene_biotype") in MITO_BIOTYPES}
+        return self._mito[r]
+
+    def on_mito(self, x, s, after):
+        """Whether gene x lies on the mitochondrial genome on one side of session s (its place at the last GTF
+        release before the session takes effect, or at the first one from it on); None where the GTF has no place of x
+        on that side."""
+        e = self.eff[s]
+        rr = [r for r in self.present.get(x, ()) if (r >= e if after else r < e)]
+        if not rr:
+            return None
+        r = min(rr) if after else max(rr)
+        return self.genes[r][x]["seqname"] in self.mito_seqs(r)
+
+    def mito_differs(self, x, y, s, forward):
+        """Rule `no_mito_nuclear_step`: the step from x (this side of session s) to y (the other side) joins the
+        mitochondrial genome and a nuclear sequence (both places known)."""
+        a, b = self.on_mito(x, s, not forward), self.on_mito(y, s, forward)
+        return a is not None and b is not None and a != b
+
+    def mito_steps(self):
+        """The ids of the steps rule `no_mito_nuclear_step` refuses: every id x of a session s whose step to an id y (y
+        = x where the id stays) joins the mitochondrial genome and a nuclear sequence (`mito_differs`)."""
+        if not hasattr(self, "_mito_steps"):
+            out = set()
+            mt = {gid for r in self.rels for gid, g in self.genes[r].items() if g["seqname"] in self.mito_seqs(r)}
+            for s in self.sessions:
+                for x in mt | {x for x, ys in self.succ[s].items() if x and (x in mt or ys & mt)}:
+                    for y in (self.succ[s].get(x, set()) - {None}) | {x}:
+                        if self.mito_differs(x, y, s, True):
+                            out |= {x, y}
+            self._mito_steps = out
+        return self._mito_steps
+
+    def mito_lineage(self):
+        """Every id that Ensembl's events join (in any direction, over every session) to an id of `mito_steps`."""
+        if not hasattr(self, "_mito_lineage"):
+            steps = self.mito_steps()
+            nb = collections.defaultdict(set)
+            for s in self.succ:
+                for x, ys in self.succ[s].items():
+                    for y in ys:
+                        if x and y and x != y:
+                            nb[x].add(y)
+                            nb[y].add(x)
+            seen, todo = set(steps), list(steps)
+            while todo:
+                for y in nb.get(todo.pop(), ()):
+                    if y not in seen:
+                        seen.add(y)
+                        todo.append(y)
+            self._mito_lineage = seen
+        return self._mito_lineage
+
     def _step(self, x, s, strict, living, resurrect, forward):
+        out = self._step_any(x, s, strict, living, resurrect, forward)
+        if self.mito_cut:
+            out = {y for y in out if not self.mito_differs(x, y, s, forward)}
+        return out
+
+    def _step_any(self, x, s, strict, living, resurrect, forward):
         moves = (self.succ if forward else self.pred)[s]
         if x not in moves:
             return {x}
@@ -1558,6 +1634,343 @@ def rev_copies_apart_early(org, lines, C):
     return out
 
 
+
+class MirbaseLoci:
+    """Rule `mirbase_genes` read from Ensembl's records: the miRBase entries (accessions and labels, without letter
+    case) that Ensembl gives to genes at two loci, which the rule leaves out.
+
+    The holders of an entry at a release are the genes whose cross-references (`core_xref/<release>`: the gene, or a
+    transcript or translation of it) carry it in database `miRBase`, among the genes of biotype `miRNA` there (GTF; the
+    rule keeps miRBase's identifiers on miRNA genes only). A holder that lies only on haplotypes, patches or
+    alternative loci (GTF region `patch`, or before 82 a sequence of the release's assembly exceptions other than a
+    PAR) is a copy and adds no locus. The others are two loci when a frame tells them apart:
+    - one release: two holders that live at it at places that do not overlap (one sequence, one strand);
+    - one assembly: holders whose places on it never overlap and that Ensembl's history does not carry one to the other
+      (a lineage: they never live at one release and the walk of the first reaches the second);
+    - the names of whole sequences across assemblies: holders all of whose places lie on whole sequences
+      (`sequences/<release>.tsv` of the last release of each assembly: coordinate system `chromosome`, or the
+      attribute `karyotype_rank`, or `codon_table`: the mitochondrial genome) on sequences of different names, and of
+      no lineage.
+    Holders on two assemblies that nothing compares are no evidence of two loci."""
+
+    def __init__(self, org, C):
+        self.org, self.C = org, C
+        tr = C.tr
+        self.holders = collections.defaultdict(lambda: collections.defaultdict(set))  # entry -> release -> genes
+        for r in tr.rels:
+            p = os.path.join(H.truth_dir(org), "core_xref", f"{r}.tsv.gz")
+            if not os.path.exists(p):
+                continue
+            genes = tr.genes.get(r, {})
+            with gzip.open(p, "rt") as fh:
+                head = fh.readline().rstrip("\n").split("\t")
+                ig, idb, iacc, ilab = (head.index(k) for k in ("gene_id", "db_name", "acc", "label"))
+                for line in fh:
+                    if "\tmiRBase\t" not in line:
+                        continue
+                    f = line.rstrip("\n").split("\t")
+                    if f[idb] != "miRBase":
+                        continue
+                    g = gene_base(f[ig])
+                    if (genes.get(g) or {}).get("gene_biotype") != "miRNA":
+                        continue
+                    for e in (f[iacc], f[ilab]):
+                        if e:
+                            self.holders[e.lower()][r].add(g)
+        self.exc = None
+        self.karyo = {}
+        for a, lo, hi in tr.eras():
+            sp = os.path.join(H.truth_dir(org), "sequences", f"{hi}.tsv")
+            self.karyo[a] = {x["seqname"] for x in H.read_tsv(sp) if x["coord_system"] == "chromosome" or
+                             x["karyotype_rank"] or x["codon_table"]} if os.path.exists(sp) else None
+        self._left = {}
+
+    def _copy_seq(self, r, seq):
+        if self.exc is None:
+            from idtrack_reproducibility.harness import assembly_map
+            self.exc = assembly_map.Exceptions(self.org)
+        return r < 82 and any(x["type"] != "PAR" for x in self.exc.rows(r).get(seq, ()))
+
+    def places(self, g, rels):
+        """{release: (assembly, seqname, strand, start, end)} of g at the given releases, None for a copy."""
+        tr, out = self.C.tr, {}
+        for r in rels:
+            x = tr.genes.get(r, {}).get(g)
+            if not x or not x.get("seqname") or not x.get("start"):
+                continue
+            if x.get("region") == "patch" or self._copy_seq(r, x["seqname"]):
+                continue
+            out[r] = (tr.assembly.get(r, ""), x["seqname"], x["strand"], int(x["start"]), int(x["end"]))
+        return out
+
+    def lineage(self, x, y):
+        """Ensembl's history carries one of x and y to the other where they follow one another (never alive at once)."""
+        tr = self.C.tr
+        px, py = tr.present.get(x, set()), tr.present.get(y, set())
+        if not px or not py or px & py:
+            return False
+        a, b = (x, y) if max(px) < min(py) else (y, x)
+        pa, pb = tr.present[a], tr.present[b]
+        return max(pa) < min(pb) and b in tr.walk_fwd(a, max(pa), min(pb), False, living=True, resurrect=True)
+
+    @staticmethod
+    def _clusters(items, same):
+        parent = {i: i for i in items}
+
+        def find(i):
+            while parent[i] != i:
+                parent[i] = parent[parent[i]]
+                i = parent[i]
+            return i
+        for i in items:
+            for j in items:
+                if i < j and same(i, j):
+                    parent[find(i)] = find(j)
+        return len({find(i) for i in items})
+
+    def loci(self, entry):
+        """The most loci a frame tells apart among the holders of an entry (0 for an entry no miRNA gene holds)."""
+        by_rel = self.holders.get(entry.lower())
+        if not by_rel:
+            return 0
+        genes = set().union(*by_rel.values())
+        rels = sorted(by_rel)
+        pl = {g: self.places(g, rels) for g in genes}
+        pl = {g: p for g, p in pl.items() if p}
+        if len(pl) < 2:
+            return len(pl)
+
+        def overlap(a, b):
+            return a[0] == b[0] and a[1] == b[1] and a[2] == b[2] and a[3] <= b[4] and b[3] <= a[4]
+
+        best = 1
+        for r in rels:  # one release
+            here = sorted(g for g in by_rel[r] if r in pl.get(g, {}))
+            if len(here) > 1:
+                best = max(best, self._clusters(here, lambda a, b: overlap(pl[a][r], pl[b][r])))
+        for asm in sorted({v[0] for p in pl.values() for v in p.values()}):  # one assembly
+            on = {g: [v for v in p.values() if v[0] == asm] for g, p in pl.items()}
+            on = {g: v for g, v in on.items() if v}
+            if len(on) > 1:
+                best = max(best, self._clusters(sorted(on), lambda a, b: any(overlap(u, w) for u in on[a] for w in on[b])
+                                                or self.lineage(a, b)))
+        kar = {g: {v[1] for v in p.values()} for g, p in pl.items()
+               if all(self.karyo.get(v[0]) is not None and v[1] in self.karyo[v[0]] for v in p.values())}
+        if len(kar) > 1:  # the names of whole sequences across assemblies
+            best = max(best, self._clusters(sorted(kar), lambda a, b: bool(kar[a] & kar[b]) or self.lineage(a, b)))
+        return best
+
+    def left_out(self, entry):
+        e = entry.lower()
+        if e not in self._left:
+            self._left[e] = self.loci(e) > 1
+        return self._left[e]
+
+
+def rev_mirbase_genes(org, lines, C):
+    """Rule `mirbase_genes` (decided): a miRBase entry that Ensembl gives to genes at two loci is no identifier of
+    those genes (`MirbaseLoci`: the frames that tell loci apart, from Ensembl's cross-references and the GTFs). A line
+    that asks for such an entry (its string, or the name a variant was made of, `_names_asked`, is the entry's
+    accession or label without letter case) is read through Ensembl's other databases at the release it is read at
+    (from_release, else to_release): the genes of the primary sequence whose cross-references in another database
+    carry the string there, else those whose synonyms do (rule `names_before_synonyms`), walked to the target (strict
+    walk with living ids); where the string is held there by no other database, it is read where it is held (rule
+    `from_release_fallback`: at the target, else at the latest release at which it is held); where no other database
+    carries it at any release, nothing is expected (it is not found). A line that asks for the genes' miRBase
+    identifiers expects none of such an entry."""
+    out = collections.defaultdict(list)
+    ml = C._cached("mirbase_loci", lambda: MirbaseLoci(org, C))
+    if not ml.holders:
+        return out
+    others = C._cached("mirbase_other_sources", lambda: _strings_in_other_sources(org, C, ml))
+    for rec in lines:
+        if rec.get("excluded") or rec.get("from_database"):
+            continue
+        if rec.get("final_database") == "miRBase":
+            keep = [v for v in rec["expect"] if not ml.left_out(v)]
+            if keep == rec["expect"]:
+                continue
+            out[rec["kind"]].append(revised(rec, "mirbase_genes", "miRBase entries of two loci are no identifiers "
+                                            "(rule `mirbase_genes`)", expect=keep,
+                                            broad=[v for v in rec["broad"] if not ml.left_out(v)] if rec.get("broad") else None))
+            continue
+        if rec.get("final_database"):
+            continue
+        name = next((x for x in _names_asked(rec) if ml.left_out(x)), None)
+        if name is None or ENS_ID.match(name):
+            continue
+        t = rec["to_release"]
+        found = others.get(name.lower(), {})
+
+        def genes_at(r):
+            prim = C.primary(r)
+            return (found.get((r, "name"), set()) & prim) or (found.get((r, "synonym"), set()) & prim)
+        held = sorted({r for r, _ in found if genes_at(r)})
+        # where the string is read (rule `from_release_fallback`, rule `start_release`): the release given if the
+        # string is held there, else the target if it is held there, else the latest release at which it is held
+        read = next((r for r in (rec.get("from_release"), t) if r in held), held[-1] if held else None)
+        if read is not None:
+            genes = genes_at(read)
+            E = set().union(*(C.tr.walk_series(g, read, [t], True, living=True)[t] for g in genes))
+            B = E | set().union(*(C.tr.walk_series(g, read, [t], False, living=True, resurrect=True)[t] for g in genes))
+            Ev, Bv = _vers(C, E, t, rec["cmp"]), _vers(C, B, t, rec["cmp"])
+            # several genes carrying the string at the release read are a tie (rule `ties`: the best answer is all of
+            # them); one gene that Ensembl's history splits is answered by any of its successors
+            ch = dict(expect=Ev, broad=Bv if set(Bv) != set(Ev) else None, apart=None,
+                      rule="set_exact" if len(genes) > 1 and len(Ev) > 1 else "set")
+            if not E and len(genes) == 1:  # no successor: the locus rule at the place of the gene read
+                loc = C.tr.locus(next(iter(genes)), read)
+                if loc:
+                    ch["locus"] = loc
+                    to_asm = H.gtf_assemblies(org).get(t)
+                    if to_asm and to_asm != loc["assembly"]:
+                        from idtrack_reproducibility.harness import assembly_map
+                        mapper = C._cached("mapper", lambda: assembly_map.Mapper(org))
+                        ch["locus_mapped"] = mapper.map(loc, to_asm)
+            note = f"a miRBase entry of two loci (rule `mirbase_genes`), read through Ensembl's other databases at {read}"
+        else:
+            ch = dict(expect=[], broad=None, apart=None, rule="set")
+            note = "a miRBase entry of two loci, carried by no other database (rule `mirbase_genes`): not found"
+        if all(rec.get(k) == v for k, v in ch.items() if v is not None) and \
+                all(rec.get(k) is None for k, v in ch.items() if v is None):
+            continue
+        new = revised(rec, "mirbase_genes", note, **ch)
+        for k in ("broad", "apart"):
+            if new.get(k) is None:
+                new.pop(k, None)
+        if ch.get("expect") is not None:
+            for k in ("locus", "locus_mapped", "locus_projected", "exceptions", "open"):
+                if k not in ch:
+                    new.pop(k, None)
+        out[rec["kind"]].append(new)
+    return out
+
+
+def _names_asked(rec):
+    """The strings a line asks by: its identifier, the identifier normalised as Unicode NFKC (full-width forms) or
+    without stray punctuation (rule `stray_punctuation`), and the name a variant line was made of (its note:
+    `<form> of <name>`)."""
+    import unicodedata
+    s = str(rec["id"])
+    out = [s, unicodedata.normalize("NFKC", s), strip_stray_punctuation(s)]
+    m = re.match(r"^[\w-]+ of ([^;\s]+)", rec.get("note") or "")
+    if m:
+        out.append(m.group(1))
+    return out
+
+
+def core_readings(org, rels, values, skip_db=None, casefold=True, display=True):
+    """{value: {(release, 'name' | 'synonym'): genes}}: the genes Ensembl's records give each value at each release, as
+    a name (a label of the core cross-references of any database but `skip_db`, `core_xref`; with `display`, the
+    display name, `core_display`) or as a synonym (`core_synonyms`); values compared without letter case where
+    `casefold`."""
+    norm = (lambda x: x.lower()) if casefold else (lambda x: x)
+    want = {norm(v) for v in values}
+    found = collections.defaultdict(lambda: collections.defaultdict(set))
+    for r in rels:
+        for sub, cols, kind in (("core_xref", ("db_name", "label", "gene_id"), "name"),
+                                ("core_display", ("db_name", "label", "gene_id"), "name"),
+                                ("core_synonyms", ("db_name", "synonym", "gene_id"), "synonym")):
+            if sub == "core_display" and not display:
+                continue
+            p = os.path.join(H.truth_dir(org), sub, f"{r}.tsv.gz")
+            if not os.path.exists(p):
+                continue
+            with gzip.open(p, "rt") as fh:
+                head = fh.readline().rstrip("\n").split("\t")
+                idb, iv, ig = (head.index(c) for c in cols)
+                for line in fh:
+                    f = line.rstrip("\n").split("\t")
+                    v = norm(f[iv]) if len(f) > iv else ""
+                    if v in want and (kind == "synonym" or f[idb] != skip_db):
+                        found[v][(r, kind)].add(gene_base(f[ig]))
+    return {v: dict(x) for v, x in found.items()}
+
+
+def _strings_in_other_sources(org, C, ml):
+    """{entry: {(release, 'name' | 'synonym'): genes}} of the left-out miRBase entries (`MirbaseLoci.left_out`) that
+    another database of Ensembl's cross-references (`core_xref`: a label, `name`) or a synonym (`core_synonyms`)
+    carries, without letter case."""
+    return core_readings(org, C.tr.rels, {e for e in ml.holders if ml.left_out(e)}, skip_db="miRBase", display=False)
+
+def _walks_with(C, truth, rec, **kw):
+    """`_history_walks` of a line under another reading of Ensembl's history (`truth`), with C's tables."""
+    C.tr  # noqa: B018  (made once)
+    saved, C._tr = C._tr, truth
+    try:
+        return _history_walks(C, rec, **kw)
+    finally:
+        C._tr = saved
+
+
+def rev_no_mito_nuclear_step(org, lines, C):
+    """Rule `no_mito_nuclear_step` (decided): a history step between the mitochondrial genome and a nuclear sequence
+    is not followed, and where Ensembl gave the stable id of a mitochondrial gene to a nuclear gene (or the reverse)
+    the versions on the two sides are two genes. Every line whose truth is a walk of its id (travel, retired, reverse,
+    cross-assembly; travel lines to a name database) or of the genes that carried a name at its release
+    (`name_old_to_current`, `name_changed_gene`) is walked again with such steps cut (`Truth(mito_cut=True)`; strict
+    with living ids, broad with living and returned ids); where the walk changes, the expected genes (values), broad
+    and place are computed again: a line left without a successor is judged by the place of the query's gene at the
+    release it is read at (the locus rule), so a gene at that place on the mitochondrial genome is undetermined and a
+    gene elsewhere wrong."""
+    out = collections.defaultdict(list)
+    tr = C.tr
+    if not any(tr.mito_seqs(r) for r in tr.rels):
+        return out
+    cut = C._cached("truth_mito_cut", lambda: Truth(org, C.T, mito_cut=True))
+    mapper = None
+    asm = H.gtf_assemblies(org)
+    for rec in lines:
+        k = rec["kind"]
+        if k in ("name_old_to_current", "name_changed_gene"):
+            if rec.get("final_database") or rec["from_release"] is None:
+                continue
+            before = _walks_with(C, tr, rec, living=True, resurrect=True)
+            after = _walks_with(C, cut, rec, living=True, resurrect=True)
+            if before is None or before[:2] == after[:2]:
+                continue
+            E = _walks_with(C, cut, rec, living=True)[0]
+            t = after[2]
+            Ev, Bv = _vers(C, E, t, rec["cmp"]), _vers(C, after[1] | E, t, rec["cmp"])
+            ch = dict(expect=Ev, broad=Bv if set(Bv) != set(Ev) else None, rule="set_exact" if len(Ev) > 1 else "set")
+            if not Ev:
+                R = rec["from_release"]
+                src = C.display(R)[0].get(rec["id"], set())
+                ch["locus"] = tr.locus(next(iter(src)), R) if len(src) == 1 else None
+        else:
+            src = _walk_source(C, rec)
+            if src is None:
+                continue
+            g, R, t = src
+            walks = [(x.walk_series(g, R, [t], True, living=True)[t],
+                      x.walk_series(g, R, [t], False, living=True, resurrect=True)[t]) for x in (tr, cut)]
+            if walks[0] == walks[1]:
+                continue
+            E, B = walks[1][0], walks[1][1] | walks[1][0]
+            if rec.get("final_database"):
+                grp, col = GENE_DB[rec["final_database"]]
+                pp = C.bm(t, grp, col)
+                vals = set().union(*(pp[0].get(x, set()) for x in E)) if pp else set()
+                bvals = set().union(*(pp[0].get(x, set()) for x in B)) if pp else set()
+                ch = dict(expect=sorted(vals), broad=sorted(bvals) if bvals != vals else None)
+            else:
+                Ev, Bv = _vers(C, E, t, rec["cmp"]), _vers(C, B, t, rec["cmp"])
+                ch = dict(expect=Ev, broad=Bv if set(Bv) != set(Ev) else None, locus=tr.locus(g, R) if not E else None)
+        if ch.get("locus") and asm.get(rec["to_release"]) != ch["locus"]["assembly"]:
+            if mapper is None:
+                from idtrack_reproducibility.harness import assembly_map
+                mapper = assembly_map.Mapper(org)
+            ch["locus_mapped"] = mapper.map(ch["locus"], asm.get(rec["to_release"]))
+        if all(rec.get(x) == v for x, v in ch.items()):
+            continue
+        new = revised(rec, "no_mito_nuclear_step", "no step between the mitochondrial genome and a nuclear sequence "
+                      "(rule `no_mito_nuclear_step`)", **ch)
+        if new.get("expect"):
+            for x in ("locus", "locus_mapped", "locus_projected", "exceptions"):
+                new.pop(x, None)
+        out[k].append(new)
+    return out
+
 # name -> function (its docstring says what it revises and why), in the order they are published
 REVISIONS = {
     "swissprot75": rev_swissprot75,
@@ -1579,11 +1992,14 @@ REVISIONS = {
     "stray_punctuation": rev_stray_punctuation,
     "par_shared_names": rev_par_shared_names,
     "copies_apart_early": rev_copies_apart_early,
+    "no_mito_nuclear_step": rev_no_mito_nuclear_step,
+    "mirbase_genes": rev_mirbase_genes,
 }
 # The judge of each correction's revision set (its manifest's `judge`): `78`, the judge corrected where it was wrong
 # (rule `judge_corrections`); `rules`, the judge following a rule idtrack decided after 71690ab (docs/rules.md). Both are left out
 # by the judge `published` (harness_lib.REVISED_JUDGES).
-RULES_JUDGE = {"missing_values", "lower_case_symbols", "stray_punctuation", "par_shared_names"}
+RULES_JUDGE = {"missing_values", "lower_case_symbols", "stray_punctuation", "par_shared_names", "no_mito_nuclear_step",
+               "mirbase_genes"}
 
 
 def not_revised_after(name, lines):

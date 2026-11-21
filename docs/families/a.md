@@ -65,7 +65,20 @@ Revision sets (only the lines whose truth changed, under their published qids; n
 | `a6_r2` | – | 4,148 | as `a3_r2` |
 | `a3_r3` | – | 1,258 | as `a3_r2`, for the published lines whose truth the generator writes differently since (`fix_versionless`) |
 
-Pig, rhesus and cynomolgus have no revision set: the place correction concerns human and mouse, and regenerating their A4 sets changed no line.
+Pig, rhesus and cynomolgus have no revision set of these: the place correction concerns human and mouse, and regenerating their A4 sets changed no line.
+
+Rule [`no_mito_nuclear_step`](../rules.md#no_mito_nuclear_step) (decided, built in idtrack's next version after its first round; judge `rules`): the shared truth (`astar.truth.TruthA`) cuts every step between the mitochondrial genome and a nuclear sequence, also where the id stays the same, and an id of such a step has no direct walk (`GenA.walks`). `revise_a --rule no_mito_nuclear_step` makes again only the lines of the lineages the rule changes (the units of `Truth.mito_steps`) and publishes those whose truth differs (pig and mouse have no such id):
+
+| set | rhesus | cynomolgus | human |
+| --- | ---: | ---: | ---: |
+| A1 (`a1_r1`; human `a1_r2`) | 355 | 120 | 21 |
+| A2 (`a2_r1`) | 8 | 5 | – |
+| A3 (`a3_r1`; human `a3_r4`) | 130 | 105 | 221 |
+| A4 (`a4_r1`) | 5 | 5 | – |
+| A5 (`a5_r1`) | 20 | 20 | 6 |
+| A6 (`a6_r1`; human `a6_r3`) | – | 1,560 | – |
+| A7 (`a7_r1`; human `a7_r2`) | 22 | 19 | 18 |
+| A8 (human `a8_s110_r2`) | – | – | 21 |
 
 ## Truth
 
@@ -94,8 +107,8 @@ Locations, trees, graphs and the job runner come from the configuration ([runnin
 python -m idtrack_reproducibility.families.a.gen_a <o> --stratum A1|A2|A3|A4|A5|A6|A8 --set <name> [--snapshot 110] [--dry-run]
 python -m idtrack_reproducibility.families.a.gen_a7 <o> --set a7_v1 [--sample 200000] [--dry-run]
 python -m idtrack_reproducibility.families.a.patterns_a <o>
-# revision sets when the shared truth changes
-python -m idtrack_reproducibility.families.a.revise_a <o> --stratum <S> --set <published set>[,<its revisions>] --name <new> [--dry-run]
+# revision sets when the shared truth changes (--rule: only the lineages a decided rule changes, judge `rules`)
+python -m idtrack_reproducibility.families.a.revise_a <o> --stratum <S> --set <published set>[,<its revisions>] --name <new> [--rule no_mito_nuclear_step] [--dry-run]
 python -m idtrack_reproducibility.families.a.fix_versionless <o> --sets <set>,<its revisions> --name <new> [--dry-run]
 # a tree's run (F0's runner and scorer), then A's report along the axes and patterns
 python -m idtrack_reproducibility.families.runner --family a --organism <o> --clone <source> --graph <graph> \

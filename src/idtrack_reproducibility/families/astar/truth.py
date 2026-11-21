@@ -41,8 +41,12 @@ def core_gene_ids(org, rel):
 
 
 class TruthA(M.Truth):
-    def __init__(self, org, target):
-        super().__init__(org, target)
+    """`make_queries.Truth` with the core genes the GTF lacks, and with rule `no_mito_nuclear_step` (decided): a step
+    of Ensembl's history between the mitochondrial genome and a nuclear sequence is not followed (`mito_cut`; the sets
+    published before the rule are revised by `revise_rules.py` and family A's `revise_a.py`)."""
+
+    def __init__(self, org, target, mito_cut=True):
+        super().__init__(org, target, mito_cut=mito_cut)
         self.core_only = {}
         for rel in CORE_GENES.get(org, {}):
             if rel not in self.genes:

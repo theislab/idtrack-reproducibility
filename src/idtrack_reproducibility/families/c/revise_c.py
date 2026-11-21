@@ -22,6 +22,8 @@ Corrections:
   they go to `broad` (their walks to the target for a line read at an older release), and to `expect` of a `safe`
   line (the string names them); the copies the line expects apart are not others. The corrected judge's
   `names_broad` for family C.
+- `display_names_at_release`, `no_mito_nuclear_step`, `mirbase_genes`: the decided rules of those names on C's lines
+  (each function's docstring).
 """
 import argparse
 import collections
@@ -274,8 +276,149 @@ def par_shared_names(org, lines, ctx):
         yield from v
 
 
+class HeldEarly:
+    """Rule `display_names_at_release` (decided) as Ensembl's records give it: at a release, the names Ensembl gives a
+    gene as its display name (`core_display/<release>`: the display cross-reference's label; the name, not the
+    accession of the record it is filed under, which is held only where a cross-reference of the gene carries it), and the
+    NCBI gene ids of any of its forms (`core_xref`: `EntrezGene` on the gene, a transcript or a translation), read
+    for the values asked only; {value: {release: genes}}."""
+
+    def __init__(self, org, values):
+        self.org, self.want = org, set()
+        self.at = collections.defaultdict(lambda: collections.defaultdict(set))
+        self.add(values)
+
+    def add(self, values):
+        """Read the records of more values (a correction reads the published sets one after another)."""
+        from idtrack_reproducibility.harness import harness_lib as H
+        org = self.org
+        want = set(values) - self.want
+        if not want:
+            return
+        self.want |= want
+        for rel in TC.xref_releases(org):
+            for ot, oid, gid, db, disp, acc, lab, ver, it in TC.read_xref(org, rel):
+                if db == "EntrezGene" and acc in want:
+                    self.at[acc][rel].add(gid)
+            p = os.path.join(H.truth_dir(org), "core_display", f"{rel}.tsv.gz")
+            if os.path.exists(p):
+                for r in H.read_tsv(p):
+                    if r.get("label") in want:
+                        self.at[r["label"]][rel].add(TC.base(r["gene_id"]))
+
+
+def display_names_at_release(org, lines, ctx):
+    """Rule `display_names_at_release` (decided, built from idtrack's next version on): every display name of every
+    release is a name of its gene there, whatever database Ensembl filed it under, and NCBI gene ids are read on every
+    form (the gene, its transcripts, its translations). A value the reference tree's configuration never holds (rule
+    `safe`: `c1_not_held`, `c3_entry`, `c4_*_not_held`, ...) that Ensembl gives a gene in one of these ways at some
+    release of the window (`HeldEarly`) is held there now: the line is read as a held value is (rule `start_release`,
+    C's generator `gen_c.default_truth`): at the target where it is held there, else at the latest release where it
+    is, its genes walked to the target (`gen_c.walked_truth`: strict walk with living ids, broad, copies apart, the
+    locus rule), rule `set`; `read_at` says where. Values held nowhere so keep their truth."""
+    from idtrack_reproducibility.families.a import gen_a as GA
+    from idtrack_reproducibility.families.c import gen_c as GC
+    todo = [r for r in lines if r.get("rule") == "safe" and not r.get("excluded") and not r.get("final_database")
+            and "display_names_at_release" not in (r.get("revised_by") or [])]
+    if not todo:
+        return
+    values = {str(r["id"]) for r in todo}
+    held = ctx["held"] if "held" in ctx else ctx.setdefault("held", HeldEarly(org, values))
+    held.add(values)
+    G = ctx["G"] if "G" in ctx else ctx.setdefault("G", GA.GenA(org, 115))
+    for rec in todo:
+        t = rec["to_release"]
+        at = {r: g for r, g in held.at.get(str(rec["id"]), {}).items() if r <= t}
+        if not at:
+            continue
+        R = rec["from_release"] if rec["from_release"] in at else (t if t in at else max(at))
+        tru = GC.walked_truth(G, at[R], R, t)
+        new = dict(rec)
+        for f in ("expect", "broad", "apart", "open", "open_within", "locus", "locus_mapped", "locus_projected",
+                  "exceptions", "partial"):
+            new.pop(f, None)
+        new.update({f: x for f, x in tru.items() if x is not None})
+        new.update(rule="set", read_at=R, revised_by=list(rec.get("revised_by") or []) + ["display_names_at_release"])
+        new.pop("set", None)
+        yield new
+
+
+def no_mito_nuclear_step(org, lines, ctx):
+    """Rule `no_mito_nuclear_step` (decided, built from idtrack's next version on): a history step between the
+    mitochondrial genome and a nuclear sequence is not followed, and the versions of a stable id on its two sides are
+    two genes (family A's truth, `truth.TruthA`, follows it). A line read at one release and asked at another whose
+    value names, at the release read (`core_xref`, any database's accession or label), a gene of the lineages the rule
+    changes (`Truth.mito_lineage`) is computed again (`gen_c.walked_truth`, as C's generator) with and without the
+    rule; where they differ the rule's truth replaces the line's."""
+    from idtrack_reproducibility.families.a import gen_a as GA
+    from idtrack_reproducibility.families.c import gen_c as GC
+    G = ctx["G"] if "G" in ctx else ctx.setdefault("G", GA.GenA(org, 115))
+    lineage = G.tr.mito_lineage()
+    if not lineage:
+        return
+    G0 = ctx["G0"] if "G0" in ctx else ctx.setdefault("G0", _gen_a_without_rule(org))
+    carriers = ctx["mito_carriers"] if "mito_carriers" in ctx else ctx.setdefault("mito_carriers", _carriers_of(org, lineage))
+    for rec in lines:
+        if rec.get("excluded") or rec.get("final_database") or "no_mito_nuclear_step" in (rec.get("revised_by") or []):
+            continue
+        R = rec.get("from_release") or rec.get("read_at")
+        t = rec["to_release"]
+        if R is None or R == t:
+            continue
+        v = str(rec["id"])
+        genes = carriers.get((R, v)) or carriers.get((R, re.sub(r"\.\d+$", "", v)))
+        if not genes:
+            continue
+        a, b = GC.walked_truth(G, genes, R, t), GC.walked_truth(G0, genes, R, t)
+        if a == b:
+            continue
+        new = dict(rec)
+        for f in ("expect", "broad", "apart", "open", "open_within", "locus", "locus_mapped", "locus_projected",
+                  "exceptions", "partial"):
+            new.pop(f, None)
+        new.update({f: x for f, x in a.items() if x is not None})
+        new["revised_by"] = list(rec.get("revised_by") or []) + ["no_mito_nuclear_step"]
+        new.pop("set", None)
+        yield new
+
+
+def _gen_a_without_rule(org):
+    """Family A's generator with the history read as Ensembl recorded it (no rule `no_mito_nuclear_step`)."""
+    from idtrack_reproducibility.families.a import gen_a as GA
+    from idtrack_reproducibility.families.astar import truth as TA
+    G0 = GA.GenA(org, 115)
+    G0.tr = TA.TruthA(org, 115, mito_cut=False)
+    return G0
+
+
+def _carriers_of(org, genes):
+    """{(release, value): genes} of the cross-references (accession and label, any database) of the given genes."""
+    out = collections.defaultdict(set)
+    for rel in TC.xref_releases(org):
+        for ot, oid, gid, db, disp, acc, lab, ver, it in TC.read_xref(org, rel):
+            if gid in genes:
+                for v in (acc, lab):
+                    if v:
+                        out[(rel, v)].add(gid)
+    return out
+
+
+def mirbase_genes(org, lines, ctx):
+    """Rule `mirbase_genes` (decided, built from idtrack's next version on): a miRBase entry that Ensembl gives to genes
+    at two loci is no identifier of them: the accuracy harness's revision of the same name
+    (`make_queries.rev_mirbase_genes`: the loci from Ensembl's cross-references and the GTFs) applied to C's lines."""
+    from idtrack_reproducibility.harness import make_queries as M
+    from idtrack_reproducibility.harness import harness_lib as H
+    C78 = ctx["C78"] if "C78" in ctx else ctx.setdefault("C78", M.Ctx78(org, H.ORGANISMS[org][2]))
+    todo = [r for r in lines if "mirbase_genes" not in (r.get("revised_by") or [])]
+    for v in M.rev_mirbase_genes(org, todo, C78).values():
+        yield from v
+
+
 CORRECTIONS = {"rfam_label_accession": rfam_label_accession, "other_database_broad": other_database_broad,
-               "rfam_label_rows": rfam_label_rows, "par_shared_names": par_shared_names}
+               "rfam_label_rows": rfam_label_rows, "par_shared_names": par_shared_names,
+               "display_names_at_release": display_names_at_release, "no_mito_nuclear_step": no_mito_nuclear_step,
+               "mirbase_genes": mirbase_genes}
 
 
 def main():
@@ -285,6 +428,7 @@ def main():
     ap.add_argument("--set", required=True)
     ap.add_argument("--sets", default=None, help="the sets read (default: every published set)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--lines-to", default=None, help="with --dry-run: the revision lines, for reading before publishing")
     ap.add_argument("--redo", default=None, help="a published revision set of this correction, made again (the correction "
                     "fixed since): every line of it is corrected anew from its line before the set, and the lines that "
                     "differ from the published ones are published as --set")
@@ -317,6 +461,11 @@ def main():
     if not out:
         log("nothing to revise")
         return
+    if a.dry_run and a.lines_to:
+        import gzip
+        with gzip.open(a.lines_to, "wt") as fo:
+            for r in out:
+                fo.write(C.dumps(r) + "\n")
     doc = CORRECTIONS[a.correction].__doc__ or ""
     man = L.publish(FAMILY, org, a.set, out, f"revision `{a.correction}` (revise_c.py docstring)", ME,
                     revises=L.resolve_sets(FAMILY, org, None, "revised"), judge="c-" + a.correction, sources=["core_xref/<release>.tsv.gz", "gtf/genes_<release>.tsv.gz"],

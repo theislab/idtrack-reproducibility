@@ -10,7 +10,8 @@ are removed, so `results/` holds only the current results.
 
 Index columns: family, stratum, organism, tree, scope (`exhaustive`: every line of the family's sets; `panel`: the
 family's panel, docs/methods.md "Measurement design"; `sets`: every line of the sets the entry names in `sets`, the
-others not asked on that tree; a registry entry says `scope`, default `exhaustive`), commit,
+others not asked on that tree; `modest`: the family's modest selection, up to 500 sampled lines per stratum,
+docs/modest.md; a registry entry says `scope`, default `exhaustive`), commit,
 graph_digest, n, right, wrong, undetermined, timeout, error, rate, low, high, interval (`cluster` for the cluster
 bootstrap over the stratum's units, `wilson` where the table has no clustered interval), file.
 """
@@ -31,7 +32,7 @@ INDEX_COLS = ["family", "stratum", "organism", "tree", "scope", "commit", "graph
               "undetermined", "timeout", "error", "rate", "low", "high", "interval", "file"]
 # every line of the family's sets, its panel (docs/methods.md, "Measurement design"), or every line of the sets the
 # entry names (`sets`; the family's other sets not asked on that tree)
-SCOPES = ("exhaustive", "panel", "sets")
+SCOPES = ("exhaustive", "panel", "sets", "modest")
 PROV_COLS = ["file", "sha256", "generated_by", "source", "source_sha256", "scored_at", "commit", "graph_digest",
              "generated_at"]
 OWN = {"index.tsv", "provenance.tsv"}

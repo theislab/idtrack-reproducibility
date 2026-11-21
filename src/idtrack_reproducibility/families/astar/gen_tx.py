@@ -42,21 +42,10 @@ def collect(org, tr, genes):
     return out
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("organism")
-    ap.add_argument("--set", required=True)
-    ap.add_argument("--target", type=int, default=115)
-    ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--selection", default=None, help="selection file name (default: the organism)")
-    a = ap.parse_args()
-    org, T = a.organism, a.target
-    G = GN.Gen(org, T)
-    sel = GN.selected(org, name=a.selection)
-    unit_of = {g: u for g, u, _ in sel}
-    GN.log("collect transcripts of", len(sel), "genes")
-    txs = collect(org, G.tr, set(unit_of))
-    GN.log("ids", collections.Counter(k for k, _ in txs))
+def lines(G, txs, unit_of, T):
+    """The lines of the transcripts and translations `txs` (`collect`) by generator G: every id from its first and last
+    release to that release and to T (stable and versioned); one transcript and one translation per gene (the smallest
+    crc32 of `20261118:<id>`) to every release of the window (stable)."""
     per_gene = {}
     for (k, x), rr in txs.items():
         for r, (v, g) in rr.items():
@@ -76,29 +65,44 @@ def main():
                              G.tr.walk_series(g, R, rels, False, living=True, resurrect=True))
         return walks[(g, R)]
 
-    def all_lines():
-        for i, ((k, x), rr) in enumerate(sorted(txs.items())):
-            origins = sorted({min(rr), max(rr)})
-            for R in origins:
-                v, g = rr[R]
-                E, B = walk(g, R)
-                full = (k, x) in chosen
-                targets = rels if full else sorted({R, T})
-                for t in targets:
-                    base = G.truth_at(g, R, t, E, B)
-                    st = ("tx_" if k == "tx" else "tl_") + G.stratum(R, t)
-                    forms = [(f"astar_{k}", x)]
-                    if t in (R, T) and v:
-                        forms.append((f"astar_{k}_v", f"{x}.{v}"))
-                    for kind, q in forms:
-                        kk = kind + ("_all" if full and t not in (R, T) else "")
-                        yield dict(qid=f"{kk}|{q}|{R}|{t}", family=GN.FAMILY, kind=kk, stratum=st, unit=unit_of[g],
-                                   id=q, from_release=R, to_release=t, strategy="both", rule="set", gene_at_origin=g,
-                                   **base)
-            if i % 20000 == 0:
-                GN.log("ids done", i, dict(G.counts))
+    for i, ((k, x), rr) in enumerate(sorted(txs.items())):
+        origins = sorted({min(rr), max(rr)})
+        for R in origins:
+            v, g = rr[R]
+            E, B = walk(g, R)
+            full = (k, x) in chosen
+            targets = rels if full else sorted({R, T})
+            for t in targets:
+                base = G.truth_at(g, R, t, E, B)
+                st = ("tx_" if k == "tx" else "tl_") + G.stratum(R, t)
+                forms = [(f"astar_{k}", x)]
+                if t in (R, T) and v:
+                    forms.append((f"astar_{k}_v", f"{x}.{v}"))
+                for kind, q in forms:
+                    kk = kind + ("_all" if full and t not in (R, T) else "")
+                    yield dict(qid=f"{kk}|{q}|{R}|{t}", family=GN.FAMILY, kind=kk, stratum=st, unit=unit_of[g],
+                               id=q, from_release=R, to_release=t, strategy="both", rule="set", gene_at_origin=g,
+                               **base)
+        if i % 20000 == 0:
+            GN.log("ids done", i, dict(G.counts))
 
-    man = GN.publish_stream(org, a.set, all_lines(),
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("organism")
+    ap.add_argument("--set", required=True)
+    ap.add_argument("--target", type=int, default=115)
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--selection", default=None, help="selection file name (default: the organism)")
+    a = ap.parse_args()
+    org, T = a.organism, a.target
+    G = GN.Gen(org, T)
+    sel = GN.selected(org, name=a.selection)
+    unit_of = {g: u for g, u, _ in sel}
+    GN.log("collect transcripts of", len(sel), "genes")
+    txs = collect(org, G.tr, set(unit_of))
+    GN.log("ids", collections.Counter(k for k, _ in txs))
+    man = GN.publish_stream(org, a.set, lines(G, txs, unit_of, T),
                             f"A* transcripts and translations of the selected genes: every id from its first and last "
                             f"release to that release and to {T} (stable and versioned); one transcript and one "
                             f"translation per gene to every release (stable)", ["gtf/tx_<release>.tsv.gz",

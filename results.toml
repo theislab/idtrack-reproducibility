@@ -29,6 +29,15 @@ homo_sapiens = "eb4fcfa05075473cacdbd21e794c5fe204d45ff86879660f689bf2f06147c260
 macaca_mulatta = "b5d2b7b89c677f90ba8d3778871b1eaf091e26ce6220a1fd2d36dba431861949"
 macaca_fascicularis = "bba5f987330c8f5ee3fddac78640751b6f5828a9af0d4de7b3d9beb3f6e31f3f"
 
+# the graphs of the tree `r1` (idtrack ef81eba: `next` after the fix of its first round), built by its own builder
+# (the data root's graphs/r1/)
+[graphs.r1]
+sus_scrofa = "1e07f6d602087ee0247088e363d7592ff788ec21836bbcde5224834465dc9447"
+mus_musculus = "26fd7425e091645b29bd4890257fa13fa54049eb5850f08c7ef365720bf2f6f2"
+homo_sapiens = "cef126901abcc890f7bda49032c9fd7cd2eb403eb722a7fe137ab3861e0370b7"
+macaca_mulatta = "c5907a16ad0ecafa02e5705323063a18de1f1d3ce92fe09d7912ddd7026aade8"
+macaca_fascicularis = "571cac8a8736288c20f17d980b0e6ace51218d9c67709c41565d4f338ea816f8"
+
 # ---------------- the accuracy harness ----------------
 [[run]]
 family = "harness"
@@ -290,3 +299,85 @@ generator = "family d run_d; idtrack-repro score --family d; family d report_d2 
 files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "price.tsv" = "d2/price.tsv" }
 index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]
+
+
+# ---------------- the modest set on the tree `r1` (docs/modest.md): the harness's sets whole (scope exhaustive),
+# each family's modest selection (scope modest: up to 500 sampled lines per stratum) ----------------
+[[run]]
+family = "f0"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/harness"
+generator = "idtrack-repro modest organism --tree r1 (runner --family harness; idtrack-repro score --family harness), --score-only after the revision sets of round 1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "astar"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/astar"
+scope = "modest"
+generator = "idtrack-repro modest organism --tree r1 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "a"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/a"
+scope = "modest"
+generator = "idtrack-repro modest organism --tree r1 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "b"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/b"
+scope = "modest"
+limits = "outcomes"
+generator = "idtrack-repro modest organism --tree r1 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 1"
+files = { "now_report.tsv" = "report.tsv", "now_scores.tsv" = "scores.tsv" }
+index = { "now_report.tsv" = "report" }
+
+[[run]]
+family = "c"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/c"
+scope = "modest"
+generator = "idtrack-repro modest organism --tree r1 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "d"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/d"
+scope = "modest"
+generator = "idtrack-repro modest organism --tree r1 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "e"
+tree = "r1"
+commit = "ef81ebaa875fd366ae4ad10e4fc657766afacd86"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r1/{organism}/e"
+scope = "modest"
+scored = ["scores_now/run.json", "scores_decided/run.json"]
+limits = "outcomes"
+generator = "idtrack-repro modest organism --tree r1 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 1"
+files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv" }
+index = { "now_report.tsv" = "report" }

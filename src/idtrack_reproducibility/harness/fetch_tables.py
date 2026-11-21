@@ -6,6 +6,7 @@ Usage:
   fetch_tables.py --organism <name> vgnc                         VGNC's gene set of the organism (VGNC id -> symbol)
   fetch_tables.py --organism <name> vega --releases 75,80        Vega gene names of the core xref tables of a release
   fetch_tables.py --organism <name> chains                       Ensembl's assembly chain files between the organism's assemblies
+  fetch_tables.py --organism <name> sequences --releases eras     the sequence regions of each assembly and their kind (karyotype)
 
 Writes into `<work>/truth/<organism>/core/`, `biomart/<release>/<group>.tsv`, `vgnc/`, `vega/` and `chain/`, one line
 per file in SOURCES.tsv.
@@ -349,6 +350,60 @@ def grc_placements(org, rp, grc, lengths):
     return rows
 
 
+def core_reader(org, rel, rp):
+    """(the core database's folder on the FTP, a reader of its table dumps) of an organism at a release: `table(name)`
+    returns the rows of `<name>.txt.gz` (or `.txt.gz.bz2`), each source listed in SOURCES.tsv under `rp` (not kept)."""
+    html = H.http_get(f"{FTP}/release-{rel}/mysql/").decode()
+    dbs = sorted(set(re.findall(rf'href="({org}_core_{rel}_[^"/]+?)/?"', html)) - {''})
+    dbs = [d for d in dbs if not d.endswith(".gz")]
+    if len(dbs) > 1:  # human 112 on also serves the GRCh37 archive core (`_37`): the release's own is the newest
+        dbs = [max(dbs, key=lambda d: int(re.search(r"_(\d+)[a-z]*$", d).group(1)))]
+    if len(dbs) != 1:
+        raise SystemExit(f"core databases of {org} at {rel}: {dbs}")
+    base = f"{FTP}/release-{rel}/mysql/{dbs[0]}"
+    listing = H.http_get(base + "/").decode()
+
+    def table(name):
+        # most releases dump `<table>.txt.gz`; some (human and mouse 89) `<table>.txt.gz.bz2`
+        fn = f"{name}.txt.gz" if f'href="{name}.txt.gz"' in listing else f"{name}.txt.gz.bz2"
+        url = f"{base}/{fn}"
+        data = H.http_get(url)
+        H.add_source(org, f"{rp} (read from {fn}; not kept)", url, len(data), hashlib.md5(data).hexdigest(), now())
+        raw = bz2.decompress(data) if fn.endswith(".bz2") else data
+        raw = gzip.decompress(raw) if raw[:2] == b"\x1f\x8b" else raw
+        return [line.split("\t") for line in raw.decode().split("\n") if line]
+    return base, table
+
+
+SEQ_HEADER = ["seqname", "coord_system", "coord_system_rank", "length", "karyotype_rank", "codon_table"]
+
+
+def sequences(org, rels):
+    """The sequence regions of the default coordinate systems at a release, with what Ensembl's core says of each:
+    the coordinate system (`coord_system`, its `rank`), the length, the `karyotype_rank` attribute (a sequence of the
+    organism's karyotype: a chromosome, or the mitochondrial genome) and the `codon_table` attribute (another genetic
+    code than the standard one: the mitochondrial genome). Written as `sequences/<release>.tsv` (SEQ_HEADER); the
+    dumps (`coord_system`, `seq_region`, `seq_region_attrib`, `attrib_type`) are listed in SOURCES.tsv and not kept.
+    One release per assembly is enough (a sequence's kind is the assembly's): `--releases eras` takes the last GTF
+    release of each assembly of the window."""
+    for rel in rels:
+        rp = f"sequences/{rel}.tsv"
+        if os.path.exists(os.path.join(H.truth_dir(org), rp)):
+            continue
+        base, table = core_reader(org, rel, rp)
+        cs = {c[0]: (c[2], c[4]) for c in table("coord_system") if "default_version" in c[-1]}
+        codes = {r[0]: r[1] for r in table("attrib_type")}
+        want = {k for k, v in codes.items() if v in ("karyotype_rank", "codon_table")}
+        sr = {r[0]: [r[1], cs[r[2]][0], cs[r[2]][1], r[3], "", ""] for r in table("seq_region") if r[2] in cs}
+        for r in table("seq_region_attrib"):
+            if r[1] in want and r[0] in sr:
+                sr[r[0]][4 if codes[r[1]] == "karyotype_rank" else 5] = r[2]
+        rows = sorted(sr.values())
+        body = ("\t".join(SEQ_HEADER) + "\n" + "".join("\t".join(r) + "\n" for r in rows)).encode()
+        save(org, rp, body, f"{base} (coord_system, seq_region, seq_region_attrib, attrib_type; see fetch_tables.sequences)")
+        print(org, rel, "sequences", len(rows), "karyotype", sum(1 for r in rows if r[4]), flush=True)
+
+
 def exceptions(org, rels):
     """Assembly exceptions of a release: the core database's `assembly_exception` (haplotypes HAP, patches
     PATCH_FIX/PATCH_NOVEL, pseudoautosomal regions PAR: a segment of one sequence region and the segment of the
@@ -370,26 +425,7 @@ def exceptions(org, rels):
         rp = f"exceptions/{rel}.tsv"
         if os.path.exists(os.path.join(H.truth_dir(org), rp)):
             continue
-        html = H.http_get(f"{FTP}/release-{rel}/mysql/").decode()
-        dbs = sorted(set(re.findall(rf'href="({org}_core_{rel}_[^"/]+?)/?"', html)) - {''})
-        dbs = [d for d in dbs if not d.endswith(".gz")]
-        if len(dbs) > 1:  # human 112 on also serves the GRCh37 archive core (`_37`): the release's own is the newest
-            dbs = [max(dbs, key=lambda d: int(re.search(r"_(\d+)[a-z]*$", d).group(1)))]
-        if len(dbs) != 1:
-            raise SystemExit(f"core databases of {org} at {rel}: {dbs}")
-        base = f"{FTP}/release-{rel}/mysql/{dbs[0]}"
-        listing = H.http_get(base + "/").decode()
-
-        def table(name):
-            # most releases dump `<table>.txt.gz`; some (human and mouse 89) `<table>.txt.gz.bz2`
-            fn = f"{name}.txt.gz" if f'href="{name}.txt.gz"' in listing else f"{name}.txt.gz.bz2"
-            url = f"{base}/{fn}"
-            data = H.http_get(url)
-            H.add_source(org, f"{rp} (read from {fn}; not kept)", url, len(data), hashlib.md5(data).hexdigest(), now())
-            raw = bz2.decompress(data) if fn.endswith(".bz2") else data
-            raw = gzip.decompress(raw) if raw[:2] == b"\x1f\x8b" else raw
-            return [line.split("\t") for line in raw.decode().split("\n") if line]
-
+        base, table = core_reader(org, rel, rp)
         ae = table("assembly_exception")
         rows = []
         if ae:
@@ -459,11 +495,25 @@ def chains(org):
         print("saved", rp, flush=True)
 
 
+def eras_of(org):
+    """[(assembly, first release, last release)] of the GTF releases of the window."""
+    out = []
+    asm = H.gtf_assemblies(org)
+    for r in H.gtf_releases(org):
+        if r > H.ORGANISMS[org][2]:
+            continue
+        if out and out[-1][0] == asm.get(r):
+            out[-1][2] = r
+        else:
+            out.append([asm.get(r), r, r])
+    return [tuple(x) for x in out]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
     ap.add_argument("what", choices=["core", "biomart", "vgnc", "vega", "chains", "exceptions", "grc_alignments",
-                                     "core_places"])
+                                     "core_places", "sequences"])
     ap.add_argument("--release", type=int, default=None)
     ap.add_argument("--releases", default="115")
     ap.add_argument("--only", default=None)
@@ -477,6 +527,12 @@ def main():
     elif a.what == "exceptions":
         rr = H.gtf_releases(a.organism) if a.releases == "all" else [int(x) for x in a.releases.split(",")]
         exceptions(a.organism, sorted(rr))
+    elif a.what == "sequences":
+        if a.releases == "eras":
+            rr = [hi for _a, _lo, hi in eras_of(a.organism)]
+        else:
+            rr = [int(x) for x in a.releases.split(",")]
+        sequences(a.organism, sorted(rr))
     elif a.what == "core_places":
         core_places(a.organism, [int(x) for x in a.releases.split(",")])
     elif a.what == "grc_alignments":

@@ -6,7 +6,7 @@ The benchmarks read and write a **data root** outside git: truth files, query se
 
 | location (configuration) | holds | made by |
 | --- | --- | --- |
-| `truth/<organism>/` | Ensembl's and the authorities' files: `gtf/genes_<release>.tsv.gz` and `tx_<release>.tsv.gz` (from the GTF of every release), `core/` (history tables of the release-115 core database), `biomart/<release>/` (archive BioMart tables), `chain/` (assembly chain files), `exceptions/<release>.tsv` (assembly exceptions), `grc_alignments/`, `core_places/`, `vgnc/`, `vega/`, `rest/` (Ensembl REST records), the extracts of the core database of every release (`core_xref/<release>.tsv.gz`: cross-references of the kept databases, family C's `fetch_c ensembl`; `core_synonyms/<release>.tsv.gz`: synonyms of every cross-reference; `core_display/<release>.tsv.gz`: each gene's display cross-reference, the name and the database it is filed under; family B's `fetch_b synonyms`, `fetch_b display`), and the authorities' files of the later families; `SOURCES.tsv` lists every fetched file with URL, size, md5 and time | `idtrack-repro fetch-gtf`, `fetch-tables`, `fetch-rest` |
+| `truth/<organism>/` | Ensembl's and the authorities' files: `gtf/genes_<release>.tsv.gz` and `tx_<release>.tsv.gz` (from the GTF of every release), `core/` (history tables of the release-115 core database), `biomart/<release>/` (archive BioMart tables), `chain/` (assembly chain files), `exceptions/<release>.tsv` (assembly exceptions), `sequences/<release>.tsv` (the sequence regions of each assembly, at the last release of the assembly, with their coordinate system and Ensembl's `karyotype_rank` and `codon_table` attributes: which are whole chromosomes and which the mitochondrial genome; `fetch_tables sequences --releases eras`), `grc_alignments/`, `core_places/`, `vgnc/`, `vega/`, `rest/` (Ensembl REST records), the extracts of the core database of every release (`core_xref/<release>.tsv.gz`: cross-references of the kept databases, family C's `fetch_c ensembl`; `core_synonyms/<release>.tsv.gz`: synonyms of every cross-reference; `core_display/<release>.tsv.gz`: each gene's display cross-reference, the name and the database it is filed under; family B's `fetch_b synonyms`, `fetch_b display`), and the authorities' files of the later families; `SOURCES.tsv` lists every fetched file with URL, size, md5 and time | `idtrack-repro fetch-gtf`, `fetch-tables`, `fetch-rest` |
 | `harness/queries/<organism>/` | the harness's query sets `v<n>.jsonl.gz` with `v<n>.manifest.json` (fixed once published) | `idtrack-repro make-queries` |
 | `harness/answers/<tree>/<organism>/{kinds,travel}/results/` | the answers of a tree to the harness's sets (`shard_<i>_of_<n>.jsonl`, `load_<i>_of_<n>.json`) | `idtrack-repro harness-score` |
 | `harness/runs/<tree>/<organism>/{kinds,travel}/` | the scoring of those answers under the current judge: the record (`outcomes/`) and the tables derived from it (`outcomes.tsv.gz`, `scores.tsv`, `wrong.tsv`, ...; the travel matrix's `travel_report.tsv`) | `idtrack-repro harness-score --merge`, `travel-report` |
@@ -41,22 +41,22 @@ The areas' sizes, summed from their manifests (`manifests/`; the family areas li
 
 | area | files | GB |
 | --- | ---: | ---: |
-| truth | 3,199 | 5.27 |
-| harness/queries | 148 | 0.03 |
+| truth | 3,213 | 5.34 |
+| harness/queries | 156 | 0.03 |
 | harness/answers | 90 | 0.64 |
 | harness/runs | 115 | 0.07 |
 | harness/checks | 8 | 0.00 |
 | families/design | 10 | 0.00 |
 | families/f0 | 460 | 0.16 |
-| families/astar | 16,698 | 8.07 |
-| families/a | 22,035 | 12.13 |
-| families/e | 3,138 | 4.33 |
-| graphs | 4,884 | 9.21 |
+| families/astar | 16,714 | 8.07 |
+| families/a | 22,071 | 12.13 |
+| families/e | 3,170 | 4.33 |
+| graphs | 4,889 | 9.53 |
 | hunts | 299 | 3.72 |
 | corpus | 170 | 0.12 |
 | performance | 117 | 0.11 |
-| families/b | 2,545 | 1.59 |
-| families/c | 7,212 | 5.36 |
+| families/b | 2,619 | 1.60 |
+| families/c | 7,234 | 5.36 |
 | families/d | 1,465 | 1.01 |
 | families/d_atlas_inputs | 151 | 0.04 |
 | **total** | **62,744** | **51.9** |
@@ -70,7 +70,7 @@ The data root is to be published with the manuscript in a data repository that g
 | truth | `truth` | 5.3 GB: Ensembl's and the authorities' files as fetched (their own licences: Ensembl's data are free to use; the authorities' terms are at the URLs in `SOURCES.tsv`) |
 | harness | `harness/*` | 0.7 GB: the fixed query sets, the reference tree's answers and their scoring |
 | families | `families/*` | 32.7 GB: the families' sets, answers, scorings and causes (the answers are most of it; Parquet, compressed) |
-| graphs | `graphs` | 9.2 GB: the reference tree's graphs and the tables they were built from (equal graphs have equal content digests, so a rebuilt graph is checked against the digest the runs record) |
+| graphs | `graphs` | 9.5 GB: the trees' graphs (the reference's and the development trees') and the tables they were built from (equal graphs have equal content digests, so a rebuilt graph is checked against the digest the runs record) |
 | corpus, hunts, performance | `corpus`, `hunts`, `performance` | 4.0 GB: the regression corpus and its references, the hunts' outputs, the performance measurements |
 
 An area marked `publish = false` in `manifests/areas.toml` is no part of any record: family D's copies of the atlas project's files (`families/d_atlas_inputs`, 150 files, 42.5 MB), whose release is the atlas project's decision; their manifest stays in this repository (each file, its origin in the project with the commit, its size and sha256), so that a reader who obtains them from the project checks them, and nothing of D's published sets, answers or scorings needs them.

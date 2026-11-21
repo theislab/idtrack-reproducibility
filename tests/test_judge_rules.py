@@ -131,4 +131,7 @@ def test_one_case_strings_read_as_the_mixed_case_authority_s_symbol():
 
 def test_the_published_judge_leaves_out_every_revised_judge():
     assert set(H.REVISED_JUDGES) == {"78", "rules"} and MQ.RULES_JUDGE <= set(MQ.REVISIONS)
-    assert list(MQ.REVISIONS).index("copies_apart_early") == len(MQ.REVISIONS) - 1 and "copies_apart_early" not in MQ.RULES_JUDGE
+    assert "copies_apart_early" in MQ.REVISIONS and "copies_apart_early" not in MQ.RULES_JUDGE
+    # the rules built after next's first round are published after every earlier revision, as judge `rules`
+    assert list(MQ.REVISIONS)[-2:] == ["no_mito_nuclear_step", "mirbase_genes"]
+    assert {"no_mito_nuclear_step", "mirbase_genes"} <= MQ.RULES_JUDGE

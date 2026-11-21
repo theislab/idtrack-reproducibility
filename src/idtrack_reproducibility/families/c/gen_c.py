@@ -140,42 +140,8 @@ class GenC:
         return out
 
     def walked(self, gs, R, t):
-        """The truth of a value read at R, to t: the union of its genes' walks (one gene: A's truth_at whole)."""
-        tr = self.tr
-        ok, miss = self.genes_ok(gs, R)
-        if miss or not ok:
-            self.counts["open: gene absent from the GTF"] += 1
-            return dict(cmp=tr.cmp_for(t), expect=[], open=f"Ensembl's xrefs name gene(s) absent from the GTF of {R}: "
-                                                            f"{','.join(sorted(miss)[:3])}")
-        if len(ok) == 1:
-            g = next(iter(ok))
-            E, B = self.G.walks(g, R, [t])
-            out = self.G.truth_at(g, R, t, E, B)
-            return out
-        Es, Bs, empty = set(), set(), 0
-        for g in sorted(ok):
-            E, B = self.G.walks(g, R, [t])
-            e = E.get(t, set())
-            Es |= e
-            Bs |= B.get(t, set()) | e
-            empty += not e
-        out = dict(cmp=tr.cmp_for(t))
-        if not Es:
-            out["expect"] = []
-            out["open"] = "several genes carry the value and Ensembl's history gives none of them a successor"
-            self.counts["open: several genes without successor"] += 1
-            return out
-        Ev = tr.vset(Es, t)
-        Ev2, apart = self.G.apart_of(Ev, t)
-        out["expect"] = sorted(Ev2)
-        if apart:
-            out["apart"] = apart
-        if Bs != Es:
-            out["broad"] = tr.vset(Bs, t)
-        if empty:
-            out["partial"] = empty
-            self.counts["several genes, some without successor"] += 1
-        return out
+        """The truth of a value read at R, to t (`walked_truth`)."""
+        return walked_truth(self.G, gs, R, t, self.counts)
 
     def default_truth(self, fam, v):
         """Rule `start_release`'s reading without from_release: (R read, truth to T) or (None, None) when the graph never holds v."""
@@ -541,6 +507,47 @@ PARTS = {
 # Fields of a line that explain it in words (the rule it follows, how it was made): a line whose other fields are
 # unchanged is the same truth, so `--revise-from` does not revise it for the wording of its explanation.
 WORDING = ("note", "q2")
+
+
+def walked_truth(G, gs, R, t, counts=None):
+    """The truth of a value read at R, to t: the union of its genes' walks (one gene: A's truth_at whole); G is family
+    A's generator (`GenA`), `counts` a Counter of the open cases."""
+    tr = G.tr
+    counts = counts if counts is not None else collections.Counter()
+    at = tr.genes.get(R) or {}
+    ok, miss = {g for g in gs if g in at}, {g for g in gs if g not in at}
+    if miss or not ok:
+        counts["open: gene absent from the GTF"] += 1
+        return dict(cmp=tr.cmp_for(t), expect=[], open=f"Ensembl's xrefs name gene(s) absent from the GTF of {R}: "
+                                                        f"{','.join(sorted(miss)[:3])}")
+    if len(ok) == 1:
+        g = next(iter(ok))
+        E, B = G.walks(g, R, [t])
+        return G.truth_at(g, R, t, E, B)
+    Es, Bs, empty = set(), set(), 0
+    for g in sorted(ok):
+        E, B = G.walks(g, R, [t])
+        e = E.get(t, set())
+        Es |= e
+        Bs |= B.get(t, set()) | e
+        empty += not e
+    out = dict(cmp=tr.cmp_for(t))
+    if not Es:
+        out["expect"] = []
+        out["open"] = "several genes carry the value and Ensembl's history gives none of them a successor"
+        counts["open: several genes without successor"] += 1
+        return out
+    Ev = tr.vset(Es, t)
+    Ev2, apart = G.apart_of(Ev, t)
+    out["expect"] = sorted(Ev2)
+    if apart:
+        out["apart"] = apart
+    if Bs != Es:
+        out["broad"] = tr.vset(Bs, t)
+    if empty:
+        out["partial"] = empty
+        counts["several genes, some without successor"] += 1
+    return out
 
 
 def truth_hash(row):

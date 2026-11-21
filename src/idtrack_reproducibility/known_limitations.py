@@ -53,8 +53,8 @@ def main(argv=None):
         fam = e["family"]
         if fam == "a" and "/a0/" in e["folder"]:
             fam = "a0"  # A0, graph fidelity: its own builder over its summaries
-        elif "/runs/" not in e["folder"]:
-            continue
+        elif "/runs/" not in e["folder"] and not (e["folder"].startswith("modest/") and e.get("limits")):
+            continue  # (a part of a modest run is read where its entry names a builder of rows from the outcomes)
         fam = e.get("limits", fam)
         if fam not in BUILDERS or (fam == "astar" and e["tree"] != "d4c2dda"):
             continue  # (A*'s builder reads every organism's run of one name; its transcript runs have no causes)

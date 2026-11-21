@@ -28,6 +28,9 @@ projected through Ensembl's assembly exceptions and mapped across assemblies by 
 (it is A*'s second reading for its ids). A walk is computed directly for an id without a cross-id event and without
 a gap in its releases (its walk is itself wherever it exists; checked against the full walk on a sample at start).
 
+The walk follows rule `no_mito_nuclear_step` (TruthA): a step between the mitochondrial genome and a nuclear sequence
+is not followed, also where the stable id stays the same (such an id has no direct walk).
+
 `unit` (cluster of the bootstrap): the id's lineage (the smallest id of its component of cross-id events), else the
 id. Extra fields: `era` (assembly of the release asked from), `dist` (target minus origin), `cross` (assembly differs).
 """
@@ -158,7 +161,7 @@ class GenA(AG.Gen):
     def walks(self, g, R, targets, fast=True):
         """(strict, broad) {target: ids} of g read at R."""
         tr = self.tr
-        if fast and g not in self.cross and self.contiguous(g):
+        if fast and g not in self.cross and g not in tr.mito_steps() and self.contiguous(g):
             pr = tr.present[g]
             E = {t: ({g} if t in pr else set()) for t in targets}
             return E, E
@@ -168,7 +171,7 @@ class GenA(AG.Gen):
     def selfcheck(self, n=3000):
         """The direct walk equals the full walk for ids without cross-id events and gaps (a seeded sample)."""
         tr = self.tr
-        pool = sorted(g for g in tr.present if g not in self.cross and self.contiguous(g))
+        pool = sorted(g for g in tr.present if g not in self.cross and g not in tr.mito_steps() and self.contiguous(g))
         rng = random.Random(f"{SEED}:{self.org}:selfcheck")
         bad = 0
         for g in rng.sample(pool, min(n, len(pool))):

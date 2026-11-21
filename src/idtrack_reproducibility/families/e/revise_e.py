@@ -33,6 +33,15 @@ Usage: revise_e.py --organism <o> --revision <name> [--dry]
   `e1_single_other`, `e1_batch_other`, no source database named) expects `MissingValueError`, as the missing value
   itself does; and E2's junk strings whose cut form is a name (`CLEC1?`: stratum `e2_junk_wild`, the wildcard `?` is
   terminal punctuation) expect the genes the harness's revision `stray_punctuation` gives them (`make_queries`).
+- `e3_missing_items` (judge `decided`; published as `e3_dec`): rule `missing_values` for a batch (decided, built in
+  idtrack's next version): an item of a batch that holds no value as Python, NumPy and pandas hold it (`None`, a float
+  NaN, `pd.NA`, `NaT`) is that item's error, `MissingValueError`, and the batch goes on (before, the whole batch was
+  refused as holding an item that is no string; any other such item still is): E3's batch lines of such an item
+  (strata `e3_batch_nonstring_item`, `e3_batch_pd_string_na`) expect `MissingValueError` under the decided judge.
+- `mirbase_decided` (judge `decided`; published as `<set>_dec<k>`, the next free name of each set the rule changes):
+  rule `mirbase_genes` (decided, built in idtrack's next version): a miRBase entry that Ensembl gives to genes at two
+  loci is no identifier of them; the accuracy harness's revision of that name (`make_queries.rev_mirbase_genes`)
+  applied to the decided judge's latest lines.
 - `e8_identity_dec` (judge `decided`): rule `lrg_answers_gene` (decided): an LRG id answers the Ensembl gene
   the LRG record describes. A line asked by an LRG gene id (`LRG_<n>_g<k>`) at a release expects, under the decided
   judge, the gene that Ensembl's core database of that release links to the record (the gene's xref of database
@@ -135,6 +144,63 @@ def e1_dec2(org):
                       "`missing_values`)")
         r.pop("set", None)
         out.append(r)
+    return out
+
+
+def is_missing_item(v):
+    """No value as Python, NumPy and pandas hold it: None, a float NaN (NumPy's too), pd.NA, NaT."""
+    import math
+    if v is None:
+        return True
+    if isinstance(v, float) and math.isnan(v):
+        return True
+    try:
+        import pandas as pd
+        return v is pd.NA or v is pd.NaT
+    except ImportError:
+        return False
+
+
+def e3_missing_items(org):
+    """The decided judge's E3 batch lines of an item that holds no value (see the module's docstring)."""
+    from idtrack_reproducibility.families.e import adapter_e as AE
+    lines, _, _ = L.load("e", org, ["e3"])
+    out = []
+    for q in lines:
+        if q.get("stratum") not in ("e3_batch_nonstring_item", "e3_batch_pd_string_na") or q.get("pos") is None:
+            continue
+        if not is_missing_item(AE.decode(q["batch"][q["pos"]])):
+            continue
+        r = dict(q, open=None, expect_error=G.E_MISSING, revised_by=["e3_missing_items"],
+                 note=((q.get("note") or "") + "; " if q.get("note") else "") + "an item without a value is that item's "
+                      "error (rule `missing_values`, batches)")
+        r.pop("set", None)
+        out.append(r)
+    return out
+
+
+def harness_rule_decided(org, name):
+    """{(set to publish, the set it revises): revised lines} of a harness revision of a decided rule applied to the
+    decided judge's latest lines of every E set; each revised line goes to `<base>_dec<k>` (the next free name) of the
+    set it last came from."""
+    from idtrack_reproducibility.families.e import score_e as SE
+    from idtrack_reproducibility.harness import make_queries as MQ
+    names = L.set_names("e", org)
+    lines, _, _ = L.load("e", org, SE.sets_for(org, "decided"))
+    C = MQ.Ctx78(org, H.ORGANISMS[org][2])
+    todo = [q for q in lines if isinstance(q.get("id"), str) and q.get("rule") != "relation" and not q.get("expect_error")
+            and q.get("to_release") is not None and q.get("expect") is not None]
+    out = collections.defaultdict(list)
+    src_of = {q["qid"]: q.get("set") or "" for q in todo}
+    for v in MQ.REVISIONS[name](org, todo, C).values():
+        for r in v:
+            r.pop("set", None)
+            src = src_of[r["qid"]]
+            m = SE.DEC.match(src)
+            base = m.group("base") if m else re.sub(r"_r\d+$", "", src)
+            ks = [int(SE.DEC.match(x).group("k") or 1) for x in names if SE.DEC.match(x) and
+                  SE.DEC.match(x).group("base") == base]
+            out[(f"{base}_dec{max(ks) + 1}" if ks else f"{base}_dec", base)].append(r)
     return out
 
 
@@ -258,7 +324,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
     ap.add_argument("--revision", required=True, choices=["e5_r1", "e5_r2", "e1_dec2", "e8_identity_dec",
-                                                         "e2_names_every_release", "e2_case_r1", "stray_decided"])
+                                                         "e2_names_every_release", "e2_case_r1", "stray_decided",
+                                                         "e3_missing_items", "mirbase_decided"])
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
     if a.revision == "stray_decided":
@@ -308,6 +375,25 @@ def main():
                       "decided rule `missing_values` as built)", __file__, revises=["e1", "e1_dec"], judge="decided",
                       sources=["pandas._libs.parsers.STR_NA_VALUES"], dry=a.dry)
         print(a.organism, a.revision, m["n"])
+        return
+    if a.revision == "mirbase_decided":
+        for (name, base), rev in sorted(harness_rule_decided(a.organism, "mirbase_genes").items()):
+            revises = [x for x in L.set_names("e", a.organism) if x == base or x.startswith(base + "_")]
+            m = L.publish("e", a.organism, name, rev, "E: miRBase entries of two loci are no identifiers (judge: the "
+                          "decided rule `mirbase_genes`; make_queries.rev_mirbase_genes)", __file__, revises=revises,
+                          judge="decided", sources=["core_xref/<release>.tsv.gz", "core_synonyms/<release>.tsv.gz",
+                                                    "gtf/genes_<release>.tsv.gz", "sequences/<release>.tsv"], dry=a.dry)
+            print(a.organism, name, m["n"] if m else len(rev), collections.Counter(r["stratum"] for r in rev))
+        return
+    if a.revision == "e3_missing_items":
+        rev = e3_missing_items(a.organism)
+        if not rev:
+            print(a.organism, a.revision, "no line changes")
+            return
+        m = L.publish("e", a.organism, "e3_dec", rev, "E3: an item of a batch without a value is that item's error "
+                      "(judge: the decided rule `missing_values` for batches, as built)", __file__, revises=["e3"],
+                      judge="decided", sources=["adapter_e.decode"], dry=a.dry)
+        print(a.organism, a.revision, m["n"], collections.Counter(r["stratum"] for r in rev))
         return
     if a.revision == "e8_identity_dec":
         rev, files = e8_identity_dec(a.organism)

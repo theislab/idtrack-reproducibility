@@ -109,6 +109,14 @@ The published sets (manifests `<families>/astar/queries/<organism>/<set>.manifes
 | cynomolgus | `v1` | 1,688,112 | – | the 2,265 ids of the first selection |
 | cynomolgus | `tx1` | 138,073 | – | transcripts and translations |
 | cynomolgus | `hunt1` | 4,714 | – | the 4 ids `r3` added |
+| rhesus | `v1r1` | 15,784 | `v1` | rule [`no_mito_nuclear_step`](../rules.md#no_mito_nuclear_step) (judge `rules`, `revise_rules.py`): the lines of the lineages of the 5 mitochondrial ids that Ensembl gave to nuclear genes at Mmul_10 |
+| rhesus | `tx1r1` | 614 | `tx1` | as `v1r1`, their transcripts and translations |
+| rhesus | `v1r2` | 372 | `v1`, `v1r1` | as `v1r1`, the `db` lines whose walk the rule leaves without a successor (the generator makes no `db` line of such a walk; `revise_rules.db_without_successor`): on the nuclear side nothing, on the mitochondrial side open |
+| cynomolgus | `v1r1` | 1,298 | `v1` | as rhesus `v1r1` (5 ids, Macaca_fascicularis_6.0) |
+| cynomolgus | `hunt1r1` | 1,947 | `hunt1` | as `v1r1` |
+| cynomolgus | `tx1r1` | 80 | `tx1` | as `v1r1` |
+| human | `v1r4` | 3,462 | `v1` to `v1r3` | as rhesus `v1r1` (5 ids at 48 to 55) |
+| human | `tx1r2` | 509 | `tx1`, `tx1r1` | as `v1r4` |
 
 Lines per stratum of each set are in its manifest (`counts`); for example human `v1`: `same` 753,551, `forward` 12,353,556, `backward` 12,707,962, `forward_handoff` 8,822,392, `backward_handoff` 16,604,007, `default` 2,553,536, `db` 363,820.
 
@@ -116,7 +124,7 @@ Lines per stratum of each set are in its manifest (`counts`); for example human 
 
 Nothing of idtrack: the truth is the harness's reading of Ensembl's history ([the accuracy harness](../harness.md)) through `astar/truth.py` and `astar/gen.py` (`Gen.truth_at`):
 
-- **the strict walk with living ids** (`expect`): the genes the history carries the id to at the target, where an id present in the GTFs on both sides of a session is kept (rule [`id_lives_on`](../rules.md#id_lives_on)); sessions are crossed where their effect appears in the GTFs, not at their recorded old release (the corrected judge's `sessions_effective`);
+- **the strict walk with living ids** (`expect`): the genes the history carries the id to at the target, where an id present in the GTFs on both sides of a session is kept (rule [`id_lives_on`](../rules.md#id_lives_on)); sessions are crossed where their effect appears in the GTFs, not at their recorded old release (the corrected judge's `sessions_effective`); a step between the mitochondrial genome and a nuclear sequence is not followed, also where the id stays the same (rule [`no_mito_nuclear_step`](../rules.md#no_mito_nuclear_step), `truth.TruthA`; the second reading is not compared on those lineages, since REST reads the steps the rule refuses);
 - **the broad walk with returned ids** (`broad`): also the genes reached through ids that Ensembl retired and brought back (rule [`resurrection`](../rules.md#resurrection)); an answer in `broad` but not in `expect` is undetermined;
 - **copies apart** (`apart`): genes on haplotypes, patches and alternative loci are expected in the list idtrack reports apart (rule [`judge_copies_apart`](../rules.md#judge_copies_apart)); before release 82, where the GTFs label every gene `primary`, the copies are read from Ensembl's assembly exceptions;
 - **the locus rule**: where the history reaches nothing, an answer at the old place is undetermined and one elsewhere wrong; places on haplotypes, patches and the Y pseudoautosomal regions are projected onto the reference through Ensembl's assembly exceptions and the GRC's alignments, and mapped across assemblies by Ensembl's chain files (the corrected judge's `exceptions`, `exceptions_span`; [the corrections of the judge](../harness.md#the-corrections-of-the-judge));
@@ -149,6 +157,7 @@ python -m idtrack_reproducibility.families.astar.revise_spellings <o> --set <new
 python -m idtrack_reproducibility.families.astar.revise_rest <o> --set <new> --revises <sets> --ids <file>
 python -m idtrack_reproducibility.families.astar.revise_early <o> --set <new> --revises <sets>
 python -m idtrack_reproducibility.families.astar.revise_core <o> --set <new> --revises <sets>
+python -m idtrack_reproducibility.families.astar.revise_rules <o> [--dry-run]   # a decided rule the truth now follows
 # a tree's run (F0's runner and scorer)
 python -m idtrack_reproducibility.families.runner --family astar --organism <o> --clone <source> --graph <graph> \
     --out <families>/astar/runs/<tree>/<o> --sets v1,... --submit <n> --score --score-parts <P>

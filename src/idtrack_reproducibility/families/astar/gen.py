@@ -14,7 +14,8 @@ For every selected id (`selection/<organism>.tsv.gz`, ids present in a GTF of th
 Every line has `strategy` `both` (scored under `best` and `all`).
 
 Truth (truth.py; nothing of idtrack): the strict walk with living ids (`expect`), the broad walk with living and
-returned ids (`broad`), copies on patches reported apart (rule `judge_copies_apart`), the locus rule with the place mapped across
+returned ids (`broad`), both without a step between the mitochondrial genome and a nuclear sequence (rule
+`no_mito_nuclear_step`; sets published before it are revised by revise_rules.py), copies on patches reported apart (rule `judge_copies_apart`), the locus rule with the place mapped across
 assemblies (the corrected judge's `places`); BioMart's values of the expected genes for `astar_db`. The second reading: for
 a line whose answer is read forward (t after the release read), REST `archive/id` followed through
 `possible_replacement` (truth.Rest.at); where it is complete and gives other genes than the walk, the line carries
@@ -52,9 +53,9 @@ def log(*a):
 
 
 class Gen:
-    def __init__(self, org, T):
+    def __init__(self, org, T, mito_cut=True):
         self.org, self.T = org, T
-        self.tr = TA.TruthA(org, T)
+        self.tr = TA.TruthA(org, T, mito_cut=mito_cut)
         self.rest = TA.Rest(org, self.tr)
         self.ctx = M.Ctx78(org, T, truth=self.tr)
         self.asm = H.gtf_assemblies(org)
@@ -128,7 +129,11 @@ class Gen:
                         self.mapped(g, read, proj, to_asm)
             else:
                 out["open"] = "Ensembl has no successor and the query's place is unknown (gene absent from the GTF)"
-        if t > read and self.rest.arch:
+        if t > read and self.rest.arch and self.tr.mito_cut and g in self.tr.mito_lineage():
+            # REST reads Ensembl's history as recorded, the steps rule `no_mito_nuclear_step` refuses among them: no
+            # second reading of the walk the rule makes
+            self.counts["rest not compared (rule no_mito_nuclear_step)"] += 1
+        elif t > read and self.rest.arch:
             r, complete = self.rest.at(g, t)
             if not complete:
                 self.counts["rest incomplete"] += 1

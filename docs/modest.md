@@ -44,6 +44,65 @@ Time: the harness's answers of `d4c2dda` took 116 to 372 seconds of query time p
 
 A part killed by a signal (the scheduler's SIGKILL when the job exceeds its memory) stops the organism's run: `modest.json` names it (`killed`: the part, the command, the signal), the parts after it are not run, and the job ends with an error; a part that fails otherwise skips the rest of its own commands and the run goes on (`modest.json` records every exit).
 
+## The tree `r1`
+
+`r1` is idtrack's next version after the fix of its first round (commit `ef81eba`, the data root's `[trees.r1]`, its own graphs `graphs/r1/<organism>/`). Its modest run (`modest_v2` of B and E, `modest_v1` of the other families, the hunt reproducers; 2026-11-21, jobs of 2, 5 to 8 GB) took 49 minutes (pig), 1 h 56 (mouse), 2 h 30 (human), 45 minutes (rhesus) and 20 minutes (cynomolgus), the kernel's peaks 2.3, 3.5, 4.5, 2.4 and 1.1 GB; nothing of other runs was reused (no stored answers of `r1`). The tree before the fix (`next`) and the reference (`d4c2dda`) were not run: their stored answers were scored again under the same judge (`modest organism --score-only` on links to their answers), `next`'s B9 and E8 lines from its exhaustive runs of those sets (`<families>/{b,e}/runs/next/`); `d4c2dda` never asked B9 or E8 (their lines have no answer of it and are left out of its comparison), nor E8's earlier pairs' partner lines that `modest_v2` added (for `next` too).
+
+Reading the losses found the judge lagging rules built in this round, and the revision sets published for them are listed in the families' documents: [the harness](harness.md#the-judge-following-idtracks-decided-rules) (`no_mito_nuclear_step`, `mirbase_genes`), A* and A (`no_mito_nuclear_step`), B (`<set>_rules2`; the corrections `places_not_comparable`, `support_from_xrefs`, `held_in_core`), C (`display_names_at_release`, `no_mito_nuclear_step`, `mirbase_genes`), E (`e3_dec`; `mirbase_genes` on the decided judge). Every part of every tree was then scored again, and `modest compare` run against `d4c2dda` (`<modest>/r1/compare.tsv`) and against `next` (`compare_vs_next.tsv`). The answers that went from right (or an expected error) to wrong, to an error and to undetermined, and the gains:
+
+| organism | part | vs `next`: wrong · error · undetermined | gains | vs `d4c2dda`: wrong · error · undetermined | gains |
+| --- | --- | ---: | ---: | ---: | ---: |
+| pig | harness | 0 · 0 · 67 | 156 | 0 · 0 · 44 | 6,230 |
+| pig | astar | 0 · 0 · 0 | 10 | 0 · 0 · 0 | 180 |
+| pig | a | 0 · 0 · 12 | 36 | 0 · 0 · 6 | 918 |
+| pig | b | 0 · 0 · 16 | 2,713 | 2 · 0 · 16 | 2,146 |
+| pig | c | 2 · 0 · 190 | 963 | 8 · 0 · 188 | 2,295 |
+| pig | d | 0 · 0 · 4 | 42 | 25 · 0 · 2 | 1,666 |
+| pig | e now | 7 · 0 · 0 | 383 | 7 · 806 · 2 | 2 |
+| pig | e decided | 0 · 0 · 0 | 390 | 0 · 0 · 2 | 12,470 |
+| mouse | harness | 9 · 0 · 935 | 727 | 6 · 0 · 851 | 1,685 |
+| mouse | astar | 6 · 0 · 14 | 26 | 6 · 0 · 14 | 1,090 |
+| mouse | a | 4 · 0 · 14 | 6 | 0 · 0 · 16 | 140 |
+| mouse | b | 0 · 0 · 80 | 4,619 | 9 · 0 · 65 | 2,107 |
+| mouse | c | 26 · 0 · 87 | 800 | 26 · 0 · 87 | 834 |
+| mouse | d | 0 · 0 · 4 | 23 | 0 · 0 · 2 | 2,015 |
+| mouse | e now | 9 · 0 · 0 | 232 | 142 · 783 · 2 | 8 |
+| mouse | e decided | 2 · 0 · 0 | 239 | 0 · 0 · 2 | 12,548 |
+| human | harness | 3 · 0 · 41 | 111 | 3 · 0 · 39 | 2,939 |
+| human | astar | 6 · 0 · 20 | 7,026 | 2 · 0 · 14 | 10,824 |
+| human | a | 2 · 0 · 14 | 262 | 0 · 0 · 12 | 486 |
+| human | b | 2 · 0 · 34 | 4,071 | 2 · 0 · 8 | 2,053 |
+| human | c | 10 · 0 · 66 | 690 | 11 · 0 · 66 | 712 |
+| human | d | 0 · 0 · 0 | 11 | 6 · 0 · 0 | 2,560 |
+| human | e now | 7 · 0 · 0 | 785 | 8 · 789 · 2 | 8 |
+| human | e decided | 0 · 0 · 0 | 792 | 0 · 0 · 2 | 12,617 |
+| rhesus | harness | 0 · 0 · 61 | 607 | 0 · 0 · 49 | 2,817 |
+| rhesus | astar | 0 · 0 · 6,800 | 23,380 | 0 · 0 · 0 | 23,492 |
+| rhesus | a | 0 · 0 · 1,682 | 496 | 0 · 0 · 12 | 854 |
+| rhesus | b | 0 · 0 · 25 | 3,638 | 2 · 0 · 2 | 2,311 |
+| rhesus | c | 0 · 0 · 144 | 794 | 0 · 0 · 140 | 1,784 |
+| rhesus | d | 0 · 0 · 4 | 5 | 0 · 0 · 4 | 1,655 |
+| rhesus | e now | 7 · 0 · 0 | 355 | 8 · 786 · 2 | 2 |
+| rhesus | e decided | 0 · 0 · 0 | 363 | 0 · 0 · 2 | 12,408 |
+| cynomolgus | harness | 0 · 0 · 0 | 21 | 0 · 0 · 0 | 351 |
+| cynomolgus | astar | 0 · 0 · 672 | 3,966 | 0 · 0 · 0 | 3,966 |
+| cynomolgus | a | 0 · 0 · 350 | 2,148 | 0 · 0 · 0 | 2,286 |
+| cynomolgus | b | 0 · 0 · 0 | 16 | 0 · 0 · 0 | 1,765 |
+| cynomolgus | c | 0 · 0 · 0 | 8 | 0 · 0 · 0 | 342 |
+| cynomolgus | d | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 1,596 |
+| cynomolgus | e now | 7 · 0 · 0 | 139 | 9 · 755 · 2 | 0 |
+| cynomolgus | e decided | 0 · 0 · 0 | 146 | 0 · 0 · 2 | 12,140 |
+
+Against `d4c2dda` E's judge `now` counts the expected errors of the decided rules as errors (about 790 per organism, all expected under the judge `decided`), and pig's D2 lists of 500 names (25), human's D (6), pig's `c2_oldver` accessions (row I140, the accession versions: round 2) and B8's `S100A10;` (stray punctuation in Ensembl's value) are the losses `next` had already (the reading of `next`'s modest run). The new sets of the round, before (`next`) and after (`r1`), the rate right / (right + wrong + error) over their strata: B9 (every display name at its own release) pig 0.864 -> 0.999, mouse 0.730 -> 0.951, human 0.797 -> 0.984, rhesus 0.841 -> 0.999, cynomolgus 1.000 -> 1.000; E8's batch against single pig 0.986 -> 0.997, mouse 0.983 -> 0.997, human 0.902 -> 1.000, rhesus 0.974 -> 1.000, cynomolgus 0.977 -> 1.000; E8's one-release pairs pig 0.794, mouse 0.927, human 0.891, rhesus 0.848, cynomolgus 0.777 -> 1.000 everywhere. The known limitations the round closes, measured on the modest selection of `r1` (`results/limitations/`, `b_r1`, `e_r1`): `L-display-name-not-held` 2 answers in a stratum of 1,000 (pig, human, rhesus; on `next`, exhaustive: pig 98,738, mouse 27,394, human 32,295, rhesus 89,181), `L-one-release-reading` none, `L-batch-copies` pig 16, mouse 20, human 2 answers (made-unique copies of a list whose single call reads otherwise). Mouse's B9 lines of UniProt names at early releases keep answering other genes as on `next` (`L-display-name-other`, mouse 972 answers of 7,074).
+
+What is left, by cause (the families' known limitations):
+
+- **Bridges where Ensembl's history gives no successor**, more of them than on `next` because the names and NCBI ids of early releases are held at their releases now ([`display_names_at_release`](rules.md#display_names_at_release)) and the mitochondrial genes of the reused ids bridge to their new ids ([`no_mito_nuclear_step`](rules.md#no_mito_nuclear_step)): across an assembly change that no chain file of Ensembl maps (pig, the macaques) undetermined (`L-no-chain`); at the query's place, on one assembly or mapped by a chain (mouse, human), undetermined (`L-bridge-at-place`); at another place by the chain (mouse: a name or NCBI id that a gene family shares, e.g. `ENSMUSG00000078334` from 60 to 115 through `Gm5923` to `ENSMUSG00000096645`, which the chain puts elsewhere), wrong (`L-bridges`: across assemblies idtrack compares chromosome names only, not places).
+- **A name several genes carry**: the best answer is the gene that more sources name at that release (rule [`support_ranks_shared_name`](rules.md#support_ranks_shared_name); NCBI's labels are held at early releases now), undetermined (B's `support_from_xrefs`); and the ties row I144 counts (below).
+- **E's judge `now`**: the 7 lines per organism of a batch item without a value (`e3_dec` gives the decided judge's `MissingValueError`), and on mouse one E8 relation (`Six3os1.1`: rule [`one_release_reading`](rules.md#one_release_reading) reads the single call at release 75 by its separators, so in the whole-release list it is the made-unique copy of `Six3os1`, rule [`made_unique_copies`](rules.md#made_unique_copies); E8's relation expects them equal).
+- **B's walk of a mitochondrial name**: human `MT-ATP6` from 53 (B1): B's truth walks the gene's id into the nuclear gene Ensembl gave it at 55; `r1` answers the mitochondrial MT-ATP6 of 115 (`all` adds MT-CO3 and MT-ATP8, which Ensembl's cross-references give that id at 54 too); rule [`no_mito_nuclear_step`](rules.md#no_mito_nuclear_step) is not applied to B's lines; one line, not revised.
+- **A later reading decides**: pig `MIC-1` (C's clone name to 89; an HGNC synonym at 91) and mouse `100040631` (NCBI's id at 66; a synonym at 87): rule [`one_release_reading`](rules.md#one_release_reading) takes the latest release at which the string has a reading, C's judge reads one database; one line each, not revised.
+
 ## What it can and cannot detect
 
 - **Can**: every change of an answer among the harness's 2.6 million lines (the judge's fixed queries over ids, names, external identifiers, history kinds and the travel matrix), each judged right or wrong as the exhaustive harness judges it; every change of a known finding of the hunts (a reproducer exits 1 and names the field); in every stratum of every family, a change that makes a share p of its lines wrong is missed with probability (1 - p)^500, under 5 % for p of 0.6 % or more (for a stratum of fewer than 500 lines: every line, so every change). A stratum's rate is estimated to within about ±4.4 percentage points at worst (the Wilson 95 % interval on 500 lines at a rate of one half; much less near 100 %).
