@@ -132,6 +132,35 @@ def test_one_case_strings_read_as_the_mixed_case_authority_s_symbol():
 def test_the_published_judge_leaves_out_every_revised_judge():
     assert set(H.REVISED_JUDGES) == {"78", "rules"} and MQ.RULES_JUDGE <= set(MQ.REVISIONS)
     assert "copies_apart_early" in MQ.REVISIONS and "copies_apart_early" not in MQ.RULES_JUDGE
-    # the rules built after next's first round are published after every earlier revision, as judge `rules`
-    assert list(MQ.REVISIONS)[-2:] == ["no_mito_nuclear_step", "mirbase_genes"]
+    # the rules built after next's first round are published after every earlier revision, as judge `rules`; the
+    # support of a name's sources alone (a correction of the corrected judge, `78`) after them
+    assert list(MQ.REVISIONS)[-3:] == ["no_mito_nuclear_step", "mirbase_genes", "support_names"]
+    assert "support_names" not in MQ.RULES_JUDGE
     assert {"no_mito_nuclear_step", "mirbase_genes"} <= MQ.RULES_JUDGE
+
+
+def test_the_support_of_a_name_counts_its_name_sources_and_of_a_synonym_its_synonyms():
+    """`support_names`: a synonym is no source of a name (idtrack reads the names that carry a string, rule
+    `names_before_synonyms`); a string read as a synonym is counted by its synonyms."""
+    class C:
+        T = 115
+
+        @staticmethod
+        def support(rel, gene, v, synonyms=False):
+            return 2 + (1 if synonyms and gene == G2 else 0)  # two name sources each; G2 carries the string as a synonym too
+
+    G1, G2 = "ENSG00000000001", "ENSG00000000002"
+
+    def line(kind, ident, support=None):
+        rec = dict(qid=f"{kind}|{ident}", kind=kind, id=ident, strategy="best", rule="set_exact", expect=[f"{G1}.1", f"{G2}.1"],
+                   from_release=100, to_release=100)
+        if support:
+            rec["support"] = support
+        return rec
+    out = MQ.rev_support_names("homo_sapiens", [line("name_ambiguous_to_set", "N1", {f"{G1}.1": 2, f"{G2}.1": 3}),
+                                                line("synonym_to_gene", "S1")], C)
+    # the name: equal support without the synonym, so the line loses it; the synonym: its synonym source counts
+    name = out["name_ambiguous_to_set"][0]
+    assert "support" not in name and name["revised_by"] == ["support_names"]
+    assert out["synonym_to_gene"][0]["support"] == {f"{G1}.1": 2, f"{G2}.1": 3}
+    assert not MQ.rev_support_names("homo_sapiens", [name, out["synonym_to_gene"][0]], C)  # run again: nothing

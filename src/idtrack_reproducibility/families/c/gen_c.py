@@ -227,7 +227,7 @@ class GenC:
         T, X, org = self.T, self.X, self.org
         oldver, lower, gap, higher, higher_ret, cat = [], [], [], [], [], []
         for v in sorted(X.H[fam]):
-            had = {int(x) for x in X.versions_in_graph(fam, v) if x.isdigit()}
+            had = {int(x) for x in X.versions_in_graph(fam, v, T) if x.isdigit()}
             if not had:
                 continue
             hT = X.at(fam, v, T)

@@ -24,6 +24,9 @@ Corrections:
   `names_broad` for family C.
 - `display_names_at_release`, `no_mito_nuclear_step`, `mirbase_genes`: the decided rules of those names on C's lines
   (each function's docstring).
+- `version_not_judged`, `versions_in_window`: rule `accession_versions` as built after `next`'s first round
+  (row I140) on the version strata (`VERSION_STRATA`), which the other corrections leave out (each
+  function's docstring).
 """
 import argparse
 import collections
@@ -415,10 +418,201 @@ def mirbase_genes(org, lines, ctx):
         yield from v
 
 
+# The strata of accessions written with a version (c2 RefSeq, c3 UniProt): the lines the version corrections read.
+VERSION_STRATA = re.compile(r"^c[23]_(at_v|default_v|oldver|ver_[a-z_]+)$")
+VERSION_FAMILY = {"c2": "refseq", "c3": "uniprot"}
+TRUTH_FIELDS = ("expect", "broad", "apart", "open", "open_within", "locus", "locus_mapped", "locus_projected",
+                "exceptions", "partial", "cmp")
+
+
+def _version_ctx(org, ctx):
+    """C's generator over the versioned databases (Ensembl's cross-references of every release, family A's walks) and
+    the edit counters of rule `accession_versions` measured from the same records (`truth_c.version_change_shares`), built once."""
+    from idtrack_reproducibility.families.c import gen_c as GC
+    if "GV" not in ctx:
+        ctx["GV"] = GC.GenC(org, 115, ["refseq", "uniprot"], authority=False)
+        dbs = set(TC.FAMILIES["refseq"]["dbs"]) | set(TC.FAMILIES["uniprot"]["dbs"])
+        ctx["shares"] = TC.version_change_shares(org, dbs, upto=115)
+        ctx["counters"] = TC.edit_counter_dbs(ctx["shares"])
+        log("version shares", {db: f"{c}/{n} = {c / n:.3f}" for db, (n, c) in sorted(ctx["shares"].items()) if n},
+            "edit counters", sorted(ctx["counters"]))
+    return ctx["GV"], ctx["counters"]
+
+
+# The fields of a line that hold its truth: a versioned line read as another line of the sets takes these from it.
+REF_FIELDS = TRUTH_FIELDS + ("rule", "other_carriers", "primaries", "spellings", "core_places")
+OWN_SETS = ("version_not_judged", "version_above_latest", "versions_in_window")  # the version corrections' own sets
+
+
+def _with_truth(rec, tru, name, **extra):
+    """The line with a new truth (`tru`'s fields of REF_FIELDS), the correction named in `revised_by`; None when the
+    truth is the line's own."""
+    if all((tru.get(f) or None) == (rec.get(f) or None) for f in REF_FIELDS):
+        return None
+    new = dict(rec)
+    for f in REF_FIELDS + ("q2", "read_as", "latest_version", "version", "read_as_name"):
+        new.pop(f, None)
+    new.update({f: x for f, x in tru.items() if f in REF_FIELDS and x is not None})
+    new.setdefault("rule", "set")
+    new["revised_by"] = list(rec.get("revised_by") or []) + [name]
+    new.update(**extra)
+    new.pop("set", None)
+    return new
+
+
+def _references(org, ctx, qids):
+    """{qid: latest line} of the lines a versioned line is read as, from every published set but the version
+    corrections' own (their truth carries every correction published for them: par_shared_names, other_database_broad,
+    no_mito_nuclear_step, ...)."""
+    want = set(qids) - set(ctx.setdefault("refs", {}))
+    if want:
+        sets = [n for n in L.resolve_sets(FAMILY, org, None, "revised") if not n.startswith(OWN_SETS)]
+        ctx["refs"].update(L.load_qids(FAMILY, org, want, sets=sets))
+    return ctx["refs"]
+
+
+def _nothing(g, t):
+    return dict(cmp=g.tr.cmp_for(t), expect=[], rule="set")
+
+
+def _read_as(org, ctx, lines, name, reading):
+    """The lines of the version strata asked without a release, each read as `reading(rec, acc, ver, fam, g)` says:
+    (qid of the line it is read as, read_at, extra fields) or None for nothing (or to leave the line: `"leave"`). A
+    line read as a line of the sets takes that line's latest truth (`_references`; a line read as itself, its truth
+    before the version corrections' sets); where the sets hold no such line, the truth C's generator gives the reading
+    (`gen_c.GenC.at_release`, `walked`). And rule `display_names_at_release` comes first where it reads the string
+    later: a versioned string that Ensembl gives a gene as its display name (`HeldEarly`: the label of RefSeq's
+    `RefSeq_dna_predicted` before 64, `XM_001083595.1`) is read as that name at the latest release where it is one,
+    when that is later than the version's own reading (`read_as_name`), its genes walked. Only lines whose truth that changes are given: running a correction again
+    (`<name>_v2`) publishes what its earlier sets made wrong, and puts back what they changed without cause."""
+    todo = []
+    for rec in lines:
+        st = rec["stratum"]
+        if not VERSION_STRATA.match(st) or rec.get("from_release") is not None or rec.get("excluded"):
+            continue
+        m = TC.VERSIONED_ACC.match(str(rec["id"]))
+        if m:
+            todo.append((rec, m.group(1), int(m.group(2))))
+    if not todo:
+        return
+    g, counters = _version_ctx(org, ctx)
+    held = ctx["held"] if "held" in ctx else ctx.setdefault("held", HeldEarly(org, ()))
+    held.add({str(rec["id"]) for rec, _, _ in todo})
+    plan = []
+    for rec, acc, ver in todo:
+        fam = VERSION_FAMILY[rec["stratum"][:2]]
+        how = reading(rec, acc, ver, fam, g, counters)
+        if how == "leave":
+            continue
+        # rule `display_names_at_release`: the whole string is a gene's display name at a release; read there where
+        # that is later than the version's own reading (idtrack's steps read the string as a name before its version)
+        t = rec["to_release"]
+        at = {r: gs for r, gs in held.at.get(str(rec["id"]), {}).items() if r <= t}
+        if at and max(at) > (how[1] if how else -1):
+            Rd = max(at)
+            how = (None, Rd, dict(read_as_name=True), at[Rd])
+        plan.append((rec, acc, fam, how))
+    refs = _references(org, ctx, {h[0] for _, _, _, h in plan if h and h[0]})
+    missing = collections.Counter()
+    for rec, acc, fam, how in plan:
+        t = rec["to_release"]
+        if how is None:
+            tru, extra = _nothing(g, t), dict(read_at=None)
+        else:
+            q, R, extra = how[:3]
+            ref = refs.get(q) if q else None  # a line read as itself: its truth before the version corrections' sets
+            if ref is not None and not ref.get("excluded"):
+                tru = ref
+            else:
+                missing[rec["stratum"] if q else "read as a display name"] += 1
+                genes = how[3] if len(how) > 3 else g.X.at(fam, acc, R)[0]
+                tru = dict(g.at_release(genes, t) if R == t else g.walked(genes, R, t), rule="set")
+            extra = dict(extra, read_at=R) if q == rec["qid"] or not q else dict(extra, read_at=R, read_as=q)
+        if how is not None and q == rec["qid"] and ref is not None:  # put back: the line as before the corrections' sets
+            extra["revised_by"] = list(ref.get("revised_by") or []) + [name]
+        new = _with_truth(rec, tru, name, **extra)
+        if new:
+            yield new
+    if missing:
+        log(name, "read as lines the sets do not hold (truth from the generator):", dict(missing))
+
+
+def version_not_judged(org, lines, ctx):
+    """Rule `accession_versions`, its edit counters (built in idtrack's next version after its first round): a version dates an accession only where it
+    is a property of the sequence record that holds over time. Of the pairs of consecutive releases at which one link
+    (the accession, the Ensembl object with its version, the database) holds, the share in which Ensembl's stored
+    `xref.version` differs, measured from Ensembl's cross-references of every release (`truth_c.version_change_shares`);
+    above one half (`truth_c.EDIT_COUNTER_SHARE`) the database's number counts its records' edits (UniProt's entry
+    version) and a typed version is not judged: the accession is read without it, never nothing. A line of a version
+    stratum (`VERSION_STRATA`) asked without a release, whose accession only databases of that kind carry, is read as
+    the accession's own line without a version (`c3_default|<acc>|-|<t>` where the graph holds it at the target, else
+    `c3_retired|...`; its latest truth, every correction of it included; `read_as` names it; `version: not judged`);
+    an accession the graph never holds: nothing. The lines read at a release (`c3_at_v`) already expect the
+    accession's reading there. On the five organisms' records Swiss-Prot and TrEMBL are such databases, RefSeq's are
+    not (the shares are logged)."""
+
+    def reading(rec, acc, ver, fam, g, counters):
+        kinds = set(TC.FAMILIES[fam]["dbs"]) & counters
+        if not kinds:
+            return "leave"  # its numbers date sequences: judged (`versions_in_window`)
+        if kinds != set(TC.FAMILIES[fam]["dbs"]):  # a family of both kinds would need each accession's own databases
+            raise NotImplementedError(f"{fam}: some but not all databases are edit counters ({sorted(counters)})")
+        t = rec["to_release"]
+        R, _ = g.default_truth(fam, acc)
+        if R is None:
+            return None
+        part = rec["stratum"][:2]
+        return (f"{part}_default|{acc}|-|{t}" if R == t else f"{part}_retired|{acc}|-|{t}"), R, \
+            dict(version="not judged (an edit counter)")
+
+    yield from _read_as(org, ctx, lines, "version_not_judged", reading)
+
+
+def _judged_reading(rec, acc, ver, fam, g, counters):
+    """Rule `accession_versions` for a database whose number dates a sequence, on the versions the graph's window had
+    (up to the line's target): a version it had, read at the latest release with it; above every version it had, the
+    latest, where the accession is attached at the line's target (the graph's last release); any other version (above
+    the versions of an accession no longer attached there, or one the window never held), nothing. The line
+    read as: `<part>_default_v|<acc>.<v>|-|<t>` where the version is held at the target, else `<part>_oldver|...`."""
+    if set(TC.FAMILIES[fam]["dbs"]) & counters:
+        return "leave"  # not judged (`version_not_judged`)
+    t = rec["to_release"]
+    had = {int(x) for x in g.X.versions_in_graph(fam, acc, t) if x.isdigit()}
+    h = g.X.at(fam, acc, t)
+    held_t = bool(h and h[2])  # the accession is attached at the graph's last release
+    read = ver if ver in had else (max(had) if had and ver > max(had) and held_t else None)
+    R = g.X.last_with_version(fam, acc, str(read), t) if read is not None else None
+    if R is None:
+        return None
+    part = rec["stratum"][:2]
+    q = f"{part}_default_v|{acc}.{read}|-|{t}" if R == t else f"{part}_oldver|{acc}.{read}|-|{t}"
+    return q, R, ({"latest_version": read} if read != ver else {})
+
+
+def versions_in_window(org, lines, ctx):
+    """Rule `accession_versions` as built in idtrack's next version after its first round (row I140: an accession's
+    versions are spellings of its links), on the versions the graph's window had. A version it had is read at the
+    latest release with it; a version above every version the accession had is read as the latest where the accession
+    is attached at the graph's last release (row I150: elsewhere it is an unknown version, nothing, as rule
+    `version_newer_than_graph` reads an Ensembl id); any other version, nothing. And the window ends at the line's
+    target: the generator read the versions over every release of the extracts, which reach one release beyond the
+    graphs' window (116, where the reference tree's configuration lists it), so a version written only at 116 made a
+    version below it a gap (`c2_ver_gap`: nothing). Every line of a version stratum asked without a release, of a
+    database whose number dates a sequence (not the edit counters of `version_not_judged`), is read so
+    (`Xrefs.versions_in_graph(..., upto)`; `_judged_reading`), as the line of the version read (its latest truth,
+    every correction of it included; `read_as` names it), or expects nothing. The sets `version_above_latest_v1`
+    (2026-11-21) and the first `versions_in_window` sets read the latest also for accessions no longer attached at the
+    target; this correction run again puts those lines back to nothing."""
+    yield from _read_as(org, ctx, lines, "versions_in_window", _judged_reading)
+
+
+VERSION_CORRECTIONS = {"version_not_judged", "versions_in_window"}
+
 CORRECTIONS = {"rfam_label_accession": rfam_label_accession, "other_database_broad": other_database_broad,
                "rfam_label_rows": rfam_label_rows, "par_shared_names": par_shared_names,
                "display_names_at_release": display_names_at_release, "no_mito_nuclear_step": no_mito_nuclear_step,
-               "mirbase_genes": mirbase_genes}
+               "mirbase_genes": mirbase_genes, "version_not_judged": version_not_judged,
+               "versions_in_window": versions_in_window}
 
 
 def main():
@@ -451,8 +645,11 @@ def main():
     d = L.query_dir(FAMILY, org)
     for n in names:
         p = L._set_file(d, n)
-        recs = (latest.get(r["qid"], r) for r in L.iter_set(p)
-                if not r["stratum"].startswith("c6") and "_ver_" not in r["stratum"])
+        if a.correction in VERSION_CORRECTIONS:  # the version strata only
+            recs = (latest.get(r["qid"], r) for r in L.iter_set(p) if VERSION_STRATA.match(r["stratum"]))
+        else:
+            recs = (latest.get(r["qid"], r) for r in L.iter_set(p)
+                    if not r["stratum"].startswith("c6") and "_ver_" not in r["stratum"])
         k = len(out)
         out.extend(CORRECTIONS[a.correction](org, recs, ctx))
         log(n, "revised", len(out) - k)

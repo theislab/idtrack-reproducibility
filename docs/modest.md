@@ -103,6 +103,67 @@ What is left, by cause (the families' known limitations):
 - **B's walk of a mitochondrial name**: human `MT-ATP6` from 53 (B1): B's truth walks the gene's id into the nuclear gene Ensembl gave it at 55; `r1` answers the mitochondrial MT-ATP6 of 115 (`all` adds MT-CO3 and MT-ATP8, which Ensembl's cross-references give that id at 54 too); rule [`no_mito_nuclear_step`](rules.md#no_mito_nuclear_step) is not applied to B's lines; one line, not revised.
 - **A later reading decides**: pig `MIC-1` (C's clone name to 89; an HGNC synonym at 91) and mouse `100040631` (NCBI's id at 66; a synonym at 87): rule [`one_release_reading`](rules.md#one_release_reading) takes the latest release at which the string has a reading, C's judge reads one database; one line each, not revised.
 
+## The tree `r1b`
+
+`r1b` is `r1` with the graph's format changes of the first round's second part (commit `cbf8603`, the data root's `[trees.r1b]`, its graphs `graphs/r1b/<organism>/`): the version Ensembl's cross-reference attached is kept per link and release, so an accession's versions are spellings of its links (rule [`accession_versions`](rules.md#accession_versions), row I140), and a database whose stored number counts its records' edits (UniProt's Swiss-Prot and TrEMBL on the five graphs) has its typed versions not judged; and a gene's display name at a release ranks first among the genes that carry the string as a name there (row I144). The graphs' nodes, links, history and places are `r1`'s. Its modest run (2026-11-21, the same selections and jobs as `r1`'s) took 52 minutes (pig), 1 h 48 (mouse), 2 h 34 (human), 56 minutes (rhesus) and 30 minutes (cynomolgus), the kernel's peaks 3.3, 5.1, 5.7, 2.4 and 1.5 GB; nothing of other runs was reused. `r1` and `d4c2dda` were not run: their stored answers were scored again under the same judge (`modest organism --score-only` on links to their answers).
+
+Reading the losses found family C's judge lagging rule `accession_versions` and three faults of its own truth; the revision sets (`version_not_judged`, `version_above_latest`, `versions_in_window`) are listed in [family C](families/c.md#the-sets): UniProt's typed versions read as the accession; a version above every version had read as the latest where the accession is attached at the graph's last release, and as an unknown version where it is not (row I150; `r1b` reads the latest there too); the versions counted up to the graph's last release (the generator had counted Ensembl's release 116, so a version written only there made a gap below it); a versioned line read as the line of the version it reads, with every correction published for that line; and a versioned string that is a gene's display name (RefSeq's labels before release 64) read as that name. And the support of rule [`support_ranks_shared_name`](rules.md#support_ranks_shared_name) counted synonyms among the sources of a name, which idtrack does not: the corrections `support_names` of [the harness](harness.md#the-corrections-of-the-judge) and [family B](families/b.md) count the name sources alone. Every part of every tree was then scored again and compared, against `r1` (`<modest>/r1b/<organism>/<part>/moved_vs_r1.tsv`) and against `d4c2dda` (`moved_vs_d4c2dda.tsv`):
+
+| organism | part | vs `r1`: wrong · error · undetermined | gains | vs `d4c2dda`: wrong · error · undetermined | gains |
+| --- | --- | ---: | ---: | ---: | ---: |
+| pig | harness | 0 · 0 · 0 | 128 | 0 · 0 · 44 | 6,358 |
+| pig | astar | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 180 |
+| pig | a | 0 · 0 · 0 | 0 | 0 · 0 · 6 | 918 |
+| pig | b | 1 · 0 · 0 | 49 | 3 · 0 · 16 | 2,162 |
+| pig | c | 0 · 0 · 0 | 1,969 | 2 · 0 · 188 | 4,258 |
+| pig | d | 0 · 0 · 0 | 0 | 25 · 0 · 2 | 1,666 |
+| pig | e now | 0 · 0 · 0 | 0 | 7 · 806 · 2 | 2 |
+| pig | e decided | 0 · 0 · 0 | 0 | 0 · 0 · 2 | 12,470 |
+| mouse | harness | 0 · 0 · 0 | 373 | 6 · 0 · 851 | 2,058 |
+| mouse | astar | 0 · 0 · 0 | 0 | 6 · 0 · 14 | 1,090 |
+| mouse | a | 0 · 0 · 0 | 0 | 0 · 0 · 16 | 140 |
+| mouse | b | 0 · 0 · 0 | 186 | 8 · 0 · 55 | 2,160 |
+| mouse | c | 0 · 0 · 0 | 1,962 | 26 · 0 · 87 | 2,796 |
+| mouse | d | 0 · 0 · 0 | 5 | 0 · 0 · 2 | 2,020 |
+| mouse | e now | 0 · 0 · 0 | 1 | 141 · 783 · 2 | 8 |
+| mouse | e decided | 0 · 0 · 0 | 1 | 0 · 0 · 2 | 12,549 |
+| human | harness | 0 · 0 · 0 | 121 | 3 · 0 · 39 | 3,060 |
+| human | astar | 0 · 0 · 0 | 0 | 2 · 0 · 14 | 10,824 |
+| human | a | 0 · 0 · 0 | 0 | 0 · 0 · 12 | 486 |
+| human | b | 0 · 0 · 0 | 215 | 2 · 0 · 6 | 2,099 |
+| human | c | 0 · 0 · 0 | 1,150 | 10 · 0 · 66 | 1,864 |
+| human | d | 0 · 0 · 0 | 9 | 5 · 0 · 0 | 2,568 |
+| human | e now | 1 · 0 · 0 | 0 | 9 · 789 · 2 | 8 |
+| human | e decided | 1 · 0 · 0 | 0 | 1 · 0 · 2 | 12,617 |
+| rhesus | harness | 0 · 0 · 0 | 46 | 0 · 0 · 49 | 2,863 |
+| rhesus | astar | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 23,492 |
+| rhesus | a | 0 · 0 · 0 | 0 | 0 · 0 · 12 | 854 |
+| rhesus | b | 0 · 0 · 0 | 66 | 0 · 0 · 2 | 2,336 |
+| rhesus | c | 0 · 0 · 0 | 1,877 | 0 · 0 · 140 | 3,661 |
+| rhesus | d | 0 · 0 · 0 | 0 | 0 · 0 · 4 | 1,655 |
+| rhesus | e now | 0 · 0 · 0 | 0 | 8 · 786 · 2 | 2 |
+| rhesus | e decided | 0 · 0 · 0 | 0 | 0 · 0 · 2 | 12,408 |
+| cynomolgus | harness | 0 · 0 · 0 | 61 | 0 · 0 · 0 | 412 |
+| cynomolgus | astar | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 3,966 |
+| cynomolgus | a | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 2,286 |
+| cynomolgus | b | 0 · 0 · 0 | 21 | 0 · 0 · 0 | 1,780 |
+| cynomolgus | c | 0 · 0 · 0 | 1,500 | 0 · 0 · 0 | 1,842 |
+| cynomolgus | d | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 1,596 |
+| cynomolgus | e now | 0 · 0 · 0 | 1 | 8 · 755 · 2 | 0 |
+| cynomolgus | e decided | 0 · 0 · 0 | 1 | 0 · 0 · 2 | 12,141 |
+
+Against `r1` no answer of any part went from right to wrong, to an error or to undetermined but these two, faults of `r1b`:
+
+- **pig B1 `C/EBP` at 78 to 115** (`best`): `r1b` answers ENSSSCG00000002866 alone where the truth expects the tie with ENSSSCG00000034207 (`r1`'s answer). At 78 `C/EBP` is the display name of ENSSSCG00000002866 and of ENSSSCG00000028739, and a UniProt gene name of ENSSSCG00000024816; Ensembl's history merges 28739 and 24816 into 34207 at 90 (equal scores). `r1b` keeps one path per gene and takes the candidate's display mark (and its support) from that path's entry gene, here 24816, so 34207 ranks below 2866 although a gene whose display name the string is leads to it: a fault of `r1b` (row I156: the display mark and the support taken over all the entry genes of the paths that reach a gene), reproducer `convert("C/EBP", from_release=78, to_release=115)` on pig.
+- **human E `3.14159`** (`e2_junk_num`, judges `now` and `decided`): `r1b` answers ENSG00000224777 (`version_newer_than_graph`, read at 51): Ensembl's cross-references give the Havana translation accession `3` with version 1 to ENSP00000318226 at 50 and 51, and `r1b` reads a version above every version attached as the latest also for an accession no longer attached at the graph's last release: a fault of `r1b` (row I150; the rule [`accession_versions`](rules.md#accession_versions) answers it with nothing), the class of hunt IN-9 (numbers read as old numeric Havana ids).
+
+Against `d4c2dda` the losses are those of `r1` (the classes of its section above) but: pig's `c2_oldver` accessions (row I140) are right now; pig B `C/EBP` and human E `3.14159` (above); family C's versioned lines that `d4c2dda` answered by cutting the version are judged by the rule as built; and family C's lines of row I150's class (below). Mouse B1 `Mtcp1` at 78 (`best`), which `r1` already answered so, is undetermined: idtrack ranks ENSMUSG00000031200 first by its support (a Vega gene label besides the names both carry), and the support of the name sources alone (`b1_snames1`) says so; the judge had counted a UniProt gene-name synonym of ENSMUSG00000090110 as a source and expected the tie.
+
+The round's faults, before (`r1`) and after (`r1b`), on the modest selection (right / (right + wrong + error); answers of both views): family C's version strata (`c2_*_v`, `c2_oldver`, `c2_ver_*` and the same of c3; 1,000 answers per stratum or the whole stratum) pig 0.794 -> 0.935 (2,855 wrong -> 904), rhesus 0.799 -> 0.934 (2,793 -> 924), cynomolgus 0.803 -> 0.911 (2,744 -> 1,244), mouse 0.629 -> 0.875 (2,962 -> 1,000), human 0.782 -> 0.993 (1,186 -> 36); what `r1b` leaves wrong there is row I150's class (a version above every version of an accession no longer attached at the graph's last release, read as the latest: `c2_ver_higher_retired`, and gap lines whose upper versions lie beyond the window: cynomolgus 414 answers) and, in mouse, 6 answers of bridges where Ensembl's history gives the accession's genes no successor (`L-bridges`). B9 (row I144) pig 0.9993 -> 0.9995, mouse 0.9506 -> 0.9515, human 0.9844 -> 0.9868, rhesus 0.9993 -> 0.9995, cynomolgus 1.000 -> 1.000. The ties round 1 created (an early display name beside NCBI's symbol on another gene's translation: answers right on `next`, undetermined on `r1` within the line's wider set): the `best` view is right again for every one (mouse 6, human 6, rhesus 9 answers); the `all` view returns every gene that carries the string and stays undetermined (mouse 14, human 16, rhesus 12). `L-accession-versions` is closed but for row I150's class (family C's [known limitations](families/c.md#known-limitations)). The hunts' reproducers hold or changed as on `r1` but AT-4 (an old RefSeq version asked without a release), which changed on pig and mouse: `XM_003129161.3` answers ENSSSCG00000026015 and `NM_001044572.1` ENSSSCG00000058470, the genes Ensembl attached those versions to.
+
+The wrong answers round 1 left by bridges through names now held that Ensembl's chain file puts elsewhere (`L-bridges`: mouse harness 9, A* 6, A 4, C 25; human harness 3, A* 6, A 2, C 10) are all wrong on `r1b` as on `r1`.
+
+
 ## What it can and cannot detect
 
 - **Can**: every change of an answer among the harness's 2.6 million lines (the judge's fixed queries over ids, names, external identifiers, history kinds and the travel matrix), each judged right or wrong as the exhaustive harness judges it; every change of a known finding of the hunts (a reproducer exits 1 and names the field); in every stratum of every family, a change that makes a share p of its lines wrong is missed with probability (1 - p)^500, under 5 % for p of 0.6 % or more (for a stratum of fewer than 500 lines: every line, so every change). A stratum's rate is estimated to within about ±4.4 percentage points at worst (the Wilson 95 % interval on 500 lines at a rate of one half; much less near 100 %).

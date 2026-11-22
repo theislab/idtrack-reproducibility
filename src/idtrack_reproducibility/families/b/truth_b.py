@@ -209,13 +209,14 @@ class NamesB:
     SUPPORT_GROUPS = (("hgnc", re.compile(r"^HGNC")), ("mgi", re.compile(r"^MGI")), ("uniprot_gn", re.compile(r"^Uniprot_gn$")),
                       ("entrez", re.compile(r"^EntrezGene$")), ("wikigene", re.compile(r"^WikiGene$")))
 
-    def support(self, R, gene, v):
+    def support(self, R, gene, v, synonyms=False):
         """Rule `support_ranks_shared_name`'s support: in how many name sources the gene carries v at R. BioMart's (display name, HGNC,
-        MGI, UniProt gene name, NCBI label, WikiGene, synonym) where the archive answers; elsewhere the GTF's display
-        name and the same databases in the core xrefs of R, without the synonym (not read there): a support that can
-        only make an answer undetermined that a full count might call wrong, never the reverse."""
+        MGI, UniProt gene name, NCBI label, WikiGene; with `synonyms`, for a string read as a synonym, the synonyms
+        beside them: `make_queries.Ctx78.support`) where the archive answers; elsewhere the GTF's display name and the
+        same databases in the core xrefs of R: a support that can only make an answer undetermined that a full count
+        might call wrong, never the reverse."""
         if R in self.bm_rels:
-            return self.C.support(R, gene, v)
+            return self.C.support(R, gene, v, synonyms=synonyms)
         by_gene = self.sources(R)[3]
         if not by_gene:
             return None

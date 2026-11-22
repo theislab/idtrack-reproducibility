@@ -914,11 +914,14 @@ class Ctx78:
                 out |= pp[1].get(v, set())
         return out
 
-    def support(self, rel, gene, v):
-        """In how many of BioMart's name sources a gene carries string v at a release (rule `support_ranks_shared_name`): the display
-        name, HGNC, MGI, UniProt gene name, NCBI label, WikiGene, synonym."""
+    def support(self, rel, gene, v, synonyms=False):
+        """In how many of BioMart's sources a gene carries string v at a release (rule `support_ranks_shared_name`): the
+        name sources (the display name, HGNC, MGI, UniProt gene name, NCBI label, WikiGene) for a string read as a name;
+        `synonyms` for a string read as a synonym (no gene carries it as a name), the synonyms beside them. idtrack reads
+        a string as the names that carry it, else as the synonyms (rule `names_before_synonyms`), and counts the
+        databases attaching what it read (`Candidate.entry_support`): a synonym is no source of a name."""
         n = int(self.display(rel)[1].get(gene, ("", ""))[0] == v)
-        for grp, col in NAME_SOURCES + [("synonym", 1)]:
+        for grp, col in NAME_SOURCES + ([("synonym", 1)] if synonyms else []):
             pp = self.bm(rel, grp, col)
             if pp and v in pp[0].get(gene, ()):
                 n += 1
@@ -1163,35 +1166,65 @@ def rev_projected_hgnc(org, lines, C):
     return out
 
 
+def _support_of(rec, C):
+    """The support per expected gene of a line of rule `support_ranks_shared_name` (`rev_support`), or None where the line is
+    no such line."""
+    k = rec["kind"]
+    if k not in ("name_ambiguous_to_set", "synonym_to_gene", "name_old_to_current") or rec["strategy"] != "best" \
+            or rec["rule"] != "set_exact" or len(rec["expect"]) < 2 or rec.get("final_database"):
+        return None
+    T = C.T
+    by_base = {gene_base(e): e for e in rec["expect"]}
+    sup = {e: 0 for e in rec["expect"]}
+    if k == "name_old_to_current":
+        R = rec["from_release"]
+        src = C.display(R)[0].get(rec["id"], set()) & C.bm_genes(R)
+        for g in src:
+            n = C.support(R, g, rec["id"], synonyms=k == "synonym_to_gene")
+            for t in C.tr.walk_fwd(g, R, T, True, living=True):
+                if t in by_base:
+                    sup[by_base[t]] = max(sup[by_base[t]], n)
+    else:
+        rel = rec["from_release"] or rec["to_release"]
+        for b, e in by_base.items():
+            sup[e] = C.support(rel, b, rec["id"], synonyms=k == "synonym_to_gene")
+    return sup
+
+
 def rev_support(org, lines, C):
     """Rule `support_ranks_shared_name`: a `best` answer that is a non-empty part of the expected set whose genes carry the name in
     strictly more name sources than every gene left out is `undetermined`. The line holds the support of every
-    expected gene (`support`: BioMart's name sources at the release read; for name_old_to_current the largest
-    support at R of the genes whose strict walk reaches it); score.py applies the rule. Only lines whose expected
-    genes differ in support."""
+    expected gene (`support`: BioMart's name sources at the release read, `Ctx78.support`; for name_old_to_current
+    the largest support at R of the genes whose strict walk reaches it); score.py applies the rule. Only lines whose
+    expected genes differ in support."""
     out = collections.defaultdict(list)
-    T = C.T
     for rec in lines:
-        k = rec["kind"]
-        if k not in ("name_ambiguous_to_set", "synonym_to_gene", "name_old_to_current") or rec["strategy"] != "best" \
-                or rec["rule"] != "set_exact" or len(rec["expect"]) < 2 or rec.get("final_database"):
+        sup = _support_of(rec, C)
+        if sup and len(set(sup.values())) > 1 and rec.get("support") != sup:
+            out[rec["kind"]].append(revised(rec, "support", "support per gene for rule `support_ranks_shared_name`'s rule (the corrected judge)", support=sup))
+    return out
+
+
+def rev_support_names(org, lines, C):
+    """Rule `support_ranks_shared_name` with idtrack's count of a name's sources: the support of `support` counted BioMart's
+    synonyms as a source of a name (`name_ambiguous_to_set`, `name_old_to_current`), which idtrack does not (it reads a string as the names that carry it, rule
+    `names_before_synonyms`, and counts the databases attaching those, `Candidate.entry_support`). Every line of
+    `rev_support`'s kinds gets the support of the name sources alone (`Ctx78.support`); the lines where that differs
+    from what they hold are revised (`support` set, changed, or dropped where the genes no longer differ)."""
+    out = collections.defaultdict(list)
+    for rec in lines:
+        sup = _support_of(rec, C)
+        if sup is None:
             continue
-        by_base = {gene_base(e): e for e in rec["expect"]}
-        sup = {e: 0 for e in rec["expect"]}
-        if k == "name_old_to_current":
-            R = rec["from_release"]
-            src = C.display(R)[0].get(rec["id"], set()) & C.bm_genes(R)
-            for g in src:
-                n = C.support(R, g, rec["id"])
-                for t in C.tr.walk_fwd(g, R, T, True, living=True):
-                    if t in by_base:
-                        sup[by_base[t]] = max(sup[by_base[t]], n)
+        new = sup if len(set(sup.values())) > 1 else None
+        if new == (rec.get("support") or None):
+            continue
+        r = revised(rec, "support_names", "support per gene from the name sources alone (the corrected judge)")
+        if new:
+            r["support"] = new
         else:
-            rel = rec["from_release"] or rec["to_release"]
-            for b, e in by_base.items():
-                sup[e] = C.support(rel, b, rec["id"])
-        if len(set(sup.values())) > 1 and rec.get("support") != sup:
-            out[k].append(revised(rec, "support", "support per gene for rule `support_ranks_shared_name`'s rule (the corrected judge)", support=sup))
+            r.pop("support", None)
+        out[rec["kind"]].append(r)
     return out
 
 
@@ -1994,6 +2027,7 @@ REVISIONS = {
     "copies_apart_early": rev_copies_apart_early,
     "no_mito_nuclear_step": rev_no_mito_nuclear_step,
     "mirbase_genes": rev_mirbase_genes,
+    "support_names": rev_support_names,
 }
 # The judge of each correction's revision set (its manifest's `judge`): `78`, the judge corrected where it was wrong
 # (rule `judge_corrections`); `rules`, the judge following a rule idtrack decided after 71690ab (docs/rules.md). Both are left out

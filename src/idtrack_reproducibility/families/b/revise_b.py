@@ -37,9 +37,17 @@ release read (`not_held`) expects nothing because nothing is found, and is left 
 (a `best` answer that is part of a name's expected genes, whose genes carry the name in strictly more name sources
 than every gene left out, is undetermined) needs each expected gene's support; the harness reads it from BioMart's
 tables, which most early releases lack. A B1 line of a name several genes carry (`set_exact`) gets `support`: per
-expected gene, the number of Ensembl's sources that give the gene the name at the release read (each database of
-the core cross-references, the synonyms, the display name; for a line asked at a later target, the largest support
-of the genes whose strict walk reaches it), where the genes differ; published as `S_<name>`.
+expected gene, the number of Ensembl's name sources that give the gene the name at the release read (each database
+of the core cross-references whose label it is, the display name; for a line asked at a later target, the largest
+support of the genes whose strict walk reaches it), where the genes differ; published as `S_<name>` (`_support`).
+
+`--correction support_names` (with `--name`; judge `78`): the support of `support_from_xrefs` counted Ensembl's
+synonyms as a name source; idtrack reads a string as the names that carry it (rule `names_before_synonyms`) and
+counts the databases attaching those (`Candidate.entry_support`), so a synonym is no source (BioMart's synonyms in
+the generator's support, Ensembl's core synonyms in `support_from_xrefs`'s): every B1 line of a name several genes
+carry, with or without `support`, gets the support the published sets give it in their order, of the name sources
+alone (`_support`), and the lines where that differs from what they hold are published as `S_<name>` (`support`
+set, changed, or dropped where the genes no longer differ).
 
 `--correction held_in_core` (with `--name`; the corrected judge, judge `78`): B4's and B5's lines of a string that the
 truth found in no Ensembl table of any release (BioMart's tables and the core extracts it read when it was generated)
@@ -268,26 +276,20 @@ def places_undo(org, S, name, wrong, dry, keep=None):
                   manifest_extra=dict(revision=name, correction="places_not_comparable_undone"))
 
 
-def support_from_xrefs(org, S, name, dry):
-    """`--correction support_from_xrefs` on set family S (the module's docstring)."""
+def _core_support(org, todo, tr):
+    """{qid: support or None} from Ensembl's core records at the release read: per expected gene, the number of name
+    sources that give the gene the string there (each database of the core cross-references whose label it is, and the
+    display name, `core_display`); for a line asked at a later target, the largest support of the genes whose strict
+    walk reaches the expected gene. None where the expected genes do not differ."""
     import gzip
     from idtrack_reproducibility.harness import harness_lib as H
     from idtrack_reproducibility.harness import make_queries as M
-    fam = family_sets(org, S)
-    if not fam or f"{S}_{name}" in fam:
-        log(org, S, "no set" if not fam else f"{S}_{name} published before")
-        return
-    pub = latest(org, [s for s in fam if "_dec" not in s])
-    todo = [ln for ln in pub.values() if ln.get("kind") in ("b1_name_at_release", "b1_name_to_current")
-            and ln.get("rule") == "set_exact" and len(ln.get("expect") or []) > 1 and not ln.get("excluded")
-            and not ln.get("support") and not ln.get("open") and ln.get("from_release") is not None]
     want = collections.defaultdict(set)
     for ln in todo:
         want[ln["from_release"]].add(ln["id"])
     count = collections.defaultdict(lambda: collections.defaultdict(set))  # (release, string) -> gene -> sources
     for R, vs in want.items():
-        for sub, col, src in (("core_xref", "label", "db_name"), ("core_synonyms", "synonym", None),
-                              ("core_display", "label", None)):
+        for sub, col, src in (("core_xref", "label", "db_name"), ("core_display", "label", None)):
             p = os.path.join(H.truth_dir(org), sub, f"{R}.tsv.gz")
             if not os.path.exists(p):
                 continue
@@ -300,8 +302,7 @@ def support_from_xrefs(org, S, name, dry):
                     if len(f) > iv and f[iv] in vs:
                         kind = f[isrc] if isrc is not None else sub
                         count[(R, f[iv])][M.gene_base(f[ig])].add(kind)
-    tr = M.Truth(org, H.ORGANISMS[org][2])
-    out = []
+    out = {}
     for ln in todo:
         R, t, v = ln["from_release"], ln["to_release"], ln["id"]
         by = count.get((R, v), {})
@@ -312,8 +313,83 @@ def support_from_xrefs(org, S, name, dry):
             for x in reach:
                 if x in by_base:
                     sup[by_base[x]] = max(sup[by_base[x]], len(srcs))
-        if len(set(sup.values())) > 1:
-            new = dict(ln, support=sup, revised_by=list(ln.get("revised_by") or []) + ["support_from_xrefs"])
+        out[ln["qid"]] = sup if len(set(sup.values())) > 1 else None
+    return out
+
+
+def _generated_support(nb, ln):
+    """The support B1's generator gives a line (`gen_b.GenB1.string_lines`: `truth_b.NamesB.support` of the genes whose
+    display name the string is at the release read, walked to the target for a later one), or None where the
+    release's name sources are not read or the expected genes do not differ."""
+    from idtrack_reproducibility.harness import make_queries as M
+    R, t, v = ln["from_release"], ln["to_release"], ln["id"]
+    by_base = {M.gene_base(e): e for e in ln["expect"]}
+    if t == R:
+        sup = {e: nb.support(R, b, v) for b, e in by_base.items()}
+        if None in sup.values():
+            return None
+    else:
+        allg = set(nb.display(R).get(v, ())) & nb.gset(R)
+        if not allg or nb.support(R, next(iter(sorted(allg))), v) is None:
+            return None
+        sup = {e: 0 for e in ln["expect"]}
+        for g in sorted(allg):
+            n = nb.support(R, g, v) or 0
+            for x in nb.walk(g, R, t)[0]:
+                if x in by_base:
+                    sup[by_base[x]] = max(sup[by_base[x]], n)
+    return sup if len(set(sup.values())) > 1 else None
+
+
+def _support(org, todo, nb=None):
+    """{qid: support or None} of B1 lines of a name several genes carry (rule `support_ranks_shared_name`), each by the
+    procedure that gave its published support, of name sources alone: a synonym is none (rule `names_before_synonyms`:
+    idtrack reads a string as the names that carry it and counts the databases attaching those,
+    `Candidate.entry_support`). At a release with BioMart's tables, the generator's support (`_generated_support`:
+    BioMart's name sources, which it counted with BioMart's synonyms); where that leaves the genes equal, and at the
+    other releases, the core records' (`_core_support`, the correction `support_from_xrefs`, which counted Ensembl's
+    core synonyms). The generator's support at the other releases never counted a synonym: such a line keeps it
+    (`_KEEP`)."""
+    from idtrack_reproducibility.families.b import truth_b as TBm
+    nb = nb or TBm.NamesB(org, log=lambda *a: None)
+    out = {}
+    for ln in sorted(todo, key=lambda r: r["from_release"]):  # the release's tables are read in order
+        by_xrefs = "support_from_xrefs" in (ln.get("revised_by") or [])
+        if ln["from_release"] in nb.bm_rels and not by_xrefs:
+            out[ln["qid"]] = _generated_support(nb, ln)
+        elif ln.get("support") and not by_xrefs:
+            out[ln["qid"]] = _KEEP
+        else:
+            out[ln["qid"]] = None
+    rest = [ln for ln in todo if out[ln["qid"]] is None]
+    out.update(_core_support(org, rest, nb.tr))
+    return out
+
+
+_KEEP = object()  # a line whose support no synonym entered: kept as it is
+
+
+def _support_todo(pub, with_support):
+    return [ln for ln in pub.values() if ln.get("kind") in ("b1_name_at_release", "b1_name_to_current")
+            and ln.get("rule") == "set_exact" and len(ln.get("expect") or []) > 1 and not ln.get("excluded")
+            and (with_support or not ln.get("support")) and not ln.get("open") and ln.get("from_release") is not None]
+
+
+def support_from_xrefs(org, S, name, dry):
+    """`--correction support_from_xrefs` on set family S (the module's docstring)."""
+    fam = family_sets(org, S)
+    if not fam or f"{S}_{name}" in fam:
+        log(org, S, "no set" if not fam else f"{S}_{name} published before")
+        return
+    pub = latest(org, [s for s in fam if "_dec" not in s])
+    todo = _support_todo(pub, False)
+    from idtrack_reproducibility.harness import harness_lib as H
+    from idtrack_reproducibility.harness import make_queries as M
+    sup = _core_support(org, todo, M.Truth(org, H.ORGANISMS[org][2]))
+    out = []
+    for ln in todo:
+        if sup[ln["qid"]]:
+            new = dict(ln, support=sup[ln["qid"]], revised_by=list(ln.get("revised_by") or []) + ["support_from_xrefs"])
             new.pop("set", None)
             out.append(new)
     log(org, S, f"{S}_{name}: revised {len(out):,} of {len(todo):,}")
@@ -322,6 +398,41 @@ def support_from_xrefs(org, S, name, dry):
                   "rule `support_ranks_shared_name` (the corrected judge, support_from_xrefs)", __file__,
                   revises=[s for s in fam if "_dec" not in s], judge="78", dry=dry,
                   manifest_extra=dict(revision=name, correction="support_from_xrefs"))
+
+
+def support_names(org, S, name, dry):
+    """`--correction support_names` on set family S (the module's docstring)."""
+    fam = family_sets(org, S)
+    if not fam or f"{S}_{name}" in fam:
+        log(org, S, "no set" if not fam else f"{S}_{name} published before")
+        return
+    pub = latest(org, [s for s in fam if "_dec" not in s])
+    todo = _support_todo(pub, True)
+    sup = _support(org, todo)
+    out, moved = [], collections.Counter()
+    for ln in todo:
+        new_sup = sup[ln["qid"]]
+        if new_sup is _KEEP or (new_sup or None) == (ln.get("support") or None):
+            continue
+        new = dict(ln, revised_by=list(ln.get("revised_by") or []) + ["support_names"])
+        new.pop("set", None)
+        if new_sup:
+            new["support"] = new_sup
+        else:
+            new.pop("support", None)
+        moved["set" if new_sup and not ln.get("support") else ("dropped" if not new_sup else "changed")] += 1
+        out.append(new)
+    log(org, S, f"{S}_{name}: revised {len(out):,} of {len(todo):,}", dict(moved))
+    if LINES_TO and dry and out:
+        import gzip
+        with gzip.open(LINES_TO, "at") as fo:
+            for r in out:
+                fo.write(json.dumps(r, default=str) + "\n")
+    if out:
+        L.publish(FAMILY, org, f"{S}_{name}", out, f"{S}: support per gene from Ensembl's name sources at the release "
+                  "read, synonyms not counted, for rule `support_ranks_shared_name` (the corrected judge, support_names)",
+                  __file__, revises=[s for s in fam if "_dec" not in s], judge="78", dry=dry,
+                  manifest_extra=dict(revision=name, correction="support_names"))
 
 
 NOT_HELD_NOTE = "no Ensembl table of any release holds the string"
@@ -415,7 +526,7 @@ def main():
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--rules", default=None, help="the harness's revisions of decided rules to apply (no regeneration)")
     ap.add_argument("--correction", default=None, choices=["places_not_comparable", "places_undo", "support_from_xrefs",
-                                                           "held_in_core"],
+                                                           "support_names", "held_in_core"],
                     help="a correction of the judge (`places_undo` with --undo <name of the places set>)")
     ap.add_argument("--undo", default=None)
     ap.add_argument("--lines-to", default=None, help="with --dry: write the revision lines of a correction here")
@@ -429,6 +540,8 @@ def main():
                             keep=decided_by_mirbase if a.undo.startswith("held") else not_held)
             elif a.correction == "support_from_xrefs":
                 support_from_xrefs(a.organism, S, a.name, a.dry)
+            elif a.correction == "support_names":
+                support_names(a.organism, S, a.name, a.dry)
             elif a.correction == "held_in_core":
                 held_in_core(a.organism, S, a.name, a.dry)
             else:

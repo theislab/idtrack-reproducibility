@@ -42,7 +42,7 @@ The areas' sizes, summed from their manifests (`manifests/`; the family areas li
 | area | files | GB |
 | --- | ---: | ---: |
 | truth | 3,213 | 5.34 |
-| harness/queries | 156 | 0.03 |
+| harness/queries | 162 | 0.03 |
 | harness/answers | 90 | 0.64 |
 | harness/runs | 115 | 0.07 |
 | harness/checks | 8 | 0.00 |
@@ -51,15 +51,15 @@ The areas' sizes, summed from their manifests (`manifests/`; the family areas li
 | families/astar | 16,714 | 8.07 |
 | families/a | 22,071 | 12.13 |
 | families/e | 3,170 | 4.33 |
-| graphs | 4,889 | 9.53 |
+| graphs | 4,894 | 9.87 |
 | hunts | 299 | 3.72 |
 | corpus | 170 | 0.12 |
 | performance | 117 | 0.11 |
-| families/b | 2,619 | 1.60 |
-| families/c | 7,234 | 5.36 |
+| families/b | 2,627 | 1.60 |
+| families/c | 7,276 | 5.36 |
 | families/d | 1,465 | 1.01 |
 | families/d_atlas_inputs | 151 | 0.04 |
-| **total** | **62,744** | **51.9** |
+| **total** | **62,805** | **52.2** |
 
 ## Publication
 
@@ -70,7 +70,7 @@ The data root is to be published with the manuscript in a data repository that g
 | truth | `truth` | 5.3 GB: Ensembl's and the authorities' files as fetched (their own licences: Ensembl's data are free to use; the authorities' terms are at the URLs in `SOURCES.tsv`) |
 | harness | `harness/*` | 0.7 GB: the fixed query sets, the reference tree's answers and their scoring |
 | families | `families/*` | 32.7 GB: the families' sets, answers, scorings and causes (the answers are most of it; Parquet, compressed) |
-| graphs | `graphs` | 9.5 GB: the trees' graphs (the reference's and the development trees') and the tables they were built from (equal graphs have equal content digests, so a rebuilt graph is checked against the digest the runs record) |
+| graphs | `graphs` | 9.9 GB: the trees' graphs (the reference's and the development trees') and the tables they were built from (equal graphs have equal content digests, so a rebuilt graph is checked against the digest the runs record) |
 | corpus, hunts, performance | `corpus`, `hunts`, `performance` | 4.0 GB: the regression corpus and its references, the hunts' outputs, the performance measurements |
 
 An area marked `publish = false` in `manifests/areas.toml` is no part of any record: family D's copies of the atlas project's files (`families/d_atlas_inputs`, 150 files, 42.5 MB), whose release is the atlas project's decision; their manifest stays in this repository (each file, its origin in the project with the commit, its size and sha256), so that a reader who obtains them from the project checks them, and nothing of D's published sets, answers or scorings needs them.

@@ -263,3 +263,157 @@ def test_a_copy_the_line_expects_apart_is_no_other_carrier():
     assert list(RC.other_database_broad("x", [line], {"G": G(), "car": Car()})) == []
     other = dict(line, apart=None)
     assert [r["broad"] for r in RC.other_database_broad("x", [other], {"G": G(), "car": Car()})] == [["G1.1", "G9.1"]]
+
+
+def test_a_database_whose_version_changes_with_most_releases_counts_edits(tmp_path, monkeypatch):
+    """Rule `accession_versions`' edit counters measured from Ensembl's records: the share of consecutive-release pairs of one link (accession,
+    object with version, database) in which the version differs; a version 0 is none, a gap breaks the pair, and the
+    bound is strict (one half is not above one half)."""
+    monkeypatch.setattr(TC, "TRUTH", str(tmp_path))
+    sp, tr, rs = "Uniprot/SWISSPROT", "Uniprot/SPTREMBL", "RefSeq_peptide"
+    rows = {
+        100: [("Translation", "P1.1", "G1", sp, "", "P00001", "P00001", 10, "X"), ("Translation", "P1.1", "G1", rs, "", "NP_1", "NP_1.1", 1, "X"),
+              ("Translation", "P2.1", "G2", tr, "", "A00002", "A00002", 5, "X"), ("Translation", "P3.1", "G3", tr, "", "A00003", "A00003", 0, "X")],
+        101: [("Translation", "P1.1", "G1", sp, "", "P00001", "P00001.11", 11, "X"), ("Translation", "P1.1", "G1", rs, "", "NP_1", "NP_1.1", 1, "X"),
+              ("Translation", "P3.1", "G3", tr, "", "A00003", "A00003", 0, "X")],
+        102: [("Translation", "P1.1", "G1", sp, "", "P00001", "P00001.12", 12, "X"), ("Translation", "P1.1", "G1", rs, "", "NP_1", "NP_1.2", 2, "X"),
+              ("Translation", "P2.1", "G2", tr, "", "A00002", "A00002.7", 7, "X")],
+        103: [("Translation", "P1.1", "G1", sp, "", "P00001", "P00001.12", 12, "X"), ("Translation", "P1.1", "G1", rs, "", "NP_1", "NP_1.2", 2, "X"),
+              ("Translation", "P2.1", "G2", tr, "", "A00002", "A00002.7", 7, "X")],
+        116: [("Translation", "P1.1", "G1", rs, "", "NP_1", "NP_1.9", 9, "X")],
+    }
+    for rel, rr in rows.items():
+        write_xref(tmp_path, "sus_scrofa", rel, rr)
+    shares = TC.version_change_shares("sus_scrofa", {sp, tr, rs}, upto=115)
+    # Swiss-Prot 10 -> 11 -> 12 -> 12: 2 of 3; TrEMBL A00002: no pair across the gap at 101, 102 -> 103 the same: 0 of 1
+    # (A00003's version 0 is none); RefSeq 1 -> 1 -> 2 -> 2: 1 of 3 (release 116 lies beyond the window)
+    assert shares == {sp: (3, 2), tr: (1, 0), rs: (3, 1)}
+    assert TC.edit_counter_dbs(shares) == {sp}
+    assert TC.edit_counter_dbs({sp: (4, 2)}) == set()  # exactly one half: not above it
+
+
+class _GV:
+    """C's generator over the versioned databases, invented: values, their genes and versions per release."""
+
+    def __init__(self, H):
+        X = object.__new__(TC.Xrefs)
+        X.H = H
+        self.X, self.T = X, 115
+        self.tr = types.SimpleNamespace(cmp_for=lambda R: "versioned")
+
+    def at_release(self, gs, R):
+        return dict(cmp="versioned", expect=sorted(gs))
+
+    def walked(self, gs, R, t):
+        return dict(cmp="versioned", expect=sorted(f"{g}w" for g in gs))
+
+    def default_truth(self, fam, v):
+        return GC.GenC.default_truth(self, fam, v)
+
+
+def _ver_line(stratum, ident, expect, fr=None, to=115, **kw):
+    return dict(qid=f"{stratum}|{ident}|{fr or '-'}|{to}", stratum=stratum, kind=stratum, id=ident, from_release=fr,
+                to_release=to, expect=expect, rule="set", cmp="versioned", **kw)
+
+
+def _held(gs, vs):
+    return frozenset(gs), frozenset(vs), True
+
+
+def test_a_typed_version_of_an_edit_counter_is_not_judged_and_reads_the_accession_s_own_line():
+    gv = _GV({"uniprot": {"P00001": {100: _held({"G1"}, {"3"}), 115: _held({"G2"}, {"9"})},
+                          "A00002": {100: _held({"G3"}, {"4"}), 105: _held({"G3"}, {"6"})}},
+              "refseq": {"NM_1": {100: _held({"G4"}, {"1"})}}})
+    # the accessions' own lines without a version, as a correction of another rule left them (a wider set)
+    refs = {"c3_default|P00001|-|115": _ver_line("c3_default", "P00001", ["G2"], broad=["G2", "G7"]),
+            "c3_retired|A00002|-|115": _ver_line("c3_retired", "A00002", ["G3w"])}
+    ctx = {"GV": gv, "counters": set(TC.FAMILIES["uniprot"]["dbs"]), "refs": refs, "held": _Held({})}
+    lines = [_ver_line("c3_ver_lower", "P00001.2", []), _ver_line("c3_oldver", "P00001.3", ["G1w"]),
+             _ver_line("c3_ver_higher_retired", "A00002.7", []), _ver_line("c3_at_v", "P00001.3", ["G1"], fr=100, to=100),
+             _ver_line("c3_ver_higher", "P00001.10", ["G2"], broad=["G2", "G7"]), _ver_line("c2_ver_lower", "NM_1.0", []),
+             _ver_line("c3_default", "P00001", ["G2"])]
+    out = {r["qid"]: r for r in RC.version_not_judged("sus_scrofa", lines, ctx)}
+    assert set(out) == {"c3_ver_lower|P00001.2|-|115", "c3_oldver|P00001.3|-|115", "c3_ver_higher_retired|A00002.7|-|115"}
+    r = out["c3_ver_lower|P00001.2|-|115"]
+    assert r["expect"] == ["G2"] and r["broad"] == ["G2", "G7"]  # the own line's truth, its correction included
+    assert r["read_at"] == 115 and r["read_as"] == "c3_default|P00001|-|115" and r["version"].startswith("not judged")
+    r = out["c3_ver_higher_retired|A00002.7|-|115"]
+    assert r["expect"] == ["G3w"] and r["read_at"] == 105 and r["revised_by"] == ["version_not_judged"] and "q2" not in r
+    assert not list(RC.version_not_judged("sus_scrofa", [dict(r)], ctx))  # a line revised once is left
+    # RefSeq's numbers date sequences: not this correction's
+    assert not list(RC.version_not_judged("sus_scrofa", [_ver_line("c2_ver_lower", "NM_1.0", [])], dict(ctx, counters=set())))
+
+
+def test_a_version_above_every_version_had_is_the_latest_only_where_the_accession_is_attached_at_the_target():
+    gv = _GV({"refseq": {"NM_1": {100: _held({"G1"}, {"2"}), 104: _held({"G1"}, {"3"}), 106: (frozenset({"G1"}), frozenset({"4"}), False)},
+                         "NM_2": {110: _held({"G2"}, {"1"}), 113: _held({"G2"}, {"2"}), 115: _held({"G2"}, {"2"})},
+                         "NM_3": {100: _held({"G1"}, {"2"}), 113: _held({"G1"}, {"3"}), 116: _held({"G1"}, {"5"})}},
+              "uniprot": {"P00001": {100: _held({"G3"}, {"5"})}}})
+    refs = {"c2_oldver|NM_1.3|-|115": _ver_line("c2_oldver", "NM_1.3", ["G1w"], read_at=104),
+            "c2_default_v|NM_2.2|-|115": _ver_line("c2_default_v", "NM_2.2", ["G2"], other_carriers=["G9"])}
+    ctx = {"GV": gv, "counters": set(TC.FAMILIES["uniprot"]["dbs"]), "refs": refs, "held": _Held({})}
+    # NM_1 (versions 2 and 3; 4 at 106 is outside the graph's scope) is not attached at the target: 4 above its
+    # versions is an unknown version, nothing (an earlier set's reading of the latest is put back); NM_2 is attached
+    # at the target: 3 above its versions is the latest, read as NM_2.2; NM_3.4: version 5 lies at 116, beyond the
+    # window, and NM_3 is not attached at 115: nothing
+    lines = [_ver_line("c2_ver_higher_retired", "NM_1.4", ["G1w"], read_at=104, latest_version=3, revised_by=["version_above_latest"]),
+             _ver_line("c2_ver_higher", "NM_2.3", ["G2"]), _ver_line("c3_ver_higher_retired", "P00001.6", []),
+             _ver_line("c2_ver_gap", "NM_3.4", [])]
+    out = {r["qid"]: r for r in RC.versions_in_window("sus_scrofa", lines, ctx)}
+    assert set(out) == {"c2_ver_higher_retired|NM_1.4|-|115", "c2_ver_higher|NM_2.3|-|115"}
+    back = out["c2_ver_higher_retired|NM_1.4|-|115"]
+    assert back["expect"] == [] and back["read_at"] is None and "latest_version" not in back
+    assert back["revised_by"] == ["version_above_latest", "versions_in_window"]
+    r = out["c2_ver_higher|NM_2.3|-|115"]
+    assert r["expect"] == ["G2"] and r["other_carriers"] == ["G9"] and r["read_at"] == 115 and r["latest_version"] == 2
+    assert not list(RC.versions_in_window("sus_scrofa", list(out.values()), ctx))  # run again on its own output: nothing
+
+
+def test_versions_beyond_the_graph_s_window_are_no_versions_the_accession_had():
+    gv = _GV({"refseq": {"NM_3": {100: _held({"G1"}, {"2"}), 113: _held({"G1"}, {"3"}), 115: _held({"G1"}, {"3"}), 116: _held({"G1"}, {"5"})},
+                         "NM_4": {100: _held({"G2"}, {"1"}), 115: _held({"G2"}, {"3"})},
+                         "NM_5": {116: _held({"G3"}, {"1"})}}})
+    refs = {"c2_default_v|NM_3.3|-|115": _ver_line("c2_default_v", "NM_3.3", ["G1"]),
+            "c2_default_v|NM_4.3|-|115": _ver_line("c2_default_v", "NM_4.3", ["G2"], broad=["G2", "G8"])}
+    ctx = {"GV": gv, "counters": set(TC.FAMILIES["uniprot"]["dbs"]), "refs": refs, "held": _Held({})}
+    assert gv.X.versions_in_graph("refseq", "NM_3") == {"2", "3", "5"}
+    assert gv.X.versions_in_graph("refseq", "NM_3", 115) == {"2", "3"}
+    lines = [_ver_line("c2_ver_gap", "NM_3.4", []), _ver_line("c2_ver_gap", "NM_4.2", []),
+             _ver_line("c2_default_v", "NM_3.3", ["G1"]), _ver_line("c2_default_v", "NM_4.3", ["G2"], broad=["G2", "G8"]),
+             _ver_line("c2_ver_lower", "NM_5.0", []), _ver_line("c2_at_v", "NM_3.5", [], fr=116, to=116)]
+    out = list(RC.versions_in_window("sus_scrofa", lines, ctx))
+    # NM_3.4: version 5 lies at 116, beyond the window: 4 is above the versions 2 and 3 the window had, and NM_3 is
+    # attached at the target: read as NM_3.3; a line read as itself keeps its truth, whatever corrections made it
+    assert [r["qid"] for r in out] == ["c2_ver_gap|NM_3.4|-|115"]
+    assert out[0]["expect"] == ["G1"] and out[0]["read_at"] == 115 and out[0]["latest_version"] == 3
+    assert out[0]["revised_by"] == ["versions_in_window"]
+    # run again on its own output: nothing; a line an earlier set changed without cause is put back
+    assert not list(RC.versions_in_window("sus_scrofa", [out[0]], ctx))
+    wrong = dict(_ver_line("c2_default_v", "NM_4.3", ["G2", "G8"]), revised_by=["versions_in_window"], latest_version=9)
+    back = list(RC.versions_in_window("sus_scrofa", [wrong], ctx))
+    assert len(back) == 1 and back[0]["expect"] == ["G2"] and back[0]["broad"] == ["G2", "G8"]
+    assert "latest_version" not in back[0] and "read_as" not in back[0]
+
+
+class _Held:
+    """`revise_c.HeldEarly`, invented: {string: {release: genes whose display name it is there}}."""
+
+    def __init__(self, at):
+        self.at = at
+
+    def add(self, values):
+        pass
+
+
+def test_a_versioned_string_that_is_a_display_name_is_read_as_that_name_where_that_is_later():
+    gv = _GV({"refseq": {"XM_9": {70: _held({"G1"}, {"2"})}, "XM_8": {70: _held({"G2"}, {"2"}), 115: _held({"G2"}, {"3"})}}})
+    refs = {"c2_oldver|XM_9.2|-|115": _ver_line("c2_oldver", "XM_9.2", ["G1w"], read_at=70),
+            "c2_default_v|XM_8.3|-|115": _ver_line("c2_default_v", "XM_8.3", ["G2"])}
+    held = _Held({"XM_9.1": {60: {"G5"}, 62: {"G5"}}, "XM_8.3": {60: {"G7"}}})
+    ctx = {"GV": gv, "counters": set(TC.FAMILIES["uniprot"]["dbs"]), "refs": refs, "held": held}
+    lines = [_ver_line("c2_ver_lower", "XM_9.1", []), _ver_line("c2_default_v", "XM_8.3", ["G2"])]
+    out = list(RC.versions_in_window("sus_scrofa", lines, ctx))
+    # XM_9.1: no version reading (below version 2), Ensembl's display name of G5 at 60 and 62: read at 62; XM_8.3: its
+    # version reading at the target is later than the display name at 60
+    assert [r["qid"] for r in out] == ["c2_ver_lower|XM_9.1|-|115"]
+    assert out[0]["expect"] == ["G5w"] and out[0]["read_at"] == 62 and out[0]["read_as_name"] is True

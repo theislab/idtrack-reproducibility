@@ -218,7 +218,7 @@ def b5(cx, dry):
                        unit=s, id=s, from_release=R, to_release=R, final_database=None, strategy="both", rule=GB.rule_of(len(E)),
                        cmp=cmpR, expect=vs(E), broad=vs(B) if B != E else None, locus=None, name_src="biomart")
             if len(E) > 1:
-                sup = {tr.vid(g, R): nb.support(R, g, s) for g in E}
+                sup = {tr.vid(g, R): nb.support(R, g, s, synonyms=not names) for g in E}  # read as a synonym: its sources
                 if len(set(sup.values())) > 1:
                     rec["support"] = sup
             out.append(rec)

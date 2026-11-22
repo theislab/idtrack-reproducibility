@@ -84,6 +84,43 @@ def xref_releases(org):
     return sorted(int(os.path.basename(p)[:-7]) for p in glob.glob(os.path.join(d, "*.tsv.gz")))
 
 
+# The edit-counter bound of rule `accession_versions` (idtrack's `settings.VERSION_EDIT_COUNTER_SHARE`): a database whose stored version differs, for
+# one link, in more than this share of the consecutive releases at which the link holds counts its records' edits
+# (UniProt's entry version), not versions of a sequence; the two groups lie at most 14.6 % and at least 58 % apart.
+EDIT_COUNTER_SHARE = 0.5
+
+
+def version_change_shares(org, dbs, upto=None):
+    """Rule `accession_versions`' edit counters measured from Ensembl's records, not from idtrack: per `db_name` of `dbs`, (pairs, changed): of
+    the pairs of consecutive releases of the extracts (up to `upto`) at which one link (the accession, the Ensembl
+    object with its version, the database) holds with a version (`xref.version` not empty or 0), the pairs and those
+    in which the version differs."""
+    out = collections.defaultdict(lambda: [0, 0])
+    prev, last_rel = {}, None
+    for rel in xref_releases(org):
+        if upto is not None and rel > upto:
+            continue
+        cur = {}
+        for ot, oid, gid, db, disp, acc, lab, ver, it in read_xref(org, rel):
+            if db not in dbs or ver in ("", "0", "\\N"):
+                continue
+            k = (db, acc, oid)
+            if k in cur:
+                continue
+            cur[k] = ver
+            p = prev.get(k)
+            if p is not None:
+                out[db][0] += 1
+                out[db][1] += p != ver
+        prev, last_rel = cur, rel
+    return {db: tuple(v) for db, v in out.items()}
+
+
+def edit_counter_dbs(shares):
+    """The databases of `version_change_shares` whose version changes in more than `EDIT_COUNTER_SHARE` of the pairs."""
+    return {db for db, (n, c) in shares.items() if n and c / n > EDIT_COUNTER_SHARE}
+
+
 def read_xref(org, rel):
     """Rows of one release's extract: (object_type, object_id, gene base id, db_name, db_display_name, acc, label,
     version, info_type)."""
@@ -200,10 +237,12 @@ class Xrefs:
                 best = r
         return best
 
-    def versions_in_graph(self, fam, v):
+    def versions_in_graph(self, fam, v, upto=None):
+        """The versions Ensembl wrote for v at the releases where the graph's configuration holds it, up to `upto` (the
+        graph's last release: the extracts reach one release beyond the graphs' window)."""
         out = set()
         for r, (gs, vers, ing) in self.H[fam].get(v, {}).items():
-            if ing:
+            if ing and (upto is None or r <= upto):
                 out |= vers
         return out
 

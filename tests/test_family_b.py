@@ -277,3 +277,28 @@ def test_a_revision_compares_the_truth_not_the_revisions_bookkeeping():
     published = RB.tag(dict(line, set="b9_r1"), "r1", "copies apart before 82")
     assert RB.canon(published) == RB.canon(line)
     assert RB.canon(dict(line, expect=["G2"])) != RB.canon(published)
+
+
+def test_support_of_a_shared_name_counts_name_sources_not_synonyms(tmp_path, monkeypatch):
+    """Rule `support_ranks_shared_name` as idtrack counts it (`entry_support`: the databases attaching the name read):
+    a synonym of another cross-reference is no name source (the judge's `_support`)."""
+    import gzip
+    from idtrack_reproducibility.families.b import revise_b as RVB
+    from idtrack_reproducibility.harness import harness_lib as H
+    X, Y = "ENSMUSG00000000001", "ENSMUSG00000000002"
+    d = tmp_path / "t"
+
+    def tsv(sub, cols, rows):
+        (d / sub).mkdir(parents=True, exist_ok=True)
+        with gzip.open(d / sub / "78.tsv.gz", "wt") as fo:
+            fo.write("\t".join(cols) + "\n" + "".join("\t".join(r) + "\n" for r in rows))
+    tsv("core_xref", ["object_type", "object_id", "gene_id", "db_name", "db_display_name", "acc", "label", "version", "info_type"],
+        [("Gene", X, X, "MGI", "MGI Symbol", "MGI:1", "Nm1", "0", "DIRECT"), ("Gene", X, X, "Vega_gene", "Vega gene", "OTT1", "Nm1", "0", "X"),
+         ("Gene", Y, Y, "MGI", "MGI Symbol", "MGI:1", "Nm1", "0", "DIRECT")])
+    tsv("core_display", ["gene_id", "db_name", "db_display_name", "acc", "label", "info_type"],
+        [(X, "MGI", "MGI Symbol", "MGI:1", "Nm1", "DIRECT"), (Y, "MGI", "MGI Symbol", "MGI:1", "Nm1", "DIRECT")])
+    tsv("core_synonyms", ["synonym", "gene_id", "db_name", "label", "object_type"], [("Nm1", Y, "Uniprot_gn", "OTHER;", "Gene")])
+    monkeypatch.setattr(H, "truth_dir", lambda org: str(d))
+    line = dict(qid="b1|Nm1|78|78", id="Nm1", from_release=78, to_release=78, expect=[f"{X}.1", f"{Y}.1"])
+    # X: MGI, Vega and its display name; Y: MGI and its display name (its UniProt synonym is no source)
+    assert RVB._core_support("mus_musculus", [line], None) == {"b1|Nm1|78|78": {f"{X}.1": 3, f"{Y}.1": 2}}
