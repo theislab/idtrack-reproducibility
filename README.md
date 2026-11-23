@@ -17,6 +17,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 | H, performance | build, load, memory, per-call latency, batch scaling, harmonization | [docs/families/h.md](docs/families/h.md) | `families.h` |
 | the regression corpus | whether an answer changed between two idtrack trees (no truth) | [docs/corpus.md](docs/corpus.md) | `idtrack_reproducibility.corpus` |
 | the weakness hunts | findings of the hunts (inputs, history, regions; the attack on idtrack's next version), with runnable reproducers | [docs/hunts.md](docs/hunts.md) | `idtrack_reproducibility.hunts` |
+| a tree's graphs | building a tree's graphs from stored tables, judging them (the tree's own verify, the history against Ensembl's, the differences from another tree's), a stored copy for load measurements | [docs/graphs.md](docs/graphs.md) | `idtrack_reproducibility.graphs` |
 
 Every benchmark keeps one row per query line, view and subject (a tree or another tool): [the record](docs/records.md) (its columns, how to load it, a worked example). How the move into this package was verified (the stored scorings scored again, line by line) is [docs/verification.md](docs/verification.md). A measurement of any tree in a few hours is the [modest set](docs/modest.md).
 
@@ -26,7 +27,7 @@ The design of the whole programme (principles, needs, coverage, the families F a
 
 | path | what |
 | --- | --- |
-| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `results.py`, `records.py` (the record's loader), `rescore.py` (scoring again), `manifests.py`, `check.py` |
+| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `graphs/` (a tree's graphs), `results.py`, `records.py` (the record's loader), `rescore.py` (scoring again), `manifests.py`, `check.py` |
 | `docs/` | the methods of each benchmark, the rules, the data, how to add a benchmark |
 | `results/` | the current results: tables per benchmark, tree and organism, `index.tsv` (one row per family, stratum, organism and tree) and `provenance.tsv` (what generated each file, from which source) |
 | `results.toml` | the registry of the scored runs whose tables are the results |
@@ -69,10 +70,11 @@ One TOML file and environment variables; nothing is a path of a particular machi
 | --- | --- |
 | fetch the truth | `idtrack-repro fetch-gtf`, `idtrack-repro fetch-tables <what>`, `idtrack-repro fetch-rest`; check the history reading: `idtrack-repro check-truth` |
 | make the query sets | the harness: `idtrack-repro make-queries --organism <o> --set <name>`; a family: `idtrack-repro family <family> <generator> --organism <o>` (e.g. `family a gen_a`) |
+| build and judge a tree's graphs | `idtrack-repro graph-build --tree <tree> --organisms all --tables <folder> --submit`, then `idtrack-repro graph-judge --tree <tree> --organisms all --against <earlier tree> --submit` ([docs/graphs.md](docs/graphs.md)) |
 | run a tree on its graphs | `idtrack-repro run --family <family> --organism <o> --clone <checkout> --graph <graph> --out <run folder> --submit <shards> --score` (the harness: `idtrack-repro harness-score ... --submit <shards>`) |
 | score | `idtrack-repro score --family <family> --organism <o> --run <run folder>` (in partitions: `--parts P --part p`, then `--parts P --merge`) |
 | score again | `idtrack-repro rescore [--parts ...] --workers N`: every registered scoring under today's judge (the revision sets published since, the judge's code), from its stored answers; resumable ([the record](docs/records.md#scoring-again)) |
-| compare two trees | `idtrack-repro compare <scored a> <scored b> --moved <file>` |
+| compare two trees | `idtrack-repro compare <scored a> <scored b> --moved <file>`; the harness's moved answers over consecutive scorings, per step: `idtrack-repro attribute --run <a>=<folder> --run <b>=<folder> ... --out <tsv>` ([attribution](docs/harness.md#attribution)) |
 | causes of the wrong answers | `idtrack-repro explain ...` on the tree, then `idtrack-repro causes --organism <o> --scored <folder> [--plugin <family module>]` |
 | known limitations | `idtrack-repro known-limitations` (every family's rows from its current runs, `results/limitations/`); one family's rows: `idtrack-repro limitations --family <family> --scored <folders> --out <tsv>` |
 | results | `idtrack-repro results` (reads `results.toml`; writes `results/`) |

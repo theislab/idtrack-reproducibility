@@ -177,6 +177,7 @@ No cold build was measured here. The only cold builds of the reference's builder
 - **Batch scaling** stops at the number of distinct identifiers of the corpus (under 10,000): the batch of 10,000 is not measured.
 - **Cold builds** depend on Ensembl's servers and the network on the day: their time is not the package's alone (the warm builds' is).
 - **`cycles`** is measured on pig only, once per tree.
+- **The page cache.** Each load runs in a fresh process with the graph file as the node's page cache holds it (usually cached: the jobs read it before); a load after the file was dropped from the page cache (a cold disk) is not measured. Two layouts of one graph (compressed members, as idtrack writes them, against every member stored) are compared by configuring a tree a second time over stored copies ([a stored copy](../graphs.md#a-stored-copy)).
 - **Threads.** The four-thread batch shows whether conversions run in parallel in one process (they hold the interpreter lock); it is no measure of a server's concurrency.
 
 ## Reproducing from scratch

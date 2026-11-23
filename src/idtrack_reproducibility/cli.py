@@ -20,6 +20,8 @@ COMMANDS = {
     "make-queries": ("idtrack_reproducibility.harness.make_queries", "publish the harness's query sets and revision sets"),
     "harness-score": ("idtrack_reproducibility.harness.score", "ask and score the harness's sets on a tree (sharded jobs)"),
     "harness-compare": ("idtrack_reproducibility.harness.compare_scores", "two harness scorings: rates, regressions, moved answers"),
+    "attribute": ("idtrack_reproducibility.harness.attribute",
+                  "the harness's moved answers between consecutive scorings, per step (a decision's effect by part)"),
     "travel-checks": ("idtrack_reproducibility.harness.travel_checks", "the travel matrix's consistency checks"),
     "travel-report": ("idtrack_reproducibility.harness.travel_report", "the travel matrix's tables"),
     "assembly-map": ("idtrack_reproducibility.harness.assembly_map", "the check of places mapped across assemblies"),
@@ -41,6 +43,11 @@ COMMANDS = {
     "corpus": ("idtrack_reproducibility.corpus.pipeline", "the regression corpus: make, run, harmonize, compare, references"),
     "hunts": ("idtrack_reproducibility.hunts.reproduce", "the weakness hunts' reproducers on a tree"),
     "performance": ("idtrack_reproducibility.families.h.run", "family H: load, calls, harmonization, server, builds"),
+    # a tree's graphs
+    "graph-build": ("idtrack_reproducibility.graphs.build", "build a tree's graphs from stored tables (one job per organism)"),
+    "graph-judge": ("idtrack_reproducibility.graphs.judge",
+                    "judge a tree's graph: its own verify, its history against Ensembl's, its differences from another's"),
+    "graph-stored": ("idtrack_reproducibility.graphs.stored", "a copy of a graph file with every member stored (load layouts)"),
     # results, data, tidiness
     "results": ("idtrack_reproducibility.results", "the results/ tables, their index and provenance, from the scored runs"),
     "manifest": ("idtrack_reproducibility.manifests", "the data manifests of manifests/areas.toml"),
