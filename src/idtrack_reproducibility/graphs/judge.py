@@ -128,7 +128,7 @@ def history_here(graph_path: str, organism: str) -> dict:
     events = gene_events(core_table(organism, last, "stable_id_event"), core_table(organism, last, "mapping_session"),
                          first, last)
     result = {"status": "checked", **compare_history(events, pairs, placed, set(store.index))}
-    unplaced, checked, examples = 0, 0, []
+    unplaced, unplaced_releases, checked, examples = 0, 0, 0, []
     for i in np.flatnonzero(store.ntype == store.backbone_code).tolist():
         name = names[i]
         if name.endswith(".Void") or name.endswith(".Retired"):
@@ -140,10 +140,11 @@ def history_here(graph_path: str, organism: str) -> dict:
         lacking = graph.active_releases(name).mask & ~have
         if lacking:
             unplaced += 1
+            unplaced_releases += bin(lacking).count("1")
             if len(examples) < 50:
                 examples.append([name, [r for r in range(lacking.bit_length()) if lacking >> r & 1]])
     result.update({"places_checked_genes": checked, "genes_without_place_at_an_active_release": unplaced,
-                   "unplaced_examples": examples})
+                   "release_pairs_without_place": unplaced_releases, "unplaced_examples": examples})
     return result
 
 
