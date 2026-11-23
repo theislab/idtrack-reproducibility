@@ -100,14 +100,17 @@ def sample(org, what, pop, k):
 
 
 class GenC:
-    def __init__(self, org, T, families, authority=True):
+    def __init__(self, org, T, families, authority=True, continuity=False):
+        """`continuity`: the databases that continue an included one are read as it (rule `database_filing`,
+        `truth_c.continuations`; the corrections of idtrack after its second round), else the configuration's alone."""
         self.org, self.T = org, T
         self.G = GA.GenA(org, T)
         self.tr = self.G.tr
         self.counts = collections.Counter()
         asm = H.gtf_assemblies(org)
         self.scope = TC.Scope(org, CFG.get().tree(REFERENCE_TREE)["source"], asm)
-        self.X = TC.Xrefs(org, self.scope, families=families, log=log) if families else None
+        self.continued = TC.continuations(org, self.scope, upto=T, log=log)[0] if continuity else None
+        self.X = TC.Xrefs(org, self.scope, families=families, log=log, continued=self.continued) if families else None
         self.A = TC.Authority(org) if authority else None
         bm = set(H.biomart_releases(org))
         tsv = {int(d) for d in os.listdir(os.path.join(TC.TRUTH, org, "tsv"))

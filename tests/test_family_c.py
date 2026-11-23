@@ -417,3 +417,69 @@ def test_a_versioned_string_that_is_a_display_name_is_read_as_that_name_where_th
     # version reading at the target is later than the display name at 60
     assert [r["qid"] for r in out] == ["c2_ver_lower|XM_9.1|-|115"]
     assert out[0]["expect"] == ["G5w"] and out[0]["read_at"] == 62 and out[0]["read_as_name"] is True
+
+
+def _filing_releases(tmp_path):
+    """RefSeq's accessions as `RefSeq_dna` (on transcripts) at 62 and 63, as RefSeq_mRNA from 64; Rfam's accessions on
+    transcripts at 62, on genes from 63; and a database (GO) whose links never move into an included one."""
+    g1, g2, g3 = "ENSMUSG00000000001", "ENSMUSG00000000002", "ENSMUSG00000000003"
+    dna = [("Transcript", 1, g1, "RefSeq_dna", "RefSeq DNA", "NM_000001", "NM_000001", 1, "DIRECT"),
+           ("Transcript", 2, g2, "RefSeq_dna", "RefSeq DNA", "NM_000002", "NM_000002", 1, "DIRECT"),
+           ("Transcript", 3, g3, "GO", "GO", "GO:0000001", "GO:0000001", 0, "DIRECT")]
+    write_xref(tmp_path, "mus_musculus", 62, dna + [("Transcript", 1, g1, "RFAM", "RFAM", "RF00001", "5S_rRNA", 0, "DIRECT")])
+    write_xref(tmp_path, "mus_musculus", 63, [r[:7] + (2,) + r[8:] if r[5] == "NM_000001" else r for r in dna] +
+               [("Gene", 1, g1, "RFAM", "RFAM", "RF00001", "5S_rRNA", 0, "DIRECT")])
+    write_xref(tmp_path, "mus_musculus", 64, [
+        ("Transcript", 1, g1, "RefSeq_mRNA", "RefSeq mRNA", "NM_000001", "NM_000001", 2, "DIRECT"),
+        ("Transcript", 2, g2, "RefSeq_mRNA", "RefSeq mRNA", "NM_000002", "NM_000002", 1, "DIRECT"),
+        ("Transcript", 3, g3, "GO", "GO", "GO:0000001", "GO:0000001", 0, "DIRECT"),
+        ("Gene", 1, g1, "RFAM", "RFAM", "RF00001", "5S_rRNA", 0, "DIRECT")])
+    return Scope({"RefSeq_mRNA": {64}, "RFAM": {63, 64}}, {"RefSeq_mRNA": "transcript", "RFAM": "gene"})
+
+
+def test_a_database_whose_links_move_into_an_included_one_continues_it(tmp_path, monkeypatch):
+    monkeypatch.setattr(TC, "TRUTH", str(tmp_path))
+    scope = _filing_releases(tmp_path)
+    out, ev = TC.continuations("mus_musculus", scope, log=lambda *a: None)
+    assert out[("RefSeq_dna", None)] == ("RefSeq_mRNA", frozenset({62, 63}))  # every release it has links
+    assert out[("RFAM", "transcript")] == ("RFAM", frozenset({62}))  # an included name on another form: its run
+    assert ("GO", None) not in out  # its links stay where they are
+    X = TC.Xrefs("mus_musculus", scope, families=["refseq", "rfam"], log=lambda *a: None, continued=out)
+    assert X.at("refseq", "NM_000001", 62) == (frozenset({"ENSMUSG00000000001"}), frozenset({"1"}), True)
+    assert X.versions_in_graph("refseq", "NM_000001") == {"1", "2"}  # the version RefSeq_dna wrote is the accession's
+    assert X.at("rfam", "RF00001", 62)[2] is True
+    plain = TC.Xrefs("mus_musculus", scope, families=["refseq", "rfam"], log=lambda *a: None)
+    assert plain.at("refseq", "NM_000001", 62) is None and plain.at("rfam", "RF00001", 62)[2] is False
+
+
+def test_a_database_that_ends_hands_over_what_it_still_had(tmp_path, monkeypatch):
+    """Row I157: few of the ending database's links move, but they are most of the receiver's links there."""
+    monkeypatch.setattr(TC, "TRUTH", str(tmp_path))
+    old = [("Transcript", i, f"ENSMUSG{i:011d}", "RefSeq_dna_predicted", "x", f"XM_{i:06d}", f"XM_{i:06d}", 1, "DIRECT")
+           for i in range(1, 11)]
+    write_xref(tmp_path, "mus_musculus", 63, old)
+    write_xref(tmp_path, "mus_musculus", 64, [("Transcript", i, f"ENSMUSG{i:011d}", "RefSeq_mRNA_predicted", "x",
+                                               f"XM_{i:06d}", f"XM_{i:06d}", 1, "DIRECT") for i in (1, 2, 3)])
+    scope = Scope({"RefSeq_mRNA_predicted": {64}}, {"RefSeq_mRNA_predicted": "transcript"})
+    out, _ = TC.continuations("mus_musculus", scope, log=lambda *a: None)
+    assert out[("RefSeq_dna_predicted", None)][0] == "RefSeq_mRNA_predicted"  # 3 of 10 move: 3 of the receiver's 3
+
+
+def test_a_value_held_now_through_a_continued_database_is_read_where_it_is_held():
+    """Correction `database_continuity`: a not-held line of rule `safe` (and a retired line) read by rule
+    `start_release` at the latest release where the continued reading holds the value; a line read where it was keeps
+    its truth."""
+    class G:
+        def default_truth(self, fam, v):
+            return {"RF00605": (57, dict(cmp="versioned", expect=["ENSSSCG00000028053.2"])),
+                    "NM_000009": (70, dict(cmp="versioned", expect=["ENSSSCG00000000009.3"]))}.get(v, (None, None))
+    lines = [dict(qid="c4_rfam_acc_not_held|RF00605|-|115", kind="c4_rfam_acc_not_held", stratum="c4_rfam_acc_not_held",
+                  id="RF00605", from_release=None, to_release=115, rule="safe", cmp="versioned", expect=[], read_at=57),
+             dict(qid="c2_retired|NM_000009|-|115", kind="c2_retired", stratum="c2_retired", id="NM_000009",
+                  from_release=None, to_release=115, rule="set", cmp="versioned", expect=["ENSSSCG00000000009.3"], read_at=70),
+             dict(qid="c4_rfam_acc_not_held|RF00001|-|115", kind="c4_rfam_acc_not_held", stratum="c4_rfam_acc_not_held",
+                  id="RF00001", from_release=None, to_release=115, rule="safe", cmp="versioned", expect=[])]
+    out = list(RC.database_continuity("sus_scrofa", lines, {"GK": G()}))
+    assert [r["qid"] for r in out] == ["c4_rfam_acc_not_held|RF00605|-|115"]
+    assert out[0]["rule"] == "set" and out[0]["read_at"] == 57 and out[0]["expect"] == ["ENSSSCG00000028053.2"]
+    assert out[0]["revised_by"] == ["database_continuity"]

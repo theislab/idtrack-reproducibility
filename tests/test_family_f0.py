@@ -137,3 +137,20 @@ def test_a_wrong_answer_under_a_rule_decided_after_the_tree_has_its_cause():
     assert "par_shared_names" in K.t_rule_decided_after_tree(c)
     c.r["rule"] = "revised:places"  # a correction of the judge, not a decided rule
     assert K.t_rule_decided_after_tree(c) is None
+
+
+def test_an_outcome_limitation_can_name_the_judge_s_reason_or_the_answer_s_status(tmp_path):
+    from idtrack_reproducibility.families import limits_outcomes as LO
+    p = tmp_path / "map.tsv"
+    p.write_text("limitation\tgroup\ttitle\twhat\tuser_action\tfixed_by\trule\tclass\tstrata\twhen\n"
+                 "L-x\tg\tt\tw\tu\tf\tr\ta\t^old_gene_to_db$\treason:not expected: .*\\b(XM|NG)_\n"
+                 "L-y\tg\tt\tw\tu\tf\tr\ta\t^travel_split$\tstatus:^no_target$\n")
+    m = LO.load_map(str(p))
+    assert LO.classify(m, "old_gene_to_db", {"reason": "not expected: NM_1,XM_2"})["limitation"] == "L-x"
+    assert LO.classify(m, "old_gene_to_db", {"reason": "not expected: NM_1"}) is None
+    assert LO.classify(m, "travel_split", {"status": "no_target", "reason": "no answer"})["limitation"] == "L-y"
+    assert LO.classify(m, "travel_split", {"status": "not_found"}) is None
+    bad = tmp_path / "bad.tsv"
+    bad.write_text("limitation\tgroup\ttitle\twhat\tuser_action\tfixed_by\trule\tclass\tstrata\twhen\nL\tg\tt\tw\tu\tf\tr\ta\t.\tmatch:x\n")
+    with pytest.raises(SystemExit):
+        LO.load_map(str(bad))

@@ -164,6 +164,69 @@ The round's faults, before (`r1`) and after (`r1b`), on the modest selection (ri
 The wrong answers round 1 left by bridges through names now held that Ensembl's chain file puts elsewhere (`L-bridges`: mouse harness 9, A* 6, A 4, C 25; human harness 3, A* 6, A 2, C 10) are all wrong on `r1b` as on `r1`.
 
 
+## The tree `r2`
+
+`r2` is idtrack after the fix of its second round, the last round of fixes (commit `978f9a0`, the data root's `[trees.r2]`, its graphs `graphs/r2/<organism>/`): Ensembl's chain files carry a gene's place across an assembly change and places are compared by overlap with strand (row I147); a copy on a patch or haplotype stands for its assembly exception's reference region (I148); a database Ensembl renamed or refiled is the selected database it continues (rule [`database_filing`](rules.md#database_filing), I149 and I157); a version above every judged one is the latest only where the accession is attached at the graph's last release (I150); a target in a final database is an id of the answered gene (I151); the display mark is ranked by the spelling typed (I152); every id form of an LRG record answers as the record (I153); the display mark and the support are taken over every entry gene of the paths that reach a gene (I156); and a link read on a transcript counts for the gene that holds the transcript at the link's releases (I158). Its modest run (2026-11-22, the selections and jobs of `r1b`'s) took 51 minutes (pig), 1 h 52 (mouse), 2 h 20 (human), 54 minutes (rhesus) and 27 minutes (cynomolgus), the kernel's peaks 3.3, 5.1, 5.7, 2.4 and 1.5 GB; nothing of other runs was reused. `r1b` and `d4c2dda` were not run: their stored answers were scored again under the same judge (`modest organism --score-only` on links to their answers; `r1b`'s scoring before the revision below equals its stored one in every part).
+
+Reading the losses found family C's judge lagging rule `database_filing`: the versions RefSeq's databases wrote under their earlier names, and the values Ensembl filed under them, were not the accessions' (`c2_ver_lower` said `XM_001082036.1` was never had: Ensembl's `RefSeq_dna_predicted` wrote it at rhesus 55 to 62). The revision `database_continuity` ([family C](families/c.md#the-sets): pig 6 lines, mouse 1,744, human 970, rhesus 2,865) reads Ensembl's cross-references for the databases that continue an included one (`truth_c.continuations`, equal to the graphs' own record of the filing); on the modest selection `r2` answers every revised line as the revision reads it but where the locus rule judges a bridge. C was then scored again on all three trees and every part compared, against `r1b` (`<modest>/r2/<organism>/<part>/moved_vs_r1b.tsv`, `compare_vs_r1b.tsv`) and against `d4c2dda` (`moved_vs_d4c2dda.tsv`, `compare.tsv`):
+
+| organism | part | vs `r1b`: wrong · error · undetermined | gains | vs `d4c2dda`: wrong · error · undetermined | gains |
+| --- | --- | ---: | ---: | ---: | ---: |
+| pig | harness | 10 · 0 · 0 | 248 | 10 · 0 · 41 | 6,603 |
+| pig | astar | 6 · 0 · 0 | 2 | 6 · 0 · 0 | 182 |
+| pig | a | 0 · 0 · 0 | 72 | 0 · 0 · 6 | 990 |
+| pig | b | 0 · 0 · 0 | 11 | 2 · 0 · 16 | 2,172 |
+| pig | c | 0 · 0 · 2 | 916 | 2 · 0 · 186 | 5,170 |
+| pig | d | 0 · 0 · 0 | 2 | 25 · 0 · 0 | 1,666 |
+| pig | e now | 0 · 0 · 0 | 0 | 7 · 806 · 2 | 2 |
+| pig | e decided | 0 · 0 · 0 | 0 | 0 · 0 · 2 | 12,470 |
+| mouse | harness | 50 · 0 · 187 | 13 | 53 · 0 · 1,041 | 2,071 |
+| mouse | astar | 0 · 0 · 2 | 16 | 0 · 0 · 18 | 1,102 |
+| mouse | a | 0 · 0 · 2 | 16 | 0 · 0 · 16 | 154 |
+| mouse | b | 4 · 0 · 11 | 8 | 11 · 0 · 57 | 2,164 |
+| mouse | c | 0 · 0 · 6 | 1,400 | 20 · 0 · 95 | 3,396 |
+| mouse | d | 1 · 0 · 0 | 0 | 0 · 0 · 2 | 2,019 |
+| mouse | e now | 2 · 0 · 0 | 0 | 141 · 783 · 2 | 8 |
+| mouse | e decided | 2 · 0 · 0 | 0 | 0 · 0 · 2 | 12,549 |
+| human | harness | 15 · 0 · 15 | 22 | 13 · 0 · 42 | 3,065 |
+| human | astar | 3 · 0 · 7 | 3,520 | 4 · 0 · 14 | 14,336 |
+| human | a | 4 · 0 · 21 | 210 | 1 · 0 · 14 | 674 |
+| human | b | 0 · 0 · 20 | 4 | 2 · 0 · 6 | 2,082 |
+| human | c | 0 · 0 · 4 | 120 | 5 · 0 · 71 | 1,816 |
+| human | d | 0 · 0 · 0 | 1 | 5 · 0 · 0 | 2,569 |
+| human | e now | 0 · 0 · 0 | 1 | 8 · 789 · 2 | 8 |
+| human | e decided | 0 · 0 · 0 | 1 | 0 · 0 · 2 | 12,617 |
+| rhesus | harness | 0 · 0 · 0 | 0 | 0 · 0 · 49 | 2,863 |
+| rhesus | astar | 10 · 0 · 0 | 0 | 10 · 0 · 0 | 23,492 |
+| rhesus | a | 0 · 0 · 0 | 0 | 0 · 0 · 12 | 854 |
+| rhesus | b | 0 · 0 · 0 | 0 | 0 · 0 · 2 | 2,336 |
+| rhesus | c | 0 · 0 · 114 | 1,508 | 0 · 0 · 146 | 3,933 |
+| rhesus | d | 0 · 0 · 0 | 0 | 0 · 0 · 4 | 1,655 |
+| rhesus | e now | 0 · 0 · 0 | 0 | 8 · 786 · 2 | 2 |
+| rhesus | e decided | 0 · 0 · 0 | 0 | 0 · 0 · 2 | 12,408 |
+| cynomolgus | harness | 10 · 0 · 0 | 0 | 10 · 0 · 0 | 412 |
+| cynomolgus | astar | 10 · 0 · 0 | 0 | 10 · 0 · 0 | 3,966 |
+| cynomolgus | a | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 2,286 |
+| cynomolgus | b | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 1,780 |
+| cynomolgus | c | 0 · 0 · 0 | 1,244 | 0 · 0 · 0 | 3,086 |
+| cynomolgus | d | 0 · 0 · 0 | 0 | 0 · 0 · 0 | 1,596 |
+| cynomolgus | e now | 0 · 0 · 0 | 0 | 8 · 755 · 2 | 0 |
+| cynomolgus | e decided | 0 · 0 · 0 | 0 | 0 · 0 · 2 | 12,141 |
+
+Against `r1b` the answers that went from right to wrong are of these causes (answers of both views):
+
+- **A split gene converted to a name database** (row I151 as built: the answer is first ranked as Ensembl genes, and a target is an id of that gene): where Ensembl's history splits the gene and the descendant ranked first has no id in the database, the result is `no_target` with the genes, in the view `all` too, although other descendants carry ids there; `r1b` and `d4c2dda` answer those ids, as the judges of A*'s `astar_db` and the harness's `travel_split` expect (rule [`tie_in_final_database`](rules.md#tie_in_final_database)). Pig 16 answers (harness 10, A* 6), human 8 (harness 6, A* 2), rhesus 10 (A*), cynomolgus 20 (harness 10, A* 10), mouse none; e.g. cynomolgus `ENSMFAG00000002704` from 95 to 105 to `UniProtKB Gene Name`: nine descendants, three of them carry H2BC1, H2BC11 and H2BC17, the first by annotation, `ENSMFAG00000053830`, none. Whether row I151 is meant to answer a split so is open (a question of this reading); it is the known-limitations row `L-split-no-target`.
+- **RefSeq's gene-level accessions of mouse 80 and 81 as RefSeq_mRNA** (a fault of the filing's form rule, `L-filing-forms`): Ensembl's `RefSeq_dna` on mouse genes at 80 and 81 holds `NM_`, `XM_`, `XR_`, `NR_` and `NG_` accessions; the filing reads it as RefSeq_mRNA and sends the forms that never moved to that main continuation, which has no identifier scheme (`NM_` is 0.89 of its accessions over the releases, Ensembl wrote gene labels and NCBI ids there), although `XM_` is RefSeq_mRNA_predicted's scheme (1.000) and `NG_` (RefSeqGene) no mRNA. Mouse harness `old_gene_to_db` to RefSeq_mRNA at 80: 41 answers that add `XM_`, `XR_` or `NG_` accessions to the `NM_` that BioMart's table gives.
+- **The judge lagging rules of the round, not revised** (one to six lines each): the harness's BioMart tables at mouse 80 (3 answers: further `NM_` accessions Ensembl's gene-level `RefSeq_dna` gives the gene, rule `database_filing`) and at 75 (mouse 6, human 3 and human 80's `4540`: `NR_` accessions and an NCBI gene id that Ensembl filed under RefSeq_mRNA, which the filing reads by their scheme as RefSeq_ncRNA's and NCBI's); family B's `BASIC` (mouse; an MGI synonym on translations at 48 to 50, held by the filing and read without letter case for a one-case string, rule [`single_case_symbols`](rules.md#single_case_symbols); B's check of the core records reads the spelling) and `OTTMUSG00000010207` at 48 (row I152: the authority's display name, MGI's symbol, ranks before the Havana label of another gene); D's list of 500 names of mouse 48 (inferred 48 to 50: MGI's names on translations are held at 49 and 50 too); A7's `LRG_3_t1` at 58 (human; row I153: the gene).
+- **A support counted in another letter case** (no decision covers it): mouse `Adora3` from 62 to 115 (`best`): UniProt's gene name `ADORA3` on ENSMUSG00000000562's translations, held at 62 now, counts for the typed mixed-case `Adora3`, so that gene ranks before ENSMUSG00000074344 where B's judge expects the tie; `r1b` and `r2` count it so from 63 on (mouse's B lines of shared names wrong by a missing gene: 15 on `r1b`, 16 on `r2`).
+- **Bridges where Ensembl's history gives no successor** (`L-bridges`, through rows I147 and I148): human 9 answers (harness 5, A 3, A* 1), e.g. `ENSG00000204645` (SSX4, X on GRCh37) from 75: `r2` bridges at 75 to the patch copy ENSG00000268009 at the same place, whose id Ensembl gave the reference gene at 76, where the chain maps the old place onto the other copy of the duplication (61.7 % aligned, the other strand); and mouse E8's batch item `Igh-6` of release 53, a copy of `Igh` in the batch (`L-batch-copies`).
+
+The answers that went from right to undetermined (all parts) are bridges the judge cannot place, at the query's place (`L-bridge-at-place`: mouse 185, human 25) or across an assembly change no chain maps (`L-no-chain`: rhesus 114, human 21, mouse 12, pig 2), the supports of shared names (human 10, mouse 1), mouse's early display-name ties (6, row I144) and answers within `broad` (human 11, mouse 4) (bridges `r2` takes and `r1b` did not: places mapped by chains and copies placed by their exceptions, rows I147 and I148, and names held at their releases, row I149). Against `d4c2dda` the losses are these and `r1b`'s (its section above) but pig B `C/EBP`, now the tie (row I156), and human E `3.14159`, now nothing (row I150).
+
+The known-limitations rows of `r2` (`results/limitations/f0_r2.tsv`, `astar_r2.tsv`, `b_r2.tsv`, `e_r2.tsv`, from the outcomes): `L-split-no-target` pig 10 of the 22,920 `travel_split` answers and 6 of 1,000 `db` answers, human 6 of 23,586 and 2 of 5,070, rhesus 10 of 3,126 `db`, cynomolgus 10 of 9,510 and 10 of 1,218; `L-filing-forms` mouse 41 of 8,700 `old_gene_to_db` answers; `L-display-name-other` and `L-display-name-not-held` (B9) as on `r1b`; `L-batch-copies` (E8) as on `r1b` but mouse 22 (`r1b` 20: `Igh-6` above).
+
+The round's faults, before (`r1b`) and after (`r2`), on the modest selection (right / (right + wrong + error), both views): family C's version strata pig 0.935 -> 1.000 (904 wrong -> 0), mouse 0.825 -> 0.9997 (1,402 -> 2, one line of a bridge, `L-bridges`), human 0.993 -> 1.000 (36 -> 0), rhesus 0.892 -> 1.000 (1,504 -> 0), cynomolgus 0.911 -> 1.000 (1,244 -> 0); B9 unchanged (pig 0.9995, mouse 0.9515, human 0.9868, rhesus 0.9995, cynomolgus 1.000). Round 1's wrong bridges through names held now that Ensembl's chain puts elsewhere (65 lines, all wrong on `r1b`): 10 right, 15 undetermined, 40 wrong on `r2`. The hunts' reproducers hold or changed as on `r1b` but AT-5 (mouse; a copy on a patch bridged far from its place), which changed to nothing; round 2's audit reproducers R2-1 to R2-6 and H5, asked on `r2`'s graphs, give the answers Ensembl's records expect (R2-2's three symbols of genes without one: `no_target` with the gene; R2-5's batch item: the record's id form, `lrg:exact`).
+
 ## What it can and cannot detect
 
 - **Can**: every change of an answer among the harness's 2.6 million lines (the judge's fixed queries over ids, names, external identifiers, history kinds and the travel matrix), each judged right or wrong as the exhaustive harness judges it; every change of a known finding of the hunts (a reproducer exits 1 and names the field); in every stratum of every family, a change that makes a share p of its lines wrong is missed with probability (1 - p)^500, under 5 % for p of 0.6 % or more (for a stratum of fewer than 500 lines: every line, so every change). A stratum's rate is estimated to within about ±4.4 percentage points at worst (the Wilson 95 % interval on 500 lines at a rate of one half; much less near 100 %).

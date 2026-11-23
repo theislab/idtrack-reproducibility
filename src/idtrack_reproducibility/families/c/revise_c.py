@@ -430,7 +430,7 @@ def _version_ctx(org, ctx):
     the edit counters of rule `accession_versions` measured from the same records (`truth_c.version_change_shares`), built once."""
     from idtrack_reproducibility.families.c import gen_c as GC
     if "GV" not in ctx:
-        ctx["GV"] = GC.GenC(org, 115, ["refseq", "uniprot"], authority=False)
+        ctx["GV"] = GC.GenC(org, 115, ["refseq", "uniprot"], authority=False, continuity=ctx.get("continuity", False))
         dbs = set(TC.FAMILIES["refseq"]["dbs"]) | set(TC.FAMILIES["uniprot"]["dbs"])
         ctx["shares"] = TC.version_change_shares(org, dbs, upto=115)
         ctx["counters"] = TC.edit_counter_dbs(ctx["shares"])
@@ -606,13 +606,65 @@ def versions_in_window(org, lines, ctx):
     yield from _read_as(org, ctx, lines, "versions_in_window", _judged_reading)
 
 
+# The strata of held_strata (gen_c) whose reading rule `start_release` gives, by the prefix of their kind: the family read.
+HELD_PREFIX = {"c1": "ncbi", "c2": "refseq", "c3": "uniprot", "c4_rfam_acc": "rfam", "c4_rfam_label": "rfam_label",
+               "c5_ccds": "ccds", "c5_ottg": "ottg", "c5_ottt": "ottt", "c5_ottp": "ottp", "c5_vega_gene": "vega_gene",
+               "c5_clone": "clone"}
+HELD_KIND = re.compile(r"^(c1|c2|c3|c4_rfam_acc|c4_rfam_label|c5_ccds|c5_ottg|c5_ottt|c5_ottp|c5_vega_gene|c5_clone)_"
+                       r"(default|retired|not_held)$")
+
+
+def database_continuity(org, lines, ctx):
+    """Rule `database_filing` (rows I149 and I157, built in idtrack after its second round): a database of
+    Ensembl that continues one the graph includes (the links that move between them from one release to the next:
+    `truth_c.continuations`, read from Ensembl's cross-references) is that database, so its values are held at its
+    releases: RefSeq's accessions that Ensembl filed as `RefSeq_dna` and `RefSeq_dna_predicted` before release 64 are
+    RefSeq_mRNA's, RefSeq_ncRNA's and their predicted databases' there, Rfam's accessions on transcripts before 63
+    Rfam's. Two kinds of line read again with that reading (`gen_c.GenC(..., continuity=True)`): the versioned lines
+    asked without a release (rule `accession_versions` as `versions_in_window` reads it, the versions those databases
+    wrote counted as the accession's versions: a version `c2_ver_lower` said the accession never had, which
+    `RefSeq_dna_predicted` wrote, is read at the latest release with it); and the lines of a value read by rule
+    `start_release` (`<part>_default`, `_retired`, `_not_held` of rule `safe`): at the latest release where the graph
+    holds it now, its genes walked to the target (`gen_c.GenC.default_truth`). Only lines whose truth changes are
+    given."""
+    from idtrack_reproducibility.families.c import gen_c as GC
+    ctx["continuity"] = True
+    lines = list(lines)
+    yield from _read_as(org, ctx, [r for r in lines if VERSION_STRATA.match(r["stratum"])], "database_continuity",
+                        _judged_reading)
+    todo = []
+    for rec in lines:
+        m = HELD_KIND.match(rec.get("kind") or "")
+        if not m or rec.get("excluded") or rec.get("final_database") or rec.get("from_release") is not None:
+            continue
+        if m.group(2) == "not_held" and rec.get("rule") != "safe":
+            continue  # a not-held value another correction already reads where held (display_names_at_release)
+        if rec["to_release"] != 115:
+            continue
+        todo.append((rec, HELD_PREFIX[m.group(1)]))
+    if not todo:
+        return
+    if "GK" not in ctx:
+        ctx["GK"] = GC.GenC(org, 115, sorted(set(HELD_PREFIX.values())), authority=False, continuity=True)
+    g = ctx["GK"]
+    for rec, fam in todo:
+        Rd, tru = g.default_truth(fam, str(rec["id"]))
+        if Rd is None:
+            continue
+        if Rd == rec.get("read_at") and rec.get("rule") != "safe":
+            continue  # read where it was: its truth (and every correction of it) stands
+        new = _with_truth(rec, dict(tru, rule="set"), "database_continuity", read_at=Rd)
+        if new:
+            yield new
+
+
 VERSION_CORRECTIONS = {"version_not_judged", "versions_in_window"}
 
 CORRECTIONS = {"rfam_label_accession": rfam_label_accession, "other_database_broad": other_database_broad,
                "rfam_label_rows": rfam_label_rows, "par_shared_names": par_shared_names,
                "display_names_at_release": display_names_at_release, "no_mito_nuclear_step": no_mito_nuclear_step,
                "mirbase_genes": mirbase_genes, "version_not_judged": version_not_judged,
-               "versions_in_window": versions_in_window}
+               "versions_in_window": versions_in_window, "database_continuity": database_continuity}
 
 
 def main():
@@ -647,6 +699,9 @@ def main():
         p = L._set_file(d, n)
         if a.correction in VERSION_CORRECTIONS:  # the version strata only
             recs = (latest.get(r["qid"], r) for r in L.iter_set(p) if VERSION_STRATA.match(r["stratum"]))
+        elif a.correction == "database_continuity":  # the version strata and the lines read by start_release
+            recs = (latest.get(r["qid"], r) for r in L.iter_set(p)
+                    if VERSION_STRATA.match(r["stratum"]) or HELD_KIND.match(r.get("kind") or ""))
         else:
             recs = (latest.get(r["qid"], r) for r in L.iter_set(p)
                     if not r["stratum"].startswith("c6") and "_ver_" not in r["stratum"])

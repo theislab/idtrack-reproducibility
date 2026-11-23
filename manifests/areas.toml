@@ -109,7 +109,7 @@ folders = ["graphs"]
 exclude = ['/\.', '\.tmp$', '\.log$']
 rebuild = "run: idtrack build of f27e810 (snapshot 115), whose builder d4c2dda keeps; equal graphs have equal content digests"
 rules = [
-  ['^graphs/(next|r1|r1b)/', "run: idtrack build by the tree's own builder (the configuration's [trees.<tree>] checkout; snapshot 115); equal graphs have equal content digests"],
+  ['^graphs/(next|r1|r1b|r2)/', "run: idtrack build by the tree's own builder (the configuration's [trees.<tree>] checkout; snapshot 115); equal graphs have equal content digests"],
 ]
 
 [[area]]

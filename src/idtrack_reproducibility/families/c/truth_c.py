@@ -162,14 +162,117 @@ class Scope:
         return any(self.included(n, rel) for n in FAMILIES[fam]["graph"])
 
 
+# Rule `database_filing` (idtrack after its second round: rows I149 and I157): the least share of links that move
+# between two adjacent releases for a database to continue another (idtrack's `continuity.CONTINUITY_SHARE`).
+CONTINUITY_SHARE = 0.5
+
+
+def continuations(org, scope, share=CONTINUITY_SHARE, upto=None, log=print):
+    """Rule `database_filing` read from Ensembl's cross-references (`core_xref/<release>`), not from idtrack: which
+    databases continue a database the reference tree's configuration includes. A link is (accession, gene). The
+    included databases (`selected`): each `db_name` that the configuration includes on some form, its links on those
+    forms together. The others: a `db_name` the configuration includes on no form (`RefSeq_dna`), all its forms
+    together, and an included `db_name` on a form the configuration leaves out (`RFAM` on transcripts), which can
+    continue that database only. Between two adjacent releases R and R' a link moves from A to B where A holds it at
+    R and not at R', and B at R' and not at R (an other database leaving for an included one; or the reverse, the
+    included one leaving for the other). A continues B where the links that move are at least `share` of the links of
+    the one that leaves (where B leaves, also of A's links at R'), or where A ends at R' (no link there) and they are
+    `share` of B's links at R' (row I157: a database that ends hands over what it still had). A continuing
+    database holds B's values at every release where it has links; an included name on another form in its run of
+    adjacent releases around the boundary.
+
+    Returns:
+        ({(db_name, form or None): (included db_name, frozenset(releases))}, evidence rows (A, B, R, moved, size of
+        the one that leaves, side)). `form` None: every form of an other database."""
+    selected = collections.defaultdict(set)  # db_name -> forms included at some release
+    for name, rels in scope.inc.items():
+        if rels:
+            selected[name].add(scope.form[name])
+    rels = [r for r in xref_releases(org) if upto is None or r <= upto]
+
+    def unit_of(db, disp, ot):
+        name = db if db in selected else disp if disp in selected else None  # the configuration's name of the rows
+        if name is not None:
+            return ("S", name) if ot in selected[name] else (name, ot)
+        return (db, None)
+
+    prev, prev_rel, seen = None, None, collections.defaultdict(set)
+    moved = collections.Counter()   # (A, B, R, side) -> links
+    sizes = {}
+    for rel in rels:
+        cur = collections.defaultdict(set)
+        for ot, oid, gid, db, disp, acc, lab, ver, it in read_xref(org, rel):
+            if acc:
+                cur[unit_of(db, disp, ot.lower())].add(hash((acc, gid)))
+        for u, s in cur.items():
+            sizes[(u, rel)] = len(s)
+            seen[u].add(rel)
+        if prev is not None:
+            # a link that leaves one unit (prev, not cur) and comes to another (cur, not prev), one of them included:
+            # side `older` where the other database leaves for the included one, `newer` the reverse
+            arrived = collections.defaultdict(list)
+            for u, s in cur.items():
+                for k in s - prev.get(u, set()):
+                    arrived[k].append(u)
+            for u, s in prev.items():
+                for k in s - cur.get(u, set()):
+                    for v in arrived.get(k, ()):
+                        if (u[0] == "S") == (v[0] == "S"):
+                            continue
+                        a, b, side = (u, v, "older") if v[0] == "S" else (v, u, "newer")
+                        if a[1] is not None and a[0] != b[1]:
+                            continue  # an included name on another form continues that database only
+                        moved[(a, b, prev_rel, side)] += 1
+        prev, prev_rel = cur, rel
+    order = rels
+    nxt = dict(zip(order, order[1:]))
+    spans, counts, evidence = {}, collections.defaultdict(collections.Counter), []
+    for (a, b, R, side), n in sorted(moved.items(), key=lambda x: (str(x[0]), x[1])):
+        R2 = nxt[R]
+        if side == "older":
+            size, received = sizes.get((a, R), 0), sizes.get((b, R2), 0)
+            ends = R2 not in seen[a]
+            ok = (size and n >= share * size) or (ends and received and n >= share * received)
+        else:
+            size, received = sizes.get((b, R), 0), sizes.get((a, R2), 0)
+            ok = size and n >= share * size and n >= share * received
+        if not ok:
+            continue
+        key = (a[0], a[1])
+        if a[1] is None:
+            span = seen[a]
+        else:  # the run of adjacent releases around the boundary
+            there = R if side == "older" else R2
+            i = j = order.index(there)
+            while i > 0 and order[i - 1] in seen[a]:
+                i -= 1
+            while j + 1 < len(order) and order[j + 1] in seen[a]:
+                j += 1
+            span = set(order[i:j + 1])
+        spans[key] = spans.get(key, set()) | span
+        counts[key][b[1]] += n
+        evidence.append((key, b[1], R, n, size, side))
+    # the database it continues: the one most of its moved links went to at the boundaries that decide
+    out = {k: (max(sorted(c), key=lambda t: c[t]), frozenset(spans[k])) for k, c in counts.items()}
+    log(f"continuations {org}: " + "; ".join(f"{k[0]}{'@' + k[1] if k[1] else ''} -> {v[0]} at {min(v[1])}-{max(v[1])}"
+                                            for k, v in sorted(out.items(), key=str)))
+    return out, evidence
+
+
+def families_of_name(name):
+    """The families of a `db_name` or of a graph database name (the configuration's)."""
+    return DB_FAMILIES.get(name) or [f for f, spec in FAMILIES.items() if name in spec["graph"]]
+
+
 class Xrefs:
     """Ensembl's values per family and release: H[fam][value] = {release: (genes, versions, in_graph)}.
 
     `genes` are base gene ids (frozensets interned); `versions` the accession versions Ensembl writes at that release;
-    `in_graph`: the value is in a database the graph's configuration includes at that release.
+    `in_graph`: the value is in a database the graph's configuration includes at that release, or (with `continued`,
+    `continuations`' result: rule `database_filing`) in a database that continues one it includes, read as that one.
     """
 
-    def __init__(self, org, scope, families=None, releases=None, log=print):
+    def __init__(self, org, scope, families=None, releases=None, log=print, continued=None):
         self.org = org
         self.fams = families or list(FAMILIES)
         self.rels = [r for r in xref_releases(org) if releases is None or r in releases]
@@ -183,9 +286,16 @@ class Xrefs:
             acc_genes = {f: collections.defaultdict(set) for f in self.fams}
             acc_vers = {f: collections.defaultdict(set) for f in self.fams}
             acc_dbs = {f: collections.defaultdict(set) for f in self.fams}
+            acc_cont = {f: set() for f in self.fams}  # values in a database that continues an included one
             for ot, oid, gid, db, disp, acc, lab, ver, it in read_xref(org, rel):
                 self.dbs_seen[rel][db] += 1
                 fs = DB_FAMILIES.get(db)
+                cont = None
+                if continued:
+                    c = continued.get((db, ot.lower())) or continued.get((db, None)) or continued.get((disp, ot.lower()))
+                    if c and rel in c[1]:
+                        cont = c[0]
+                        fs = fs or families_of_name(cont)
                 if not fs:
                     continue
                 if not gid.startswith(prefix):
@@ -204,6 +314,8 @@ class Xrefs:
                     names = ((db, disp) if acc == lab else (db,)) if FAMILIES[f]["field"] == "acc" else \
                         ((disp, db) if acc == lab else (disp,))
                     acc_dbs[f][v].update((n, ot.lower()) for n in names)
+                    if cont:
+                        acc_cont[f].add(v)
                     if FAMILIES[f].get("versioned") and ver not in ("", "0", "\\N"):
                         acc_vers[f][v].add(ver)
                     if f in self.labels and lab and lab != acc:
@@ -214,7 +326,8 @@ class Xrefs:
                     key = intern.setdefault(key, key)
                     vers = frozenset(acc_vers[f].get(v, ()))
                     vers = intern.setdefault(vers, vers)
-                    in_graph = any(scope.included(n, rel) and scope.form.get(n) == ot for n, ot in acc_dbs[f][v])
+                    in_graph = v in acc_cont[f] or \
+                        any(scope.included(n, rel) and scope.form.get(n) == ot for n, ot in acc_dbs[f][v])
                     self.H[f][v][rel] = (key, vers, in_graph)
             log(f"xref {org} {rel}: " + ", ".join(f"{f} {len(acc_genes[f])}" for f in self.fams if acc_genes[f]))
 
