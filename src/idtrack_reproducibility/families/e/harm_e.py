@@ -1,7 +1,7 @@
 """E5 and E8 for the harmonizer (`idtrack.harmonize.HarmonizeFeatures`, trees of the convert generation, 71690ab on).
 
 Usage: harm_e.py --organism <o> --clone <clone> --graph <graph> --out <run>/<organism>
-       (envs/py313: anndata 0.13.4, the package's anndata>=0.13; idtrack_dev_env's anndata 0.10.8 cannot read .h5ad)
+       (idtrack_py313: anndata 0.13.4, the package's anndata>=0.13; idtrack_dev_env's anndata 0.10.8 cannot read .h5ad)
 
 Datasets are built from the truth (GTF 115 and BioMart 115 of the store, never idtrack): three datasets of 40 cells,
 each with 300 current display names of one gene, 200 versioned and 50 unversioned gene ids (overlapping between the
