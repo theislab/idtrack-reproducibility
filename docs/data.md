@@ -15,6 +15,7 @@ The benchmarks read and write a **data root** outside git: truth files, query se
 | `families/<family>/...` | the family's other inputs (A*'s `selection/` and REST `truth/`, A's `patterns/`, `a0/`, `a8/`; D's copies of the atlas project's files, `d/inputs/atlas/`: external inputs, not published, [D](families/d.md#truth)) | the family's modules |
 | `graphs/<organism>/` | the reference graphs (`graph_*.npz`) and the tables idtrack downloaded to build them (`idtrack_tables/`) | `idtrack build` at `f27e810` (2026-11-12), see below |
 | `graphs/<tree>/<organism>/` | a later tree's graph; when `graph-build` and `graph-judge` made it, its `build.json` and `judge.json`, and `build/` (the local repository of the build: links to stored tables, derived tables) and `logs/` are left out of the manifests | `idtrack-repro graph-build`, `graph-judge` ([graphs](graphs.md)) |
+| `modest/<tree>/` | the [modest set](modest.md#where-the-runs-lie)'s run of a tree: `<organism>/<part>/` (the answers and the scoring of each part, its `moved_vs_<tree>.tsv`), `<organism>/modest.json`, the comparisons with other trees (`compare.tsv`, `compare_vs_<tree>.tsv`) and the jobs' `logs/` | `idtrack-repro modest run`, `modest compare` |
 | `corpus/`, `hunts/`, `performance/` | the regression corpus and its references; the hunts' outputs; the performance measurements | [corpus](corpus.md), [hunts](hunts.md), [H](families/h.md) |
 | `cache/` | caches of the truth readers (rebuilt when missing; never published) | the readers |
 

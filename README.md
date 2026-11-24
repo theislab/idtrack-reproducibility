@@ -50,7 +50,18 @@ or `python -m pip install -e ".[test]"` in any Python 3.12 or newer. The command
 
 ## Trees
 
-The idtrack that is measured is a **tree**: a checkout of github.com/theislab/idtrack at a commit, with the Python that runs it. The results here measure two trees: `d4c2dda` (the reference every later version is compared with) and `71690ab` (the same answers with a typed api; idtrack's main branch). To measure a tree, clone idtrack, check out the commit, make the tree's environment, and name the checkout, its Python and its graphs in the configuration (`[trees.<name>]`); the adapter puts the checkout first on the path, so idtrack need not be installed in it. The environments the stored results were made in are `environments/tree_d4c2dda.yml` (Python 3.11.12: every result of `d4c2dda`) and `environments/tree_71690ab.yml` (Python 3.13.18: `71690ab` and the trees after it); a tree's runs record its Python (`load_<i>_of_<n>.json`). `pip install -e ".[idtrack]"` installs idtrack `71690ab` itself into this package's environment.
+The idtrack that is measured is a **tree**: a checkout of github.com/theislab/idtrack at a commit, with the Python that runs it. The results here measure six trees, the six of the data root of record's configuration ([docs/data.md](docs/data.md)), each with its checkout `trees/<tree>/`:
+
+| tree | commit | what it is | its results |
+| --- | --- | --- | --- |
+| `d4c2dda` | `d4c2dda` (tag `manuscript-2026-03`) | the reference every later version is compared with (2026-11-13) | every family and the harness, exhaustive |
+| `71690ab` | `71690ab` | the same answers with a typed api (on idtrack's main) | F0, D and E, exhaustive |
+| `next` | `4471396` | the development tree with the graph rebuilt, before the rounds of fixes | B's and E's sets of the attack on it |
+| `r1` | `ef81eba` | after the first round of fixes | the [modest set](docs/modest.md#the-tree-r1) |
+| `r1b` | `cbf8603` | `r1` with the graph format's changes of the first round | the [modest set](docs/modest.md#the-tree-r1b) |
+| `r2` | `978f9a0` (the runs); `b5d4fb4`, tag `v0.1.0` (the configuration) | after the second and last round: the released package | the [modest set](docs/modest.md#the-tree-r2), the known limitations |
+
+`next`, `r1`, `r1b` and `978f9a0` are commits of development branches that were squashed when they landed: they are on no branch of idtrack's GitHub repository, and their checkouts in the data root keep them. `r2`'s runs were made at `978f9a0`, the commit their records and `results.toml` name; its package (`idtrack/`) is the same tree as that of `b5d4fb4`, the commit on idtrack's main tagged `v0.1.0`, which differs from it only in the documentation's list of limitations and one unit test, so the configuration and the checkout name `b5d4fb4`. The released package is `r2`: version 0.1.0, and 0.1.1 (`9340216`), which adds the command line and changes nothing else under `idtrack/` but two comments. To measure a tree, clone idtrack, check out the commit, make the tree's environment, and name the checkout, its Python and its graphs in the configuration (`[trees.<name>]`); the adapter puts the checkout first on the path, so idtrack need not be installed in it. The environments the stored results were made in are `environments/tree_d4c2dda.yml` (Python 3.11.12: every result of `d4c2dda`) and `environments/tree_71690ab.yml` (Python 3.13.18: `71690ab` and the trees after it); a tree's runs record its Python (`load_<i>_of_<n>.json`). `pip install -e ".[idtrack]"` installs idtrack `71690ab` itself into this package's environment.
 
 ## Configuration
 

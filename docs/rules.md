@@ -5,7 +5,7 @@ The benchmarks judge idtrack against independent truth, and some answers depend 
 Status of each idtrack rule:
 
 - **d4c2dda**: idtrack behaves so from commit `d4c2dda` (the reference tree of the benchmarks) on;
-- **71690ab**: from commit `71690ab` on (`d4c2dda`'s answers with a typed api; idtrack's main branch);
+- **71690ab**: from commit `71690ab` on (`d4c2dda`'s answers with a typed api; a commit of idtrack's main, which has moved on since: [Trees](../README.md#trees));
 - **decided**: decided for idtrack's next version, not in `71690ab`; the families score such lines under two judges where the rule changes the expected answer (`now`: the documented behaviour of `71690ab`; `decided`: the rule), so that the change is measured when it lands.
 
 Rules of the judge (the truth's reading) are marked **judge**.
