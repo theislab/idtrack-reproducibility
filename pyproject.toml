@@ -20,7 +20,8 @@ dependencies = [
 # The idtrack the benchmarks measure by default (the installed package; other trees are configured in
 # idtrack-repro.toml, see README "Trees"). Pinned to a commit of github.com/theislab/idtrack.
 idtrack = ["idtrack[harmonize] @ git+https://github.com/theislab/idtrack@71690abe044f19afcc97f146d5e6c35cf4873962"]
-test = ["pytest>=8"]
+# pytest, and what family F's tests build and read count matrices with (the harmonizer's own requirements).
+test = ["pytest>=8", "scipy>=1.14", "h5py>=3.12", "anndata>=0.13"]
 
 [project.scripts]
 idtrack-repro = "idtrack_reproducibility.cli:main"
