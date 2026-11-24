@@ -302,3 +302,82 @@ def test_support_of_a_shared_name_counts_name_sources_not_synonyms(tmp_path, mon
     line = dict(qid="b1|Nm1|78|78", id="Nm1", from_release=78, to_release=78, expect=[f"{X}.1", f"{Y}.1"])
     # X: MGI, Vega and its display name; Y: MGI and its display name (its UniProt synonym is no source)
     assert RVB._core_support("mus_musculus", [line], None) == {"b1|Nm1|78|78": {f"{X}.1": 3, f"{Y}.1": 2}}
+
+
+def test_a_revision_ignores_wording_and_what_was_read():
+    """A regenerated line whose truth is the published one in other words (a decision's number become a rule's
+    name, the reach become the synonyms read) is no revision; another truth is."""
+    from idtrack_reproducibility.families.b import revise_b as RB
+    line = dict(qid="b1|GA|2|2", kind="b1_name_at_release", id="GA", from_release=2, to_release=2, expect=["G1.1"],
+                rule="set", cmp="versioned", strategy="both", note="place mapped (decision 78)",
+                name_src="core_xref+synonyms_reach", open="the truth's tables do not fix it (decision 1)")
+    same = dict(line, note="place mapped (the corrected judge)", name_src="core_xref+synonyms",
+                open="the truth's tables do not fix it (rule `start_release`)")
+    assert RB.canon(line) == RB.canon(same)
+    assert RB.canon(dict(line, open=None)) != RB.canon(line)
+    assert RB.canon(dict(line, expect=["G2.1"])) != RB.canon(line)
+
+
+def test_a_regeneration_replays_the_published_corrections_in_their_order(monkeypatch):
+    """The corrections published after the base sets are given to the regenerated lines in publication order, so a
+    line a correction revised is not published again without it."""
+    from idtrack_reproducibility.families.b import revise_b as RB
+    mans = {"b1_v1": dict(seq=1), "b1_fix1": dict(seq=3, correction="fix"), "b1_more1": dict(seq=4, correction="more"),
+            "b1_rules1": dict(seq=2, rules=["r"], revision="rules1"), "b1_rules1_dec": dict(seq=5, rules=["r"], revision="rules1")}
+    monkeypatch.setattr(RB, "family_sets", lambda org, S: sorted(mans))
+    monkeypatch.setattr(RB.L, "manifest", lambda fam, org, s: mans[s])
+    assert [k for _, k, _ in RB.chain("sus_scrofa", "b1")] == ["rules", "fix", "more"]
+    assert [k for _, k, _ in RB.chain("sus_scrofa", "b1", decided=True)] == ["rules", "fix", "more"]
+    order = []
+
+    def fix(org, lines, rd):
+        order.append("fix")
+        return [dict(ln, expect=["G2.1"], revised_by=["fix"]) for ln in lines if ln["expect"] == ["G1.1"]]
+
+    def more(org, lines, rd):
+        order.append("more")
+        return [dict(ln, broad=["G2.1", "G3.1"]) for ln in lines if ln["expect"] == ["G2.1"]]
+    monkeypatch.setitem(RB.CORRECTIONS, "fix", fix)
+    monkeypatch.setitem(RB.CORRECTIONS, "more", more)
+    line = dict(qid="b1|GA|2|2", expect=["G1.1"])
+    got = RB.replay("sus_scrofa", [line], [("b1_fix1", "fix", None), ("b1_more1", "more", None)], rd=None)
+    assert order == ["fix", "more"] and got == [dict(qid="b1|GA|2|2", expect=["G2.1"], revised_by=["fix"], broad=["G2.1", "G3.1"])]
+
+
+def test_a_string_without_a_release_is_read_where_the_records_hold_it_last(monkeypatch):
+    """Rule `start_release` with Ensembl's records of every release read: a string no name or synonym of 115 holds is
+    read at the latest release whose records hold it, names before synonyms, its genes walked to 115."""
+
+    class Tr:
+        def walk_series(self, g, R, targets, strict, living=True, resurrect=False):
+            return {targets[0]: {"G5"} if g == "G1" else set()}
+
+        def vset(self, ids, R):
+            return sorted(f"{g}.1" for g in ids)
+
+        def locus(self, g, R):
+            return dict(seqname="1", start=1, end=10, release=R)
+    cx = object.__new__(G2.Ctx)
+    cx.org = "sus_scrofa"
+    cx.nb = types_ns(tr=Tr(), rels=[1, 2, 3])
+    cx.lower_T, cx.GT = {"case": {"G8"}}, {"G8"}
+    monkeypatch.setattr(G2.Ctx, "records_of_every_release", lambda self: True)
+    found = {"OLD": {(1, "name"): {"G9"}, (3, "synonym"): {"G7"}, (3, "name"): {"G1"}}, "GONE": {(2, "synonym"): {"G2"}}}
+    monkeypatch.setattr(G2.GB.M, "core_readings", lambda org, rels, values, casefold=True: found)
+    old = dict(qid="b5|ncbi|OLD|default|115", kind="b_string_default", id="OLD", expect=[], open="not fixed", open_within=["G9.1"])
+    gone = dict(qid="b5|ncbi|GONE|default|115", kind="b_string_default", id="GONE", expect=[], open="not fixed", open_within=[])
+    none = dict(qid="b5|ncbi|NONE|default|115", kind="b_string_default", id="NONE", expect=[],
+                note="no Ensembl table of any release holds the string")
+    found["CASE"] = {(2, "name"): {"G1"}}
+    case = dict(qid="b5|ncbi|CASE|default|115", kind="b_string_default", id="CASE", expect=[], open="not fixed",
+                open_within=["G8.1"])  # a gene of 115 carries it as `case`: idtrack may read it there
+    assert cx.read_where_held([old, gone, none, case]) == 2
+    assert case["open_within"] == ["G8.1"] and "read_at" not in case
+    assert old["expect"] == ["G5.1"] and old["read_at"] == 3 and "open" not in old and "open_within" not in old
+    assert gone["expect"] == [] and gone["read_at"] == 2 and gone["locus"]["release"] == 2  # no successor: its place
+    assert none["expect"] == [] and "read_at" not in none
+
+
+def types_ns(**kw):
+    import types
+    return types.SimpleNamespace(**kw)

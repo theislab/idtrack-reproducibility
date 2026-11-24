@@ -403,7 +403,7 @@ class GenC:
         def ccds_auth(v):
             gs = set()
             tx = self.tx_gene(T)
-            for t in A.ccds_tx.get(v, ()) | A.ccds_tx.get(v.split(".")[0], ()):
+            for t in set(A.ccds_tx.get(v, ())) | set(A.ccds_tx.get(v.split(".")[0], ())):
                 if t in tx:
                     gs.add(tx[t])
             return gs

@@ -233,3 +233,38 @@ def test_the_open_reasons_of_the_truth_map_to_their_limitations(sources):
     assert LD.classify(RD4.OPEN_52)[0] == "L-missing-values"
     assert LD.classify("the stated release 92 fits the list worse (0.9) than 89..89 (1.0) by Ensembl's GTFs")[0] == "L-stated-release"
     assert LD.classify("a reason no row names")[0] == "L-undetermined-other"
+
+
+class _History:
+    """An invented history: genes of every release, and each gene's broad walk to 115."""
+
+    def __init__(self, genes, walks):
+        self.genes, self._walks = genes, walks
+
+    def walk_fwd(self, g, R, T, strict, living=True):
+        return set(self._walks.get(g, ()))
+
+
+def test_names_in_other_name_sources_are_broad_in_d1_and_d3():
+    """The corrected judge's `names_broad`: a symbol other genes carry as a name in another name source at the release
+    read puts the genes they become at 115 into `broad`, or within the place of an open line; synonyms and the
+    truth's own genes change nothing."""
+    tr = _History({101: {"G1": {}, "G2": {}, "G3": {}}}, {"G2": ["H2"], "G3": ["H3"]})
+    names = {101: {"SYM": {"G1", "G2"}, "OPEN": {"G3"}}}
+    one = dict(qid="d1|ds|symbol|SYM|101", kind="d1_symbol", id="SYM", from_release=101, to_release=115,
+               genes_at_source=["G1"], expect=["H1"], broad=None, stratum="d1_symbol_same_one")
+    opened = dict(qid="d1|ds|symbol|OPEN|101", kind="d1_symbol", id="OPEN", from_release=101, to_release=115,
+                  genes_at_source=["G4"], expect=[], open="several", open_within=["H4"], stratum="d1_symbol_same_open")
+    none = dict(one, qid="d1|ds|symbol|OTHER|101", id="OTHER")
+    ident = dict(qid="d1|ds|id|G1|101", kind="d1_id", id="SYM", from_release=101, to_release=115, expect=["H1"])
+    out = {q["qid"]: q for q in RD1.names_broad("sus_scrofa", [one, opened, none, ident], "d1_symbol", "genes_at_source",
+                                                "from_release", log=lambda *a: None, tr=tr, names_of=names.get)}
+    assert set(out) == {one["qid"], opened["qid"]}
+    assert out[one["qid"]]["broad"] == ["H1", "H2"] and out[one["qid"]]["expect"] == ["H1"]
+    assert out[opened["qid"]]["open_within"] == ["H3", "H4"] and "names_broad" in out[opened["qid"]]["revised_by"]
+    # D3's lines read without a release name their release in `read_at`
+    d3 = dict(qid="d3|panglaodb|SYM|101|default", kind="d3_symbol", id="SYM", from_release=None, read_at=101,
+              to_release=115, genes_at_read=["G1"], expect=["H1"], broad=["H1", "H9"], stratum="d3_panglaodb_default")
+    got = RD1.names_broad("homo_sapiens", [d3], "d3_symbol", "genes_at_read", "read_at", log=lambda *a: None, tr=tr,
+                          names_of=names.get)
+    assert [q["broad"] for q in got] == [["H1", "H2", "H9"]]

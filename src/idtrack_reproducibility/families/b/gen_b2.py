@@ -11,10 +11,12 @@ and the authority differ (a limitation of Ensembl's data, not an answer of idtra
 - **B4** (`b4_v1`): every previous symbol (HGNC `prev_symbol` and the withdrawn list's symbols merged into an approved
   one; MGI's withdrawn gene symbols with their current marker; VGNC `prev_symbol`), asked without a release
   (`b4_prev_default`: rule `start_release`, read at 115: names before synonyms, rules `names_before_synonyms` and `name_before_synonym`; a string that is no exact
-  name or synonym of 115 is `open` with `open_within` = the walks to 115 of every gene that ever carried it, so an
-  answer outside every gene linked to it is wrong) and from the last release whose GTF has it as a display name
+  name or synonym of 115 is read at the latest release whose Ensembl records hold it, its genes walked to 115
+  (`Ctx.read_where_held`, where the records of every release are read; else `open` with `open_within` = the walks to
+  115 of every gene that ever carried it, so an answer outside every gene linked to it is wrong) and from the last release whose GTF has it as a display name
   (`b4_prev_from`: B1's judge of that string at that release, to 115).
-- **B5** (`b5_v1`): every BioMart synonym of every BioMart release R, read at R, to R (`b5_syn_atR`: the harness's
+- **B5** (`b5_v1`; `b5_v2`: the synonyms Ensembl's records of every cross-reference add at those releases,
+  `name_src: core_synonyms`): every BioMart synonym of every BioMart release R, read at R, to R (`b5_syn_atR`: the harness's
   `synonym_to_gene` rule: names before synonyms, rule `name_before_synonym`) and to 115 (`b5_syn_to115`: their walks); every
   authority alias (HGNC `alias_symbol`, MGI synonyms of current gene markers, VGNC `alias_symbol`, NCBI `Synonyms`
   where gene_info is in the store) without a release (`b5_alias_<authority>`, judged as B4's default lines).
@@ -124,6 +126,57 @@ class Ctx:
                    "it is active (rule `start_release`), which the truth's tables do not fix", open_within=tr.vset(within & GT, T))
         return rec
 
+    def records_of_every_release(self):
+        """Whether Ensembl's records of every release of the window are read (`core_xref`, `core_display`,
+        `core_synonyms` of each release in the truth store)."""
+        d = H.truth_dir(self.org)
+        return all(os.path.exists(os.path.join(d, sub, f"{R}.tsv.gz")) for R in self.nb.rels
+                   for sub in ("core_xref", "core_display", "core_synonyms"))
+
+    def read_where_held(self, lines):
+        """Rule `start_release` on the lines asked without a release whose string no name or synonym of 115 holds
+        (`default_line`'s last branches), where Ensembl's records of every release are read
+        (`records_of_every_release`): the string is read at the latest release whose records hold it (a label of any
+        database of the core cross-references, the display name, or a synonym of any cross-reference;
+        `make_queries.core_readings`), names before synonyms (rule `names_before_synonyms`), and its genes walked to
+        115 (the strict walk with living ids `expect`, the broad walk `broad`; one gene without a successor holds its
+        place, `locus`), as the corrected judge's `held_in_core` reads the strings its tables had not found. The
+        line names the release read (`read_at`). A string that a gene of 115 carries in another letter case (idtrack's
+        spelling steps may read it there first), one that no record holds as written, and every such line without
+        the records of every release, stays as `default_line` made it: open within every gene that ever carried the
+        string (the release idtrack reads it at cannot be fixed), or nothing where no table holds it. Lines are
+        revised in place; returns how many."""
+        todo = [ln for ln in lines if ln.get("kind") == "b_string_default" and not ln.get("expect")
+                and (ln.get("open") or ln.get("note") == "no Ensembl table of any release holds the string")
+                and not set(self.lower_T.get(ln["id"].lower(), ())) & self.GT]
+        if not todo or not self.records_of_every_release():
+            return 0
+        tr, rels = self.nb.tr, self.nb.rels
+        found = GB.M.core_readings(self.org, rels, {ln["id"] for ln in todo}, casefold=False)
+        n = 0
+        for ln in todo:
+            at = found.get(ln["id"], {})
+            held = sorted({r for r, _ in at if r <= T})
+            if not held:  # no record holds the string as written: the line stays as `default_line` made it
+                continue
+            R = held[-1]
+            genes = at.get((R, "name")) or at.get((R, "synonym"))  # rule `names_before_synonyms`
+            E = set().union(*(tr.walk_series(g, R, [T], True, living=True)[T] for g in genes))
+            Bw = E | set().union(*(tr.walk_series(g, R, [T], False, living=True, resurrect=True)[T] for g in genes))
+            Ev, Bv = tr.vset(E, T), tr.vset(Bw, T)
+            ln.pop("open", None)
+            ln.pop("open_within", None)
+            ln.update(expect=Ev, broad=Bv if set(Bv) != set(Ev) else None, read_at=R,
+                      rule="set_exact" if len(genes) > 1 and len(Ev) > 1 else "set",
+                      note=f"no exact name or synonym of release 115: read at {R}, the latest release whose records hold it "
+                           "(rule `start_release`)")
+            if not E and len(genes) == 1:
+                loc = tr.locus(next(iter(genes)), R)
+                if loc:
+                    ln["locus"] = loc
+            n += 1
+        return n
+
 
 # ---------------- B4 ----------------
 
@@ -185,6 +238,7 @@ def b4(cx, dry):
                 ln["authority_db"] = db
                 out.append(ln)
         nb._walk.clear()
+    log(cx.org, "B4 lines without a release read where Ensembl's records hold them", cx.read_where_held(out))
     return publish(cx, "b4_v1", out, "B4 previous symbols of the authorities: without a release (read at 115) and from "
                    "the last release whose GTF displays them", dry)
 
@@ -202,6 +256,7 @@ def b5(cx, dry):
             continue
         disp, src, G = nb.display(R), nb.sources(R)[0], nb.genes(R)
         prim = {g for g, r in G.items() if r["region"] != "patch"}
+        bm_syn = (nb.C.bm(R, "synonym", 1) or (None, {}))[1]  # BioMart's synonyms (of display xrefs): the rest is the core's
         n0 = len(out)
         for s in sorted(syn):
             if not TB.clean(s) or s in disp:
@@ -216,7 +271,8 @@ def b5(cx, dry):
             vs = (lambda x, r=R, c=cmpR: tr.vset(x, r) if c == "versioned" else sorted(x))
             rec = dict(qid=f"b5|syn|{s}|{R}|{R}", family=FAMILY, kind="b5_synonym", stratum="b5_syn_at115" if R == T else "b5_syn_atR",
                        unit=s, id=s, from_release=R, to_release=R, final_database=None, strategy="both", rule=GB.rule_of(len(E)),
-                       cmp=cmpR, expect=vs(E), broad=vs(B) if B != E else None, locus=None, name_src="biomart")
+                       cmp=cmpR, expect=vs(E), broad=vs(B) if B != E else None, locus=None,
+                       name_src="biomart" if s in bm_syn else "core_synonyms")
             if len(E) > 1:
                 sup = {tr.vid(g, R): nb.support(R, g, s, synonyms=not names) for g in E}  # read as a synonym: its sources
                 if len(set(sup.values())) > 1:
@@ -232,7 +288,8 @@ def b5(cx, dry):
                 ln = dict(qid=f"b5|syn|{s}|{R}|{T}", family=FAMILY, kind="b5_synonym_to_current", stratum="b5_syn_to115", unit=s,
                           id=s, from_release=R, to_release=T, final_database=None, strategy="both",
                           rule="set" if len(E) == 1 else GB.rule_of(len(Et)), cmp="versioned", expect=tr.vset(Et, T),
-                          broad=tr.vset(Bs | At, T) if (Bs | At) != Et else None, locus=loc, name_src="biomart")
+                          broad=tr.vset(Bs | At, T) if (Bs | At) != Et else None, locus=loc,
+                          name_src="biomart" if s in bm_syn else "core_synonyms")
                 if At:
                     ln["apart"] = tr.vset(At, T)
                 if loc is not None:
@@ -261,6 +318,7 @@ def b5(cx, dry):
     for (who, a), ens in sorted(per.items()):
         out.append(cx.default_line(f"b5|{who}|{a}|default|{T}", f"b5_alias_{who}", a, a, authority=ens, auth_db=who.upper()))
     log(org, "B5 authority aliases", len(per), "sources", sorted({w for w, _ in per}))
+    log(org, "B5 lines without a release read where Ensembl's records hold them", cx.read_where_held(out))
     return publish(cx, "b5_v1", out, "B5 BioMart synonyms of every BioMart release (to R, to 115) and the authorities' "
                    "aliases without a release", dry)
 
