@@ -12,6 +12,8 @@ root = "data"
 # performance = "data/performance"
 # graphs = "data/graphs"
 # cache = "data/cache"
+# modest = "data/modest"            # the modest set's runs, one folder per tree (docs/modest.md)
+# iterations = "data/iterations"    # the iterations' plans, states and reports, one folder per tree (docs/iterate.md)
 
 # The idtrack trees the benchmarks measure: a checkout of github.com/theislab/idtrack at the commit, the Python that
 # runs it (an environment with idtrack's dependencies; default: the Python running this package) and its graphs.
@@ -36,6 +38,14 @@ mus_musculus = "data/graphs/mus_musculus/graph_mus_musculus_assembly39_min48_max
 homo_sapiens = "data/graphs/homo_sapiens/graph_homo_sapiens_assembly38_min48_max115_narrow.npz"
 macaca_mulatta = "data/graphs/macaca_mulatta/graph_macaca_mulatta_assembly10_min48_max115_narrow.npz"
 macaca_fascicularis = "data/graphs/macaca_fascicularis/graph_macaca_fascicularis_assembly6_min91_max115_narrow.npz"
+
+# The iterations (`idtrack-repro iterate <tree>`, docs/iterate.md): the trees in the order they were made. A tree's
+# previous iteration is the tree before it here; every iteration is also compared with the reference (default: the
+# first of the order). A data root that holds the reference and the trees after it would read
+# order = ["d4c2dda", "r1", "r1b", "r2", "main"].
+[iterations]
+order = ["d4c2dda", "71690ab"]
+# reference = "d4c2dda"
 
 # External inputs a family reads that are not in the data root's areas (family D: the atlas project's checkout and its
 # per-feature locus tables, for regenerating D's sets; the copies D read are in <families>/d/inputs/, docs/families/d.md).
@@ -71,6 +81,13 @@ mus_musculus = 7
 sus_scrofa = 5
 macaca_mulatta = 5
 macaca_fascicularis = 4
+# Limits per user that `idtrack-repro iterate` reads against the queue (squeue) before each submission: the jobs at
+# once (running and pending, these included) and the memory they ask; `names` counts only the jobs whose names start
+# so (default: every job of the user). Unset, nothing is held.
+[jobs.limits]
+# max_jobs = 30
+# max_memory_gb = 300
+# names = "idtrack_"
 
 [tools]
 # The idtrack-web command for family E's web-layer checks (E9).

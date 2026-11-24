@@ -16,8 +16,11 @@ Usage:
   idtrack-repro modest run --tree <name> --out <folder> [--organisms ...] [--families ...] [--shards d=8]
                                                            one job per organism (the configured runner)
   idtrack-repro modest organism --tree <name> --organism <o> --out <folder> [--shards d=8] [--score-only]
+                                [--selections a=panel_v1,...]
                                                            the job's body: every part in turn (--score-only: the
-                                                           stored answers scored again under today's judge)
+                                                           stored answers scored again under today's judge;
+                                                           --selections: a family's part asks another published
+                                                           selection, e.g. its panel, instead of its modest one)
   idtrack-repro modest compare <folder a> <folder b> [--out <tsv>]
                                                            every part of two trees' runs: rates, regressions, moves
 
@@ -137,11 +140,13 @@ def shards_of(spec=None):
     return out
 
 
-def organism_parts(tree, organism, out, families=FAMILIES, shards=None):
+def organism_parts(tree, organism, out, families=FAMILIES, shards=None, selections=None):
     """The commands of one organism's modest run, in order: (part, [commands]); a command that is a list is the
-    shards of one part's runner, run at once (`shards`: {part: n})."""
+    shards of one part's runner, run at once (`shards`: {part: n}). `selections` ({family: published selection}) asks a
+    family's part on another selection than its latest modest one (the family's panel: `iterate`)."""
     cfg = CFG.get()
     shards = shards or {}
+    selections = selections or {}
     t = cfg.tree(tree)
     graph = cfg.graph(tree, organism)
     py_tree, py = t["python"], cfg.python
@@ -152,7 +157,7 @@ def organism_parts(tree, organism, out, families=FAMILIES, shards=None):
                           f"{py} -m idtrack_reproducibility.families.scorer --family harness --organism {organism} "
                           f"--run {base}/harness"])]
     for f in families:
-        sel = selection(f, organism)
+        sel = selections.get(f) or selection(f, organism)
         if not sel:
             continue
         runner = RUNNER.get(f, "idtrack_reproducibility.families.runner")
@@ -202,7 +207,9 @@ def cmd_organism(a):
     log = os.path.join(base, "modest.log")
     done, killed = [], None
     again = dict(x.split("=", 1) for x in (getattr(a, "again", None) or "").split(",") if x.strip())
-    for part, cmds in organism_parts(a.tree, a.organism, a.out, a.families, shards_of(getattr(a, "shards", None))):
+    chosen = dict(x.split("=", 1) for x in (getattr(a, "selections", None) or "").split(",") if x.strip())
+    for part, cmds in organism_parts(a.tree, a.organism, a.out, a.families, shards_of(getattr(a, "shards", None)),
+                                     **({"selections": chosen} if chosen else {})):
         if getattr(a, "score_only", False):  # the stored answers scored again (the judge of today); nothing asked
             cmds = [c for c in cmds if isinstance(c, str) and "families.scorer" in c]
         elif again:  # only the parts named, their lines of the revision set asked again (runner `--again`), then scored
@@ -237,7 +244,7 @@ def cmd_organism(a):
         os.replace(rec, os.path.join(base, f"modest.earlier_{k}.json"))
     if not again:
         json.dump(dict(tree=a.tree, commit=tr["commit"], organism=a.organism, parts=done, killed=killed,
-                       finished=time.strftime("%Y-%m-%d %H:%M:%S")),
+                       **({"selections": chosen} if chosen else {}), finished=time.strftime("%Y-%m-%d %H:%M:%S")),
                   open(os.path.join(base, "modest_scored_again.json" if getattr(a, "score_only", False) else "modest.json"),
                        "w"), indent=1)  # a scoring again keeps the run's own record
     if killed:
@@ -319,6 +326,8 @@ def main(argv=None):
     o.add_argument("--out", required=True)
     o.add_argument("--families", default=",".join(FAMILIES))
     o.add_argument("--shards", default=None)
+    o.add_argument("--selections", default=None, help="`<family>=<published selection>,...`: the family's part asks that "
+                   "selection (e.g. its panel `panel_v1`) instead of its latest modest one")
     o.add_argument("--score-only", action="store_true", help="score the stored answers again (today's judge); ask nothing, "
                    "run no reproducer")
     o.add_argument("--again", default=None, help="`<part>=<revision set>,...`: only these parts, the lines of the revision "

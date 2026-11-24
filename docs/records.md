@@ -26,7 +26,29 @@ corpus = records.load_corpus("<corpus>/runs/d4c2dda/sus_scrofa/run1.jsonl.gz")
 h = records.load_h("<performance>/runs/<tree>/sus_scrofa")
 ```
 
-`records.load` reads the runs that `results.toml` registers (filtered by part, organism and subject) or the scored folders given, and returns one long table with the columns below in this order. From the command line: `python -m idtrack_reproducibility.records --parts a --organisms sus_scrofa --out a_pig.parquet`. A family of hundreds of millions of rows (A, A*) is best loaded one organism at a time.
+`records.load` reads the runs that `results.toml` registers (filtered by part, organism and subject), the scored folders given, or an export (`export=<folder>`, below), and returns one long table with the columns below in this order. A family of hundreds of millions of rows (A, A*) is best loaded one organism at a time.
+
+### The export
+
+```
+idtrack-repro records --parts <part,...|all> --organisms <o,...> --subjects <s,...> --out <folder>
+```
+
+writes the record of the registered runs (or of `--folders`) as files for any tool that reads Parquet:
+
+| file | what |
+| --- | --- |
+| `part=<part>/organism=<organism>/subject=<subject>/records.parquet` | every row of that part, organism and subject (a part's several scored folders together: family E's two scorings, A*'s gene and transcript runs; `folder` and `scoring` tell them apart), the columns below in their order and with their types (zstd-compressed; written outcome file by outcome file, so a family of hundreds of millions of rows is exported in the memory of one partition). A folder name is the value with every character but letters, digits, `_`, `.` and `-` written `_` (`subject=g_Profiler`); the rows hold the value itself |
+| `schema.json` | the record's version, every column with its type, its Arrow type, its meaning and its values (from `records.SCHEMA`), the partitioning, the parts kept as summaries (A0, E7, E9: what they keep per line, what only as counts, their registered folders), and the loaders of the rows kept elsewhere (the hunts, the regression corpus, family H, another tool's raw responses) |
+| `index.tsv` | one row per file: `file`, `part`, `organism`, `subject`, `rows`, `bytes`, `sha256`, `folders` (the scored folders it was made from) |
+
+`--subjects` takes a subject's name (`d4c2dda`, a tool's name) or a tree's name in the registry (`r2`, `d4c2dda_tx`). Another tool's rows (family G, `subject_kind` `tool`) pass through as its scorer wrote them. Read back:
+
+```python
+df = records.load(export="<folder>", parts=["a"], organisms=["sus_scrofa"])   # the columns and types of the schema
+```
+
+The integer columns come back as pandas' nullable integers (`Int32`), so a missing `n_got` stays missing. Without `--out` the command counts the rows by part, subject, organism and outcome.
 
 ### A worked example: the rate per stratum and tree, with an interval
 
@@ -56,42 +78,47 @@ The causes and limitations of the wrong answers are columns of the same rows: `d
 
 ## Columns
 
+The table is `records.SCHEMA` (the one source of the column list, the export's Parquet types and its `schema.json`; `idtrack-repro records --schema-table` prints it, and a test compares it with this one). Types: `int32`, `float64`, `string`; `string (JSON)` holds a JSON object as a string; a missing value is a null.
+
 | column | type | meaning | values |
 | --- | --- | --- | --- |
-| `record_version` | int | the version of the record the scored folder was written as | `1`: every row holds the query, the truth and the answer |
-| `subject_kind` | str | what answered | `tree` (an idtrack checkout), `tool` (another tool: family G) |
-| `subject` | str | its name | a tree: its commit's first seven characters; a tool: its name (`run.json` `subject.name`) |
-| `subject_version` | str | its version | a tree: the full commit; a tool: its version or release as the tool reports it |
-| `graph_digest` | str | the content digest of the graph a tree was asked on (`,` between several) | |
-| `asked_at` | str | for a tool: the date (ISO 8601) its service was asked; empty for a tree (the scoring's `scored_at` says when) | |
-| `endpoint` | str | for a tool: the service's address or the package and its version; empty for a tree | |
-| `python` | str | the Python the subject ran in | e.g. `3.11.12` |
-| `part` | str | the benchmark | `harness` (the harness's own scorer), `f0` (the harness's sets through the common machinery), `astar`, `a`, `b`, `c`, `d`, `e`, `hunts`, `corpus`, `h`, a later family's name |
-| `scoring` | str | the judge's scoring folder where a part has several | `scores_now`, `scores_decided` (family E, B), or empty |
-| `organism` | str | | the five organisms' Ensembl names |
-| `family` | str | the family of the line's sets | `harness` for the harness's own sets |
-| `set` | str | the published set whose line is the truth (the latest line of the qid: a revision set's line replaces its base's) | |
-| `qid` | str | the line's stable id within the family and organism | |
-| `view` | str | the view scored | `best`, `all` |
-| `stratum`, `kind` | str | the line's stratum and kind (the family's design) | |
-| `variant` | str | the view and whether a release was given | `best,from`, `best,default`, `all,from`, `all,default` |
-| `unit` | str | the cluster of the bootstrap (gene id, lineage, name, dataset) | |
-| `query` | JSON str | the call: `id`, `from_release`, `to_release`, `final_database`, `from_database`, `strategy` (the view), `expect_error` | |
-| `judge` | str | the judge of the line | `published`, or `revised:<corrections>` |
-| `expected` | str | the truth: the expected ids (`,` between) | |
-| `broad` | str | the wider set Ensembl's data also allow (`,` between); empty where none | |
-| `outcome` | str | the verdict | `right`, `wrong`, `undetermined` (the truth cannot decide), `timeout`, `error`, `expected_error` (the error the docs promise), `not_supported` (a tool that cannot ask such a query), `missing` (no answer stored), `unjudged` (a call without truth: the regression corpus, H's timed calls) |
-| `reason` | str | why, in words (the rule that decided it) | |
-| `got` | str | the answer's ids as the subject returned them (`,` between) | |
-| `n_got` | int | how many | |
-| `status`, `match` | str | the answer's own status (`converted`, `tie`, `no_target`, `no_conversion`, `not_found`, `unknown_version`) and how the identifier was matched | as the subject reports them |
-| `error_type` | str | the class of an error raised | |
-| `seconds` | float | the time of the call that gave this view | |
-| `calls` | int | the calls made for the line | |
-| `cause`, `cause_class` | str | for a classified wrong (or undetermined) answer: its cause and class ([F0's causes](families/f0.md#causes)) | classes `a` to `e` |
-| `limitation` | str | its row of [the known-limitations table](../results/limitations/limitations.tsv) (`L-...`); empty for a decided judge's scoring | |
-| `scored_at` | str | when the scoring was made | |
-| `folder` | str | the scored folder in the data root | |
+| `record_version` | int32 | the version of the record the scored folder was written as | `1`: every row holds the query, the truth and the answer |
+| `subject_kind` | string | what answered | `tree` (an idtrack checkout), `tool` (another tool: family G) |
+| `subject` | string | its name | a tree: its commit's first seven characters; a tool: its name (`run.json` `subject.name`) |
+| `subject_version` | string | its version | a tree: the full commit; a tool: its version or release as the tool reports it |
+| `graph_digest` | string | the content digest of the graph a tree was asked on (`,` between several) |  |
+| `asked_at` | string | for a tool: the date (ISO 8601) its service was asked; empty for a tree (the scoring's `scored_at` says when) |  |
+| `endpoint` | string | for a tool: the service's address or the package and its version; empty for a tree |  |
+| `python` | string | the Python the subject ran in | e.g. `3.11.12` |
+| `part` | string | the benchmark | `harness` (the harness's own scorer), `f0` (the harness's sets through the common machinery), `astar`, `a`, `b`, `c`, `d`, `e`, `hunts`, `corpus`, `h`, a later family's name |
+| `scoring` | string | the judge's scoring folder where a part has several | `scores_now`, `scores_decided` (family E, B), or empty |
+| `organism` | string | the organism | the five organisms' Ensembl names |
+| `family` | string | the family of the line's sets | `harness` for the harness's own sets |
+| `set` | string | the published set whose line is the truth (the latest line of the qid: a revision set's line replaces its base's) |  |
+| `qid` | string | the line's stable id within the family and organism |  |
+| `view` | string | the view scored | `best`, `all` |
+| `stratum` | string | the line's stratum (the family's design) |  |
+| `kind` | string | the line's kind (the family's design) |  |
+| `variant` | string | the view and whether a release was given | `best,from`, `best,default`, `all,from`, `all,default` |
+| `unit` | string | the cluster of the bootstrap (gene id, lineage, name, dataset) |  |
+| `query` | string (JSON) | the call | `id`, `from_release`, `to_release`, `final_database`, `from_database`, `strategy` (the view), `expect_error` |
+| `judge` | string | the judge of the line | `published`, or `revised:<corrections>` |
+| `expected` | string | the truth: the expected ids (`,` between) |  |
+| `broad` | string | the wider set Ensembl's data also allow (`,` between); empty where none |  |
+| `outcome` | string | the verdict | `right`, `wrong`, `undetermined` (the truth cannot decide), `timeout`, `error`, `expected_error` (the error the docs promise), `not_supported` (a tool that cannot ask such a query), `missing` (no answer stored), `unjudged` (a call without truth: the regression corpus, H's timed calls) |
+| `reason` | string | why, in words (the rule that decided it) |  |
+| `got` | string | the answer's ids as the subject returned them (`,` between) |  |
+| `n_got` | int32 | how many |  |
+| `status` | string | the answer's own status | `converted`, `tie`, `no_target`, `no_conversion`, `not_found`, `unknown_version`, as the subject reports it |
+| `match` | string | how the identifier was matched | as the subject reports it |
+| `error_type` | string | the class of an error raised |  |
+| `seconds` | float64 | the time of the call that gave this view |  |
+| `calls` | int32 | the calls made for the line |  |
+| `cause` | string | for a classified wrong (or undetermined) answer: its cause ([F0's causes](families/f0.md#causes)) |  |
+| `cause_class` | string | the class of that cause | classes `a` to `e` |
+| `limitation` | string | its row of [the known-limitations table](../results/limitations/limitations.tsv) (`L-...`); empty for a decided judge's scoring |  |
+| `scored_at` | string | when the scoring was made |  |
+| `folder` | string | the scored folder in the data root |  |
 
 The truth's source is the set's manifest (`<set>.manifest.json`: generator, sources with their checksums, `revises`, `judge`, `revision`); seeds are in the sets' and selections' manifests.
 
@@ -146,3 +173,5 @@ The answers the scorer reads are made from these files by the tool's adapter, ne
 
 - A0 (the graph against Ensembl's tables), E7 (determinism) and E9 (the web layer) keep every row that is not right or agreeing, and the others counted ([what each part keeps](#what-each-part-keeps)).
 - H's stored runs of `d4c2dda` and `71690ab` keep latency summaries; every later run of the measure `calls` keeps every call.
+
+The export's `schema.json` states the first three as they are (`kept_as_summaries`), with the registry's folders that hold them.

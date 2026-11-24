@@ -36,6 +36,9 @@ COMMANDS = {
     "limitations": ("idtrack_reproducibility.families.limitations", "rows of the known-limitations table"),
     "panel": ("idtrack_reproducibility.families.panel", "a family's panel: the lines a development stage asks"),
     "modest": ("idtrack_reproducibility.modest", "the modest set: build it, run it on a tree (one job per organism), compare"),
+    "iterate": ("idtrack_reproducibility.iterate",
+                "one iteration of a tree: its graphs built and judged, the modest set (or panels), comparisons, the "
+                "corpus, one report (a resumable plan of jobs); --complete records a complete run"),
     "check-harness": ("idtrack_reproducibility.families.check_harness", "the common scorer against the harness's scorer, line by line"),
     "known-limitations": ("idtrack_reproducibility.known_limitations",
                           "the known-limitations table of every family, from the current runs"),
@@ -50,6 +53,8 @@ COMMANDS = {
     "graph-stored": ("idtrack_reproducibility.graphs.stored", "a copy of a graph file with every member stored (load layouts)"),
     # results, data, tidiness
     "results": ("idtrack_reproducibility.results", "the results/ tables, their index and provenance, from the scored runs"),
+    "records": ("idtrack_reproducibility.records",
+                "the record: its export (one Parquet per part, organism and subject, with schema.json and index.tsv)"),
     "manifest": ("idtrack_reproducibility.manifests", "the data manifests of manifests/areas.toml"),
     "check": ("idtrack_reproducibility.check", "the repository's checks (CI runs them; run before every push)"),
 }
@@ -88,6 +93,8 @@ def main(argv=None):
     try:
         runpy.run_module(mod, run_name="__main__", alter_sys=True)
     except SystemExit as e:
+        if e.code is not None and not isinstance(e.code, int):  # a message: say it, as Python does
+            print(e.code, file=sys.stderr)
         return e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
     return 0
 

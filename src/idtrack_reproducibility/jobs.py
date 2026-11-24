@@ -2,8 +2,9 @@
 
 `submit(what, command, ...)` returns a job id. With the `slurm` runner the command is an `sbatch --wrap` job in the
 configured partition and QOS, named `<name_prefix><what>` (a rerun of the same work keeps its name), its log in
-`<log_dir>/<name>_<id>.out`; dependencies are `afterany` (a preempted or failed predecessor does not hold the queue:
-each step checks its inputs). With the `local` runner the command runs at once in this process's environment, its
+`<log_dir>/<name>_<id>.out`; dependencies are `afterany` by default (a preempted or failed predecessor does not hold the
+queue: each step checks its inputs), or `afterok` where a caller chains steps that must not run after a failure (the
+iteration's plan, `iterate.py`). With the `local` runner the command runs at once in this process's environment, its
 output in the same log file, and dependencies are met by order; the id is `local:<n>`.
 
 Every job's environment: `PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONHASHSEED=0 IDTRACK_ENSEMBL_ACCESS=https`,
@@ -37,8 +38,11 @@ def module(python, name, args=""):
     return f"{python} -m {name} {args}".strip()
 
 
-def submit(what, command, log_dir, cpus=2, mem_gb=8, time="04:00:00", after=None, env=None):
-    """Run `command` (a shell command line) as a job; returns its id."""
+def submit(what, command, log_dir, cpus=2, mem_gb=8, time="04:00:00", after=None, env=None, dependency="afterany"):
+    """Run `command` (a shell command line) as a job; returns its id. `dependency` is the kind of the dependency on the
+    jobs `after` (`afterany` or `afterok`; the local runner runs in order and ignores it)."""
+    if dependency not in ("afterany", "afterok"):
+        raise ValueError(f"dependency must be `afterany` or `afterok`, not {dependency!r}")
     cfg = CFG.get()
     name = f"{cfg.name_prefix}{what}"
     os.makedirs(log_dir, exist_ok=True)
@@ -60,7 +64,7 @@ def submit(what, command, log_dir, cpus=2, mem_gb=8, time="04:00:00", after=None
             f"--output={log_dir}/%x_%j.out"] + cfg.slurm["extra"]
     deps = [j for j in (after or []) if j and not str(j).startswith("local:")]
     if deps:
-        cmd.append(f"--dependency=afterany:{':'.join(str(j) for j in deps)}")
+        cmd.append(f"--dependency={dependency}:{':'.join(str(j) for j in deps)}")
     cmd.append(f"--wrap=export {exports}; {command}")
     out = subprocess.run(cmd, capture_output=True, text=True, check=True).stdout.strip()
     return out.split(";")[0]

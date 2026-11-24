@@ -27,8 +27,8 @@ The design of the whole programme (principles, needs, coverage, the families F a
 
 | path | what |
 | --- | --- |
-| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `graphs/` (a tree's graphs), `results.py`, `records.py` (the record's loader), `rescore.py` (scoring again), `manifests.py`, `check.py` |
-| `docs/` | the methods of each benchmark, the rules, the data, how to add a benchmark |
+| `src/idtrack_reproducibility/` | the package: `config.py` (locations), `jobs.py` (runners), `cli.py` (the commands), `harness/`, `families/` (the common machinery and one package per family), `corpus/`, `hunts/`, `graphs/` (a tree's graphs), `modest.py` (the modest set), `iterate.py` (an iteration: one plan of jobs per tree), `results.py`, `records.py` (the record's columns, loader and export), `rescore.py` (scoring again), `manifests.py`, `check.py` |
+| `docs/` | the methods of each benchmark, the rules, the data, the record, an iteration, how to add a benchmark |
 | `results/` | the current results: tables per benchmark, tree and organism, `index.tsv` (one row per family, stratum, organism and tree) and `provenance.tsv` (what generated each file, from which source) |
 | `results.toml` | the registry of the scored runs whose tables are the results |
 | `manifests/` | one manifest per area of the data root (path, size, sha256, source, time, how to rebuild) and `areas.toml` |
@@ -67,9 +67,10 @@ The idtrack that is measured is a **tree**: a checkout of github.com/theislab/id
 
 One TOML file and environment variables; nothing is a path of a particular machine. The file is `$IDTRACK_REPRO_CONFIG`, else `./idtrack-repro.toml`; [idtrack-repro.example.toml](idtrack-repro.example.toml) shows every setting with its default:
 
-- `[data]`: the data root (`root`, default `./data`) and, if they lie elsewhere, each location (`truth`, `harness`, `families`, `corpus`, `hunts`, `performance`, `graphs`, `cache`); variables `IDTRACK_REPRO_DATA_ROOT`, `IDTRACK_REPRO_<LOCATION>`;
+- `[data]`: the data root (`root`, default `./data`) and, if they lie elsewhere, each location (`truth`, `harness`, `families`, `corpus`, `hunts`, `performance`, `graphs`, `cache`, `modest`, `iterations`); variables `IDTRACK_REPRO_DATA_ROOT`, `IDTRACK_REPRO_<LOCATION>`;
 - `[trees.<name>]`: `commit`, `source` (the checkout), `python`, `[trees.<name>.graphs]` per organism;
-- `[jobs]`: `runner` = `local` (every job runs at once, here) or `slurm` (`sbatch`, with `[jobs.slurm]` `partition`, `qos`, `extra`; variables `IDTRACK_REPRO_RUNNER`, `IDTRACK_REPRO_SLURM_PARTITION`, `IDTRACK_REPRO_SLURM_QOS`), `name_prefix` of the jobs' names, `[jobs.memory_gb]` per organism (a job that holds a graph and asks it) and `[jobs.modest_memory_gb]` (a job of the modest set: its largest part's measured peak, [docs/modest.md](docs/modest.md)).
+- `[iterations]`: `order` (the trees in the order they were made: a tree's previous iteration is the one before it) and `reference` (default the first), read by `idtrack-repro iterate` ([docs/iterate.md](docs/iterate.md));
+- `[jobs]`: `runner` = `local` (every job runs at once, here) or `slurm` (`sbatch`, with `[jobs.slurm]` `partition`, `qos`, `extra`; variables `IDTRACK_REPRO_RUNNER`, `IDTRACK_REPRO_SLURM_PARTITION`, `IDTRACK_REPRO_SLURM_QOS`), `name_prefix` of the jobs' names, `[jobs.memory_gb]` per organism (a job that holds a graph and asks it) and `[jobs.modest_memory_gb]` (a job of the modest set: its largest part's measured peak, [docs/modest.md](docs/modest.md)), and `[jobs.limits]` (`max_jobs`, `max_memory_gb`, `names`: the queue's limits that `iterate` reads before each submission).
 
 `idtrack-repro config` prints the configuration as a process reads it.
 
@@ -89,8 +90,10 @@ One TOML file and environment variables; nothing is a path of a particular machi
 | causes of the wrong answers | `idtrack-repro explain ...` on the tree, then `idtrack-repro causes --organism <o> --scored <folder> [--plugin <family module>]` |
 | known limitations | `idtrack-repro known-limitations` (every family's rows from its current runs, `results/limitations/`); one family's rows: `idtrack-repro limitations --family <family> --scored <folders> --out <tsv>` |
 | results | `idtrack-repro results` (reads `results.toml`; writes `results/`) |
+| the record's export | `idtrack-repro records --parts all --out <folder>`: one Parquet file per part, organism and subject, `schema.json`, `index.tsv`; read back with `records.load(export=<folder>)` ([the record](docs/records.md#the-export)) |
 | data manifests | `idtrack-repro manifest <area>` or `--all` |
 | the modest set | `idtrack-repro modest build` once; `idtrack-repro modest run --tree <tree> --out <folder>` (one job per organism); `idtrack-repro modest compare <reference> <tree>` ([docs/modest.md](docs/modest.md)) |
+| an iteration of a tree, in one command | `idtrack-repro iterate <tree> [--dry]`: graph-build, graph-judge against the previous iteration, the modest set (or the families' panels), its comparisons with the previous iteration and the reference, the corpus, one report (`<iterations>/<tree>/iterate_report.md`), as one resumable plan of jobs; called again, it continues; `--complete` records a complete run ([docs/iterate.md](docs/iterate.md)) |
 | checks | `idtrack-repro check` |
 
 Each benchmark's document says how to reproduce it from an empty data root ("Reproducing from scratch"): [harness](docs/harness.md), [F0](docs/families/f0.md#reproducing-from-scratch), [A*](docs/families/astar.md#reproducing-from-scratch), [A](docs/families/a.md#reproducing-from-scratch), [B](docs/families/b.md#reproducing-from-scratch), [C](docs/families/c.md#reproducing-from-scratch), [D](docs/families/d.md#reproducing-from-scratch), [E](docs/families/e.md#reproducing-from-scratch), [H](docs/families/h.md#reproducing-from-scratch), [the corpus](docs/corpus.md), [the hunts](docs/hunts.md#reproducing).

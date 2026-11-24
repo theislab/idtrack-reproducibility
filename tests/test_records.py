@@ -109,3 +109,65 @@ def test_another_tool_is_a_subject_of_its_own(data_root):
     r = df.iloc[0]
     assert (r.subject_kind, r.subject, r.subject_version, r.asked_at, r.outcome) == \
         ("tool", "gprofiler", "e113", "2026-11-20", "not_supported")
+
+
+def test_the_columns_come_from_one_table_that_the_document_shows():
+    assert R.COLUMNS == [c for c, *_ in R.SCHEMA] and len(set(R.COLUMNS)) == len(R.COLUMNS)
+    assert [f.name for f in R.schema()] == R.COLUMNS
+    doc = open(os.path.join(os.path.dirname(__file__), "..", "docs", "records.md"), encoding="utf-8").read()
+    assert R.schema_table() in doc  # docs/records.md, "Columns": regenerate with `idtrack-repro records --schema-table`
+
+
+def exported(data_root, tool=False):
+    a = scored_folder(data_root, 1, [row("q1", "right", got="G1.1", expected="G1.1", query='{"id":"TP53"}', n_got=1,
+                                         seconds=0.25, calls=2, status="converted"),
+                                     row("q2", "wrong", got="G9.1", expected="G2.1", n_got=None, seconds=None)], [])
+    folders = [str(a)]
+    if tool:  # family G's rows: another tool as the subject, written by the same scorer
+        g = data_root / "g"
+        g.mkdir()
+        b = scored_folder(g, 1, [row("q1", "not_supported", got="", expected="G1.1", n_got=0)], [])
+        info = json.load(open(b / "run.json"))
+        info["subject"] = dict(kind="tool", name="g:Profiler", version="e113", asked_at="2026-11-20", endpoint="https://x")
+        json.dump(info, open(b / "run.json", "w"))
+        folders.append(str(b))
+    out = data_root / "export"
+    return out, R.export(str(out), folders=folders), folders
+
+
+def test_the_export_is_partitioned_typed_indexed_and_read_back(data_root):
+    out, index, folders = exported(data_root, tool=True)
+    files = sorted(r["file"] for r in index)
+    assert files == ["part=t/organism=sus_scrofa/subject=d4c2dda/records.parquet",
+                     "part=t/organism=sus_scrofa/subject=g_Profiler/records.parquet"]
+    for r in index:
+        t = pq.read_table(out / r["file"])
+        assert t.schema.equals(R.schema(), check_metadata=False) and t.num_rows == r["rows"]
+        import hashlib
+        assert hashlib.sha256(open(out / r["file"], "rb").read()).hexdigest() == r["sha256"]
+    doc = json.load(open(out / "schema.json"))
+    assert doc["record_version"] == R.RECORD_VERSION
+    assert [(c["name"], c["type"]) for c in doc["columns"]] == [(c, t) for c, t, *_ in R.SCHEMA]
+    assert {s["part"] for s in doc["kept_as_summaries"]} == {"a0", "e7", "e9"}
+    tsv = (out / "index.tsv").read_text().splitlines()
+    assert tsv[0].split("\t") == R.INDEX_COLS and len(tsv) == 3
+    back = R.load(export=str(out))
+    direct = R.load(folders=folders)
+    assert list(back.columns) == R.COLUMNS and len(back) == len(direct) == 3
+    assert str(back.n_got.dtype) == "Int32" and back.n_got.isna().sum() == 1
+    tree = back[back.subject == "d4c2dda"].sort_values("qid")
+    assert tree.seconds.tolist()[0] == 0.25 and tree.calls.tolist()[0] == 2 and tree.cause.isna().tolist() == [True, False] and \
+        tree.cause.tolist()[1] == "external_bridge"
+    tool = back[back.subject_kind == "tool"].iloc[0]  # passes through unchanged
+    assert (tool.subject, tool.subject_version, tool.asked_at, tool.endpoint, tool.outcome) == \
+        ("g:Profiler", "e113", "2026-11-20", "https://x", "not_supported")
+    only = R.load(export=str(out), subjects=["g:Profiler"])
+    assert len(only) == 1 and R.load(export=str(out), parts=["x"]).empty
+
+
+def test_the_export_command_writes_the_folder(data_root):
+    a = scored_folder(data_root, 1, [row("q1", "right")], [])
+    out = data_root / "ex"
+    assert R.main(["--folders", str(a), "--out", str(out)]) == 0
+    assert (out / "schema.json").exists() and (out / "index.tsv").exists()
+    assert len(R.load(export=str(out), organisms=["sus_scrofa"])) == 1

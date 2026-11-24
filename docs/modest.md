@@ -249,6 +249,9 @@ idtrack-repro modest run --tree <tree> --out <folder>/<tree>
 # a revision that changed the question of its lines for one tree: those lines asked again on that tree, then scored
 idtrack-repro modest organism --tree <tree> --organism <o> --out <folder>/<tree> --again c=rfam_label_rows_v1
 
+# a family's part on another published selection than its modest one (its panel: what `iterate` asks where one exists)
+idtrack-repro modest organism --tree <tree> --organism <o> --out <folder>/<tree> --selections a=panel_v1
+
 # compare the tree with the reference, part by part (exit 1 on a regression: right -> wrong or right -> error)
 idtrack-repro modest compare <folder>/d4c2dda <folder>/<tree> --out <folder>/<tree>/compare.tsv
 ```

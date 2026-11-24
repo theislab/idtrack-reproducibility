@@ -16,6 +16,8 @@ Locations (each a folder; defaults under the data root):
     performance = "<root>/performance"  # IDTRACK_REPRO_PERFORMANCE
     graphs = "<root>/graphs"       # IDTRACK_REPRO_GRAPHS       graph files built by the trees
     cache = "<root>/cache"         # IDTRACK_REPRO_CACHE        caches of truth readers (rebuilt when missing)
+    modest = "<root>/modest"       # IDTRACK_REPRO_MODEST       the modest set's runs, one folder per tree
+    iterations = "<root>/iterations"  # IDTRACK_REPRO_ITERATIONS  the iterations' plans, states and reports, per tree
 
 Trees (an idtrack checkout at a commit, the Python that runs it, its graphs per organism):
 
@@ -32,6 +34,13 @@ External inputs a family reads (family D: the atlas project's checkout and its p
     rosetta = "<checkout of the atlas project>"
     rosetta_m02 = "<its per-feature locus tables (m02)>"
 
+The iterations (`idtrack-repro iterate`, docs/iterate.md): the trees in the order they were made; a tree's previous
+iteration is the tree before it, the reference the one every iteration is also compared with:
+
+    [iterations]
+    order = ["d4c2dda", "r1", "r1b", "r2", "main"]
+    reference = "d4c2dda"          # default: the first of `order`
+
 Jobs (`runner` is `slurm` or `local`; IDTRACK_REPRO_RUNNER):
 
     [jobs]
@@ -45,6 +54,10 @@ Jobs (`runner` is `slurm` or `local`; IDTRACK_REPRO_RUNNER):
     homo_sapiens = 90
     [jobs.modest_memory_gb]        # memory of a modest-set job (its largest part's measured peak), per organism
     homo_sapiens = 8
+    [jobs.limits]                  # read against the queue before each submission of `iterate`
+    max_jobs = 30                  # the user's jobs at once (running and pending), these included
+    max_memory_gb = 300            # the memory they ask at once
+    names = ""                     # count only the jobs whose names start so (default: every job of the user)
 
 The module reads no idtrack and runs on Python 3.11 too (the Python of an older tree imports it).
 """
@@ -53,7 +66,7 @@ import sys
 import tomllib
 
 ORGANISMS = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
-LOCATIONS = ["truth", "harness", "families", "corpus", "hunts", "performance", "graphs", "cache"]
+LOCATIONS = ["truth", "harness", "families", "corpus", "hunts", "performance", "graphs", "cache", "modest", "iterations"]
 # Memory of one job that holds a graph of the reference tree (d4c2dda) and asks it, with room for the run (GB).
 MEMORY_GB = {"homo_sapiens": 90, "mus_musculus": 50, "sus_scrofa": 24, "macaca_mulatta": 24, "macaca_fascicularis": 20}
 # Memory of one job of the modest set (one organism; its parts run one after another, so the largest part's peak): the
@@ -110,6 +123,17 @@ class Config:
         self.modest_memory_gb = dict(MODEST_MEMORY_GB, **jobs.get("modest_memory_gb", {}))
         self.modest_shards = dict(jobs.get("modest_shards", {}))  # part -> shards asked at once in a modest job
         self.python = jobs.get("python") or sys.executable  # the Python of this package in jobs
+        lim = jobs.get("limits", {})
+        self.limits = dict(max_jobs=lim.get("max_jobs"), max_memory_gb=lim.get("max_memory_gb"),
+                           names=str(lim.get("names", "")))
+        for k in ("max_jobs", "max_memory_gb"):
+            if self.limits[k] is not None and (not isinstance(self.limits[k], (int, float)) or self.limits[k] <= 0):
+                raise SystemExit(f"[jobs.limits] {k} must be a positive number, not {self.limits[k]!r}")
+        it = raw.get("iterations", {})
+        order = list(it.get("order", []))
+        if len(set(order)) != len(order):
+            raise SystemExit(f"[iterations] order names a tree twice: {order}")
+        self.iteration = dict(order=order, reference=it.get("reference") or (order[0] if order else None))
 
     def source(self, name):
         """An external input named in `[sources]` (e.g. the atlas project's checkout and its feature tables that family D
@@ -145,9 +169,15 @@ class Config:
             raise SystemExit(f"no graph of {organism} for tree {tree}: add [trees.{tree}.graphs] {organism} = ...")
         return t["graphs"][organism]
 
+    def previous(self, tree):
+        """The iteration before `tree` in `[iterations] order`, or None (the first, or a tree not in the order)."""
+        order = self.iteration["order"]
+        return order[order.index(tree) - 1] if tree in order and order.index(tree) > 0 else None
+
     def describe(self):
         out = dict(config=self.path, root=self.root, **{loc: getattr(self, loc) for loc in LOCATIONS},
-                   runner=self.runner, slurm=self.slurm, name_prefix=self.name_prefix,
+                   runner=self.runner, slurm=self.slurm, name_prefix=self.name_prefix, limits=self.limits,
+                   iteration=self.iteration,
                    trees={n: {k: v for k, v in t.items()} for n, t in self.trees.items()})
         return out
 

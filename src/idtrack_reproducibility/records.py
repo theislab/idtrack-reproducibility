@@ -3,6 +3,7 @@
     from idtrack_reproducibility import records
     df = records.load(parts=["a"], organisms=["sus_scrofa"])            # a pandas frame, one long table
     df = records.load(folders=["<run>/sus_scrofa/e/scores_now"])         # any scored folder (a modest run's part)
+    df = records.load(export="<export>", parts=["a"])                    # an export (`idtrack-repro records --out`)
     hunts = records.load_hunts("<hunts>/reproduce/d4c2dda")              # the hunts' reproducers, one row per call
     corpus = records.load_corpus("<corpus>/runs/d4c2dda/sus_scrofa/run1.jsonl.gz")   # the regression corpus's calls
     h = records.load_h("<performance>/runs/<tree>/<organism>")           # family H's timed calls
@@ -15,7 +16,11 @@ classified, the cause of each wrong answer (`causes.tsv.gz`) and its row of the 
 holds the query, the truth, the answer as the subject returned it and the verdict (record version `RECORD_VERSION`;
 a scoring of an earlier version is scored again from its stored answers: `idtrack-repro rescore`).
 
-Usage (a quick look): python -m idtrack_reproducibility.records [--parts a,e] [--organisms ...] [--out x.parquet]
+Usage: idtrack-repro records [--parts a,e|all] [--organisms ...] [--subjects ...] [--out <folder>]
+    without --out, the rows counted by part, subject, organism and outcome; with it, the export: one Parquet file per
+    part, organism and subject (`part=<p>/organism=<o>/subject=<s>/records.parquet`), `schema.json` (the record's
+    version, every column with its type and meaning, from `SCHEMA`; the parts kept as summaries) and `index.tsv` (rows,
+    bytes and sha256 per file); `records.load(export=<folder>)` reads it back.
 """
 import argparse
 import csv
@@ -28,11 +33,74 @@ import sys
 from . import config as CFG
 
 RECORD_VERSION = 1
-# Columns of the record, in order (docs/records.md has each column's meaning, type and values).
-COLUMNS = ["record_version", "subject_kind", "subject", "subject_version", "graph_digest", "asked_at", "endpoint",
-           "python", "part", "scoring", "organism", "family", "set", "qid", "view", "stratum", "kind", "variant",
-           "unit", "query", "judge", "expected", "broad", "outcome", "reason", "got", "n_got", "status", "match",
-           "error_type", "seconds", "calls", "cause", "cause_class", "limitation", "scored_at", "folder"]
+# The record's columns, in order: (column, type, meaning, values). This table is the one source of the column list
+# (`COLUMNS`), of the export's Parquet types (`schema`), of its `schema.json`, and of the table in docs/records.md
+# ("Columns", which `schema_table()` prints and the tests compare). Types: `int32`, `float64`, `string`; `string (JSON)`
+# is a string that holds a JSON object.
+SCHEMA = [
+    ("record_version", "int32", "the version of the record the scored folder was written as",
+     "`1`: every row holds the query, the truth and the answer"),
+    ("subject_kind", "string", "what answered", "`tree` (an idtrack checkout), `tool` (another tool: family G)"),
+    ("subject", "string", "its name",
+     "a tree: its commit's first seven characters; a tool: its name (`run.json` `subject.name`)"),
+    ("subject_version", "string", "its version",
+     "a tree: the full commit; a tool: its version or release as the tool reports it"),
+    ("graph_digest", "string", "the content digest of the graph a tree was asked on (`,` between several)", ""),
+    ("asked_at", "string",
+     "for a tool: the date (ISO 8601) its service was asked; empty for a tree (the scoring's `scored_at` says when)", ""),
+    ("endpoint", "string", "for a tool: the service's address or the package and its version; empty for a tree", ""),
+    ("python", "string", "the Python the subject ran in", "e.g. `3.11.12`"),
+    ("part", "string", "the benchmark",
+     "`harness` (the harness's own scorer), `f0` (the harness's sets through the common machinery), `astar`, `a`, `b`, "
+     "`c`, `d`, `e`, `hunts`, `corpus`, `h`, a later family's name"),
+    ("scoring", "string", "the judge's scoring folder where a part has several",
+     "`scores_now`, `scores_decided` (family E, B), or empty"),
+    ("organism", "string", "the organism", "the five organisms' Ensembl names"),
+    ("family", "string", "the family of the line's sets", "`harness` for the harness's own sets"),
+    ("set", "string",
+     "the published set whose line is the truth (the latest line of the qid: a revision set's line replaces its base's)", ""),
+    ("qid", "string", "the line's stable id within the family and organism", ""),
+    ("view", "string", "the view scored", "`best`, `all`"),
+    ("stratum", "string", "the line's stratum (the family's design)", ""),
+    ("kind", "string", "the line's kind (the family's design)", ""),
+    ("variant", "string", "the view and whether a release was given", "`best,from`, `best,default`, `all,from`, `all,default`"),
+    ("unit", "string", "the cluster of the bootstrap (gene id, lineage, name, dataset)", ""),
+    ("query", "string (JSON)", "the call",
+     "`id`, `from_release`, `to_release`, `final_database`, `from_database`, `strategy` (the view), `expect_error`"),
+    ("judge", "string", "the judge of the line", "`published`, or `revised:<corrections>`"),
+    ("expected", "string", "the truth: the expected ids (`,` between)", ""),
+    ("broad", "string", "the wider set Ensembl's data also allow (`,` between); empty where none", ""),
+    ("outcome", "string", "the verdict",
+     "`right`, `wrong`, `undetermined` (the truth cannot decide), `timeout`, `error`, `expected_error` (the error the "
+     "docs promise), `not_supported` (a tool that cannot ask such a query), `missing` (no answer stored), `unjudged` (a "
+     "call without truth: the regression corpus, H's timed calls)"),
+    ("reason", "string", "why, in words (the rule that decided it)", ""),
+    ("got", "string", "the answer's ids as the subject returned them (`,` between)", ""),
+    ("n_got", "int32", "how many", ""),
+    ("status", "string", "the answer's own status",
+     "`converted`, `tie`, `no_target`, `no_conversion`, `not_found`, `unknown_version`, as the subject reports it"),
+    ("match", "string", "how the identifier was matched", "as the subject reports it"),
+    ("error_type", "string", "the class of an error raised", ""),
+    ("seconds", "float64", "the time of the call that gave this view", ""),
+    ("calls", "int32", "the calls made for the line", ""),
+    ("cause", "string", "for a classified wrong (or undetermined) answer: its cause ([F0's causes](families/f0.md#causes))", ""),
+    ("cause_class", "string", "the class of that cause", "classes `a` to `e`"),
+    ("limitation", "string",
+     "its row of [the known-limitations table](../results/limitations/limitations.tsv) (`L-...`); empty for a decided "
+     "judge's scoring", ""),
+    ("scored_at", "string", "when the scoring was made", ""),
+    ("folder", "string", "the scored folder in the data root", ""),
+]
+COLUMNS = [c for c, *_ in SCHEMA]
+# The parts that keep only some of their lines as rows and count the others (docs/records.md, "What each part keeps"):
+# stated in the export's schema.json as they are.
+SUMMARIES = [
+    ("a0", "family A's graph fidelity (the graph against Ensembl's tables)",
+     "every mismatch that is not right (`<check>.tsv.gz`)", "the matches, counted per class (`summary.tsv`)"),
+    ("e7", "family E's determinism and concurrency", "every difference (`e7_differences.jsonl.gz`)",
+     "the agreeing calls, counted (`e7_report.tsv`)"),
+    ("e9", "family E's web layer", "every difference (`differences.jsonl`)", "the agreeing requests, counted (`report.tsv`)"),
+]
 OUTCOMES = ("right", "wrong", "undetermined", "timeout", "error", "expected_error", "not_supported", "missing", "unjudged")
 # The index of another tool's raw responses (family G): one row per request, beside the files that hold the responses
 # as the tool returned them (docs/records.md, "Another tool").
@@ -100,17 +168,9 @@ def _limitations():
     return out
 
 
-def load_folder(folder, part=None, columns=None, limitations=None):
-    """The record rows of one scored folder (a pandas frame with `COLUMNS`)."""
-    import pandas as pd
-    import pyarrow as pa
-    import pyarrow.parquet as pq
-    info = _run_info(folder)
-    if info["record_version"] < RECORD_VERSION:
-        raise SystemExit(f"{folder}: a scoring of record version {info['record_version']} (before {RECORD_VERSION}); score "
-                         f"it again from its stored answers: idtrack-repro rescore (or the scorer on its run)")
-    tabs = [pq.read_table(p) for p in sorted(glob.glob(os.path.join(folder, "outcomes", "*.parquet")))]
-    df = pa.concat_tables(tabs, promote_options="default").to_pandas() if tabs else pd.DataFrame(columns=COLUMNS)
+def _frame(df, info, folder, part, causes, limitations):
+    """Outcome rows of a scored folder as rows of the record (`COLUMNS`): the folder's facts, the causes and the
+    limitations added."""
     for k in ("record_version", "subject_kind", "subject", "subject_version", "graph_digest", "asked_at", "endpoint",
               "python", "organism", "scored_at"):
         df[k] = info[k]
@@ -118,27 +178,187 @@ def load_folder(folder, part=None, columns=None, limitations=None):
     df["scoring"] = os.path.basename(folder) if os.path.basename(folder).startswith("scores_") else ""
     df["folder"] = CFG.in_root(folder)
     df["judge"] = df.pop("rule") if "rule" in df else None
-    cz = _causes(folder)
     pairs = list(zip(df["qid"], df["view"]))
-    df["cause"] = [cz.get(k, (None, None))[0] for k in pairs]
-    df["cause_class"] = [cz.get(k, (None, None))[1] for k in pairs]
-    lim = _limitations() if limitations is None else limitations
+    df["cause"] = [causes.get(k, (None, None))[0] for k in pairs]
+    df["cause_class"] = [causes.get(k, (None, None))[1] for k in pairs]
     fam = part or info["family"] or ""
     # the known-limitations table measures what users get: a `decided` scoring's causes are no limitation rows
-    judged_now = df["scoring"].iloc[0:1].tolist() != ["scores_decided"]
-    df["limitation"] = [lim.get((fam, o, c)) if c and judged_now else None for o, c in zip(df["organism"], df["cause"])]
-    df = df.reindex(columns=COLUMNS)
+    judged_now = os.path.basename(folder) != "scores_decided"
+    df["limitation"] = [limitations.get((fam, o, c)) if c and judged_now else None
+                        for o, c in zip(df["organism"], df["cause"])]
+    return df.reindex(columns=COLUMNS)
+
+
+def _checked_info(folder):
+    info = _run_info(folder)
+    if info["record_version"] < RECORD_VERSION:
+        raise SystemExit(f"{folder}: a scoring of record version {info['record_version']} (before {RECORD_VERSION}); score "
+                         f"it again from its stored answers: idtrack-repro rescore (or the scorer on its run)")
+    return info
+
+
+def load_folder(folder, part=None, columns=None, limitations=None):
+    """The record rows of one scored folder (a pandas frame with `COLUMNS`)."""
+    import pandas as pd
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    info = _checked_info(folder)
+    tabs = [pq.read_table(p) for p in sorted(glob.glob(os.path.join(folder, "outcomes", "*.parquet")))]
+    df = pa.concat_tables(tabs, promote_options="default").to_pandas() if tabs else pd.DataFrame(columns=COLUMNS)
+    df = _frame(df, info, folder, part, _causes(folder), _limitations() if limitations is None else limitations)
     return df[columns] if columns else df
 
 
-def load(parts=None, organisms=None, subjects=None, folders=None, columns=None):
-    """One long table over the given scored folders, or over the runs `results.toml` registers (filtered by part,
-    organism and subject: a tree's name in the registry)."""
+def load(parts=None, organisms=None, subjects=None, folders=None, columns=None, export=None):
+    """One long table over the given scored folders, over an export's files (`export`, filtered by part, organism and
+    subject), or over the runs `results.toml` registers (filtered by part, organism and subject: a tree's name in the
+    registry)."""
     import pandas as pd
+    if export:
+        return load_export(export, parts, organisms, subjects, columns)
     lim = _limitations()
     todo = [(None, None, None, f) for f in folders] if folders else registered_folders(parts, organisms, subjects)
     frames = [load_folder(f, part=p, columns=columns, limitations=lim) for p, _, _, f in todo]
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=columns or COLUMNS)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The export: one Parquet file per part, organism and subject, with the schema and an index
+
+
+ARROW = {"int32": "int32", "float64": "float64", "string": "string", "string (JSON)": "string"}
+INDEX_COLS = ["file", "part", "organism", "subject", "rows", "bytes", "sha256", "folders"]
+
+
+def schema():
+    """The record's Parquet schema (types from `SCHEMA`)."""
+    import pyarrow as pa
+    return pa.schema([(c, getattr(pa, ARROW[t])()) for c, t, *_ in SCHEMA])
+
+
+def schema_table():
+    """The Markdown table of the columns that docs/records.md shows ("Columns"), from `SCHEMA`."""
+    lines = ["| column | type | meaning | values |", "| --- | --- | --- | --- |"]
+    lines += [f"| `{c}` | {t} | {m} | {v} |" for c, t, m, v in SCHEMA]
+    return "\n".join(lines)
+
+
+def to_table(df):
+    """A frame of the record as an Arrow table of `schema()` (columns in order; missing values as nulls)."""
+    import pandas as pd
+    import pyarrow as pa
+    cols = {}
+    for c, t, *_ in SCHEMA:
+        x = df[c] if c in df else pd.Series([None] * len(df), dtype=object)
+        if ARROW[t] == "string":
+            try:
+                cols[c] = pa.array(x, type=pa.string(), from_pandas=True)
+            except (pa.ArrowTypeError, pa.ArrowInvalid):  # values that are not strings: their text
+                cols[c] = pa.array([None if pd.isna(v) else str(v) for v in x.tolist()], type=pa.string())
+        else:
+            cols[c] = pa.array(pd.to_numeric(x, errors="coerce").astype("float64"), from_pandas=True).cast(
+                getattr(pa, ARROW[t])())
+    return pa.table(cols, schema=schema())
+
+
+def _safe(value):
+    """A value as a folder name of the partitions (`[A-Za-z0-9_.-]`, others as `_`)."""
+    return "".join(ch if ch.isalnum() or ch in "_.-" else "_" for ch in str(value or "none"))
+
+
+def _sha256(path):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for b in iter(lambda: fh.read(1 << 20), b""):
+            h.update(b)
+    return h.hexdigest()
+
+
+def schema_document():
+    """`schema.json` of an export: the record's version, every column with its type and meaning, the partitions, and
+    the parts kept as summaries."""
+    from .check import ROOT
+    from . import results as RES
+    kept = []
+    try:
+        reg = RES.registry(ROOT).get("run", [])
+    except OSError:
+        reg = []
+    for part, what, rows, counted in SUMMARIES:
+        folders = [e["folder"] for e in reg if e.get("rows") and (part == "a0" and "/a0/" in e["folder"]
+                                                                  or part != "a0" and part in e["folder"])]
+        kept.append(dict(part=part, what=what, rows=rows, kept_only_as_summary=counted, registered=folders))
+    return dict(record_version=RECORD_VERSION,
+                columns=[dict(name=c, type=t, arrow=ARROW[t], meaning=m, values=v) for c, t, m, v in SCHEMA],
+                partitioning=["part", "organism", "subject"],
+                files="part=<part>/organism=<organism>/subject=<subject>/records.parquet (folder names: the values "
+                      "with characters other than letters, digits, `_`, `.`, `-` as `_`)",
+                kept_as_summaries=kept,
+                other_rows=dict(hunts="records.load_hunts", corpus="records.load_corpus", h="records.load_h",
+                                tool_raw_responses="records.load_raw"))
+
+
+def export(out, parts=None, organisms=None, subjects=None, folders=None):
+    """Write the record of the registered runs (or of `folders`) to the folder `out`: one Parquet file per part,
+    organism and subject (`part=<p>/organism=<o>/subject=<s>/records.parquet`, written outcome file by outcome file),
+    `schema.json` and `index.tsv` (rows, bytes and sha256 per file). Returns the index rows."""
+    import pyarrow.parquet as pq
+    lim = _limitations()
+    todo = [(None, None, None, f) for f in folders] if folders else registered_folders(parts, organisms)
+    groups = {}
+    for part, tree, _, folder in todo:
+        info = _checked_info(folder)
+        key = (part or info["family"], info["organism"], info["subject"])
+        if subjects and info["subject"] not in subjects and tree not in subjects:
+            continue
+        groups.setdefault(key, []).append((folder, info))
+    os.makedirs(out, exist_ok=True)
+    index = []
+    for (part, organism, subject), members in sorted(groups.items()):
+        rel = os.path.join(f"part={_safe(part)}", f"organism={_safe(organism)}", f"subject={_safe(subject)}",
+                           "records.parquet")
+        path = os.path.join(out, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        n = 0
+        with pq.ParquetWriter(path + ".tmp", schema(), compression="zstd") as writer:
+            for folder, info in members:
+                causes = _causes(folder)
+                for p in sorted(glob.glob(os.path.join(folder, "outcomes", "*.parquet"))):
+                    t = to_table(_frame(pq.read_table(p).to_pandas(), info, folder, part, causes, lim))
+                    writer.write_table(t)
+                    n += t.num_rows
+        os.replace(path + ".tmp", path)
+        index.append(dict(file=rel, part=part, organism=organism, subject=subject, rows=n, bytes=os.path.getsize(path),
+                          sha256=_sha256(path), folders=",".join(CFG.in_root(f) for f, _ in members)))
+    with open(os.path.join(out, "schema.json"), "w") as fh:
+        json.dump(schema_document(), fh, indent=1)
+        fh.write("\n")
+    with open(os.path.join(out, "index.tsv"), "w") as fh:
+        fh.write("\t".join(INDEX_COLS) + "\n")
+        for r in index:
+            fh.write("\t".join(str(r[c]) for c in INDEX_COLS) + "\n")
+    return index
+
+
+def load_export(folder, parts=None, organisms=None, subjects=None, columns=None):
+    """The rows of an export (`export`), filtered by part, organism and subject: one long table with `COLUMNS` and
+    their types as the schema gives them (pandas' nullable integers for `int32`)."""
+    import pandas as pd
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    doc = json.load(open(os.path.join(folder, "schema.json")))
+    if doc.get("record_version") != RECORD_VERSION:
+        raise SystemExit(f"{folder}: an export of record version {doc.get('record_version')}, not {RECORD_VERSION}")
+    rows = list(csv.DictReader(open(os.path.join(folder, "index.tsv")), delimiter="\t", quoting=csv.QUOTE_NONE))
+    keep = [r for r in rows if (not parts or r["part"] in parts) and (not organisms or r["organism"] in organisms)
+            and (not subjects or r["subject"] in subjects)]
+    tabs = [pq.read_table(os.path.join(folder, r["file"]), schema=schema(), columns=columns) for r in keep]
+    if not tabs:
+        return pd.DataFrame(columns=columns or COLUMNS)
+    t = pa.concat_tables(tabs)
+    df = t.to_pandas(types_mapper={pa.int32(): pd.Int32Dtype()}.get)
+    return df.reindex(columns=columns or COLUMNS)
 
 
 def load_hunts(folder):
@@ -241,20 +461,28 @@ def load_raw(folder):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="python -m idtrack_reproducibility.records", description=__doc__.split("\n\n")[0])
-    ap.add_argument("--parts", default=None)
+    ap = argparse.ArgumentParser(prog="idtrack-repro records", description=__doc__.split("\n\n")[0])
+    ap.add_argument("--parts", default=None, help="comma-separated, or `all` (default: all)")
     ap.add_argument("--organisms", default=None)
-    ap.add_argument("--subjects", default=None)
+    ap.add_argument("--subjects", default=None, help="a subject's name (a tree's short commit, a tool) or a tree's name "
+                    "in the registry")
     ap.add_argument("--folders", default=None, help="comma-separated scored folders (instead of the registry's runs)")
-    ap.add_argument("--out", default=None, help="write the table as Parquet")
+    ap.add_argument("--out", default=None, help="the export's folder (one Parquet per part, organism and subject, "
+                    "schema.json, index.tsv); without it, the rows are counted only")
+    ap.add_argument("--schema-table", action="store_true", help="print the columns' table of docs/records.md")
     a = ap.parse_args(argv)
-    sp = lambda x: x.split(",") if x else None  # noqa: E731
+    if a.schema_table:
+        print(schema_table())
+        return 0
+    sp = lambda x: None if not x or x == "all" else x.split(",")  # noqa: E731
+    if a.out:
+        index = export(a.out, sp(a.parts), sp(a.organisms), sp(a.subjects), sp(a.folders))
+        print(f"{len(index)} files, {sum(r['rows'] for r in index):,} rows: {os.path.join(a.out, 'index.tsv')}")
+        return 0
     df = load(sp(a.parts), sp(a.organisms), sp(a.subjects), sp(a.folders))
     print(f"{len(df):,} rows; by part and outcome:")
     if len(df):
         print(df.groupby(["part", "subject", "organism", "outcome"]).size().to_string())
-    if a.out:
-        df.to_parquet(a.out)
     return 0
 
 
