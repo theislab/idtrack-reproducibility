@@ -31,3 +31,27 @@ def test_recorded_ids_are_read_for_a_published_selection_only():
     assert SEL._recorded("sus_scrofa") == []  # published, took no external id
     assert SEL._recorded("sus_scrofa.r99") is None  # a new selection reads the current sources
     assert SEL.weak_cell_ids("sus_scrofa", "sus_scrofa.r99") == set()
+
+
+def test_a_versioned_line_the_mito_rule_leaves_without_successor_expects_nothing_on_the_nuclear_side():
+    from idtrack_reproducibility.families.astar import revise_rules as RR
+
+    class Tr:  # an id on a nuclear contig at 48-54 whose stable id Ensembl gives a mitochondrial gene at 55
+        genes = {48: {"ENSG00000000001": dict(seqname="NT_1")}, 55: {"ENSG00000000001": dict(seqname="MT")}}
+
+        def walk_series(self, g, R, ts, forward, living):
+            return {t: set() for t in ts}  # the rule refuses the step: no successor
+
+        def mito_seqs(self, r):
+            return {"MT"}
+
+    class Gen:
+        tr = Tr()
+
+    nuclear = dict(id="ENSG00000000001.1", kind="astar_from_v", from_release=48, to_release=100, expect=["ENSG00000000001.2"])
+    assert RR.gene_line_without_successor(Gen, nuclear) == dict(expect=[], broad=None)
+    default = dict(id="ENSG00000000001.1", kind="astar_default_v", to_release=100, read_at=48, expect=["ENSG00000000001.2"])
+    assert RR.gene_line_without_successor(Gen, default) == dict(expect=[], broad=None)
+    mito = dict(id="ENSG00000000001.2", kind="astar_from_v", from_release=55, to_release=100)
+    assert RR.gene_line_without_successor(Gen, mito)["open"].startswith("rule `no_mito_nuclear_step`")
+    assert RR.gene_line_without_successor(Gen, dict(nuclear, to_release=48)) is None  # not across the step

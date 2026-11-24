@@ -25,7 +25,7 @@ def lines_of(org, sets, qids):
     import pyarrow.parquet as pq
     d = L.query_dir("a", org)
     mans = sorted((json.load(open(os.path.join(d, f"{s}.manifest.json"))) for s in sets), key=lambda m: m["seq"])
-    out, want = {}, pa.array(sorted(qids))
+    out, want = {}, pa.array(sorted(qids), type=pa.string())  # (typed: a run without a wrong answer asks for none)
     for m in mans:
         p = L._set_file(d, m["name"])
         t = pq.read_table(p)
@@ -87,6 +87,7 @@ def main():
                 if i % 200 == 0:
                     fh.flush()
                     sys.stderr.write(f"{i}/{len(todo)}\n")
+    open(part, "a").close()  # a run without a wrong answer: an empty explanation file
     with open(part) as fi, gzip.open(out + ".tmp", "wt") as fo:
         fo.write(fi.read())
     os.replace(out + ".tmp", out)

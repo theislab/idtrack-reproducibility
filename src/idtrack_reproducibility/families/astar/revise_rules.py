@@ -56,6 +56,23 @@ def db_without_successor(G, line):
     return dict(expect=[], broad=None)
 
 
+def gene_line_without_successor(G, line):
+    """The truth of a gene line (not `astar_db`) whose walk the rule leaves without a successor at the target: the
+    generator makes no line of a walk that reaches nothing (the versioned lines, `astar_*_v`), so the published line
+    holds the successors of the walk without the rule. Read where the line reads (`from_release`, or `read_at` for a
+    line asked without a release), as `db_without_successor` judges it: on the nuclear side of the step nothing is
+    expected; on the mitochondrial side the line is open. None where the walk under the rule reaches a gene."""
+    g, t = M.gene_base(line["id"]), line["to_release"]
+    R = line.get("from_release") or line.get("read_at")
+    if R is None or t <= R or G.tr.walk_series(g, R, [t], True, living=True)[t]:
+        return None
+    on_mito = (G.tr.genes.get(R, {}).get(g) or {}).get("seqname") in G.tr.mito_seqs(R)
+    if on_mito:
+        return dict(expect=[], broad=None, open=f"rule `{RULE}`: Ensembl's history gives the mitochondrial gene no "
+                    f"successor at {t}")
+    return dict(expect=[], broad=None)
+
+
 def base_of(name):
     """The published set a revision set revises: `v1r3` -> `v1`, `tx1` -> `tx1`."""
     m = re.match(r"^(.*?\d+)(r\d+)?$", name)
@@ -122,8 +139,13 @@ def main():
                 y = y or {k: old.get(k) for k in tru}
                 x = dict(y, **tru)
                 x.pop("spellings", None)
+        if x is None and old["kind"] != "astar_db":  # no line of a walk that reaches nothing
+            tru = gene_line_without_successor(G, old)
+            if tru is not None:
+                y = y or {k: old.get(k) for k in tru}
+                x = dict(y, **tru)
         if x is None or y is None:
-            c["not made again"] += 1
+            c[("not made again", old["kind"])] += 1
             continue
         keys = {k for k in set(x) | set(y) if x.get(k) != y.get(k)}
         if not keys:

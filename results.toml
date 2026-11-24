@@ -57,6 +57,20 @@ homo_sapiens = "f922779314f8a27dd1d1a7a4f24e7b6a316fa7fb8f7b071f3d66857095682cfb
 macaca_mulatta = "19866fe1699f8de855226a1f8fbf4dc97c4c6e912bc21095ea1a708f289668fa"
 macaca_fascicularis = "881d8af7db843120b8bdbb8c9c503089a449f5694dd321baf06c1233ebf9cccc"
 
+# the graphs of the tree `main` (idtrack cabfd9a, the released package): built again by its own builder, each with the
+# content digest of r2's, so the complete run reads r2's graph files under the name `main` (docs/families/a.md, "State")
+[graphs.main]
+sus_scrofa = "80bda9b3bb224243664e8b35d2ea602255b02b4dd39abb22e982f7aa2aff62df"
+mus_musculus = "a0663af01bd72b7785c06a69de0eadb7cfc4bf5faa27d8a328fec22a9bf963fc"
+homo_sapiens = "f922779314f8a27dd1d1a7a4f24e7b6a316fa7fb8f7b071f3d66857095682cfb"
+macaca_mulatta = "19866fe1699f8de855226a1f8fbf4dc97c4c6e912bc21095ea1a708f289668fa"
+macaca_fascicularis = "881d8af7db843120b8bdbb8c9c503089a449f5694dd321baf06c1233ebf9cccc"
+
+# the graphs of snapshot 110 (family A's A8), built by main's builder (graphs/main_s110; not judged against d4c2dda's)
+[graphs.main_s110]
+sus_scrofa = "3aebf2cabb579c94811c785f2a1f4a43b9652267469e4102f0da47151983d19c"
+homo_sapiens = "3346eff66af6fda5dff67f957c6a1415ec7c8bf6ce68ba3ccb5b2e3309081272"
+
 # ---------------- the accuracy harness ----------------
 [[run]]
 family = "harness"
@@ -579,4 +593,170 @@ scored = ["scores_now/run.json", "scores_decided/run.json"]
 limits = "outcomes"
 generator = "idtrack-repro modest organism --tree r2 (the family's runner on modest_v<k>; idtrack-repro score), --score-only after the revision sets of round 2's confirming benchmark"
 files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv" }
+index = { "now_report.tsv" = "report" }
+
+# ---------------- the complete run on the tree `main` (idtrack cabfd9a, the released package; r2's graph files, equal
+# by digest): every family's sets whole ----------------
+# the harness's sets: exhaustive on r2's modest run (the modest set holds them whole; main's idtrack/ is r2's), not asked again
+[[run]]
+family = "f0"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "main"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "modest/r2/{organism}/harness"
+scope = "exhaustive"
+limits = "outcomes"
+generator = "taken from r2's modest run (idtrack-repro modest organism --tree r2: runner --family harness; idtrack-repro score --family harness): the same package, graphs and environment"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "astar"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/astar/runs/main/{organism}"
+scope = "exhaustive"
+limits = "outcomes"
+generator = "idtrack-repro run --family astar; idtrack-repro score --family astar (human again after v1r5); idtrack-repro family astar report_astar"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "per_pattern.tsv" = "astar/per_pattern.tsv", "per_pattern_stratum.tsv" = "astar/per_pattern_stratum.tsv", "open.tsv" = "astar/open.tsv", "hard_ids.tsv.gz" = "astar/hard_ids.tsv.gz" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "astar"
+tree = "main_tx"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "main"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/astar/runs/main_tx/{organism}"
+scope = "exhaustive"
+limits = "outcomes"
+generator = "idtrack-repro run --family astar --sets tx*; idtrack-repro score --family astar"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "a"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/a/runs/main/{organism}"
+scope = "exhaustive"
+generator = "idtrack-repro run --family a; idtrack-repro score --family a; family a explain_a; idtrack-repro causes --plugin families/a/causes_a.py; idtrack-repro family a report_a"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "axes.tsv" = "axes.tsv", "patterns.tsv" = "patterns.tsv", "wrong_units.tsv" = "wrong_units.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv", "wrong_units.tsv"]  # a run without wrong answers has no causes
+
+# A8 on main's builder's snapshot-110 graphs (graphs/main_s110; Ensembl's tables of 110 read for the build only, the
+# graphs not judged against d4c2dda's: docs/families/a.md, "A8")
+[[run]]
+family = "a"
+tree = "main_s110"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "main_s110"
+organisms = ["sus_scrofa", "homo_sapiens"]
+folder = "families/a/runs/main_s110/{organism}"
+scope = "exhaustive"
+generator = "idtrack-repro graph-build --tree main_s110; idtrack-repro run --family a --sets a8*; idtrack-repro score --family a"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "a"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/a/a0/main/{organism}"
+scored = ["summary.json"]
+generator = "idtrack-repro family a a0_fidelity (then --resummarize)"
+files = { "a0_summary.tsv" = "summary.tsv" }
+rows = "every row that is not ok: presence/history/transcripts/names.tsv.gz; counts per class of the others"
+
+[[run]]
+family = "b"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/b/runs/main/{organism}"
+scope = "exhaustive"
+scored = ["scores_now/run.json", "scores_decided/run.json"]
+limits = "outcomes"
+generator = "idtrack-repro run --family b; idtrack-repro score --family b (scores_now: the sets without _dec; scores_decided: every set); idtrack-repro family b report_b"
+files = { "now_report.tsv" = "scores_now/report.tsv", "now_scores.tsv" = "scores_now/scores.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "decided_scores.tsv" = "scores_decided/scores.tsv", "report_b.tsv" = "report_b.tsv", "authority_b.tsv" = "authority_b.tsv", "name_src_b.tsv" = "name_src_b.tsv" }
+index = { "now_report.tsv" = "report" }
+
+[[run]]
+family = "c"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/c/runs/main/{organism}"
+scope = "exhaustive"
+generator = "idtrack-repro run --family c; idtrack-repro score --family c; family c explain_qids; idtrack-repro explain; idtrack-repro causes --plugin families/c/causes_c.py; family c authority_c"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "authority.tsv" = "authority.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv", "authority.tsv"]
+
+[[run]]
+family = "d"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/main/{organism}"
+scope = "exhaustive"
+generator = "idtrack-repro run --family d --sets d1*; idtrack-repro score --family d; idtrack-repro explain; idtrack-repro causes --plugin families/d/causes_d.py; family d report_d1, bridges_d1"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "rates.tsv" = "d1/rates.tsv", "datasets.tsv" = "d1/datasets.tsv", "history_vs_locus.tsv" = "d1/history_vs_locus.tsv", "wrong_classes.tsv" = "d1/wrong_classes.tsv", "bridges_no_successor.tsv" = "d1/bridges_no_successor.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]
+
+[[run]]
+family = "d"
+tree = "main_d2"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "main"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/main_d2/{organism}"
+scope = "exhaustive"
+generator = "family d run_d; idtrack-repro score --family d; family d report_d2 (and --price)"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "synthetic.tsv" = "d2/synthetic.tsv", "matrices.tsv" = "d2/matrices.tsv", "price.tsv" = "d2/price.tsv" }
+index = { "report.tsv" = "report" }
+
+[[run]]
+family = "d"
+tree = "main_d3"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "main"
+organisms = ["mus_musculus", "homo_sapiens"]
+folder = "families/d/runs/main_d3/{organism}"
+scope = "exhaustive"
+generator = "idtrack-repro run --family d --sets d3*; idtrack-repro score --family d; idtrack-repro explain; idtrack-repro causes --plugin families/d/causes_d.py; family d report_d3"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "authority.tsv" = "d3/authority.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]
+
+[[run]]
+family = "d"
+tree = "main_d4"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "main"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/d/runs/main_d4/{organism}"
+scope = "exhaustive"
+generator = "family d run_d; idtrack-repro score --family d; idtrack-repro explain; idtrack-repro causes --plugin families/d/causes_d.py; family d report_d4 (single calls: r2's modest run of the harness's sets)"
+files = { "report.tsv" = "report.tsv", "scores.tsv" = "scores.tsv", "causes_summary.tsv" = "causes_summary.tsv", "batch_vs_single.tsv" = "d4/batch_vs_single.tsv" }
+index = { "report.tsv" = "report" }
+optional = ["causes_summary.tsv"]
+
+[[run]]
+family = "e"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/e/runs/main/{organism}"
+scope = "exhaustive"
+scored = ["scores_now/run.json", "scores_decided/run.json"]
+generator = "family e run_e; family e score_e; family e causes_e; family e budget / det / relations_e / harm_e (e6, e7, e8, harm); E9 not run on main (docs/families/e.md)"
+files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "now_causes_summary.tsv" = "scores_now/causes_summary.tsv", "decided_causes_summary.tsv" = "scores_decided/causes_summary.tsv", "e_summary.tsv" = "e_summary.tsv", "e6_report.tsv" = "e6_report.tsv", "e7_report.tsv" = "e7_report.tsv", "e8_report.tsv" = "e8_report.tsv", "compare_vs_d4c2dda_now.tsv" = "compare_vs_d4c2dda_now.tsv", "compare_vs_d4c2dda_decided.tsv" = "compare_vs_d4c2dda_decided.tsv", "harm_report.tsv" = "harm/report.tsv" }
+optional = ["harm_report.tsv", "now_causes_summary.tsv", "decided_causes_summary.tsv"]
 index = { "now_report.tsv" = "report" }

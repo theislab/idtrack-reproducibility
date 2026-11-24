@@ -117,6 +117,7 @@ The published sets (manifests `<families>/astar/queries/<organism>/<set>.manifes
 | cynomolgus | `tx1r1` | 80 | `tx1` | as `v1r1` |
 | human | `v1r4` | 3,462 | `v1` to `v1r3` | as rhesus `v1r1` (5 ids at 48 to 55) |
 | human | `tx1r2` | 509 | `tx1`, `tx1r1` | as `v1r4` |
+| human | `v1r5` | 305 | `v1` to `v1r4` | as `v1r4`, the versioned lines (`astar_from_v`, `astar_default_v`) whose walk the rule leaves without a successor (the generator makes no line of such a walk; `revise_rules.gene_line_without_successor`): MT-ND4L's id `ENSG00000212907.1` read at 48 to 51 (or without a release, read at 51) to 55 to 115 expects nothing. Ensembl's tables of release 54 show why: the id names `AC037482.14-5` (protein coding, 10,022 to 11,196) on `NT_113931`, a sequence of coordinate system `supercontig` (attributes `toplevel`, gene counts and SNP count, no `codon_table`) whose 17 genes are clone-named copies and two `KRTAP2-3` genes, a nuclear contig of NCBI36; the mitochondrion is its own region `MT` (coordinate system `chromosome`, attribute `codon_table`) with 38 genes, among them MT-ND4 (`ENSG00000198868.2`, 10,471 to 12,138) over MT-ND4L's place; from release 55 Ensembl gives the id to MT-ND4L on `MT` (10,471 to 10,767; event of session 54 to 55, score 0.564) |
 
 Lines per stratum of each set are in its manifest (`counts`); for example human `v1`: `same` 753,551, `forward` 12,353,556, `backward` 12,707,962, `forward_handoff` 8,822,392, `backward_handoff` 16,604,007, `default` 2,553,536, `db` 363,820.
 
