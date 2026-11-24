@@ -57,7 +57,7 @@ LOCATIONS = ["truth", "harness", "families", "corpus", "hunts", "performance", "
 # Memory of one job that holds a graph of the reference tree (d4c2dda) and asks it, with room for the run (GB).
 MEMORY_GB = {"homo_sapiens": 90, "mus_musculus": 50, "sus_scrofa": 24, "macaca_mulatta": 24, "macaca_fascicularis": 20}
 # Memory of one job of the modest set (one organism; its parts run one after another, so the largest part's peak): the
-# largest measured peak of its parts plus a quarter (docs/modest.md, "Memory"): the scoring of the harness's sets in one
+# largest measured peak of its parts plus a quarter (docs/modest.md, "Size"): the scoring of the harness's sets in one
 # partition (pig 3.52, mouse 5.45, human 6.14, rhesus 2.52, cynomolgus 1.65 GB: the kernel's peak of the scorer, 2026-11-20),
 # the query shards (pig 3.5, mouse 4.6, human 4.8, rhesus 3.7, cynomolgus 3.2 GB) and the modest jobs of 2026-11-20 (at
 # most 5.6 GB, mouse; 5.7 GB human).

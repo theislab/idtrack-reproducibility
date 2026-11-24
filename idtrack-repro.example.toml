@@ -53,7 +53,10 @@ name_prefix = "idtrack_repro_"
 partition = "cpu_p"
 qos = "cpu_normal"
 extra = []
-# Memory (GB) of a job that holds a graph of the reference tree and asks it, per organism.
+# Memory (GB) of a job that holds a graph of the reference tree and asks it, per organism. The defaults below are a wide
+# bound; set them to the measured peak of such a job plus a quarter: the query shards of d4c2dda peaked at 3.5 (pig),
+# 4.6 (mouse), 4.8 (human), 3.7 (rhesus) and 3.2 GB (cynomolgus), the scheduler's peaks (docs/modest.md, "Size"),
+# so 5, 6, 6, 5 and 4.
 [jobs.memory_gb]
 homo_sapiens = 90
 mus_musculus = 50
@@ -61,7 +64,7 @@ sus_scrofa = 24
 macaca_mulatta = 24
 macaca_fascicularis = 20
 # Memory (GB) of one job of the modest set (one organism, its parts one after another): the largest measured peak of its
-# parts plus a quarter (docs/modest.md, "Memory"; defaults in idtrack_reproducibility.config.MODEST_MEMORY_GB).
+# parts plus a quarter (docs/modest.md, "Size"; defaults in idtrack_reproducibility.config.MODEST_MEMORY_GB).
 [jobs.modest_memory_gb]
 homo_sapiens = 8
 mus_musculus = 7
