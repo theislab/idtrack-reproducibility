@@ -1,0 +1,6 @@
+stratum	cause	class	rule	answers	units
+f1_name_moved	best_keeps_part_of_shared_name	b	rule `ties`	3	3
+f1_name_moved	external_bridge	b	rule `external_bridge`	48	39
+f1_name_moved	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	4	3
+f1_name_shared	best_keeps_part_of_shared_name	b	rule `ties`	24	14
+f1_retired	external_bridge	b	rule `external_bridge`	18	16

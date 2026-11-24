@@ -1,0 +1,3 @@
+stratum	cause	class	rule	answers	units
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	35	15
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	2	1

@@ -1,0 +1,6 @@
+kind	variant	n	right	wrong	undetermined	timeout	error	rate	ci_low	ci_high
+d3_symbol	*	518208	465510	635	52063	0	0	0.9986	0.9985	0.9987
+d3_symbol	all,default	129552	118672	301	10579	0	0	0.9975	0.9972	0.9977
+d3_symbol	all,from	129552	113401	63	16088	0	0	0.9994	0.9993	0.9996
+d3_symbol	best,default	129552	119368	252	9932	0	0	0.9979	0.9976	0.9981
+d3_symbol	best,from	129552	114069	19	15464	0	0	0.9998	0.9997	0.9999

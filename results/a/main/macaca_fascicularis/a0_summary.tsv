@@ -1,0 +1,36 @@
+check	class	by_design	count	ids	example
+presence	ok		852259	48019	
+presence	ok|core_only		47	47	
+history	birth:node_missing:id_in_no_gtf	builder: an event whose id is in no id table is left out	1	1	[{"session": 1, "old": "", "new": "ENSMFAG00000046953.1", "score": 0.0, "recorded": "91->92", "sides": "91->92", "graph": ""}]
+history	edge_ok_birth_or_return		48019	48019	[{"session": "", "old": "ENSMFAG00000000001.Void", "new": "ENSMFAG00000000001.1", "score": "", "recorded": "", "sides": "91->91", "graph": "edge"}, {"session": "", "old": "ENSMFAG00000000002.Void", "new": "ENSMFAG00000000002.1", "score": "", "recorded": "", "sides": "91->91", "graph": "edge"}]
+history	edge_ok_event		5665	986	[{"session": "", "old": "ENSMFAG00000000494.1", "new": "ENSMFAG00000047347.1", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}, {"session": "", "old": "ENSMFAG00000000494.1", "new": "ENSMFAG00000047765.1", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}]
+history	edge_ok_last_loop		38550	38550	[{"session": "", "old": "ENSMFAG00000000004.2", "new": "ENSMFAG00000000004.2", "score": "", "recorded": "", "sides": "103->inf", "graph": "edge"}, {"session": "", "old": "ENSMFAG00000000025.2", "new": "ENSMFAG00000000025.2", "score": "", "recorded": "", "sides": "103->inf", "graph": "edge"}]
+history	edge_ok_retirement		9469	9469	[{"session": "", "old": "ENSMFAG00000000001.1", "new": "ENSMFAG00000000001.Retired", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}, {"session": "", "old": "ENSMFAG00000000002.1", "new": "ENSMFAG00000000002.Retired", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}]
+history	edge_ok_version_change		19855	19855	[{"session": "", "old": "ENSMFAG00000000004.1", "new": "ENSMFAG00000000004.2", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}, {"session": "", "old": "ENSMFAG00000000025.1", "new": "ENSMFAG00000000025.2", "score": "", "recorded": "", "sides": "102->103", "graph": "edge"}]
+history	ok_between_ids		5665	986	
+history	ok_birth		19427	19427	
+history	ok_retirement		9469	9469	
+history	ok_version_change		19855	19855	
+transcripts	tl:graph_extra|parent_core_only	truth: translations of core genes the GTF lacks (hh-5, J2)	109	109	[{"kind": "tl", "release": 112, "id": "ENSMFAP00000000013.2", "parent": "ENSMFAT00000028178.2", "region": "", "graph": "edge"}, {"kind": "tl", "release": 112, "id": "ENSMFAP00000001651.1", "parent": "ENSMFAT00000000178.2", "region": "", "graph": "edge"}]
+transcripts	tl:ok		1202614	64287	
+transcripts	tx:graph_extra|parent_core_only	truth: transcripts of core genes the GTF lacks (hh-5, J2)	109	109	[{"kind": "tx", "release": 112, "id": "ENSMFAT00000000178.2", "parent": "ENSMFAG00000036496.2", "region": "", "graph": "edge"}, {"kind": "tx", "release": 112, "id": "ENSMFAT00000002251.2", "parent": "ENSMFAG00000045394.2", "region": "", "graph": "edge"}]
+transcripts	tx:ok		1517142	84772	
+names	display:ok		66028	22506	
+names	display:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	2	2	[{"release": 115, "family": "display", "gene": "ENSMFAG00000038609", "value": "ncr2", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}, {"release": 115, "family": "display", "gene": "ENSMFAG00000043077", "value": "GzmB", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}]
+names	hgnc:ok		30883	15854	
+names	links_on_another_assembly_not_read	links of a release on an assembly that does not serve it (human GRCh37 at 76 on): not part of the graph's answers at that release; counted, not compared	0	0	
+names	ncbi:ok		73944	35655	
+names	refseq_mrna:ok		703	656	
+names	refseq_mrna_predicted:ok		29494	18994	
+names	refseq_ncrna_predicted:ok		7854	4790	
+names	refseq_peptide:ok		1091	999	
+names	refseq_peptide_predicted:ok		61051	35804	
+names	rfam:ok		18867	6289	
+names	sptrembl:ok		154031	53615	
+names	swissprot:ok		936	316	
+names	synonym:ok		470	419	
+names	synonym:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	1	1	[{"release": 105, "family": "synonym", "gene": "ENSMFAG00000042235", "value": "SmN", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:ok		43860	15592	
+names	uniprot_gn:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	12	4	[{"release": 105, "family": "uniprot_gn", "gene": "ENSMFAG00000038609", "value": "ncr2", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "uniprot_gn", "gene": "ENSMFAG00000043077", "value": "GzmB", "region": "primary", "graph_dbs": ""}]
+names	vgnc:ok		141	47	
+names	wikigene:database_not_in_graph	the organism's externals file does not include the database	36972	17965	[{"release": 105, "family": "wikigene", "gene": "ENSMFAG00000044637", "value": "PGBD2", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "wikigene", "gene": "ENSMFAG00000000115", "value": "RAB25", "region": "primary", "graph_dbs": ""}]

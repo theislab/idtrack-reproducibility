@@ -1,0 +1,19 @@
+stratum	cause	class	rule	answers	units
+e1_batch_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	123	41
+e1_batch_d81	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	36	12
+e1_batch_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	12	4
+e1_single_d52	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	41	41
+e1_single_d81	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	12	12
+e1_single_other	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	4	4
+e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	6	2
+e2_internal_name	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	400	400
+e2_internal_syn	internal_name_accepted	a	rule `no_synonym_target` (finding IN-6; decided)	150	150
+e2_long	long_input_not_refused	a	rule `bounded_arguments` (finding IN-8; decided)	7	7
+e2_longversion	long_input_not_refused	a	rule `bounded_arguments` (finding IN-8; decided)	1050	150
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	4	2
+e3_batch_nonstring_item	unexplained	?	-	6	3
+e3_batch_pd_string_na	unexplained	?	-	1	1
+e5_database_synonym	synonym_database_offered	a	rule `no_synonym_target` (decided)	1	1
+e8_batch_release_default_suffix	unexplained	?	-	16	1
+hunt_IN-1	missing_value_not_refused	a	rule `missing_values` (finding IN-1; decided)	1	1
+hunt_IN-2	lowercase_exact_synonym_other_organism	b	IN-2's residual (rule `single_case_symbols` covers organisms with mixed-case symbols only)	2	1

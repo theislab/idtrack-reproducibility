@@ -1,0 +1,71 @@
+stratum	cause	class	rule	answers	units
+c1_discontinued	external_bridge	b	rule `external_bridge`	30	15
+c1_discontinued	name_in_other_source	e	rule `names_before_synonyms`	6	3
+c1_discontinued	unexplained	?	-	56	28
+c1_discontinued	value_of_another_database	e	-	2092	1046
+c1_not_held	external_bridge	b	rule `external_bridge`	69	36
+c1_not_held	name_in_other_source	e	rule `names_before_synonyms`	8	4
+c1_not_held	unexplained	?	-	38	32
+c1_not_held	value_of_another_database	e	-	12	6
+c1_retired	external_bridge	b	rule `external_bridge`	6	3
+c1_retired	unexplained	?	-	11	10
+c1_retired	value_of_another_database	e	-	3	2
+c2_at	value_of_another_database	e	-	4	4
+c2_at_v	unexplained	?	-	50	25
+c2_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	61	34
+c2_oldver	external_bridge	b	rule `external_bridge`	214	111
+c2_oldver	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	2	2
+c2_oldver	unexplained	?	-	281	148
+c2_retired	external_bridge	b	rule `external_bridge`	172	91
+c2_retired	name_in_other_source	e	rule `names_before_synonyms`	4	2
+c2_retired	unexplained	?	-	3	2
+c2_retired	value_of_another_database	e	-	8	8
+c2_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	4	2
+c2_ver_lower	unexplained	?	-	1	1
+c3_deleted	external_bridge	b	rule `external_bridge`	54	29
+c3_retired	external_bridge	b	rule `external_bridge`	133	71
+c3_secondary_held	external_bridge	b	rule `external_bridge`	24	14
+c4_mirbase_label	value_of_another_database	e	-	24	12
+c4_rfam_label_not_held	unexplained	?	-	20	10
+c4_rfam_label_retired	external_bridge	b	rule `external_bridge`	2	1
+c4_rfam_label_retired	rfam_label_is_accession	d	-	2	1
+c4_rfam_label_retired	unexplained	?	-	4	4
+c5_ccds_label	unexplained	?	-	104	52
+c5_ccds_label	value_of_another_database	e	-	4	2
+c5_ccds_label_retired	external_bridge	b	rule `external_bridge`	1	1
+c5_ccds_label_retired	unexplained	?	-	2	1
+c5_ccds_retired	external_bridge	b	rule `external_bridge`	4	3
+c5_ccds_retired	unexplained	?	-	340	337
+c5_ccds_retired	value_of_another_database	e	-	386	193
+c5_clone_at	name_in_db_not_in_truth	d	-	328	152
+c5_clone_at	value_of_another_database	e	-	145	71
+c5_clone_retired	external_bridge	b	rule `external_bridge`	275	150
+c5_clone_retired	name_in_db_not_in_truth	d	-	492	248
+c5_clone_retired	name_in_other_source	e	rule `names_before_synonyms`	6	3
+c5_clone_retired	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	1	1
+c5_clone_retired	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+c5_clone_retired	unexplained	?	-	288	253
+c5_clone_retired	value_of_another_database	e	-	7	7
+c5_mgi_id	external_bridge	b	rule `external_bridge`	4	2
+c5_mgi_id	unexplained	?	-	21	12
+c5_mgi_id	value_of_another_database	e	-	18	10
+c5_ottg_retired	external_bridge	b	rule `external_bridge`	6	3
+c5_ottg_retired	name_in_other_source	e	rule `names_before_synonyms`	4	2
+c5_ottg_retired	unexplained	?	-	8	4
+c5_ottp_retired	external_bridge	b	rule `external_bridge`	8	4
+c5_ottt_retired	external_bridge	b	rule `external_bridge`	42	22
+c5_ottt_retired	unexplained	?	-	12	12
+c5_vega_gene_retired	external_bridge	b	rule `external_bridge`	4	2
+c5_vega_gene_retired	name_in_other_source	e	rule `names_before_synonyms`	4	2
+c5_vega_gene_retired	unexplained	?	-	2	1
+c6:EntrezGene	unexplained	?	-	56	16
+c6:Havana transcript	unexplained	?	-	20418	10209
+c6:RefSeq_mRNA	unexplained	?	-	12844	6374
+c6:RefSeq_mRNA_predicted	unexplained	?	-	12652	6326
+c6:RefSeq_ncRNA	unexplained	?	-	872	436
+c6:RefSeq_ncRNA_predicted	unexplained	?	-	1712	856
+c7_clone	external_bridge	b	rule `external_bridge`	1	1
+c7_ncbi	external_bridge	b	rule `external_bridge`	27	12
+c7_ncbi	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	7	1
+c7_refseq	external_bridge	b	rule `external_bridge`	128	40
+c7_refseq	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	88	16

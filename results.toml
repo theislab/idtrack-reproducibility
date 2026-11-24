@@ -681,7 +681,7 @@ organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "ma
 folder = "families/b/runs/main/{organism}"
 scope = "exhaustive"
 scored = ["scores_now/run.json", "scores_decided/run.json"]
-limits = "outcomes"
+limits = "b"
 generator = "idtrack-repro run --family b; idtrack-repro score --family b (scores_now: the sets without _dec; scores_decided: every set); idtrack-repro family b report_b"
 files = { "now_report.tsv" = "scores_now/report.tsv", "now_scores.tsv" = "scores_now/scores.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "decided_scores.tsv" = "scores_decided/scores.tsv", "report_b.tsv" = "report_b.tsv", "authority_b.tsv" = "authority_b.tsv", "name_src_b.tsv" = "name_src_b.tsv" }
 index = { "now_report.tsv" = "report" }

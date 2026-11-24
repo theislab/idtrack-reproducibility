@@ -19,6 +19,7 @@ What was run and scored (the graphs of the reference tree `d4c2dda`, which `7169
 | `runs/d4c2dda_d3/` | D3 | mouse, human: `d3_v1` | yes | `d3/` |
 | `runs/d4c2dda_d4/` | D4 | all five: `d4_v1`, `d4_r1`, `d4_r2` | yes (cynomolgus: no wrong answer) | `d4/` |
 | `runs/71690ab_d2/` | D2 on `71690ab` | pig and mouse: `d2_v1`, `d2_v2`, `d2_r1`; human: `d2_v2` | yes | – |
+| `runs/main/`, `runs/main_d2/`, `runs/main_d3/`, `runs/main_d4/` | D1 to D4 on `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only; 2026-11-24) | every organism and set of each part, D1 with `d1_r3` and D3 with `d3_r2` (the corrected judge `names_broad`) | D1, D3, D4 | `d1/`, `d2/`, `d3/`, `d4/` |
 
 Every one of these folders holds `run.json` and `report.tsv`. Not run: `runs/71690ab_d4/` (D4 on `71690ab`, stopped before it started; the question it would answer for missing values is checked directly: `<families>/d/checks/missing_71690ab_pig.json`).
 
@@ -162,6 +163,111 @@ python -m idtrack_reproducibility.families.d.limits_d --out <tsv> <run folder> [
 
 ## Results
 
+### On main
+
+Runs `<families>/d/runs/main/<organism>/` (D1, with the corrected judge `names_broad`: `d1_r3`), `main_d2` (D2), `main_d3` (D3, `d3_r2`) and `main_d4` (D4; its single calls are `r2`'s answers to the harness's sets, the same package and graphs), the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only), on `r2`'s graph files, which `main`'s own builder rebuilt with the same content digests (`[graphs.main]` of `results.toml`), 2026-11-24. Result files `results/d/<run>/<organism>/`. Totals:
+
+| family | organism | n | right | wrong | undetermined | rate (Wilson 95 %) | d4c2dda |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| d | pig | 117,470 | 81,367 | 4,611 | 31,492 | 0.94637 (0.94484–0.94786) | 0.94195 |
+| d | mouse | 612,946 | 575,364 | 14,277 | 23,305 | 0.97579 (0.97539–0.97618) | 0.97254 |
+| d | human | 1,633,436 | 1,501,286 | 21,614 | 110,536 | 0.98581 (0.98562–0.98599) | 0.98277 |
+| d [main_d2] | pig | 5,359 | 5,263 | 31 | 65 | 0.99414 (0.99170–0.99587) | 1.00000 |
+| d [main_d2] | mouse | 6,060 | 5,986 | 67 | 7 | 0.98893 (0.98597–0.99127) | 0.99853 |
+| d [main_d2] | human | 6,093 | 6,036 | 57 | 0 | 0.99065 (0.98790–0.99277) | 0.85410 |
+| d [main_d3] | mouse | 518,208 | 465,510 | 635 | 52,063 | 0.99864 (0.99853–0.99874) | 0.99426 |
+| d [main_d3] | human | 829,384 | 702,098 | 3,102 | 124,184 | 0.99560 (0.99544–0.99575) | 0.99126 |
+| d [main_d4] | pig | 152,328 | 150,495 | 35 | 1,798 | 0.99977 (0.99968–0.99983) | 0.87252 |
+| d [main_d4] | mouse | 152,530 | 150,633 | 64 | 1,833 | 0.99958 (0.99946–0.99967) | 0.86066 |
+| d [main_d4] | human | 156,282 | 154,307 | 104 | 1,871 | 0.99933 (0.99918–0.99944) | 0.87990 |
+| d [main_d4] | rhesus | 152,782 | 151,861 | 32 | 889 | 0.99979 (0.99970–0.99985) | 0.86134 |
+| d [main_d4] | cynomolgus | 153,606 | 152,734 | 0 | 872 | 1.00000 (0.99997–1.00000) | 0.86805 |
+
+Against `d4c2dda`, right to wrong: D1 pig 2, mouse 13, human 176 (of human's: a name with no successor answered nothing or elsewhere 132, a name that is no name at its source 18, the place's split 24); D2 none; D3 mouse 3, human 14 (a string read at another release); D4 mouse 4, human 54 (rule `support_ranks_shared_name` 48, bridges 6), rhesus 6. Every answer of the modest set's lines is identical to `r2`'s stored answers.
+
+`main` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human |
+| --- | ---: | ---: | ---: |
+| `d1_id_same_dominant` | 0.8909 (0.8736–0.9082) | – | 0.9601 (0.9565–0.9636) |
+| `d1_id_same_one` | 0.9488 (0.9458–0.9520) | – | 0.9948 (0.9941–0.9954) |
+| `d1_id_same_open` | 0.0000 (0.0000–0.0000) | – | 0.0000 (0.0000–0.0000) |
+| `d1_symbol_same_dominant` | 0.9052 (0.8867–0.9238) | – | 0.9299 (0.9247–0.9349) |
+| `d1_symbol_same_one` | 0.9982 (0.9975–0.9988) | – | 0.9953 (0.9948–0.9958) |
+| `d1_symbol_same_open` | 0.0000 (0.0000–0.0000) | – | 0.0000 (0.0000–0.0000) |
+| `d1_id_cross_dominant` | – | 0.9321 (0.9255–0.9388) | 0.9355 (0.9276–0.9431) |
+| `d1_id_cross_one` | – | 0.9711 (0.9700–0.9722) | 0.9784 (0.9768–0.9802) |
+| `d1_id_cross_open` | – | 0.0000 (0.0000–0.0000) | 0.0000 (0.0000–0.0000) |
+| `d1_symbol_cross_dominant` | – | 0.9551 (0.9484–0.9618) | 0.9076 (0.8999–0.9158) |
+| `d1_symbol_cross_one` | – | 0.9950 (0.9945–0.9955) | 0.9821 (0.9808–0.9835) |
+| `d1_symbol_cross_open` | – | 0.0000 (0.0000–0.0000) | 0.0000 (0.0000–0.0000) |
+| `d1_id_versioned_dominant` | – | – | 0.9109 (0.9044–0.9174) |
+| `d1_id_versioned_one` | – | – | 0.9951 (0.9945–0.9958) |
+| `d1_id_versioned_open` | – | – | 0.0000 (0.0000–0.0000) |
+
+`main_d2` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human |
+| --- | ---: | ---: | ---: |
+| `d2_matrix_ids_stated` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_matrix_mixed_stated` | 1.0000 (1.0000–1.0000) | – | – |
+| `d2_synth_5000_junk20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_5000_junk5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_5000_none` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_5000_other20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_5000_other5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_500_junk20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_500_junk5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_500_none` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_500_other20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_500_other5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_50_junk20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_50_junk5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_50_none` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_50_other20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_50_other5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_all_junk20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_all_junk5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_all_none` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_all_other20` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_all_other5` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_synth_names_500` | 0.9067 (0.8533–0.9533) | 0.8118 (0.7206–0.8971) | 0.8412 (0.7676–0.9088) |
+| `d2_synth_names_all` | 0.9500 (0.8833–1.0000) | 0.9853 (0.9559–1.0000) | 0.9706 (0.9265–1.0000) |
+| `d2_synth_versioned_500` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_matrix_ids_measured` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d2_matrix_symbols_measured` | – | 0.6667 (0.0000–1.0000) | 0.9444 (0.8500–1.0000) |
+| `d2_matrix_symbols_stated` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+
+`main_d3` (rate and interval per stratum, both views):
+
+| stratum | mouse | human |
+| --- | ---: | ---: |
+| `d3_cellmarker_default` | 0.9975 (0.9970–0.9980) | 0.9915 (0.9907–0.9923) |
+| `d3_cellmarker_from` | 0.9997 (0.9996–0.9998) | 0.9993 (0.9991–0.9995) |
+| `d3_msigdb_default` | 0.9998 (0.9995–1.0000) | 1.0000 (0.9999–1.0000) |
+| `d3_msigdb_from` | 0.9998 (0.9995–1.0000) | 1.0000 (0.9999–1.0000) |
+| `d3_panglaodb_default` | 0.9959 (0.9942–0.9974) | 0.9995 (0.9988–1.0000) |
+| `d3_panglaodb_from` | 0.9974 (0.9962–0.9984) | 1.0000 (1.0000–1.0000) |
+| `d3_rosetta_lineage_default` | – | 1.0000 (1.0000–1.0000) |
+| `d3_rosetta_lineage_from` | – | 1.0000 (1.0000–1.0000) |
+
+`main_d4` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human | rhesus | cynomolgus |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `d4_id_current` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_id_old` | 0.9989 (0.9981–0.9996) | 0.9963 (0.9941–0.9981) | 0.9971 (0.9954–0.9985) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_missing` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_ncbi` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9995 (0.9990–0.9999) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_nothing` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_refseq` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9994 (0.9981–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_symbol` | 0.9991 (0.9979–0.9999) | 1.0000 (1.0000–1.0000) | 0.9986 (0.9976–0.9994) | 0.9984 (0.9973–0.9992) | 1.0000 (1.0000–1.0000) |
+| `d4_transcript` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_uniprot` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9999 (0.9997–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `d4_issue85` | – | – | 1.0000 (1.0000–1.0000) | – | – |
+
+### On d4c2dda
+
 Every number below is copied from the run's `report.tsv` (row `*`: both views; row `best`), its `causes_summary.tsv`, D's own tables in `<families>/d/runs/<run>/<organism>/` or the file named; the result files are `results/d/<run>/<organism>/` with the same names (D's own tables without their subfolder). No answer timed out, and no answer raised an error.
 
 ### D1: the authors' matrices on `d4c2dda`
@@ -302,6 +408,8 @@ D's rows of the known-limitations table come from its causes (the wrong answers,
 | `L-branch` | D4: answers on branches that left the id (until `main_line_first`) | 132 | 71 | 77 | 14 | 33 |
 | `L-shared-names` | D4: a name of several genes, `best` keeps the better-supported | 1 | 8 | 36 | 15 | 2 |
 | `L-unplaced-copy` | D4: a copy on a haplotype or patch without a place on the reference | – | – | 2 | – | – |
+
+On `main` (`d_main.tsv`, `d_main_d3.tsv`, `d_main_d4.tsv` of `results/limitations/`, the same builder; answers per organism): `L-branch` pig 177, mouse 1,985, human 5,629, rhesus 11, cynomolgus 20; `L-bridge-at-place` pig 188, mouse 1,696, human 1,710; `L-bridges` pig 49, mouse 264, human 509; `L-decided-rules` pig 2; `L-default-release-names` mouse 49, human 713; `L-history-vs-place` pig 1,822, mouse 2,213, human 10,120; `L-id-not-at-source` mouse 130; `L-made-unique` pig 2,496, mouse 168, human 1,450; `L-marker-not-a-name` mouse 49,198, human 119,650; `L-marker-not-found` human 6; `L-marker-retired` mouse 1,532, human 2,236; `L-mirbase` pig 14, human 20, rhesus 24; `L-name-not-at-source` pig 782, mouse 4,884, human 30,494; `L-name-not-in-graph` pig 8; `L-name-read-otherwise` pig 32, mouse 252, human 406; `L-name-several-part` mouse 16, human 82; `L-name-several-place` mouse 130, human 7,016; `L-new-id-no-event` pig 530, mouse 7,666, human 8,496; `L-no-chain` pig 1,478, mouse 60, human 48, rhesus 862, cynomolgus 850; `L-other-name-sources` pig 24, mouse 444, human 2,507; `L-patch-source` human 34,560; `L-place-empty` pig 19,030, mouse 5,260, human 4,094; `L-place-several` pig 2,698, mouse 6,411, human 25,304; `L-place-shrunk` pig 6,440, mouse 1,114, human 2,272; `L-place-unmapped` mouse 4,624, human 2,088; `L-resurrection` mouse 3; `L-separator-synonym` rhesus 6; `L-shared-names` pig 1, mouse 9, human 63, rhesus 18, cynomolgus 2; `L-spellings` mouse 176, human 129; `L-split-best` pig 658, mouse 1,457, human 69; `L-split-place` pig 1,498, mouse 2,156, human 221; `L-successor-dropped` pig 2; `L-unexplained` pig 7, mouse 250, human 1,494; `L-unplaced-copy` human 2; `T-name-db-not-read` mouse 30, human 23.
 
 ## Reproducing from scratch
 

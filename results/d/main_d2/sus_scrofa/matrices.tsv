@@ -1,0 +1,5 @@
+dataset	source	features	stated	rosetta_release	expected	idtrack	outcome	items	best_share
+sterr2025_pigneurog3chronoscrna	EmAd_fullgenes.sterr2025_pigneurog3chronoscrna.h5ad	all	101	101	101	101	right	28453	0.943486
+sterr2025_pigneurog3chronoscrna	EmAd_fullgenes.sterr2025_pigneurog3chronoscrna.h5ad	counted	101	101	101	101	right	26756	0.952983
+yang2026_pigpostnatalpancreasmultiome	rna_combined_hq_no_doublet.yang2026_pigpostnatalpancreasmultiome.h5ad	all	101	101	100..106 (7)	100..106 (7)	right	30282	1.0
+yang2026_pigpostnatalpancreasmultiome	rna_combined_hq_no_doublet.yang2026_pigpostnatalpancreasmultiome.h5ad	counted	101	101	100..106 (7)	100..106 (7)	right	29409	1.0

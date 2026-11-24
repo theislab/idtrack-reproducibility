@@ -1,0 +1,8 @@
+stratum	cause	class	rule	answers	units
+f1_name_moved	external_bridge	b	rule `external_bridge`	31	18
+f1_name_shared	best_keeps_part_of_shared_name	b	rule `ties`	1	1
+f1_name_shared	external_bridge	b	rule `external_bridge`	9	8
+f1_name_shared	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+f1_name_unique	external_bridge	b	rule `external_bridge`	5	5
+f1_name_unique	unexplained	?	-	3	2
+f1_retired	external_bridge	b	rule `external_bridge`	15	14

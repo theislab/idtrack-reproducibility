@@ -1,0 +1,41 @@
+relation	organism	count	value
+composition	sus_scrofa	by_history	111
+composition	sus_scrofa	holds	2889
+composition	sus_scrofa	not_one_gene	2616
+composition	sus_scrofa	triples	3000
+return	sus_scrofa	holds	3000
+return	sus_scrofa	pairs	3000
+roundtrip	sus_scrofa	EntrezGene|holds	460
+roundtrip	sus_scrofa	EntrezGene|ids	460
+roundtrip	sus_scrofa	EntrezGene|no_id	543
+roundtrip	sus_scrofa	HGNC Symbol|holds	399
+roundtrip	sus_scrofa	HGNC Symbol|ids	399
+roundtrip	sus_scrofa	HGNC Symbol|no_id	601
+roundtrip	sus_scrofa	NCBI gene (formerly Entrezgene)|holds	460
+roundtrip	sus_scrofa	NCBI gene (formerly Entrezgene)|ids	460
+roundtrip	sus_scrofa	NCBI gene (formerly Entrezgene)|no_id	543
+roundtrip	sus_scrofa	RefSeq_mRNA|holds	100
+roundtrip	sus_scrofa	RefSeq_mRNA|ids	100
+roundtrip	sus_scrofa	RefSeq_mRNA|no_id	904
+roundtrip	sus_scrofa	UniProtKB Gene Name|holds	523
+roundtrip	sus_scrofa	UniProtKB Gene Name|ids	523
+roundtrip	sus_scrofa	UniProtKB Gene Name|no_id	495
+roundtrip	sus_scrofa	Uniprot/SWISSPROT|holds	7
+roundtrip	sus_scrofa	Uniprot/SWISSPROT|ids	7
+roundtrip	sus_scrofa	Uniprot/SWISSPROT|no_id	993
+roundtrip	sus_scrofa	VGNC Symbol|holds	405
+roundtrip	sus_scrofa	VGNC Symbol|ids	405
+roundtrip	sus_scrofa	VGNC Symbol|no_id	595
+path	sus_scrofa	bridge_far_held	4
+path	sus_scrofa	bridge_far_steps	131
+path	sus_scrofa	bridge_far_undetermined	127
+path	sus_scrofa	bridge_near_held	6
+path	sus_scrofa	bridge_near_steps	131
+path	sus_scrofa	bridge_near_undetermined	125
+path	sus_scrofa	candidates	4489
+path	sus_scrofa	final_held	46
+path	sus_scrofa	final_steps	46
+path	sus_scrofa	history_event	7246
+path	sus_scrofa	history_event_versions_equal	7246
+path	sus_scrofa	history_steps	7246
+path	sus_scrofa	lines	3000

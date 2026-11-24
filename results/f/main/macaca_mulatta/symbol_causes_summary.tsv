@@ -1,0 +1,4 @@
+stratum	cause	class	rule	answers	units
+f1_made_unique	copy_of_another_feature	b	rule `made_unique_copies`	1	1
+f1_name_moved	external_bridge	b	rule `external_bridge`	1	1
+f1_name_unique	external_bridge	b	rule `external_bridge`	2	2

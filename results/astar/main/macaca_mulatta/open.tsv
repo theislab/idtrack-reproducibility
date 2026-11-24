@@ -1,0 +1,4 @@
+reason	stratum	rows
+open: rule `no_mito_nuclear_step`: Ensembl's history gives the mitochondrial gene no successor at 105; a bridge to the mitochondrial gene of the other side is not judged by the database's values	db	200
+open: rule `no_mito_nuclear_step`: Ensembl's history gives the mitochondrial gene no successor at 110; a bridge to the mitochondrial gene of the other side is not judged by the database's values	db	200
+open: rule `no_mito_nuclear_step`: Ensembl's history gives the mitochondrial gene no successor at 115; a bridge to the mitochondrial gene of the other side is not judged by the database's values	db	200

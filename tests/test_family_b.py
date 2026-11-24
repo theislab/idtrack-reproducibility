@@ -411,3 +411,18 @@ def test_a_revision_is_published_from_its_dry_run_as_found(tmp_path, monkeypatch
     import pytest
     with pytest.raises(SystemExit):
         RB.publish_from("sus_scrofa", "b6", "r2", "why", str(f))
+
+
+def test_b2_moved_from_is_split_by_whether_the_old_genes_history_ends(tmp_path):
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from idtrack_reproducibility.families.b import report_b as RB
+    (tmp_path / "outcomes").mkdir()
+    t = pa.table({"qid": ["q1", "q1", "q2", "q2", "q3"], "stratum": ["b2_moved_from"] * 4 + ["b1_atR_unique"],
+                  "unit": ["A", "A", "B", "B", "C"], "outcome": ["right", "wrong", "undetermined", "right", "wrong"]})
+    pq.write_table(t, tmp_path / "outcomes" / "part-0.parquet")
+    parts = dict(RB.split_b2(str(tmp_path), {"q1": False, "q2": True}))
+    assert parts["history continues"]["n"] == 2 and parts["history continues"]["wrong"] == 1
+    assert parts["history continues"]["units_wrong"] == {"A"}
+    assert parts["history ends"]["n"] == 2 and parts["history ends"]["undetermined"] == 1
+    assert RB.split_b2(str(tmp_path), {}) and RB.split_b2(str(tmp_path / "outcomes"), {}) == []

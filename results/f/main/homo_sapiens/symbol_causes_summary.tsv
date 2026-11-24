@@ -1,0 +1,9 @@
+stratum	cause	class	rule	answers	units
+f1_name_moved	best_keeps_part_of_shared_name	b	rule `ties`	2	1
+f1_name_moved	external_bridge	b	rule `external_bridge`	35	26
+f1_name_moved	lrg_record_as_gene	a	rule `lrg_copies`	2	2
+f1_name_moved	unexplained	?	-	3	3
+f1_name_shared	external_bridge	b	rule `external_bridge`	24	23
+f1_name_shared	unexplained	?	-	2	2
+f1_name_unique	external_bridge	b	rule `external_bridge`	7	7
+f1_retired	external_bridge	b	rule `external_bridge`	17	12

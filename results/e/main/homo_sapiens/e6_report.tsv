@@ -1,0 +1,3 @@
+family	organism	lines	lines_with_violation	partial_answer	changed_by_larger	other_error	batch	unbounded_not_answered	median_first_finished_states	max_first_finished_states
+astar	homo_sapiens	200	0	0	0	0	0	0	50	2000
+harness	homo_sapiens	200	0	0	0	0	0	0	200	1000

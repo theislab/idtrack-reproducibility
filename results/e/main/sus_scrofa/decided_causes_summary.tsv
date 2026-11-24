@@ -1,0 +1,6 @@
+stratum	cause	class	rule	answers	units
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	4	2
+e8_batch_release_default_suffix	unexplained	?	-	16	1
+e8_batch_single	unexplained	?	-	142	25
+e8_onerelease_reference	unexplained	?	-	16	8
+hunt_IN-2	lowercase_exact_synonym_other_organism	b	IN-2's residual (rule `single_case_symbols` covers organisms with mixed-case symbols only)	2	1

@@ -1,0 +1,6 @@
+stratum	cause	class	rule	answers	units
+d4_id_old	external_bridge	b	rule `external_bridge`	16	7
+d4_id_old	unexplained	?	-	2	2
+d4_symbol	mirbase_not_in_graph	c	rule `mirbase_genes`	14	4
+d4_symbol	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	2	1
+d4_symbol	unexplained	?	-	1	1

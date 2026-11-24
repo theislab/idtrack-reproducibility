@@ -1,0 +1,11 @@
+stratum	cause	class	rule	answers	units
+d4_id_old	external_bridge	b	rule `external_bridge`	42	18
+d4_id_old	unexplained	?	-	12	8
+d4_ncbi	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	5	5
+d4_ncbi	unexplained	?	-	5	5
+d4_refseq	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	6	2
+d4_refseq	unexplained	?	-	6	2
+d4_symbol	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	13	11
+d4_symbol	unexplained	?	-	13	11
+d4_uniprot	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	1	1
+d4_uniprot	unexplained	?	-	1	1

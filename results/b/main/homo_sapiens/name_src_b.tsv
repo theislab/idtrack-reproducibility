@@ -1,0 +1,91 @@
+stratum	name_src	rows	right	wrong	undetermined	error	timeout
+b1_at115_patchonly	biomart+core_xref+synonyms	62	44	4	14	0	0
+b1_at115_shared	biomart+core_xref+synonyms	966	745	0	221	0	0
+b1_at115_unique	biomart+core_xref+synonyms	81874	81525	4	345	0	0
+b1_atR_patchonly	biomart+core_xref+synonyms	110	74	10	26	0	0
+b1_atR_patchonly	core_xref+synonyms	368	254	19	95	0	0
+b1_atR_patchonly	core_xref+synonyms_reach	55390	54572	285	533	0	0
+b1_atR_patchonly	none+reach+synonyms_reach	14	8	3	3	0	0
+b1_atR_shared	biomart+core_xref+synonyms	1098	878	13	207	0	0
+b1_atR_shared	biomart+core_xref+synonyms_reach	9638	8987	49	602	0	0
+b1_atR_shared	core_xref+synonyms	16518	11306	417	4795	0	0
+b1_atR_shared	core_xref+synonyms_reach	85092	79866	1062	4164	0	0
+b1_atR_shared	none+reach+synonyms_reach	734	568	0	166	0	0
+b1_atR_unique	biomart+core_xref+synonyms	163006	162371	12	623	0	0
+b1_atR_unique	biomart+core_xref+synonyms_reach	218938	217618	32	1288	0	0
+b1_atR_unique	core_xref+synonyms	60560	59290	267	1003	0	0
+b1_atR_unique	core_xref+synonyms_reach	6013468	5981575	2888	29005	0	0
+b1_atR_unique	none+reach+synonyms_reach	74662	74423	0	239	0	0
+b1_default_patchonly	biomart+core_xref	62	44	7	11	0	0
+b1_default_shared	biomart+core_xref	44	31	13	0	0	0
+b1_default_unique	biomart+core_xref	76324	76058	0	266	0	0
+b1_to115_patchonly	biomart+core_xref+synonyms	110	74	10	26	0	0
+b1_to115_patchonly	core_xref+synonyms	232	132	12	88	0	0
+b1_to115_patchonly	core_xref+synonyms_reach	55484	53823	316	1345	0	0
+b1_to115_patchonly	none+reach+synonyms_reach	12	8	2	2	0	0
+b1_to115_shared	biomart+core_xref+synonyms	822	646	0	176	0	0
+b1_to115_shared	biomart+core_xref+synonyms_reach	9598	9009	112	477	0	0
+b1_to115_shared	core_xref+synonyms	7876	4303	226	3347	0	0
+b1_to115_shared	core_xref+synonyms_reach	89362	82612	2892	3858	0	0
+b1_to115_shared	none+reach+synonyms_reach	744	578	0	166	0	0
+b1_to115_unique	biomart+core_xref+synonyms	158974	158415	8	551	0	0
+b1_to115_unique	biomart+core_xref+synonyms_reach	218628	215017	134	3477	0	0
+b1_to115_unique	core_xref+synonyms	6230	6126	2	102	0	0
+b1_to115_unique	core_xref+synonyms_reach	5987816	5858085	6779	122952	0	0
+b1_to115_unique	none+reach+synonyms_reach	74782	74536	2	244	0	0
+b2_moved_default	biomart+core_xref	6472	6181	211	80	0	0
+b2_moved_from	biomart+core_xref+synonyms	1198	1159	1	38	0	0
+b2_moved_from	biomart+core_xref+synonyms_reach	3460	1709	59	1692	0	0
+b2_moved_from	core_xref+synonyms	300	168	20	112	0	0
+b2_moved_from	core_xref+synonyms_reach	83932	44531	1886	37515	0	0
+b2_moved_from	none+reach+synonyms_reach	36	31	0	5	0	0
+b4_prev_default		31566	27405	30	4131	0	0
+b4_prev_from	biomart+core_xref+synonyms	280	277	0	3	0	0
+b4_prev_from	biomart+core_xref+synonyms_reach	484	422	0	62	0	0
+b4_prev_from	core_xref+synonyms	30	20	3	7	0	0
+b4_prev_from	core_xref+synonyms_reach	12704	12102	58	544	0	0
+b5_alias_hgnc		86874	67808	96	18970	0	0
+b5_alias_ncbi		139742	121094	2088	16560	0	0
+b5_syn_at115	biomart	110050	110021	29	0	0	0
+b5_syn_atR	biomart	213170	213122	48	0	0	0
+b5_syn_atR	core_synonyms	260382	255407	4975	0	0	0
+b5_syn_to115	biomart	213170	213102	40	28	0	0
+b5_syn_to115	core_synonyms	260382	252693	4919	2770	0	0
+b6_case		165830	165063	8	759	0	0
+b6_fullwidth		8748	8748	0	0	0	0
+b6_invisible		26282	26276	4	2	0	0
+b6_sep		4970	4938	30	2	0	0
+b6_space		165804	165074	16	714	0	0
+b7_date		504	496	8	0	0	0
+b7_greek		102	98	4	0	0	0
+b7_suffix		11800	11800	0	0	0	0
+b8_biomart	biomart	542178	542178	0	0	0	0
+b8_core_xref	core_xref	7066176	7064774	1402	0	0	0
+b9_early_clone_based_ensembl_gene	core_display+core_xref+core_synonyms	953160	949769	12	3379	0	0
+b9_early_clone_based_vega_gene	core_display+core_xref+core_synonyms	1293456	1292798	17	641	0	0
+b9_early_entrezgene	core_display+core_xref+core_synonyms	5126	5087	0	39	0	0
+b9_early_hgnc	core_display+core_xref+core_synonyms	2952114	2928352	2491	21271	0	0
+b9_early_hgnc_automatic_gene	core_display+core_xref+core_synonyms	161734	160545	15	1174	0	0
+b9_early_hgnc_automatic_transcript	core_display+core_xref+core_synonyms	4	4	0	0	0	0
+b9_early_hgnc_curated_gene	core_display+core_xref+core_synonyms	282208	279398	12	2798	0	0
+b9_early_imgt_gene_db	core_display+core_xref+core_synonyms	2304	2271	0	33	0	0
+b9_early_lrg	core_display+core_xref+core_synonyms	22	22	0	0	0	0
+b9_early_mirbase	core_display+core_xref+core_synonyms	15274	14524	380	370	0	0
+b9_early_mirbase_gene_name	core_display+core_xref+core_synonyms	26	26	0	0	0	0
+b9_early_patchonly	core_display+core_xref+core_synonyms	54452	53980	216	256	0	0
+b9_early_refseq_dna	core_display+core_xref+core_synonyms	1188	1188	0	0	0	0
+b9_early_refseq_peptide	core_display+core_xref+core_synonyms	2784	2776	0	8	0	0
+b9_early_rfam	core_display+core_xref+core_synonyms	10306	9964	240	102	0	0
+b9_early_rfam_gene_name	core_display+core_xref+core_synonyms	18706	18706	0	0	0	0
+b9_early_uniprot_genename	core_display+core_xref+core_synonyms	778	651	82	45	0	0
+b9_early_uniprot_gn	core_display+core_xref+core_synonyms	1322	1099	78	145	0	0
+b9_early_uniprot_sptrembl	core_display+core_xref+core_synonyms	7636	7604	0	32	0	0
+b9_early_uniprot_swissprot	core_display+core_xref+core_synonyms	1716	1712	0	4	0	0
+b9_early_uniprot_varsplic	core_display+core_xref+core_synonyms	100	100	0	0	0	0
+b9_late_entrezgene	core_display+core_xref+core_synonyms	1594	1581	0	13	0	0
+b9_late_hgnc	core_display+core_xref+core_synonyms	963728	960041	0	3687	0	0
+b9_late_mirbase	core_display+core_xref+core_synonyms	68	4	36	28	0	0
+b9_late_patchonly	core_display+core_xref+core_synonyms	398	310	40	48	0	0
+b9_late_rfam	core_display+core_xref+core_synonyms	212	212	0	0	0	0
+b9_shared_early	core_display+core_xref+core_synonyms	44886	41725	776	2385	0	0
+b9_shared_late	core_display+core_xref+core_synonyms	7226	7102	9	115	0	0

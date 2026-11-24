@@ -1,0 +1,21 @@
+stratum	cause	class	rule	answers	units
+c2_oldver	external_bridge	b	rule `external_bridge`	10	5
+c2_retired	external_bridge	b	rule `external_bridge`	10	5
+c2_retired	value_of_another_database	e	-	3	3
+c3_deleted	external_bridge	b	rule `external_bridge`	67	36
+c3_oldver	external_bridge	b	rule `external_bridge`	19	5
+c3_oldver	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	1	1
+c3_retired	external_bridge	b	rule `external_bridge`	69	37
+c3_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	2	1
+c4_rfam_label_retired	rfam_label_is_accession	d	-	2	2
+c5_clone_retired	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+c5_clone_retired	unexplained	?	-	22	19
+c5_clone_retired	value_of_another_database	e	-	21	19
+c6:NCBI gene (formerly Entrezgene)	ncbi_label_name_by_release	a	rule `one_kind_per_database` (decided)	30	8
+c7_ncbi	external_bridge	b	rule `external_bridge`	610	124
+c7_ncbi	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	1206	120
+c7_ncbi	value_of_another_database	e	-	4	1
+c7_refseq	external_bridge	b	rule `external_bridge`	2980	598
+c7_refseq	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	5496	594
+c7_uniprot	external_bridge	b	rule `external_bridge`	81	39
+c7_uniprot	value_of_another_database	e	-	2	2

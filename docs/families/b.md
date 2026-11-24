@@ -17,8 +17,10 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 | --- | --- |
 | `runs/d4c2dda/macaca_fascicularis/` | every line answered; `scores_now/` holds `run.json` and `report.tsv` (sets `b1_v1`, `b8_v1`, `b5_v1`, `b6_v1`, `b7_v1`); `scores_decided/` not scored; no causes |
 | `runs/d4c2dda/macaca_mulatta/` | every line answered; `scores_now/` holds `run.json` and `report.tsv` (the same sets and `b4_v1`); `scores_decided/` not scored; no causes |
-| `runs/d4c2dda/mus_musculus/` | incomplete: shards 0 to 24 of 29 complete (8,464,522 lines; `partial.json` says so), shards 25 to 28 not asked, not scored; the answers are kept in the data root (manifested), and the runner, which asks only what has no answer, finishes them with `--shard 25/29` to `28/29` |
+| `runs/d4c2dda/mus_musculus/` | incomplete: shards 0 to 24 of 29 answered (8,464,522 lines; `partial.json` says so), shards 25 to 28 not asked (the reference is not run again); the answered lines scored under both judges (`scores_now/`, `scores_decided/`, 2026-11-24), the others `missing`: a comparison with it covers the answered lines only |
 | `runs/d4c2dda/sus_scrofa/`, `runs/d4c2dda/homo_sapiens/` | not run (no answer) |
+
+The complete run on the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only; 2026-11-24): `runs/main/<organism>/` of all five organisms, every line of every set with every revision set (`r1`, `rules3`), scored under both judges (`scores_now/`, `scores_decided/`), with `report_b.tsv`, `authority_b.tsv`, `name_src_b.tsv` and the causes of the judge `now` ([results](#on-main)).
 
 The judge following idtrack's decided rules (judge `rules`, [`judge_follows_rules`](../rules.md#judge_follows_rules); published 2026-11-20): `<set>_rules1`, the accuracy harness's revisions `missing_values`, `capitals_mgi` and `lower_case_symbols` (rule `single_case_symbols`), `stray_punctuation` and `par_shared_names` applied to B's latest lines (`revise_b --rules`, B's truth context): pig `b5_rules1` 12 (missing values, left out of the scoring); mouse `b4_rules1` 21, `b5_rules1` 1,156, `b6_rules1` 2,312, `b1_rules1` 105 (capitals and lower case read as MGI's symbol, missing values, stray punctuation); human `b4_rules1` 35, `b5_rules1` 415, `b6_rules1` 168, `b1_rules1` 464 (the names the X and Y copies of a pseudoautosomal gene share: the Y copy apart; missing values; stray punctuation); rhesus and cynomolgus none. B6's decided judge reads its `_dec` sets after the `now` sets, so its lines get the same revisions in `b6_rules1_dec` (mouse 2,270: the decided lines of the qids `b6_rules1` holds, published again after it so that the decided truth stands in publication order too; human 23 with the Y copy apart). On the modest selection every revised line `next` answers is right but one (mouse `MUP1` from 105, `all`: the second gene its capitals reach, wrong on every tree).
 
@@ -43,7 +45,7 @@ The revision `r1` (published 2026-11-24, judge `b_r1`; `revise_b --name r1`): ev
 
 No revision changes a question: every changed line keeps its query; `b7_r1` leaves out the suffix forms that Ensembl's synonyms of 115 now hold as strings of their own (`excluded`: pig 1, cynomolgus 3), and `b1_r1` mouse's 6 names no longer asked; `b8_v2` holds mouse's genes of release 89 and human's of 112, which version 1 read through the reach. The stored answers of `d4c2dda` (cynomolgus, rhesus, mouse's 25 shards) answer every revised line; `b5_v2`'s lines were never asked.
 
-What is not built: the runs of pig, mouse and human, the `decided` scorings, the explained paths and causes of the wrong answers, the family's limitations map and its rows of the known-limitations table, the authority measure (`report_b`, written, not run), and the family's panel ([Measurement design](../methods.md#measurement-design)).
+What is not built: the family's panel ([Measurement design](../methods.md#measurement-design)).
 
 ## What it measures
 
@@ -161,7 +163,184 @@ python -m idtrack_reproducibility.families.b.report_b --organism <o> --run <fami
 
 ## Results
 
-Runs `<families>/b/runs/d4c2dda/macaca_fascicularis/scores_now/` and `<families>/b/runs/d4c2dda/macaca_mulatta/scores_now/` (the reference graphs, the published sets of version 1, the judge `now`); result files `results/b/d4c2dda/<organism>/report.tsv` and `scores.tsv`. No answer timed out and none raised an error. These are the only complete scored runs of B: pig, mouse and human are not run, no `decided` scoring and no cause exists, and they are judged by the sets of version 1 and the corrections before `r1` (which was published after them), so no wrong answer below is attributed yet to idtrack or to the truth.
+### On main
+
+Runs `<families>/b/runs/main/<organism>/`, every line of B1 to B9 with every revision set (`r1`, `rules3`: above), scored under both judges (`scores_now`, `scores_decided`), the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only), on `r2`'s graph files, which `main`'s own builder rebuilt with the same content digests (`[graphs.main]` of `results.toml`), 2026-11-24. Result files `results/b/main/<organism>/` (`now_report.tsv`, `decided_report.tsv`, `report_b.tsv`, `authority_b.tsv`, `name_src_b.tsv`). Pig, mouse and human have no exhaustive reference (`d4c2dda` ran B only in rhesus and cynomolgus; mouse's 25 of 29 answered shards are compared on the lines they hold). Totals (the groups of `report_b.tsv`, B2 its measured part):
+
+| family | organism | n | right | wrong | undetermined | rate (Wilson 95 %) | d4c2dda |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| b (now) | pig | 7,115,074 | 7,019,275 | 3,632 | 92,167 | 0.99948 (0.99947–0.99950) | no exhaustive reference |
+| b (now) | mouse | 26,271,678 | 25,994,145 | 103,461 | 174,072 | 0.99604 (0.99601–0.99606) | no exhaustive reference |
+| b (now) | human | 29,628,008 | 29,330,009 | 34,247 | 263,752 | 0.99883 (0.99882–0.99885) | no exhaustive reference |
+| b (now) | rhesus | 9,224,742 | 9,132,404 | 2,076 | 90,262 | 0.99977 (0.99976–0.99978) | 0.97641 |
+| b (now) | cynomolgus | 3,607,892 | 3,603,548 | 265 | 4,079 | 0.99993 (0.99992–0.99993) | 0.99924 |
+| b (decided) | pig | 7,115,074 | 7,018,619 | 4,024 | 92,431 | 0.99943 (0.99941–0.99944) | no exhaustive reference |
+| b (decided) | mouse | 26,271,678 | 25,994,009 | 103,811 | 173,858 | 0.99602 (0.99600–0.99605) | no exhaustive reference |
+| b (decided) | human | 29,628,008 | 29,329,376 | 34,733 | 263,899 | 0.99882 (0.99880–0.99883) | no exhaustive reference |
+| b (decided) | rhesus | 9,224,742 | 9,131,940 | 2,515 | 90,287 | 0.99972 (0.99971–0.99974) | no exhaustive reference |
+| b (decided) | cynomolgus | 3,607,892 | 3,603,172 | 604 | 4,116 | 0.99983 (0.99982–0.99985) | no exhaustive reference |
+
+Against `d4c2dda`, right to wrong: rhesus 18 answers (judge `now`; rule `support_ranks_shared_name` 4, `mirbase_genes` 2, 12 not classified), cynomolgus none; mouse's 25 answered shards 1,307, most of them B8's lines that expect the label Ensembl's core gives under `MGI Symbol` at 48 to 54 where it is a Havana id (`OTTMUSG…`; `main` answers no MGI symbol for these genes: 2,290 wrong answers on `main`, a row of the backlog with its reproducer), and bridges (183). Every answer of the modest set's lines is identical to `r2`'s stored answers.
+
+**B2's moved names are reported in two parts.** A moved name read at an old release (`b2_moved_from`) is judged by its old gene's history. Where that history reaches the target, the line is measured (`b2_moved_from: history continues`: its rate and interval below). Where Ensembl retired the old gene without a successor (`b2_moved_from: history ends`), the answer key cannot judge a name whose gene ended: the line expects nothing, every answer is a bridge, and the truth's wider set holds every gene that carries the name at 115, so the answer that a user would want, the name's carrier now, is undetermined; it is reported apart, with its outcomes and no rate (`L-b2-history-ends` of the known limitations). On `main` the part whose history ends holds pig 148,482 of 161,092 answers, mouse 33,962 of 65,002, human 40,744 of 88,926, rhesus 184,570 of 203,036 and cynomolgus 20,848 of 24,092. Twenty seeded examples per organism show the same thing: the line expects nothing, its wider set holds the gene that carries the name at 115, and that gene is idtrack's answer. The corrected judge's names in other name sources (`names_broad`) explain few of them (pig 3,293 of the 129,986 undetermined answers, mouse 3,330 of 32,726, human 6,404 of 39,362). Judged without the genes that carry the name at 115, a seeded sample of 2,000 such lines per organism stays undetermined but for pig 12, mouse 25 and human 32 of 4,000 answers (rhesus and cynomolgus none): the answer lies at the old gene's place (mouse, human) or the two assemblies have no chain to compare them (pig, the macaques), so the judge is kept as it is.
+
+`main`, judge `now` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human | rhesus | cynomolgus |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `b1_at115_shared` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_at115_unique` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_atR_shared` | 0.9951 (0.9924–0.9974) | 0.9461 (0.9411–0.9508) | 0.9851 (0.9829–0.9870) | 0.9945 (0.9910–0.9972) | 0.9986 (0.9973–0.9995) |
+| `b1_atR_unique` | 0.9997 (0.9997–0.9997) | 0.9929 (0.9928–0.9930) | 0.9995 (0.9995–0.9995) | 0.9999 (0.9999–0.9999) | 1.0000 (1.0000–1.0000) |
+| `b1_default_shared` | 1.0000 (1.0000–1.0000) | 0.9000 (0.8049–0.9756) | 0.7045 (0.6136–0.8182) | 0.9773 (0.9318–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_default_unique` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_to115_shared` | 0.9795 (0.9727–0.9852) | 0.9024 (0.8926–0.9115) | 0.9678 (0.9648–0.9709) | 0.9691 (0.9592–0.9784) | 0.9697 (0.9563–0.9820) |
+| `b1_to115_unique` | 0.9999 (0.9998–0.9999) | 0.9928 (0.9926–0.9929) | 0.9989 (0.9988–0.9990) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b2_moved_default` | 0.9999 (0.9997–1.0000) | 0.9859 (0.9825–0.9893) | 0.9670 (0.9626–0.9713) | 0.9940 (0.9922–0.9956) | 0.9968 (0.9941–0.9991) |
+| `b4_prev_default` | 0.9974 (0.9920–1.0000) | 0.9993 (0.9991–0.9995) | 0.9989 (0.9984–0.9994) | 1.0000 (1.0000–1.0000) | – |
+| `b4_prev_from` | 1.0000 (1.0000–1.0000) | 0.9968 (0.9958–0.9977) | 0.9953 (0.9938–0.9966) | 1.0000 (1.0000–1.0000) | – |
+| `b5_alias_ncbi` | 0.9875 (0.9843–0.9906) | 0.9979 (0.9976–0.9982) | 0.9830 (0.9821–0.9841) | 0.9878 (0.9848–0.9907) | 0.9920 (0.9886–0.9950) |
+| `b5_alias_vgnc` | 0.8333 (0.5000–1.0000) | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b5_syn_at115` | 1.0000 (1.0000–1.0000) | 0.9999 (0.9999–1.0000) | 0.9997 (0.9996–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b5_syn_atR` | 0.9996 (0.9994–0.9997) | 0.9907 (0.9904–0.9911) | 0.9894 (0.9890–0.9898) | 0.9995 (0.9993–0.9998) | 1.0000 (1.0000–1.0000) |
+| `b5_syn_to115` | 0.9977 (0.9972–0.9982) | 0.9910 (0.9907–0.9914) | 0.9895 (0.9891–0.9898) | 0.9981 (0.9975–0.9987) | 1.0000 (1.0000–1.0000) |
+| `b6_case` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b6_fullwidth` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b6_invisible` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9998 (0.9996–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b6_sep` | 0.9654 (0.9463–0.9825) | 1.0000 (1.0000–1.0000) | 0.9940 (0.9907–0.9968) | 0.9907 (0.9812–0.9984) | 1.0000 (1.0000–1.0000) |
+| `b6_space` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9999 (0.9998–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b7_date` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9841 (0.9683–0.9960) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b7_greek` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9608 (0.8936–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b7_suffix` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b8_biomart` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b8_core_xref` | 0.9991 (0.9990–0.9991) | 0.9994 (0.9993–0.9994) | 0.9998 (0.9998–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_early_clone_based_vega_gene` | 0.9978 (0.9972–0.9983) | 0.9984 (0.9979–0.9988) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_entrezgene` | 0.9980 (0.9974–0.9985) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9997 (0.9995–0.9998) | – |
+| `b9_early_hgnc` | 0.9993 (0.9993–0.9994) | 0.9928 (0.9735–1.0000) | 0.9992 (0.9991–0.9992) | 0.9997 (0.9996–0.9998) | – |
+| `b9_early_hgnc_automatic_gene` | 1.0000 (1.0000–1.0000) | – | 0.9999 (0.9998–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_hgnc_automatic_transcript` | 1.0000 (1.0000–1.0000) | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_hgnc_curated_gene` | 1.0000 (1.0000–1.0000) | – | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_mirbase` | 0.9990 (0.9968–1.0000) | 0.9763 (0.9692–0.9829) | 0.9745 (0.9678–0.9808) | 0.9996 (0.9988–1.0000) | – |
+| `b9_early_refseq_peptide` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_rfam` | 1.0000 (1.0000–1.0000) | 0.9970 (0.9925–1.0000) | 0.9765 (0.9689–0.9834) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_uniprot_genename` | 0.9995 (0.9993–0.9997) | 0.3973 (0.3322–0.4634) | 0.8881 (0.8445–0.9284) | 0.9995 (0.9992–0.9997) | – |
+| `b9_early_uniprot_gn` | 0.9994 (0.9991–0.9997) | 0.3594 (0.2483–0.4756) | 0.9337 (0.9100–0.9545) | – | – |
+| `b9_early_uniprot_sptrembl` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_uniprot_swissprot` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_late_entrezgene` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_late_hgnc` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_late_mirbase` | 1.0000 (1.0000–1.0000) | – | 0.1000 (0.0000–1.0000) | 0.9995 (0.9987–1.0000) | – |
+| `b9_late_rfam` | 1.0000 (1.0000–1.0000) | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_shared_early` | 0.9975 (0.9960–0.9989) | 0.9964 (0.9944–0.9980) | 0.9817 (0.9784–0.9847) | 0.9970 (0.9950–0.9986) | – |
+| `b9_shared_late` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9987 (0.9969–1.0000) | 0.9982 (0.9967–0.9995) | 1.0000 (1.0000–1.0000) |
+| `b2_moved_from: history continues` | 0.9857 (0.9834–0.9876) | 0.9997 (0.9994–0.9998) | 0.9936 (0.9929–0.9943) | 0.9791 (0.9769–0.9811) | 0.9832 (0.9781–0.9871) |
+| `b2_moved_from: history ends` | – (148,482 answers: 17580 right, 1047 wrong, 129855 undetermined) | – (33,962 answers: 1266 right, 1272 wrong, 31424 undetermined) | – (40,744 answers: 1840 right, 1672 wrong, 37232 undetermined) | – (184,570 answers: 19774 right, 188 wrong, 164608 undetermined) | – (20,848 answers: 1930 right, 0 wrong, 18918 undetermined) |
+| `b1_atR_patchonly` | – | 0.8469 (0.8188–0.8724) | 0.9943 (0.9922–0.9960) | – | – |
+| `b1_to115_patchonly` | – | 0.9436 (0.9154–0.9664) | 0.9937 (0.9916–0.9956) | – | – |
+| `b5_alias_mgi` | – | 0.9995 (0.9993–0.9996) | – | – | – |
+| `b9_early_clone_based_ensembl_gene` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_clone_based_vega_transcript` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_imgt_gene_db` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_mgi` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mgi_automatic_gene` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mgi_automatic_transcript` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mgi_curated_gene` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mirbase_gene_name` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_patchonly` | – | 0.8479 (0.8213–0.8722) | 0.9960 (0.9949–0.9969) | – | – |
+| `b9_early_refseq_dna` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_rfam_gene_name` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_uniprot_varsplic` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_late_mgi` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b1_at115_patchonly` | – | – | 0.9167 (0.8222–0.9808) | – | – |
+| `b1_default_patchonly` | – | – | 0.8627 (0.7551–0.9464) | – | – |
+| `b5_alias_hgnc` | – | – | 0.9986 (0.9982–0.9990) | – | – |
+| `b9_early_lrg` | – | – | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_late_patchonly` | – | – | 0.8857 (0.7493–0.9725) | – | – |
+| `b9_early_refseq_dna_predicted` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_refseq_peptide_predicted` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `b9_late_uniprot_gn` | – | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_late_vgnc` | – | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+
+`main`, judge `decided` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human | rhesus | cynomolgus |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `b1_at115_shared` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_at115_unique` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_atR_shared` | 0.9951 (0.9924–0.9974) | 0.9461 (0.9411–0.9508) | 0.9851 (0.9829–0.9870) | 0.9945 (0.9910–0.9972) | 0.9986 (0.9973–0.9995) |
+| `b1_atR_unique` | 0.9997 (0.9997–0.9997) | 0.9929 (0.9928–0.9930) | 0.9995 (0.9995–0.9995) | 0.9999 (0.9999–0.9999) | 1.0000 (1.0000–1.0000) |
+| `b1_default_shared` | 1.0000 (1.0000–1.0000) | 0.9000 (0.8049–0.9756) | 0.7045 (0.6136–0.8182) | 0.9773 (0.9318–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_default_unique` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b1_to115_shared` | 0.9795 (0.9727–0.9852) | 0.9024 (0.8926–0.9115) | 0.9678 (0.9648–0.9709) | 0.9691 (0.9592–0.9784) | 0.9697 (0.9563–0.9820) |
+| `b1_to115_unique` | 0.9999 (0.9998–0.9999) | 0.9928 (0.9926–0.9929) | 0.9989 (0.9988–0.9990) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b2_moved_default` | 0.9999 (0.9997–1.0000) | 0.9859 (0.9825–0.9893) | 0.9670 (0.9626–0.9713) | 0.9940 (0.9922–0.9956) | 0.9968 (0.9941–0.9991) |
+| `b4_prev_default` | 0.9974 (0.9920–1.0000) | 0.9993 (0.9991–0.9995) | 0.9989 (0.9984–0.9994) | 1.0000 (1.0000–1.0000) | – |
+| `b4_prev_from` | 1.0000 (1.0000–1.0000) | 0.9968 (0.9958–0.9977) | 0.9953 (0.9938–0.9966) | 1.0000 (1.0000–1.0000) | – |
+| `b5_alias_ncbi` | 0.9875 (0.9843–0.9906) | 0.9979 (0.9976–0.9982) | 0.9830 (0.9821–0.9841) | 0.9878 (0.9848–0.9907) | 0.9920 (0.9886–0.9950) |
+| `b5_alias_vgnc` | 0.8333 (0.5000–1.0000) | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b5_syn_at115` | 1.0000 (1.0000–1.0000) | 0.9999 (0.9999–1.0000) | 0.9997 (0.9996–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b5_syn_atR` | 0.9996 (0.9994–0.9997) | 0.9907 (0.9904–0.9911) | 0.9894 (0.9890–0.9898) | 0.9995 (0.9993–0.9998) | 1.0000 (1.0000–1.0000) |
+| `b5_syn_to115` | 0.9977 (0.9972–0.9982) | 0.9910 (0.9907–0.9914) | 0.9895 (0.9891–0.9898) | 0.9981 (0.9975–0.9987) | 1.0000 (1.0000–1.0000) |
+| `b6_case` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b6_fullwidth` | 1.0000 (1.0000–1.0000) | 0.9997 (0.9993–1.0000) | 0.9978 (0.9968–0.9987) | 0.9991 (0.9983–0.9996) | 1.0000 (1.0000–1.0000) |
+| `b6_invisible` | 1.0000 (1.0000–1.0000) | 0.9997 (0.9994–0.9998) | 0.9968 (0.9960–0.9976) | 0.9986 (0.9980–0.9991) | 0.9998 (0.9997–1.0000) |
+| `b6_sep` | 0.9654 (0.9463–0.9825) | 1.0000 (1.0000–1.0000) | 0.9940 (0.9907–0.9968) | 0.9907 (0.9812–0.9984) | 1.0000 (1.0000–1.0000) |
+| `b6_space` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9999 (0.9998–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b7_date` | 0.0000 (0.0000–0.0000) | 0.4000 (0.2286–0.5714) | 0.3770 (0.2381–0.5198) | 0.0000 (0.0000–0.0000) | 0.0000 (0.0000–0.0000) |
+| `b7_greek` | 0.1304 (0.0426–0.2293) | 0.0889 (0.0204–0.1819) | 0.1569 (0.0545–0.2766) | 0.1373 (0.0556–0.2281) | 0.1087 (0.0238–0.2000) |
+| `b7_suffix` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b8_biomart` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b8_core_xref` | 0.9991 (0.9990–0.9991) | 0.9994 (0.9993–0.9994) | 0.9998 (0.9998–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_early_clone_based_vega_gene` | 0.9978 (0.9972–0.9983) | 0.9984 (0.9979–0.9988) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_entrezgene` | 0.9980 (0.9974–0.9985) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9997 (0.9995–0.9998) | – |
+| `b9_early_hgnc` | 0.9993 (0.9993–0.9994) | 0.9928 (0.9735–1.0000) | 0.9992 (0.9991–0.9992) | 0.9997 (0.9996–0.9998) | – |
+| `b9_early_hgnc_automatic_gene` | 1.0000 (1.0000–1.0000) | – | 0.9999 (0.9998–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_hgnc_automatic_transcript` | 1.0000 (1.0000–1.0000) | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_hgnc_curated_gene` | 1.0000 (1.0000–1.0000) | – | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_mirbase` | 0.9990 (0.9968–1.0000) | 0.9763 (0.9692–0.9829) | 0.9745 (0.9678–0.9808) | 0.9996 (0.9988–1.0000) | – |
+| `b9_early_refseq_peptide` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_rfam` | 1.0000 (1.0000–1.0000) | 0.9970 (0.9925–1.0000) | 0.9765 (0.9689–0.9834) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_uniprot_genename` | 0.9995 (0.9993–0.9997) | 0.3973 (0.3322–0.4634) | 0.8881 (0.8445–0.9284) | 0.9995 (0.9992–0.9997) | – |
+| `b9_early_uniprot_gn` | 0.9994 (0.9991–0.9997) | 0.3594 (0.2483–0.4756) | 0.9337 (0.9100–0.9545) | – | – |
+| `b9_early_uniprot_sptrembl` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_uniprot_swissprot` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_late_entrezgene` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_late_hgnc` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_late_mirbase` | 1.0000 (1.0000–1.0000) | – | 0.1000 (0.0000–1.0000) | 0.9995 (0.9987–1.0000) | – |
+| `b9_late_rfam` | 1.0000 (1.0000–1.0000) | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_shared_early` | 0.9975 (0.9960–0.9989) | 0.9964 (0.9944–0.9980) | 0.9817 (0.9784–0.9847) | 0.9970 (0.9950–0.9986) | – |
+| `b9_shared_late` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9987 (0.9969–1.0000) | 0.9982 (0.9967–0.9995) | 1.0000 (1.0000–1.0000) |
+| `b2_moved_from: history continues` | 0.9857 (0.9834–0.9876) | 0.9997 (0.9994–0.9998) | 0.9936 (0.9929–0.9943) | 0.9791 (0.9769–0.9811) | 0.9832 (0.9781–0.9871) |
+| `b2_moved_from: history ends` | – (148,482 answers: 17580 right, 1047 wrong, 129855 undetermined) | – (33,962 answers: 1266 right, 1272 wrong, 31424 undetermined) | – (40,744 answers: 1840 right, 1672 wrong, 37232 undetermined) | – (184,570 answers: 19774 right, 188 wrong, 164608 undetermined) | – (20,848 answers: 1930 right, 0 wrong, 18918 undetermined) |
+| `b1_atR_patchonly` | – | 0.8469 (0.8188–0.8724) | 0.9943 (0.9922–0.9960) | – | – |
+| `b1_to115_patchonly` | – | 0.9436 (0.9154–0.9664) | 0.9937 (0.9916–0.9956) | – | – |
+| `b5_alias_mgi` | – | 0.9995 (0.9993–0.9996) | – | – | – |
+| `b9_early_clone_based_ensembl_gene` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_clone_based_vega_transcript` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_imgt_gene_db` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_mgi` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mgi_automatic_gene` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mgi_automatic_transcript` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mgi_curated_gene` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b9_early_mirbase_gene_name` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_patchonly` | – | 0.8479 (0.8213–0.8722) | 0.9960 (0.9949–0.9969) | – | – |
+| `b9_early_refseq_dna` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_rfam_gene_name` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_early_uniprot_varsplic` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `b9_late_mgi` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `b1_at115_patchonly` | – | – | 0.9167 (0.8222–0.9808) | – | – |
+| `b1_default_patchonly` | – | – | 0.8627 (0.7551–0.9464) | – | – |
+| `b5_alias_hgnc` | – | – | 0.9986 (0.9982–0.9990) | – | – |
+| `b9_early_lrg` | – | – | 1.0000 (1.0000–1.0000) | – | – |
+| `b9_late_patchonly` | – | – | 0.8857 (0.7493–0.9725) | – | – |
+| `b9_early_refseq_dna_predicted` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `b9_early_refseq_peptide_predicted` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `b9_late_uniprot_gn` | – | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `b9_late_vgnc` | – | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+
+### On d4c2dda
+
+Runs `<families>/b/runs/d4c2dda/macaca_fascicularis/scores_now/` and `<families>/b/runs/d4c2dda/macaca_mulatta/scores_now/` (the reference graphs, the published sets of version 1, the judge `now`); result files `results/b/d4c2dda/<organism>/report.tsv` and `scores.tsv`. No answer timed out and none raised an error. These are the reference tree's only complete scored runs of B (pig and human not run, mouse's 25 of 29 shards); they are judged by the sets of version 1 and the corrections before `r1`, which was published after them, so their wrong answers are not classified; `main`'s comparison with them is above.
 
 Rate and cluster-bootstrap interval per stratum (row `*` of `report.tsv`: both views):
 
@@ -243,13 +422,13 @@ The rows of the known-limitations table these lines fall under until the fix lan
 
 ## Known limitations
 
-B's rows of the known-limitations table are those of B9 on `next` (above: `L-display-name-not-held`, `L-display-name-other`); the wrong answers of the sets of version 1 are not classified. What the truth cannot judge, and what the published sets leave open (the synonyms of every cross-reference, the support at releases without BioMart and human's 112 and mouse's 89, read through the reach by version 1, are read by the revision `r1`):
+B's rows of the known-limitations table come from its builder (`limits_b`): the wrong answers of `main` by the class of the answer (`limitations_map_outcomes.tsv`: a display name of B9 not read at its release or held by another gene, `L-display-name-not-held` and `L-display-name-other`; a name that is an identifier of a database the graph does not hold, `L-ids-not-held`; a bridge where Ensembl's history has no successor, `L-bridges`) and B2's names whose old gene ended (`L-b2-history-ends`, below), and those of B9 on `next`. What the truth cannot judge, and what the published sets leave open (the synonyms of every cross-reference, the support at releases without BioMart and human's 112 and mouse's 89, read through the reach by version 1, are read by the revision `r1`):
 
 | limitation | what | size |
 | --- | --- | --- |
-| moved names read at an old release | a moved name read at an old release is often answered with its carrier now, which the truth puts in `broad` when the old release's cross-references give that gene the name in another source (the corrected judge's `names_broad` at every release): such lines are undetermined | `b2_moved_from` undetermined: cynomolgus 20,878 of 24,092 answers, rhesus 185,218 of 203,036 (`results/b/d4c2dda/<organism>/report.tsv`) |
+| moved names whose old gene ended (`L-b2-history-ends`) | a name read at an old release whose carrier then Ensembl retired without a successor, and that another gene carries at 115: the answer key cannot judge a name whose gene ended (every answer is a bridge: judged by place where the assemblies can be compared, else undetermined); reported apart from B2's measured part, with its outcomes and no rate | on `main`, answers (right / wrong / undetermined): pig 148,482 (17,580 / 1,047 / 129,855), mouse 33,962 (1,266 / 1,272 / 31,424), human 40,744 (1,840 / 1,672 / 37,232), rhesus 184,570 (19,774 / 188 / 164,608), cynomolgus 20,848 (1,930 / 0 / 18,918) (`results/limitations/limitations.tsv`) |
 | the reach | where a release's synonyms or name sources are not read, the truth accepts the genes that carry the string at any release read (open) and calls an answer outside them wrong; since `r1` every release's are read, and the lines of version 1 whose truth the revision left as it was keep the `name_src` they were made with | every line says what was read (`name_src`) |
-| the authority | where HGNC, MGI, VGNC or NCBI and Ensembl disagree, the disagreement is Ensembl's and is measured beside idtrack (`authority_b.tsv`), never a wrong answer | not measured (`report_b` not run) |
+| the authority | where HGNC, MGI, VGNC or NCBI and Ensembl disagree, the disagreement is Ensembl's and is measured beside idtrack (`authority_b.tsv`), never a wrong answer | on `main`: `results/b/main/<organism>/authority_b.tsv` |
 
 ## Reproducing from scratch
 

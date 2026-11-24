@@ -1,0 +1,45 @@
+check	class	by_design	count	ids	example
+presence	ok		2157903	59572	
+history	edge_ok_birth_or_return		59572	59572	[{"session": "", "old": "ENSMMUG00000000001.Void", "new": "ENSMMUG00000000001.2", "score": "", "recorded": "", "sides": "48->48", "graph": "edge"}, {"session": "", "old": "ENSMMUG00000000002.Void", "new": "ENSMMUG00000000002.2", "score": "", "recorded": "", "sides": "48->48", "graph": "edge"}]
+history	edge_ok_event		14108	2250	[{"session": "", "old": "ENSMMUG00000000272.2", "new": "ENSMMUG00000040186.1", "score": "", "recorded": "", "sides": "85->86", "graph": "edge"}, {"session": "", "old": "ENSMMUG00000000272.2", "new": "ENSMMUG00000041290.1", "score": "", "recorded": "", "sides": "85->86", "graph": "edge"}]
+history	edge_ok_last_loop		35432	35432	[{"session": "", "old": "ENSMMUG00000000001.4", "new": "ENSMMUG00000000001.4", "score": "", "recorded": "", "sides": "98->inf", "graph": "edge"}, {"session": "", "old": "ENSMMUG00000000002.4", "new": "ENSMMUG00000000002.4", "score": "", "recorded": "", "sides": "98->inf", "graph": "edge"}]
+history	edge_ok_retirement		24140	24140	[{"session": "", "old": "ENSMMUG00000000004.2", "new": "ENSMMUG00000000004.Retired", "score": "", "recorded": "", "sides": "85->86", "graph": "edge"}, {"session": "", "old": "ENSMMUG00000000012.2", "new": "ENSMMUG00000000012.Retired", "score": "", "recorded": "", "sides": "97->98", "graph": "edge"}]
+history	edge_ok_self_event		1	1	[{"session": "", "old": "ENSMMUG00000047306.1", "new": "ENSMMUG00000047306.1", "score": "", "recorded": "", "sides": "97->98", "graph": "edge"}]
+history	edge_ok_version_change		39841	23139	[{"session": "", "old": "ENSMMUG00000000001.2", "new": "ENSMMUG00000000001.3", "score": "", "recorded": "", "sides": "85->86", "graph": "edge"}, {"session": "", "old": "ENSMMUG00000000001.3", "new": "ENSMMUG00000000001.4", "score": "", "recorded": "", "sides": "97->98", "graph": "edge"}]
+history	ok_between_ids		14108	2250	
+history	ok_birth		31863	31863	
+history	ok_retirement		24140	24140	
+history	ok_self_same_version		1	1	
+history	ok_version_change		39841	23139	
+history	outside_window	session outside the graph's window	62244	33517	
+history	self_same_version_no_edge_by_rule	builder's rule: an id mapped onto itself with score 1 and no other event of the id in the session is no edge	27670	27670	
+transcripts	tl:ok		2803981	76290	
+transcripts	tx:ok		3518777	103349	
+names	display:missing		160	79	[{"release": 75, "family": "display", "gene": "ENSMMUG00000010169", "value": "mml-mir-7173", "region": "primary", "graph_dbs": "source=miRBase"}, {"release": 75, "family": "display", "gene": "ENSMMUG00000026981", "value": "mml-mir-126", "region": "primary", "graph_dbs": "source=miRBase"}]
+names	display:ok		116397	33289	
+names	display:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	506	283	[{"release": 75, "family": "display", "gene": "ENSMMUG00000000594", "value": "C19ORF70", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}, {"release": 75, "family": "display", "gene": "ENSMMUG00000032590", "value": "C14ORF109", "region": "primary", "graph_dbs": "source=UniProtKB Gene Name"}]
+names	display:under_another_database		53	28	[{"release": 75, "family": "display", "gene": "ENSMMUG00000028657", "value": "mml-mir-513b-1", "region": "primary", "graph_dbs": "synonym_id::NCBI gene (formerly Entrezgene)"}, {"release": 75, "family": "display", "gene": "ENSMMUG00000033813", "value": "mml-mir-1233", "region": "primary", "graph_dbs": "synonym_id::NCBI gene (formerly Entrezgene)"}]
+names	hgnc:ok		19779	10328	
+names	hgnc:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	4	4	[{"release": 75, "family": "hgnc", "gene": "ENSMMUG00000009947", "value": "C22orf24", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "hgnc", "gene": "ENSMMUG00000020729", "value": "C21orf37", "region": "primary", "graph_dbs": ""}]
+names	links_on_another_assembly_not_read	links of a release on an assembly that does not serve it (human GRCh37 at 76 on): not part of the graph's answers at that release; counted, not compared	0	0	
+names	ncbi:graph_extra|label_column_absent	truth: BioMart's NCBI table of the release has no label column	36717	18406	[{"release": 75, "family": "ncbi", "gene": "ENSMMUG00000032626", "value": "LOC704845", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "ncbi", "gene": "ENSMMUG00000032626", "value": "LOC696204", "region": "primary", "graph_dbs": ""}]
+names	ncbi:ok		168214	52712	
+names	refseq_mrna:ok		17814	5787	
+names	refseq_mrna_predicted:ok		206098	71574	
+names	refseq_ncrna:ok		2479	639	
+names	refseq_ncrna_predicted:ok		17241	6647	
+names	refseq_peptide:ok		18003	5845	
+names	refseq_peptide_predicted:ok		212909	74773	
+names	rfam:ok		29537	9914	
+names	sptrembl:ok		229895	78574	
+names	swissprot:ok		733	239	
+names	synonym:ok		1490	675	
+names	synonym:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	23	21	[{"release": 105, "family": "synonym", "gene": "ENSMMUG00000046400", "value": "env", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "synonym", "gene": "ENSMMUG00000021205", "value": "C2H3orf67", "region": "primary", "graph_dbs": ""}]
+names	uniprot_gn:ok		71805	21704	
+names	uniprot_gn:other_spelling	rule `spelling_steps`: a node is named as the value was written at its first release	553	302	[{"release": 75, "family": "uniprot_gn", "gene": "ENSMMUG00000000594", "value": "C19ORF70", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "uniprot_gn", "gene": "ENSMMUG00000032590", "value": "C14ORF109", "region": "primary", "graph_dbs": ""}]
+names	vgnc:graph_extra	authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then	299	103	[{"release": 105, "family": "vgnc", "gene": "ENSMMUG00000011424", "value": "EFCAB2", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "vgnc", "gene": "ENSMMUG00000014876", "value": "NEPRO", "region": "primary", "graph_dbs": ""}]
+names	vgnc:graph_extra_gene_without_table_row	authority: VGNC's own symbols (no VGNC id in BioMart for the gene)	3	1	[{"release": 105, "family": "vgnc", "gene": "ENSMMUG00000001752", "value": "TMEM155", "region": "primary", "graph_dbs": "VGNC Symbol"}, {"release": 110, "family": "vgnc", "gene": "ENSMMUG00000001752", "value": "TMEM155", "region": "primary", "graph_dbs": "VGNC Symbol"}]
+names	vgnc:missing	authority: VGNC's own current and previous symbols of the gene's VGNC id, not Ensembl's label then	607	285	[{"release": 105, "family": "vgnc", "gene": "ENSMMUG00000011424", "value": "DRC8", "region": "primary", "graph_dbs": ""}, {"release": 105, "family": "vgnc", "gene": "ENSMMUG00000000015", "value": "SPMIP3", "region": "primary", "graph_dbs": ""}]
+names	vgnc:ok		43559	15025	
+names	vgnc:under_another_database	authority: VGNC's own symbols; Ensembl wrote the gene's label under another database	397	174	[{"release": 105, "family": "vgnc", "gene": "ENSMMUG00000000016", "value": "ADSS", "region": "primary", "graph_dbs": "synonym_id::VGNC Symbol"}, {"release": 105, "family": "vgnc", "gene": "ENSMMUG00000006892", "value": "PQLC2", "region": "primary", "graph_dbs": "synonym_id::VGNC Symbol"}]
+names	wikigene:database_not_in_graph	the organism's externals file does not include the database	102367	32228	[{"release": 75, "family": "wikigene", "gene": "ENSMMUG00000032626", "value": "LOC704845", "region": "primary", "graph_dbs": ""}, {"release": 75, "family": "wikigene", "gene": "ENSMMUG00000032626", "value": "LOC696204", "region": "primary", "graph_dbs": ""}]

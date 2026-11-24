@@ -1,0 +1,5 @@
+stratum	lines	authority_no_gene_at_115	authority_gene	ensembl_agrees	ensembl_overlaps	ensembl_differs	idtrack_equals_authority	idtrack_holds_authority	idtrack_misses_authority	idtrack_nothing
+b4_prev_default	71313	22044	49269	44436	399	4434	44655	321	834	3458
+b4_prev_from	14053	4260	9793	8854	352	587	9197	133	380	83
+b5_alias_mgi	50241	1958	48283	47669	82	532	47737	80	407	56
+b5_alias_ncbi	73466	13729	59737	51759	1108	6870	52596	1079	1705	4353

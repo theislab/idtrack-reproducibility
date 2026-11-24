@@ -127,6 +127,84 @@ The snapshot-110 graphs are built by the tree from the same downloaded tables, t
 
 ## Results
 
+### On main
+
+Runs `<families>/a/runs/main/<organism>/` (every line of A's sets), A0 `<families>/a/a0/main/<organism>/` (main's graphs against Ensembl's tables) and A8 `runs/main_s110/<organism>/` (pig and human, on the snapshot-110 graphs `main`'s builder made: `graphs/main_s110`, built from Ensembl's tables of 110, not judged against `d4c2dda`'s), the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only), on `r2`'s graph files, which `main`'s own builder rebuilt with the same content digests (`[graphs.main]` of `results.toml`), 2026-11-24. Result files `results/a/main/<organism>/` and `results/a/main_s110/<organism>/`. Totals:
+
+| family | organism | n | right | wrong | undetermined | rate (Wilson 95 %) | d4c2dda |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| a | pig | 58,633,038 | 56,479,798 | 36,082 | 2,117,158 | 0.99936 (0.99935–0.99937) | 0.99648 |
+| a | mouse | 91,126,681 | 89,546,388 | 108,589 | 1,471,704 | 0.99879 (0.99878–0.99880) | 0.99460 |
+| a | human | 121,303,881 | 118,677,733 | 287,587 | 2,338,561 | 0.99758 (0.99757–0.99759) | 0.99350 |
+| a | rhesus | 72,162,026 | 70,324,868 | 0 | 1,837,158 | 1.00000 (1.00000–1.00000) | 0.99985 |
+| a | cynomolgus | 59,089,484 | 58,370,514 | 0 | 718,970 | 1.00000 (1.00000–1.00000) | 1.00000 |
+| a [main_s110] | pig | 4,817,680 | 4,454,982 | 3,980 | 358,718 | 0.99911 (0.99908–0.99913) | 0.99667 |
+| a [main_s110] | human | 11,962,848 | 11,763,472 | 7,836 | 191,540 | 0.99933 (0.99932–0.99935) | 0.99734 |
+
+Against `d4c2dda`, right to wrong: pig 928, mouse 2,101, human 1,333 answers, all of them bridges where Ensembl's history has no successor (`external_bridge`) but human 39 LRG answers (`gtf_lacks_core_gene`) and 42 not classified; rhesus and cynomolgus none (no wrong answer on `main`); A8 human 171 (163 bridges, 8 not classified), pig none. Every answer of the modest set's lines is identical to `r2`'s stored answers.
+
+`main` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human | rhesus | cynomolgus |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `A1` | 0.9992 (0.9991–0.9994) | 0.9994 (0.9992–0.9995) | 0.9993 (0.9992–0.9994) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A2` | 0.9985 (0.9983–0.9988) | 0.9992 (0.9991–0.9994) | 0.9988 (0.9987–0.9990) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A3_+1` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A3_+2` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9999 (0.9999–0.9999) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A3_-1` | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | 0.9998 (0.9998–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A3_-2` | 0.9998 (0.9998–0.9999) | 0.9999 (0.9999–1.0000) | 0.9995 (0.9995–0.9995) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A3_first` | 0.9977 (0.9972–0.9980) | 0.9969 (0.9965–0.9973) | 0.9889 (0.9881–0.9896) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A4_back` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A4_back_version_not_in_gtf` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9819 (0.9770–0.9861) | – | – |
+| `A4_fwd` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A4_fwd_version_not_in_gtf` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9947 (0.9923–0.9967) | – | – |
+| `A4_ver` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A5_66_67_born` | 0.9867 (0.9845–0.9889) | – | – | – | – |
+| `A5_66_67_dies` | 0.9971 (0.9954–0.9986) | – | – | – | – |
+| `A5_66_67_lives` | 1.0000 (1.0000–1.0000) | – | – | – | – |
+| `A5_89_90_born` | 1.0000 (1.0000–1.0000) | – | – | – | – |
+| `A5_89_90_dies` | 1.0000 (1.0000–1.0000) | – | – | – | – |
+| `A5_89_90_lives` | 1.0000 (1.0000–1.0000) | – | – | – | – |
+| `A6_backward` | 0.9999 (0.9999–1.0000) | 0.9992 (0.9989–0.9995) | 0.9949 (0.9941–0.9957) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A6_backward_handoff` | 0.9977 (0.9970–0.9984) | 0.9957 (0.9945–0.9969) | 0.9900 (0.9882–0.9917) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A6_forward` | 0.9995 (0.9993–0.9998) | 0.9998 (0.9995–0.9999) | 0.9995 (0.9993–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A6_forward_handoff` | 1.0000 (1.0000–1.0000) | 0.9975 (0.9965–0.9984) | 0.9976 (0.9967–0.9983) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A6_same` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A7_tl_115` | 0.9990 (0.9987–0.9993) | 0.9985 (0.9982–0.9988) | 0.9984 (0.9981–0.9987) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A7_tl_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A7_tl_sample` | 0.9992 (0.9989–0.9994) | 0.9994 (0.9992–0.9996) | 0.9994 (0.9992–0.9996) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A7_tx_115` | 0.9992 (0.9990–0.9994) | 0.9994 (0.9993–0.9995) | 0.9990 (0.9989–0.9992) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A7_tx_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A7_tx_sample` | 0.9993 (0.9990–0.9995) | 0.9996 (0.9995–0.9997) | 0.9996 (0.9994–0.9997) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `A4_ver_version_not_in_gtf` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `A5_102_103_born` | – | 0.9977 (0.9943–1.0000) | – | – | 1.0000 (1.0000–1.0000) |
+| `A5_102_103_dies` | – | 0.9962 (0.9938–0.9983) | – | – | 1.0000 (1.0000–1.0000) |
+| `A5_102_103_lives` | – | 1.0000 (1.0000–1.0000) | – | – | 1.0000 (1.0000–1.0000) |
+| `A5_67_68_born` | – | 0.9927 (0.9888–0.9958) | – | – | – |
+| `A5_67_68_dies` | – | 0.9937 (0.9909–0.9962) | – | – | – |
+| `A5_67_68_lives` | – | 1.0000 (1.0000–1.0000) | – | – | – |
+| `A5_54_55_born` | – | – | 0.9972 (0.9959–0.9983) | – | – |
+| `A5_54_55_dies` | – | – | 0.9975 (0.9965–0.9985) | – | – |
+| `A5_54_55_lives` | – | – | 1.0000 (1.0000–1.0000) | – | – |
+| `A5_75_76_born` | – | – | 0.9700 (0.9647–0.9747) | – | – |
+| `A5_75_76_dies` | – | – | 0.9918 (0.9894–0.9941) | – | – |
+| `A5_75_76_lives` | – | – | 1.0000 (1.0000–1.0000) | – | – |
+| `A8` | – | – | 0.9993 (0.9992–0.9994) | – | – |
+| `A5_85_86_born` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `A5_85_86_dies` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `A5_85_86_lives` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `A5_97_98_born` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `A5_97_98_dies` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+| `A5_97_98_lives` | – | – | – | 1.0000 (1.0000–1.0000) | – |
+
+`main_s110` (rate and interval per stratum, both views):
+
+| stratum | pig | human |
+| --- | ---: | ---: |
+| `A8` | 0.9991 (0.9989–0.9993) | 0.9993 (0.9992–0.9994) |
+
+### On d4c2dda
+
 Runs `<families>/a/runs/d4c2dda/<organism>/` (the reference graphs, every set with its revision sets, judge `revised`) and `runs/d4c2dda_s110/{sus_scrofa,homo_sapiens}/` (A8 on the snapshot-110 graphs); A0 `<families>/a/a0/d4c2dda/<organism>/summary.tsv`. Result files: `results/a/d4c2dda/<organism>/report.tsv`, `scores.tsv`, `causes_summary.tsv`, `axes.tsv`, `patterns.tsv`, `wrong_units.tsv` and `a0_summary.tsv`; `results/a/d4c2dda_s110/<organism>/` for A8. No answer timed out and none raised an error. Human's run on the 115 graph also holds the A8 lines (to 110, asked on the 115 graph). A was run on `d4c2dda`; `71690ab` is answer-identical to it on every harness line ([F0's check](f0.md#the-check-against-the-harnesss-scorer)) and was not run on A.
 
 ### A0
@@ -320,6 +398,8 @@ A's rows of [the known-limitations table](../../results/limitations/limitations.
 | `L-undetermined-other` | other undetermined answers | undetermined | – | 4,654 | 10,092 | – | – |
 
 On the snapshot-110 graphs (A8): pig `L-bridges` 14,314, `L-no-chain` 485,976, `L-bridge-at-place` 35,958, `L-branch` 1,466; human `L-bridges` 31,266, `L-event-versions` 84, `L-bridge-at-place` 164,874, `L-chain-gap` 16,744, `L-open-truth` 2,980, `L-undetermined-other` 980, `L-branch` 84. Each row also carries its units, the answers of the strata it occurs in, the share, the strata, the run and the graph's digest.
+
+On `main` (`results/limitations/a_main.tsv`, the same builder; answers, units in parentheses): `L-bridges` pig 36,082 (300), mouse 108,409 (607), human 274,372 (2,490), rhesus and cynomolgus none; `L-copies-before-82` human 11,639 (38); `L-truth-gtf-short` human 1,431 (28); `L-resurrection` mouse 180 (2); `L-transcript-elsewhere` human 12 (7); `L-unexplained` human 131 (13); and undetermined: `L-bridge-at-place` pig 284,852, mouse 1,379,369, human 2,155,739, rhesus 16,424; `L-no-chain` pig 1,737,568, rhesus 1,820,734, cynomolgus 718,970; `L-chain-gap` pig 44,502, mouse 81,184, human 82,762; `L-branch` pig 50,236, mouse 6,235, human 73,318; `L-open-truth` human 17,614; `L-undetermined-other` mouse 4,916, human 9,128.
 
 ## Reproducing from scratch
 

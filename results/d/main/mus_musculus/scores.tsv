@@ -1,0 +1,9 @@
+kind	variant	n	right	wrong	undetermined	timeout	error	rate	ci_low	ci_high
+d1_id	*	411976	385787	12732	13457	0	0	0.9681	0.9675	0.9686
+d1_id	all,default	65	0	0	65	0	0	nan	nan	nan
+d1_id	all,from	205923	192795	6466	6662	0	0	0.9676	0.9668	0.9683
+d1_id	best,default	65	0	0	65	0	0	nan	nan	nan
+d1_id	best,from	205923	192992	6266	6665	0	0	0.9686	0.9678	0.9693
+d1_symbol	*	200970	189577	1545	9848	0	0	0.9919	0.9915	0.9923
+d1_symbol	all,from	100485	94389	884	5212	0	0	0.9907	0.9901	0.9913
+d1_symbol	best,from	100485	95188	661	4636	0	0	0.9931	0.9926	0.9936

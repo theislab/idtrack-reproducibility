@@ -1,0 +1,3 @@
+stratum	cause	class	rule	answers	units
+c4_rfam_label_retired	rfam_label_is_accession	d	-	2	2
+c6:NCBI gene (formerly Entrezgene)	ncbi_label_name_by_release	a	rule `one_kind_per_database` (decided)	64	18

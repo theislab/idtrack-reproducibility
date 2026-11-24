@@ -1,0 +1,4 @@
+family	organism	stratum	view	n	right	expected_error	wrong	undetermined	timeout	error	not_supported	missing	rate	wilson_low	wilson_high	boot_low	boot_high	units	units_wrong	units_error	recovered	s_p50	s_p95	s_p99	s_max
+a	sus_scrofa	A8	*	4817680	4454982	0	3980	358718	0	0	0	0	0.9991	0.9991	0.9991	0.9989	0.9993	56799	124	0	0	0.00028	0.00110	0.00251	0.6521
+a	sus_scrofa	A8	all	2408840	2226914	0	2054	179872	0	0	0		0.9991	0.9990	0.9991	0.9989	0.9992	56799	124	0	0	0.00028	0.00110	0.00251	0.6521
+a	sus_scrofa	A8	best	2408840	2228068	0	1926	178846	0	0	0		0.9991	0.9991	0.9992	0.9990	0.9993	56799	118	0	0	0.00028	0.00110	0.00251	0.6521

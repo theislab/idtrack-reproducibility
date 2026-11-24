@@ -1,0 +1,45 @@
+relation	organism	count	value
+composition	mus_musculus	by_history	67
+composition	mus_musculus	holds	2932
+composition	mus_musculus	not_one_gene	2562
+composition	mus_musculus	refuted	1
+composition	mus_musculus	triples	3000
+return	mus_musculus	holds	3000
+return	mus_musculus	pairs	3000
+roundtrip	mus_musculus	EntrezGene|holds	367
+roundtrip	mus_musculus	EntrezGene|ids	367
+roundtrip	mus_musculus	EntrezGene|no_id	638
+roundtrip	mus_musculus	HGNC Symbol|holds	1
+roundtrip	mus_musculus	HGNC Symbol|ids	1
+roundtrip	mus_musculus	HGNC Symbol|no_id	999
+roundtrip	mus_musculus	MGI Symbol|holds	987
+roundtrip	mus_musculus	MGI Symbol|ids	987
+roundtrip	mus_musculus	MGI Symbol|no_id	13
+roundtrip	mus_musculus	NCBI gene (formerly Entrezgene)|holds	367
+roundtrip	mus_musculus	NCBI gene (formerly Entrezgene)|ids	367
+roundtrip	mus_musculus	NCBI gene (formerly Entrezgene)|no_id	638
+roundtrip	mus_musculus	RefSeq_mRNA|holds	471
+roundtrip	mus_musculus	RefSeq_mRNA|ids	471
+roundtrip	mus_musculus	RefSeq_mRNA|no_id	726
+roundtrip	mus_musculus	UniProtKB Gene Name|holds	284
+roundtrip	mus_musculus	UniProtKB Gene Name|ids	284
+roundtrip	mus_musculus	UniProtKB Gene Name|no_id	720
+roundtrip	mus_musculus	Uniprot/SWISSPROT|holds	200
+roundtrip	mus_musculus	Uniprot/SWISSPROT|ids	200
+roundtrip	mus_musculus	Uniprot/SWISSPROT|no_id	802
+path	mus_musculus	bridge_far_held	30
+path	mus_musculus	bridge_far_steps	154
+path	mus_musculus	bridge_far_undetermined	124
+path	mus_musculus	bridge_near_held	31
+path	mus_musculus	bridge_near_not_held	1
+path	mus_musculus	bridge_near_steps	155
+path	mus_musculus	bridge_near_undetermined	123
+path	mus_musculus	candidates	8112
+path	mus_musculus	candidates_with_problem	1
+path	mus_musculus	final_held	163
+path	mus_musculus	final_steps	163
+path	mus_musculus	history_event	12774
+path	mus_musculus	history_event_versions_differ	42
+path	mus_musculus	history_event_versions_equal	12732
+path	mus_musculus	history_steps	12774
+path	mus_musculus	lines	3000

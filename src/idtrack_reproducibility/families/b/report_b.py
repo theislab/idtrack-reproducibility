@@ -6,7 +6,10 @@ Usage: report_b.py --organism <o> --run <run folder>/<organism>
 Writes into the run folder:
   report_b.tsv      per judge and stratum (and the groups B1..B8): n, right, wrong, undetermined, timeout, error, rate
                     with Wilson and clustered intervals (F0's report.tsv of each judge, view `*`), units behind the
-                    wrong answers
+                    wrong answers; `b2_moved_from` in two parts (`b2_moved_split`): `history continues` (the old gene's
+                    history reaches the target: measured, its rate and interval) and `history ends` (Ensembl retired
+                    the old gene without a successor: every answer is a bridge, which the truth judges by place or
+                    leaves undetermined; no rate, its outcomes only), the group B2 from the measured part
   authority_b.tsv   per stratum of the lines that carry an authority's gene (B4, B5's aliases): lines, the authority
                     names a gene at 115, Ensembl's truth equals the authority's gene (agree), differs; idtrack's `best`
                     answer equals the authority's gene, holds it among others, misses it, answers nothing
@@ -36,12 +39,62 @@ def group_of(stratum):
     return stratum[:2]
 
 
+def split_b2(scored, ends):
+    """`b2_moved_from`'s outcomes in two parts by its lines (`ends`: qid -> the old gene's history ends, the line
+    expects nothing): [(part, Counter of n and outcomes, with the sets `units` and `units_wrong`)]."""
+    import pyarrow.compute as pc
+    import pyarrow.parquet as pq
+    parts = {k: collections.Counter() for k in ("history continues", "history ends")}
+    units = {k: (set(), set()) for k in parts}
+    for p in RP.outcome_parts(scored):
+        t = pq.read_table(p, columns=["qid", "stratum", "unit", "outcome"])
+        t = t.filter(pc.equal(t.column("stratum"), "b2_moved_from"))
+        for q, u, o in zip(*(t.column(c).to_pylist() for c in ("qid", "unit", "outcome"))):
+            k = "history ends" if ends.get(q) else "history continues"
+            parts[k]["n"] += 1
+            parts[k][o] += 1
+            units[k][0].add(u)
+            if o == "wrong":
+                units[k][1].add(u)
+    out = []
+    for k, c in parts.items():
+        c = collections.Counter(c)
+        c["units"], c["units_wrong"] = units[k]
+        out.append((k, c))
+    return out if any(c["n"] for _, c in out) else []
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--organism", required=True)
     ap.add_argument("--run", required=True)
     a = ap.parse_args()
     run, org = os.path.abspath(a.run), a.organism
+    import pyarrow as pa
+    import pyarrow.compute as pc
+    import pyarrow.parquet as pq
+    info = json.load(open(os.path.join(run, "scores_now", "run.json")))
+    sets = list(info["sets"])
+    auth, src, ends = {}, {}, {}
+    d = L.query_dir("b", org)
+    for s in sets:  # in publication order: the latest line of a qid wins
+        p = L._set_file(d, s)
+        if p.endswith(".parquet"):
+            t = pq.read_table(p, columns=["qid", "stratum", "expect", "extra"])
+            for q, st, e, x in zip(*(t.column(c).to_pylist() for c in ("qid", "stratum", "expect", "extra"))):
+                xx = json.loads(x) if x else {}
+                src[q] = (st, xx.get("name_src", ""))
+                if st == "b2_moved_from":
+                    ends[q] = not e
+                if "authority" in xx:
+                    auth[q] = (st, set(e or []), set(xx["authority"]))
+        else:
+            for ln in L.iter_set(p):
+                src[ln["qid"]] = (ln.get("stratum"), ln.get("name_src", ""))
+                if ln.get("stratum") == "b2_moved_from":
+                    ends[ln["qid"]] = not ln.get("expect")
+                if "authority" in ln:
+                    auth[ln["qid"]] = (ln.get("stratum"), set(ln.get("expect") or []), set(ln["authority"]))
     rows = []
     for judge in ("now", "decided"):
         p = os.path.join(run, f"scores_{judge}", "report.tsv")
@@ -53,8 +106,22 @@ def main():
             rows.append([judge, r["stratum"], group_of(r["stratum"]), r["n"], r["right"], r["expected_error"], r["wrong"],
                          r["undetermined"], r["timeout"], r["error"], r["rate"], r["wilson_low"], r["wilson_high"], r["boot_low"],
                          r["boot_high"], r["units"], r["units_wrong"]])
+            if r["stratum"] == "b2_moved_from":
+                continue  # the group B2 counts its measured part (below)
             for k in ("n", "right", "expected_error", "wrong", "undetermined", "timeout", "error"):
                 agg[group_of(r["stratum"])][k] += int(r[k])
+        for part, c in split_b2(os.path.join(run, f"scores_{judge}"), ends):
+            ok = c["right"] + c["expected_error"]
+            den = ok + c["wrong"] + c["error"]
+            lo, hi = RP.wilson(ok, den)
+            measured = part == "history continues"
+            rows.append([judge, f"b2_moved_from: {part}", "b2", c["n"], c["right"], c["expected_error"], c["wrong"],
+                         c["undetermined"], c["timeout"], c["error"], (f"{ok / den:.5f}" if den else "nan") if measured else "",
+                         f"{lo:.5f}" if measured else "", f"{hi:.5f}" if measured else "", "", "", len(c["units"]),
+                         len(c["units_wrong"])])
+            if measured:
+                for k in ("n", "right", "expected_error", "wrong", "undetermined", "timeout", "error"):
+                    agg["b2"][k] += c[k]
         for g, c in sorted(agg.items()):
             ok = c["right"] + c["expected_error"]
             den = ok + c["wrong"] + c["error"]
@@ -68,28 +135,6 @@ def main():
         for r in rows:
             fo.write("\t".join(str(x) for x in r) + "\n")
     # the authority measure (lines with an authority's gene) and the name sources read, from the lines and answers
-    import pyarrow as pa
-    import pyarrow.compute as pc
-    import pyarrow.parquet as pq
-    info = json.load(open(os.path.join(run, "scores_now", "run.json")))
-    sets = list(info["sets"])
-    auth = {}
-    src = {}
-    d = L.query_dir("b", org)
-    for s in sets:
-        p = L._set_file(d, s)
-        if p.endswith(".parquet"):
-            t = pq.read_table(p, columns=["qid", "stratum", "expect", "extra"])
-            for q, st, e, x in zip(*(t.column(c).to_pylist() for c in ("qid", "stratum", "expect", "extra"))):
-                xx = json.loads(x) if x else {}
-                src[q] = (st, xx.get("name_src", ""))
-                if "authority" in xx:
-                    auth[q] = (st, set(e or []), set(xx["authority"]))
-        else:
-            for ln in L.iter_set(p):
-                src[ln["qid"]] = (ln.get("stratum"), ln.get("name_src", ""))
-                if "authority" in ln:
-                    auth[ln["qid"]] = (ln.get("stratum"), set(ln.get("expect") or []), set(ln["authority"]))
     ans = {}
     if auth:
         want = pa.array(sorted(auth))

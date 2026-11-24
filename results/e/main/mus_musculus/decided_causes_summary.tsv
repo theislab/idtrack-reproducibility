@@ -1,0 +1,5 @@
+stratum	cause	class	rule	answers	units
+e2_all_makeunique	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	3	1
+e8_batch_release_default_suffix	unexplained	?	-	38	8
+e8_batch_single	unexplained	?	-	34	14
+e8_onerelease_reference	unexplained	?	-	26	13

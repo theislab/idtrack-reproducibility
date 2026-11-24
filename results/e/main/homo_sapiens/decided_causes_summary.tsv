@@ -1,0 +1,7 @@
+stratum	cause	class	rule	answers	units
+e2_all_punct	stray_punctuation_artifact_name	a	rule `stray_punctuation` (finding IN-11; decided)	18	6
+e2_makeunique_syn	separator_joins_suffix	b	rule `made_unique_copies` (finding IN-3; decided)	2	1
+e8_batch_release_atR_suffix	unexplained	?	-	2	1
+e8_batch_release_default_suffix	unexplained	?	-	42	18
+e8_batch_single	unexplained	?	-	20	10
+e8_onerelease_reference	unexplained	?	-	2	1

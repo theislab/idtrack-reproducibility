@@ -1,0 +1,17 @@
+stratum	view	lines	with_authority	ensembl_vs_authority_differ	agree	other	nothing	open_agree	open_other	open_nothing	open_agree_alias	open_agree_approved	open_agree_previous	open_nothing_alias	open_nothing_approved	open_nothing_previous	open_other_alias	open_other_approved	open_other_previous
+d3_cellmarker_default	all	182351	132930	917	130872	2036	22	2026	97	22	1620	1	405	8	14	0	52	15	30
+d3_cellmarker_default	best	182351	132930	917	132164	744	22	2026	97	22	1620	1	405	8	14	0	52	15	30
+d3_cellmarker_from	all	182351	132930	359	131363	1536	31	7707	312	31	2689	176	4842	8	14	9	57	86	169
+d3_cellmarker_from	best	182351	132930	359	132432	467	31	7748	271	31	2701	176	4871	8	14	9	45	86	140
+d3_msigdb_default	all	20436	20151	211	19774	375	2	0	1	2	0	0	0	0	2	0	0	1	0
+d3_msigdb_default	best	20436	20151	211	20040	109	2	0	1	2	0	0	0	0	2	0	0	1	0
+d3_msigdb_from	all	20436	20151	209	19773	376	2	3	2	2	0	3	0	0	2	0	0	2	0
+d3_msigdb_from	best	20436	20151	209	20034	115	2	3	2	2	0	3	0	0	2	0	0	2	0
+d3_panglaodb_default	all	4343	4335	6	4308	27	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_panglaodb_default	best	4343	4335	6	4332	3	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_panglaodb_from	all	4343	4335	4	4310	25	0	43	1	0	0	2	41	0	0	0	0	0	1
+d3_panglaodb_from	best	4343	4335	4	4331	4	0	43	1	0	0	2	41	0	0	0	0	0	1
+d3_rosetta_lineage_default	all	216	216	0	215	1	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_rosetta_lineage_default	best	216	216	0	216	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_rosetta_lineage_from	all	216	216	0	215	1	0	0	0	0	0	0	0	0	0	0	0	0	0
+d3_rosetta_lineage_from	best	216	216	0	216	0	0	0	0	0	0	0	0	0	0	0	0	0	0

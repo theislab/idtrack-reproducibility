@@ -178,6 +178,39 @@ The truth's own fetches for A* (beyond the harness's): `python -m idtrack_reprod
 
 ## Results
 
+### On main
+
+Runs `<families>/astar/runs/main/<organism>/` (gene lines) and `runs/main_tx/<organism>/` (transcripts and translations), every line of A*'s sets with their revision sets (human with `v1r5`), the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only), on `r2`'s graph files, which `main`'s own builder rebuilt with the same content digests (`[graphs.main]` of `results.toml`), 2026-11-24. Result files `results/astar/main/<organism>/` (`report.tsv`, `scores.tsv`, A*'s own tables) and `results/astar/main_tx/<organism>/`. Totals (answers are lines x views; the interval of a total is Wilson's; per stratum the cluster bootstrap over the lineage):
+
+| family | organism | n | right | wrong | undetermined | rate (Wilson 95 %) | d4c2dda |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| astar | pig | 38,719,226 | 37,303,287 | 16,037 | 1,399,902 | 0.99957 (0.99956–0.99958) | 0.99887 |
+| astar | mouse | 108,689,726 | 105,592,301 | 238,984 | 2,858,441 | 0.99774 (0.99773–0.99775) | 0.99326 |
+| astar | human | 108,317,648 | 103,591,009 | 652,719 | 4,073,920 | 0.99374 (0.99372–0.99375) | 0.98699 |
+| astar | rhesus | 30,703,584 | 30,498,124 | 1,164 | 204,296 | 0.99996 (0.99996–0.99996) | 0.99997 |
+| astar | cynomolgus | 3,385,652 | 3,382,092 | 288 | 3,272 | 0.99991 (0.99990–0.99992) | 1.00000 |
+| astar [main_tx] | pig | 2,959,016 | 2,791,845 | 833 | 166,338 | 0.99970 (0.99968–0.99972) | 0.99849 |
+| astar [main_tx] | mouse | 4,346,302 | 4,021,735 | 19,306 | 305,261 | 0.99522 (0.99515–0.99529) | 0.98392 |
+| astar [main_tx] | human | 6,817,212 | 6,002,638 | 123,693 | 690,881 | 0.97981 (0.97970–0.97992) | 0.95933 |
+| astar [main_tx] | rhesus | 1,448,730 | 1,434,918 | 0 | 13,812 | 1.00000 (1.00000–1.00000) | 0.99999 |
+| astar [main_tx] | cynomolgus | 276,146 | 276,062 | 0 | 84 | 1.00000 (0.99999–1.00000) | 1.00000 |
+
+Against `d4c2dda` (`idtrack-repro compare`), every answer that went to wrong is read by its cause: the bridges where Ensembl's history has no successor (`L-bridges`; `main`'s graph holds the early names and NCBI ids at their releases, so more ids find a bridge), a split gene converted to a name database (`L-split-no-target`: pig 6,528 answers, mouse 52, human 760, rhesus 1,164, cynomolgus 288), human LRG records answered where the GTF lacks them (`L-truth-gtf-short`) and copies apart before 82 (`L-copies-before-82`); MT-ND4L's 610 answers are the judge's (revision `v1r5`). Two human cases are left as known issues with reproducers (`ENST00000403893` 50 to 52: four candidates tie and the annotation decides; `ENSG00000269359` to 52 to 54 and `ENST00000595290`: bridges). Every answer of the modest set's lines is identical to `r2`'s stored answers.
+
+`main` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human | rhesus | cynomolgus |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `backward` | 0.9998 (0.9994–1.0000) | 0.9995 (0.9992–0.9997) | 0.9964 (0.9951–0.9973) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `backward_handoff` | 0.9996 (0.9993–0.9998) | 0.9967 (0.9955–0.9977) | 0.9875 (0.9853–0.9895) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `db` | 0.9879 (0.9825–0.9923) | 0.9999 (0.9998–1.0000) | 0.9989 (0.9981–0.9996) | 0.9938 (0.9870–0.9985) | 0.9912 (0.9804–0.9986) |
+| `default` | 0.9997 (0.9995–0.9999) | 0.9972 (0.9966–0.9977) | 0.9926 (0.9915–0.9936) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `forward` | 0.9996 (0.9993–0.9999) | 0.9999 (0.9998–1.0000) | 0.9992 (0.9988–0.9995) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `forward_handoff` | 0.9999 (0.9998–1.0000) | 0.9960 (0.9949–0.9969) | 0.9930 (0.9916–0.9943) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `same` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+
+### On d4c2dda
+
 Runs `<families>/astar/runs/d4c2dda/<organism>/` (gene lines) and `runs/d4c2dda_tx/<organism>/` (transcripts and translations), on the reference graphs of `d4c2dda` (their content digests in `run.json`). Result files: `results/astar/d4c2dda/<organism>/report.tsv`, `scores.tsv`, `causes_summary.tsv` and A*'s own tables (`per_pattern.tsv`, `per_pattern_stratum.tsv`, `hard_ids.tsv.gz`, `open.tsv`); `results/astar/d4c2dda_tx/<organism>/report.tsv` and `scores.tsv`. No answer timed out and none raised an error; every identity line (`same`) is right in every organism.
 
 **Every gene line** (pattern `ALL` of `results/astar/d4c2dda/<organism>/per_pattern.tsv`; answers are lines x views; the interval is the cluster bootstrap over the lineage):
@@ -289,6 +322,16 @@ A*'s rows of [the known-limitations table](../../results/limitations/limitations
 | `L-astar-5` | the answer is a branch that left the id while it lived on (within the broad walk), not its own continuation; the decided rule `main_line_first` ranks the continuation first | use strategy `all` to see every branch | 99,717 (229) | 44,073 (175) | 876,312 (1,350) | – | – |
 
 `L-astar-1` is wrong; `L-astar-2` to `L-astar-5` are undetermined answers. Each row also carries its share of the organism's answers, the run and the graph's digest.
+
+On `main`, A*'s rows are read from the class of each wrong answer (registry `limits = "outcomes"`, A*'s `limitations_map_outcomes.tsv`; answers, with the lineages in parentheses):
+
+| limitation | what | pig | mouse | human | rhesus | cynomolgus |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `L-bridges` | no successor in Ensembl's history: a bridge through a shared id or name to a gene not at the query's place (genes; transcripts and translations in `main_tx`) | 9,509 (20); tx 833 (19) | 238,932 (167); tx 19,306 (157) | 649,941 (986); tx 108,912 (942) | – | – |
+| `L-split-no-target` | a split gene converted to a name database where the best descendant has no id (`db`) | 6,528 (48) | 52 (1) | 760 (12) | 1,164 (7) | 288 (5) |
+| `L-truth-gtf-short` | an LRG record answered for an id without successor (the core holds it, the GTF does not) | – | – | 768 (2); tx 456 (2) | – | – |
+
+The copies apart before release 82 (`L-copies-before-82`) are measured by family A's causes (`a_main`: human 11,639 answers, 38 units).
 
 ## Reproducing from scratch
 

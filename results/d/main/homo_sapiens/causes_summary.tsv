@@ -1,0 +1,73 @@
+stratum	cause	class	rule	answers	units
+d1_id_cross_dominant	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	1	1
+d1_id_cross_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	350	175
+d1_id_cross_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	44	22
+d1_id_cross_dominant	external_bridge	b	rule `external_bridge`	81	42
+d1_id_cross_one	d1_history_part_not_place	b	ranking among Ensembl's successors	24	24
+d1_id_cross_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	45	45
+d1_id_cross_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	68	35
+d1_id_cross_one	d1_no_successor_nothing	b	rule `bridge_same_place`	992	496
+d1_id_cross_one	external_bridge	b	rule `external_bridge`	70	37
+d1_id_cross_open	d1_open_follows_history	b	rule `place_moves_marked`	24	12
+d1_id_cross_open	external_bridge	b	rule `external_bridge`	13	8
+d1_id_same_dominant	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	2	2
+d1_id_same_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	3708	706
+d1_id_same_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	210	29
+d1_id_same_dominant	external_bridge	b	rule `external_bridge`	108	44
+d1_id_same_dominant	unexplained	?	-	95	26
+d1_id_same_one	d1_history_part_not_place	b	ranking among Ensembl's successors	42	8
+d1_id_same_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	160	20
+d1_id_same_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	296	32
+d1_id_same_one	d1_no_successor_nothing	b	rule `bridge_same_place`	3198	350
+d1_id_same_one	external_bridge	b	rule `external_bridge`	74	27
+d1_id_same_one	unexplained	?	-	149	20
+d1_id_same_open	d1_open_follows_history	b	rule `place_moves_marked`	18	4
+d1_id_same_open	external_bridge	b	rule `external_bridge`	49	19
+d1_id_same_open	unexplained	?	-	39	11
+d1_id_versioned_dominant	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	1332	666
+d1_id_versioned_dominant	d1_no_successor_nothing	b	rule `bridge_same_place`	32	16
+d1_id_versioned_dominant	external_bridge	b	rule `external_bridge`	25	14
+d1_id_versioned_one	d1_history_part_not_place	b	ranking among Ensembl's successors	3	3
+d1_id_versioned_one	d1_history_split_place_one	b	Ensembl's split; the place shows one gene	13	12
+d1_id_versioned_one	d1_history_to_another_place	b	rule `place_moves_marked`; finding hh-2	36	18
+d1_id_versioned_one	d1_no_successor_nothing	b	rule `bridge_same_place`	412	206
+d1_id_versioned_one	external_bridge	b	rule `external_bridge`	18	9
+d1_id_versioned_open	d1_open_follows_history	b	rule `place_moves_marked`	2	1
+d1_id_versioned_open	external_bridge	b	rule `external_bridge`	29	15
+d1_symbol_cross_dominant	d1_name_history_to_another_place	b	rule `place_moves_marked`	1627	415
+d1_symbol_cross_dominant	d1_name_in_other_source	e	rule `names_before_synonyms`	404	232
+d1_symbol_cross_dominant	d1_name_no_successor_nothing	b	rule `bridge_same_place`	106	22
+d1_symbol_cross_dominant	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	94	45
+d1_symbol_cross_dominant	name_in_other_source	e	rule `names_before_synonyms`	75	64
+d1_symbol_cross_dominant	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+d1_symbol_cross_dominant	unexplained	?	-	21	11
+d1_symbol_cross_one	d1_name_history_to_another_place	b	rule `place_moves_marked`	236	54
+d1_symbol_cross_one	d1_name_in_other_source	e	rule `names_before_synonyms`	204	141
+d1_symbol_cross_one	d1_name_no_successor_nothing	b	rule `bridge_same_place`	2588	528
+d1_symbol_cross_one	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	117	47
+d1_symbol_cross_one	d1_name_several_part	c	rule `mirbase_genes`	27	16
+d1_symbol_cross_one	mirbase_not_in_graph	c	rule `mirbase_genes`	14	3
+d1_symbol_cross_one	name_in_other_source	e	rule `names_before_synonyms`	114	59
+d1_symbol_cross_one	unexplained	?	-	15	8
+d1_symbol_cross_open	d1_name_history_to_another_place	b	rule `place_moves_marked`	136	43
+d1_symbol_cross_open	d1_name_in_other_source	e	rule `names_before_synonyms`	125	55
+d1_symbol_cross_open	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	98	28
+d1_symbol_cross_open	mirbase_not_in_graph	c	rule `mirbase_genes`	6	1
+d1_symbol_cross_open	name_in_other_source	e	rule `names_before_synonyms`	6	4
+d1_symbol_cross_open	unexplained	?	-	3	2
+d1_symbol_same_dominant	d1_name_history_to_another_place	b	rule `place_moves_marked`	2185	728
+d1_symbol_same_dominant	d1_name_in_other_source	e	rule `names_before_synonyms`	401	256
+d1_symbol_same_dominant	d1_name_no_successor_nothing	b	rule `bridge_same_place`	44	19
+d1_symbol_same_dominant	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	15	10
+d1_symbol_same_dominant	unexplained	?	-	2	2
+d1_symbol_same_one	d1_name_history_to_another_place	b	rule `place_moves_marked`	76	35
+d1_symbol_same_one	d1_name_in_other_source	e	rule `names_before_synonyms`	67	35
+d1_symbol_same_one	d1_name_no_successor_nothing	b	rule `bridge_same_place`	870	315
+d1_symbol_same_one	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	77	30
+d1_symbol_same_one	d1_name_several_part	c	rule `mirbase_genes`	27	24
+d1_symbol_same_one	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	2	1
+d1_symbol_same_one	unexplained	?	-	18	9
+d1_symbol_same_open	d1_name_history_to_another_place	b	rule `place_moves_marked`	26	16
+d1_symbol_same_open	d1_name_in_other_source	e	rule `names_before_synonyms`	6	3
+d1_symbol_same_open	d1_name_not_a_name_at_source	e	rules `names_before_synonyms` and `name_before_synonym`	5	1
+d1_symbol_same_open	unexplained	?	-	13	11

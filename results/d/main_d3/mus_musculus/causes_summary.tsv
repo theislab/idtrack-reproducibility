@@ -1,0 +1,19 @@
+stratum	cause	class	rule	answers	units
+d3_cellmarker_default	d3_name_in_other_source	e	rule `names_before_synonyms`	82	36
+d3_cellmarker_default	d3_read_elsewhere	e	rule `start_release`	47	22
+d3_cellmarker_default	name_in_db_not_in_truth	d	-	17	8
+d3_cellmarker_default	name_in_other_source	e	rule `names_before_synonyms`	183	76
+d3_cellmarker_default	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	31	23
+d3_cellmarker_default	unexplained	?	-	153	49
+d3_cellmarker_from	d3_name_in_other_source	e	rule `names_before_synonyms`	31	15
+d3_cellmarker_from	name_in_db_not_in_truth	d	-	1	1
+d3_cellmarker_from	path_through_resurrection	e	graph builder: `<id>.Retired -> <id>.<v>` when an id comes back	1	1
+d3_cellmarker_from	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	19	18
+d3_cellmarker_from	unexplained	?	-	3	3
+d3_msigdb_default	name_in_other_source	e	rule `names_before_synonyms`	4	2
+d3_msigdb_from	d3_name_in_other_source	e	rule `names_before_synonyms`	4	2
+d3_panglaodb_default	d3_read_elsewhere	e	rule `start_release`	2	1
+d3_panglaodb_default	name_in_other_source	e	rule `names_before_synonyms`	2	1
+d3_panglaodb_default	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	32	28
+d3_panglaodb_from	d3_name_in_other_source	e	rule `names_before_synonyms`	2	1
+d3_panglaodb_from	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	21	21

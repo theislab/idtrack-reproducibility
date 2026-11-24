@@ -1,0 +1,8 @@
+stratum	cause	class	rule	answers	units
+f1_made_unique	copy_of_another_feature	b	rule `made_unique_copies`	1	1
+f1_name_moved	best_keeps_part_of_shared_name	b	rule `ties`	3	2
+f1_name_moved	external_bridge	b	rule `external_bridge`	1	1
+f1_name_moved	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	3	3
+f1_name_shared	best_keeps_part_of_shared_name	b	rule `ties`	71	36
+f1_name_shared	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	2	1
+f1_name_unique	external_bridge	b	rule `external_bridge`	2	2

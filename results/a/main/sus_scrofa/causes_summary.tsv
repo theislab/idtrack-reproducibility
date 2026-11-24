@@ -1,0 +1,18 @@
+stratum	cause	class	rule	answers	units
+A1	external_bridge	b	rule `external_bridge`	4048	126
+A2	external_bridge	b	rule `external_bridge`	483	126
+A3_+1	external_bridge	b	rule `external_bridge`	41	18
+A3_+2	external_bridge	b	rule `external_bridge`	68	19
+A3_-1	external_bridge	b	rule `external_bridge`	267	139
+A3_-2	external_bridge	b	rule `external_bridge`	519	140
+A3_first	external_bridge	b	rule `external_bridge`	6843	156
+A5_66_67_born	external_bridge	b	rule `external_bridge`	247	133
+A5_66_67_dies	external_bridge	b	rule `external_bridge`	27	14
+A6_backward	external_bridge	b	rule `external_bridge`	300	3
+A6_backward_handoff	external_bridge	b	rule `external_bridge`	19731	44
+A6_forward	external_bridge	b	rule `external_bridge`	2514	17
+A6_forward_handoff	external_bridge	b	rule `external_bridge`	92	1
+A7_tl_115	external_bridge	b	rule `external_bridge`	306	75
+A7_tl_sample	external_bridge	b	rule `external_bridge`	142	44
+A7_tx_115	external_bridge	b	rule `external_bridge`	306	77
+A7_tx_sample	external_bridge	b	rule `external_bridge`	148	41

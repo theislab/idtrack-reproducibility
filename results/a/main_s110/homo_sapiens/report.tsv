@@ -1,0 +1,4 @@
+family	organism	stratum	view	n	right	expected_error	wrong	undetermined	timeout	error	not_supported	missing	rate	wilson_low	wilson_high	boot_low	boot_high	units	units_wrong	units_error	recovered	s_p50	s_p95	s_p99	s_max
+a	homo_sapiens	A8	*	11962848	11763472	0	7836	191540	0	0	0	0	0.9993	0.9993	0.9993	0.9992	0.9994	100607	514	0	0	0.00021	0.00058	0.00131	9.3681
+a	homo_sapiens	A8	all	5981424	5881694	0	4284	95446	0	0	0		0.9993	0.9993	0.9993	0.9992	0.9994	100607	514	0	0	0.00021	0.00058	0.00131	9.3681
+a	homo_sapiens	A8	best	5981424	5881778	0	3552	96094	0	0	0		0.9994	0.9994	0.9994	0.9993	0.9995	100607	461	0	0	0.00021	0.00058	0.00131	9.3681

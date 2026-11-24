@@ -1,0 +1,5 @@
+stratum	cause	class	rule	answers	units
+d4_symbol	d4_mirbase_form	c	rule `mirbase_genes`	4	2
+d4_symbol	d4_separator_synonym	e	rule `names_before_synonyms`; the separator search	6	3
+d4_symbol	mirbase_not_in_graph	c	rule `mirbase_genes`	20	7
+d4_symbol	support_ranks_shared_name	b	rules `ties`, `from_database`, `support_counts_all`, `all_order` and `support_ranks_shared_name`	2	2

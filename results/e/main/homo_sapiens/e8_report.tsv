@@ -1,0 +1,47 @@
+relation	organism	count	value
+composition	homo_sapiens	by_history	83
+composition	homo_sapiens	holds	2912
+composition	homo_sapiens	not_one_gene	2151
+composition	homo_sapiens	refuted	5
+composition	homo_sapiens	triples	3000
+return	homo_sapiens	holds	3000
+return	homo_sapiens	pairs	3000
+roundtrip	homo_sapiens	EntrezGene|holds	334
+roundtrip	homo_sapiens	EntrezGene|ids	335
+roundtrip	homo_sapiens	EntrezGene|no_id	671
+roundtrip	homo_sapiens	EntrezGene|violation	1
+roundtrip	homo_sapiens	HGNC Symbol|holds	489
+roundtrip	homo_sapiens	HGNC Symbol|ids	490
+roundtrip	homo_sapiens	HGNC Symbol|no_id	510
+roundtrip	homo_sapiens	HGNC Symbol|violation	1
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|holds	334
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|ids	335
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|no_id	671
+roundtrip	homo_sapiens	NCBI gene (formerly Entrezgene)|violation	1
+roundtrip	homo_sapiens	RefSeq_mRNA|holds	442
+roundtrip	homo_sapiens	RefSeq_mRNA|ids	443
+roundtrip	homo_sapiens	RefSeq_mRNA|no_id	770
+roundtrip	homo_sapiens	RefSeq_mRNA|violation	1
+roundtrip	homo_sapiens	UniProtKB Gene Name|holds	239
+roundtrip	homo_sapiens	UniProtKB Gene Name|ids	240
+roundtrip	homo_sapiens	UniProtKB Gene Name|no_id	766
+roundtrip	homo_sapiens	UniProtKB Gene Name|violation	1
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|holds	229
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|ids	230
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|no_id	771
+roundtrip	homo_sapiens	Uniprot/SWISSPROT|violation	1
+path	homo_sapiens	bridge_far_held	28
+path	homo_sapiens	bridge_far_steps	191
+path	homo_sapiens	bridge_far_undetermined	163
+path	homo_sapiens	bridge_near_held	32
+path	homo_sapiens	bridge_near_not_held	1
+path	homo_sapiens	bridge_near_steps	193
+path	homo_sapiens	bridge_near_undetermined	160
+path	homo_sapiens	candidates	3856
+path	homo_sapiens	candidates_with_problem	1
+path	homo_sapiens	final_held	12
+path	homo_sapiens	final_steps	12
+path	homo_sapiens	history_event	9426
+path	homo_sapiens	history_event_versions_equal	9426
+path	homo_sapiens	history_steps	9426
+path	homo_sapiens	lines	3000

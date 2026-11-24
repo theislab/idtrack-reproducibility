@@ -20,6 +20,8 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 | `runs/d4c2dda/sus_scrofa/` | `c1_v1` to `c7_v1` | yes | yes | yes |
 | mouse, human | – | not run | – | – |
 
+The complete run on the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only; 2026-11-24): `runs/main/<organism>/` of all five organisms, every set with every correction of the judge, with `run.json`, `report.tsv`, causes and the authority measure ([results](#on-main)); mouse and human have no run of the reference tree to compare with.
+
 What is not built:
 
 - the family's panel ([Measurement design](../methods.md#measurement-design)); C's modest selection is built (`panels/<organism>/modest_v1`, [the modest set](../modest.md)), from mouse's and human's c1 and c2 only (their c3 to c7 were published after it, 2026-11-24).
@@ -126,6 +128,120 @@ A rescoring after a correction of the judge reads the stored answers (`runner ..
 
 ## Results
 
+### On main
+
+Runs `<families>/c/runs/main/<organism>/`, every line of the seven parts in the five organisms (mouse's and human's c3 to c7 made for this run, with every correction of the judge the other organisms' sets received), the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only), on `r2`'s graph files, which `main`'s own builder rebuilt with the same content digests (`[graphs.main]` of `results.toml`), 2026-11-24. Result files `results/c/main/<organism>/`. Mouse and human have no exhaustive reference (`d4c2dda` ran C in pig, rhesus and cynomolgus). Totals:
+
+| family | organism | n | right | wrong | undetermined | rate (Wilson 95 %) | d4c2dda |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| c | pig | 52,239,278 | 51,956,901 | 10,637 | 271,740 | 0.99980 (0.99979–0.99980) | 0.98336 |
+| c | mouse | 96,475,558 | 96,382,481 | 54,721 | 38,356 | 0.99943 (0.99943–0.99944) | no exhaustive reference |
+| c | human | 124,579,798 | 124,510,580 | 13,530 | 55,688 | 0.99989 (0.99989–0.99989) | no exhaustive reference |
+| c | rhesus | 51,559,210 | 51,352,554 | 66 | 206,590 | 1.00000 (1.00000–1.00000) | 0.97994 |
+| c | cynomolgus | 34,471,762 | 34,350,318 | 1 | 121,443 | 1.00000 (1.00000–1.00000) | 0.98990 |
+
+Against `d4c2dda` (pig, rhesus, cynomolgus), right to wrong: pig 8 answers (not classified), rhesus and cynomolgus none; wrong to right: pig 538,973, rhesus 193,976, cynomolgus 345,861. Every answer of the modest set's lines is identical to `r2`'s stored answers.
+
+`main` (rate and interval per stratum, both views):
+
+| stratum | pig | mouse | human | rhesus | cynomolgus |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `c1_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c1_default` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c1_discontinued` | 1.0000 (1.0000–1.0000) | 0.9919 (0.9915–0.9924) | 0.9882 (0.9877–0.9887) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c1_not_held` | 1.0000 (1.0000–1.0000) | 0.9773 (0.9716–0.9825) | 0.9904 (0.9865–0.9939) | 1.0000 (1.0000–1.0000) | – |
+| `c1_retired` | 1.0000 (1.0000–1.0000) | 0.9971 (0.9955–0.9986) | 0.9980 (0.9968–0.9991) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_at_v` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_default` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_default_v` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_oldver` | 0.9999 (0.9999–1.0000) | 0.9987 (0.9985–0.9988) | 0.9994 (0.9993–0.9995) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_retired` | 0.9999 (0.9998–1.0000) | 0.9992 (0.9990–0.9993) | 0.9986 (0.9985–0.9988) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_ver_catalog` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_ver_gap` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_ver_higher` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_ver_higher_retired` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c2_ver_lower` | 1.0000 (1.0000–1.0000) | 0.9994 (0.9985–1.0000) | 0.9997 (0.9992–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_at_v` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_default` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_default_v` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_deleted` | 0.9994 (0.9992–0.9996) | 0.9982 (0.9975–0.9988) | 0.9985 (0.9982–0.9988) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_entry` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_isoform` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_isoform_canonical` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_oldver` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_retired` | 0.9993 (0.9990–0.9995) | 0.9986 (0.9982–0.9989) | 0.9987 (0.9985–0.9989) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_secondary` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_secondary_held` | 1.0000 (1.0000–1.0000) | 0.9989 (0.9983–0.9994) | 0.9989 (0.9986–0.9993) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_ver_higher` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_ver_higher_retired` | 0.9997 (0.9992–1.0000) | 1.0000 (1.0000–1.0000) | 0.9995 (0.9987–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c3_ver_lower` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_mirbase_acc` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9978 (0.9957–0.9995) | 1.0000 (1.0000–1.0000) | – |
+| `c4_mirbase_label` | 1.0000 (1.0000–1.0000) | 0.9894 (0.9833–0.9947) | 0.9794 (0.9723–0.9857) | 1.0000 (1.0000–1.0000) | – |
+| `c4_rfam_acc_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_rfam_acc_default` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_rfam_acc_not_held` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `c4_rfam_acc_retired` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_rfam_label_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9994 (0.9983–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_rfam_label_default` | 1.0000 (1.0000–1.0000) | – | 0.9875 (0.9605–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_rfam_label_not_held` | 1.0000 (1.0000–1.0000) | 0.2308 (0.0000–0.5000) | 0.2778 (0.0714–0.5000) | 1.0000 (1.0000–1.0000) | – |
+| `c4_rfam_label_retired` | 0.9986 (0.9965–1.0000) | 0.9885 (0.9782–0.9971) | 0.9946 (0.9904–0.9980) | 0.9987 (0.9968–1.0000) | 0.9993 (0.9980–1.0000) |
+| `c4_rnacentral` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c5_clone_at` | 1.0000 (1.0000–1.0000) | 0.9919 (0.9908–0.9930) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_clone_retired` | 0.9989 (0.9985–0.9992) | 0.9892 (0.9883–0.9901) | 0.9925 (0.9920–0.9930) | – | – |
+| `c5_hgnc_id` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c5_ottg_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_ottg_retired` | 1.0000 (1.0000–1.0000) | 0.9998 (0.9997–0.9999) | 0.9988 (0.9986–0.9991) | – | – |
+| `c5_ottt_at` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_ottt_retired` | 1.0000 (1.0000–1.0000) | 0.9998 (0.9997–0.9999) | 0.9995 (0.9995–0.9996) | – | – |
+| `c5_vgnc_id` | 1.0000 (1.0000–1.0000) | – | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:Clone_based_ensembl_gene` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c6:Clone_based_vega_gene` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c6:EntrezGene` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:Havana gene` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c6:Havana transcript` | 1.0000 (1.0000–1.0000) | 0.9750 (0.9746–0.9754) | 1.0000 (1.0000–1.0000) | – | – |
+| `c6:NCBI gene (formerly Entrezgene)` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:RFAM` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:RefSeq_mRNA` | 1.0000 (1.0000–1.0000) | 0.9963 (0.9963–0.9964) | 0.9998 (0.9997–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:RefSeq_mRNA_predicted` | 1.0000 (1.0000–1.0000) | 0.9964 (0.9963–0.9965) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:RefSeq_ncRNA` | 1.0000 (1.0000–1.0000) | 0.9998 (0.9997–0.9998) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `c6:RefSeq_ncRNA_predicted` | 1.0000 (1.0000–1.0000) | 0.9995 (0.9995–0.9995) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:RefSeq_peptide` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:RefSeq_peptide_predicted` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:Uniprot/SPTREMBL` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c6:Uniprot/SWISSPROT` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c7_clone` | 1.0000 (1.0000–1.0000) | 0.9985 (0.9953–1.0000) | 0.9995 (0.9988–1.0000) | – | – |
+| `c7_ncbi` | 0.9983 (0.9979–0.9986) | 1.0000 (1.0000–1.0000) | 0.9999 (0.9998–0.9999) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c7_ottg` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9997 (0.9992–1.0000) | – | – |
+| `c7_ottt` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 0.9997 (0.9992–1.0000) | – | – |
+| `c7_refseq` | 0.9986 (0.9985–0.9987) | 1.0000 (1.0000–1.0000) | 1.0000 (0.9999–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c7_rfam` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c7_rfam_label` | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c7_uniprot` | 0.9991 (0.9988–0.9994) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) |
+| `c4_mature_acc` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `c4_mature_name` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – |
+| `c5_ccds_at` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_ccds_default` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_ccds_label` | – | 0.9979 (0.9974–0.9984) | 0.9994 (0.9992–0.9997) | – | – |
+| `c5_ccds_label_retired` | – | 0.9979 (0.9942–1.0000) | 0.9957 (0.9929–0.9983) | – | – |
+| `c5_ccds_not_held` | – | 1.0000 (1.0000–1.0000) | 0.9852 (0.9712–0.9967) | – | – |
+| `c5_ccds_retired` | – | 0.9838 (0.9824–0.9852) | 0.9985 (0.9971–0.9997) | – | – |
+| `c5_mgi_id` | – | 0.9997 (0.9996–0.9998) | – | – | – |
+| `c5_ottp_at` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_ottp_retired` | – | 0.9999 (0.9999–1.0000) | 0.9817 (0.9811–0.9824) | – | – |
+| `c5_ottt_not_held` | – | 1.0000 (1.0000–1.0000) | 0.9906 (0.9712–1.0000) | – | – |
+| `c5_vega_gene_at` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c5_vega_gene_retired` | – | 0.9999 (0.9998–1.0000) | 0.9994 (0.9992–0.9996) | – | – |
+| `c6:CCDS` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c6:Havana translation` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c6:Vega_gene` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c7_ccds` | – | 1.0000 (1.0000–1.0000) | 0.9999 (0.9997–1.0000) | – | – |
+| `c7_ottp` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+| `c7_vega_gene` | – | 1.0000 (1.0000–1.0000) | 1.0000 (1.0000–1.0000) | – | – |
+
+### On d4c2dda
+
 Runs `<families>/c/runs/d4c2dda/<organism>/` of cynomolgus, pig and rhesus (the reference graphs, every set of version 1); result files `results/c/d4c2dda/<organism>/report.tsv`, `scores.tsv`, `causes_summary.tsv` and `authority.tsv`. No answer timed out. The results are judged with the corrections of the judge (scored again on 2026-11-20 from the stored answers); mouse and human are not run.
 
 Every stratum read at a release and by default is right on every answer in the three organisms (`c1_at`, `c1_default`, `c2_at_v`, `c2_default`, `c2_default_v`, `c3_at`, `c3_at_v`, `c3_default`, `c3_default_v`, the RFAM accessions and labels at R and by default, pig's Havana ids), and pig's `c2_at` and clone-based names read at a release, whose 42 and 718 answers once wrong are undetermined under the correction `other_database_broad` (the string is also another database's value of the answered gene); so are NCBI's discontinued ids (nothing), the versions above every version of a held accession and the catalog's newer versions (the gene), and every database the graph does not hold but miRBase's names (`safe`: nothing or the gene). Rate, cluster-bootstrap interval and wrong answers of the other strata (row `*` of `report.tsv`; – : no such stratum): Since `rfam_label_rows_v1` (rule `rfam_display_label`), `d4c2dda`'s RFAM label lines at R are wrong where it answers genes whose display name is another string: pig 8 answers (4 labels), cynomolgus 45 (24), cause `rule_decided_after_tree`; cynomolgus's 8 lines whose label names no gene at R are left out (`excluded`) and 27 answers are undetermined (`open`).
@@ -219,6 +335,8 @@ What the results show beyond the classified causes, and what the truth cannot ju
 | RFAM labels written as accessions (the truth's) | Ensembl writes an entry's accession as its label at some releases; the label line expected only the label rows' genes | the correction `rfam_label_accession` (published; the entry's genes, at the release read and at the target, go to `broad`): of cynomolgus's 38, pig's 20 and rhesus's 36 wrong answers, 37, 18 and 34 became undetermined | cynomolgus 1, pig 2, rhesus 2 left |
 | a value of several databases (the truth's) | a string that another database or the GTF gives other genes at the release read (pig's clone-based names such as `ABCA1`, RefSeq values written `LOC...`, mouse's NCBI ids that are numeric `Vega_translation` accessions): without `from_database` it names both | the correction `other_database_broad` (published: the other genes the string names at the release read, or at the target for a line asked without a release and without a version, go to `broad`, or to `expect` of a `safe` line; the copies a line expects apart are not other genes) | pig's `c5_clone_at` 718, `c2_at` 42, `c5_clone_retired` 46, `c7_clone` 3, `c2_retired` 5 and `c7_refseq` 12 wrong answers became undetermined, rhesus's `c2_retired` 4; classified as `value_of_another_database` still: pig 1,377, rhesus 4 |
 | the authority | where a database's own file and Ensembl disagree, the disagreement is Ensembl's | none (Ensembl's data) | [the authority beside Ensembl](#the-authority-beside-ensembl) |
+
+On `main` (`c_main.tsv` of `results/limitations/`, the same builder; answers per organism): `L-accession-versions` pig 2, mouse 65, human 11; `L-bridges` pig 10,549, mouse 1,299, human 3,239; `L-decided-rules` human 75; `L-mirbase` human 4; `L-ncbi-label-names` pig 30, human 25, rhesus 64; `L-other-database-values` pig 30, mouse 2,703, human 7,499; `L-other-name-sources` mouse 32, human 213; `L-resurrection` mouse 3; `L-spellings` pig 2, mouse 2, human 72; `L-truth-rfam-labels` pig 2, mouse 2, human 8, rhesus 2, cynomolgus 1; `L-unexplained` pig 22, mouse 49,795, human 2,063; `UNMAPPED-name_in_db_not_in_truth` mouse 820, human 321.
 
 ## Reproducing from scratch
 

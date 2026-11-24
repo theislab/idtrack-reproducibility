@@ -134,6 +134,29 @@ E6, the explained path, the harmonizer and E9 run only on trees of the `convert`
 
 ## Results
 
+### On main
+
+Runs `<families>/e/runs/main/<organism>/`: E1 to E5 and E8's static lines under both judges, E7 (determinism), E8's two calls, E6 (budgets) and the harmonizer, the tree `main` (idtrack's main `cabfd9a`, whose answers are those of the release 0.1.2, `7f71b26`: documentation strings only), on `r2`'s graph files, which `main`'s own builder rebuilt with the same content digests (`[graphs.main]` of `results.toml`), 2026-11-24; E9 is not run on `main` (above). `main` builds the decided rules, so its `decided` rate is the one to read; under `now`, the documented behaviour of `71690ab`, the about 1,150 answers per organism that `main` refuses by a decided rule (a string beginning with the graph's internal prefix `synonym_id::`, rule `no_synonym_target`: `InvalidArgumentError`) are errors. Result files `results/e/main/<organism>/`. Totals:
+
+| family | organism | n | right | wrong | undetermined | rate (Wilson 95 %) | d4c2dda |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| e [now] | pig | 2,522,363 | 2,337,594 | 1,872 | 182,897 | 0.99920 (0.99916–0.99924) | 0.99972 |
+| e [now] | mouse | 4,647,903 | 4,386,261 | 2,031 | 259,611 | 0.99954 (0.99952–0.99956) | 0.99975 |
+| e [now] | human | 5,273,760 | 5,002,021 | 1,927 | 269,812 | 0.99961 (0.99960–0.99963) | 0.99986 |
+| e [now] | rhesus | 3,120,153 | 2,916,220 | 1,859 | 202,074 | 0.99936 (0.99933–0.99939) | 0.99979 |
+| e [now] | cynomolgus | 1,514,358 | 1,419,126 | 1,831 | 93,401 | 0.99871 (0.99865–0.99877) | 0.99959 |
+| e [decided] | pig | 2,522,363 | 2,339,444 | 180 | 182,739 | 0.99992 (0.99991–0.99993) | 0.96474 |
+| e [decided] | mouse | 4,647,903 | 4,388,264 | 101 | 259,538 | 0.99998 (0.99997–0.99998) | 0.94076 |
+| e [decided] | human | 5,273,760 | 5,003,883 | 86 | 269,791 | 0.99998 (0.99998–0.99999) | 0.97372 |
+| e [decided] | rhesus | 3,120,153 | 2,918,092 | 164 | 201,897 | 0.99994 (0.99993–0.99995) | 0.97017 |
+| e [decided] | cynomolgus | 1,514,358 | 1,420,920 | 37 | 93,401 | 0.99997 (0.99996–0.99998) | 0.94558 |
+
+Against `d4c2dda`: under `decided` no answer went from right to wrong or error in any organism; under `now`, right to error pig 1,143, mouse 1,147, human 1,153, rhesus 1,140, cynomolgus 1,097 (the refusals above). Every answer of the modest set's lines is identical to `r2`'s stored answers.
+
+
+
+### On d4c2dda
+
 Runs `<families>/e/runs/d4c2dda/<organism>/` and `runs/71690ab/<organism>/`, both on the reference graphs, and `runs/71690ab_web/e9/`. Result files per tree and organism: `results/e/<tree>/<organism>/now_report.tsv` and `decided_report.tsv` (F0's `report.tsv` under each judge), `e_summary.tsv` (per judge and stratum: outcomes, rate, Wilson interval, `answered`, `undetermined_answered`), `e7_report.tsv`, `e8_report.tsv`; for `71690ab` also `e6_report.tsv`, `compare_vs_d4c2dda_now.tsv` and `compare_vs_d4c2dda_decided.tsv`; and `results/e/71690ab/web/e9_report.tsv`. No line timed out.
 
 **`d4c2dda` and `71690ab` give the same answers on every line both are asked**, under both judges and in all five organisms, but 32 per organism (`compare_vs_d4c2dda_<judge>.tsv`): the 30 batch lines in NumPy and pandas containers, which `d4c2dda` refuses with its documented `TypeError` and `71690ab` answers right, and the 2 iterables a batch is not documented to take (a generator, a set), refused on `d4c2dda` and open on `71690ab`. No answer moved from right to wrong or to an error.
@@ -348,6 +371,8 @@ E's rows of [the known-limitations table](../../results/limitations/limitations.
 | `L-spellings` | a string carried in two letter cases (mouse `GC` and `gc`): the graph keeps one spelling per database and release, so one case answers the genes of both, or the symbol matched without letter case | type the exact spelling | decided: rule `spelling_per_edge` | – | 13 of 6,143 | – | – | – |
 
 The rows generated from the `d4c2dda` runs are the same, but `L-infer-names`, whose lines `d4c2dda`'s api does not have.
+
+On `main` (`results/limitations/e_main.tsv`, the same builder, judge `now`: the behaviour `71690ab` documents, so the refusals of the decided rules `main` builds count here; answers per organism): `L-bare-numbers` mouse 149, human 123; `L-case-synonym` pig 2; `L-control-characters` pig 1,550, mouse 1,550, human 1,550, rhesus 1,550, cynomolgus 1,500; `L-emoji-brackets` pig 11,150, mouse 11,149, human 11,150, rhesus 11,150, cynomolgus 10,799; `L-foreign-symbols` pig 22, mouse 28, human 2, rhesus 11, cynomolgus 31; `L-internal-names` pig 551, mouse 551, human 554, rhesus 551, cynomolgus 501; `L-long-inputs` pig 1,057, mouse 1,057, human 1,058, rhesus 1,057, cynomolgus 1,057; `L-lookalikes` pig 2,624, mouse 1,985, human 2,599, rhesus 2,593, cynomolgus 2,539; `L-make-unique` pig 4, mouse 3, human 2, rhesus 6, cynomolgus 37; `L-missing-values` pig 229, mouse 230, human 232, rhesus 228, cynomolgus 228; `L-number-forms` pig 1,600, mouse 1,600, human 1,600, rhesus 1,600, cynomolgus 1,600; `L-prefixes` pig 500, mouse 500, human 500, rhesus 500, cynomolgus 500; `L-spellings` mouse 144; `L-stray-punctuation` pig 6, human 18, rhesus 9; `L-version-forms` pig 750, mouse 750, human 750, rhesus 750, cynomolgus 750; `UNMAPPED-unexplained` pig 23, mouse 46, human 63, rhesus 8, cynomolgus 8.
 
 ## Reproducing from scratch
 

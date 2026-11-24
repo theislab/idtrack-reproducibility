@@ -1,0 +1,80 @@
+stratum	cause	class	rule	answers	units
+c1_at	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	16	1
+c1_discontinued	external_bridge	b	rule `external_bridge`	94	47
+c1_discontinued	unexplained	?	-	146	73
+c1_discontinued	value_of_another_database	e	-	3558	1779
+c1_not_held	external_bridge	b	rule `external_bridge`	45	24
+c1_not_held	value_of_another_database	e	-	4	2
+c1_retired	external_bridge	b	rule `external_bridge`	23	12
+c2_at	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	16	1
+c2_at	value_of_another_database	e	-	12	6
+c2_at_v	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	16	1
+c2_at_v	unexplained	?	-	33	15
+c2_at_v	value_of_another_database	e	-	4	2
+c2_oldver	accession_old_version_read_at_target	a	rule `accession_versions` (decided)	5	3
+c2_oldver	external_bridge	b	rule `external_bridge`	406	225
+c2_oldver	unexplained	?	-	21	11
+c2_retired	external_bridge	b	rule `external_bridge`	350	197
+c2_retired	name_in_other_source	e	rule `names_before_synonyms`	6	3
+c2_retired	unexplained	?	-	185	95
+c2_retired	value_of_another_database	e	-	19	19
+c2_ver_lower	accession_version_never_had	a	rule `accession_versions` (decided)	2	1
+c3_deleted	external_bridge	b	rule `external_bridge`	154	94
+c3_entry	external_bridge	b	rule `external_bridge`	2	1
+c3_oldver	external_bridge	b	rule `external_bridge`	10	2
+c3_oldver	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	8	2
+c3_retired	external_bridge	b	rule `external_bridge`	287	166
+c3_secondary_held	external_bridge	b	rule `external_bridge`	70	39
+c3_ver_higher_retired	accession_version_never_had	a	rule `accession_versions` (decided)	4	2
+c4_mirbase_acc	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	8	4
+c4_mirbase_label	mirbase_not_in_graph	c	rule `mirbase_genes`	4	2
+c4_mirbase_label	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	4	2
+c4_mirbase_label	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	56	28
+c4_mirbase_label	unexplained	?	-	7	7
+c4_rfam_label_at	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	6	1
+c4_rfam_label_default	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	1	1
+c4_rfam_label_not_held	unexplained	?	-	24	12
+c4_rfam_label_not_held	value_of_another_database	e	-	2	1
+c4_rfam_label_retired	rfam_label_is_accession	d	-	8	8
+c5_ccds_label	external_bridge	b	rule `external_bridge`	6	3
+c5_ccds_label	unexplained	?	-	19	11
+c5_ccds_label	value_of_another_database	e	-	18	9
+c5_ccds_label_retired	external_bridge	b	rule `external_bridge`	7	6
+c5_ccds_label_retired	value_of_another_database	e	-	8	4
+c5_ccds_not_held	external_bridge	b	rule `external_bridge`	9	5
+c5_ccds_retired	external_bridge	b	rule `external_bridge`	5	5
+c5_clone_at	name_in_db_not_in_truth	d	-	8	6
+c5_clone_at	value_of_another_database	e	-	14	7
+c5_clone_retired	external_bridge	b	rule `external_bridge`	486	255
+c5_clone_retired	name_in_db_not_in_truth	d	-	313	171
+c5_clone_retired	name_in_other_source	e	rule `names_before_synonyms`	201	108
+c5_clone_retired	synonym_spelling_merged	c	rules `spelling_steps` and `spelling_of_release` (9d point 3)	16	10
+c5_clone_retired	unexplained	?	-	417	210
+c5_clone_retired	value_of_another_database	e	-	229	209
+c5_ottg_retired	external_bridge	b	rule `external_bridge`	129	68
+c5_ottg_retired	name_in_other_source	e	rule `names_before_synonyms`	4	2
+c5_ottp_retired	external_bridge	b	rule `external_bridge`	154	83
+c5_ottp_retired	unexplained	?	-	68	34
+c5_ottp_retired	value_of_another_database	e	-	3587	2994
+c5_ottt_not_held	external_bridge	b	rule `external_bridge`	2	1
+c5_ottt_retired	external_bridge	b	rule `external_bridge`	191	110
+c5_vega_gene_retired	external_bridge	b	rule `external_bridge`	61	31
+c5_vega_gene_retired	name_in_other_source	e	rule `names_before_synonyms`	2	1
+c6:NCBI gene (formerly Entrezgene)	ncbi_label_name_by_release	a	rule `one_kind_per_database` (decided)	25	22
+c6:RefSeq_mRNA	unexplained	?	-	960	439
+c6:RefSeq_ncRNA	unexplained	?	-	80	20
+c6:RefSeq_ncRNA_predicted	unexplained	?	-	28	1
+c6:RefSeq_peptide	unexplained	?	-	73	38
+c6:RefSeq_peptide_predicted	unexplained	?	-	2	1
+c7_ccds	external_bridge	b	rule `external_bridge`	2	1
+c7_clone	external_bridge	b	rule `external_bridge`	4	2
+c7_ncbi	external_bridge	b	rule `external_bridge`	69	20
+c7_ncbi	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	112	8
+c7_ncbi	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	4	1
+c7_ncbi	value_of_another_database	e	-	28	1
+c7_ottg	external_bridge	b	rule `external_bridge`	1	1
+c7_ottt	external_bridge	b	rule `external_bridge`	5	3
+c7_refseq	external_bridge	b	rule `external_bridge`	309	139
+c7_refseq	no_successor_answer_elsewhere	b	rule `external_bridge`; rule `bridge_same_place` (decided)	238	18
+c7_refseq	rule_decided_after_tree	a	rule `judge_follows_rules` (a rule idtrack decided after this tree)	4	1
+c7_refseq	value_of_another_database	e	-	16	10
