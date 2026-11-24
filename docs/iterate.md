@@ -88,6 +88,10 @@ A tree whose families were run exhaustively (the final tree: [Measurement design
 
 Family A's graph fidelity (A0, `<families>/a/a0/<tree>*/`) is listed as kept as a summary ([the record](records.md#what-the-record-keeps-as-summaries-only)). The result goes into the state file (`complete`) and the report ("The complete run"). `--complete` submits nothing: the complete run is made by each family's own commands (each family's "Reproducing from scratch"). Submitting it from here would need each family's runner to return its jobs (command, memory, time, the jobs it runs after) instead of submitting them, and the family-specific steps (A0, A8 with its graphs, D's and E's own runners, E7, E9) in the same form; then they would join the plan as steps under the same limits.
 
+## A tree that is stored already
+
+`iterate` is for the trees after the last stored one. A stored tree run through it again would be measured again where its records do not name what the configuration names: a modest run whose `modest.json` names another commit than `[trees.<tree>] commit` (even one of the same `idtrack/` tree, as `r2`'s runs name `978f9a0` and its configuration `b5d4fb4`) is not done, and a graph without a build record (`build.json`, as `r2`'s graphs, built before `graph-build` existed) is not built, and `graph-build` then refuses to replace or record that file ([graphs](graphs.md#building)), so the step fails; `iterate <tree> --dry` shows each such step as `would submit` with the reason (`the stored run is of ...`, `the configured graph exists without a build record`) and changes nothing.
+
 ## Adding a tree
 
 1. Check out idtrack at the tree's commit, make its environment, and add `[trees.<tree>]` with its graphs where `graph-build` writes them ([README](../README.md#trees), [graphs](graphs.md#places)).

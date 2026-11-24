@@ -20,7 +20,10 @@ For each organism, in its own job with `--submit` (the configured runner, `jobs.
    build (it must not).
 
 A graph already in the build folder is loaded, not built again, so a job lost to the scheduler is simply submitted
-again. Add the printed lines to the configuration (`[trees.<tree>.graphs]`) to ask the graphs; judge them with
+again. A graph file already in `<graphs>/<tree>/<organism>/` that is not the build's own (the same file or the same
+bytes) is never replaced and never described by a record of another build: like a published set or a reference, a
+stored graph is not rewritten. The command then builds nothing, records nothing, says so and exits 1;
+`--keep-existing` keeps such a file the same way and exits 0. Add the printed lines to the configuration (`[trees.<tree>.graphs]`) to ask the graphs; judge them with
 `idtrack-repro graph-judge`.
 """
 from __future__ import annotations
@@ -56,13 +59,41 @@ def content_digest(graph) -> str | None:
     return manifest.get("content_digest")
 
 
-def build_here(tree: str, organism: str, snapshot: int, tables: str) -> dict:
-    """Build one graph in this process (the tree's Python) and record it; returns the record."""
+def same_file(a: str | None, b: str | None) -> bool:
+    """Whether two paths are one file (a link) or files of the same bytes."""
+    if not a or not b or not os.path.exists(a) or not os.path.exists(b):
+        return False
+    return os.path.samefile(a, b) or (os.path.getsize(a) == os.path.getsize(b) and sha256(a) == sha256(b))
+
+
+def foreign_graph(present: str | None, own: str | None) -> str | None:
+    """Why the graph file `present` of the tree's folder is not the build's own graph `own`, or None."""
+    if not present or same_file(present, own):
+        return None
+    return (f"{present} exists and is not this build's graph"
+            + (f" ({own} differs from it)" if own and os.path.exists(own) else "")
+            + ": it is not replaced and no record of this build is written for it")
+
+
+def keep(reason: str, keep_existing: bool) -> None:
+    """Leave a foreign graph file as it is: say so; an error unless an existing graph is to be kept."""
+    if not keep_existing:
+        raise SystemExit(f"{reason}; move it away to build here, or pass --keep-existing to keep it")
+    print(f"kept: {reason}")
+
+
+def build_here(tree: str, organism: str, snapshot: int, tables: str, keep_existing: bool = False) -> dict | None:
+    """Build one graph in this process (the tree's Python) and record it; returns the record, or None where a graph
+    file of the tree's folder that is not this build's is kept (nothing built, nothing recorded)."""
     from idtrack_reproducibility.families import common as C
 
     t = CFG.get().tree(tree)
     gen = C.generation(t["source"])
     out, repository = G.out_dir(tree, organism), G.repository_of(tree, organism)
+    reason = foreign_graph(G.graph_in(out, organism), G.graph_in(repository, organism))
+    if reason:  # decided before hours of building: the file is kept and described by no record of this build
+        keep(reason, keep_existing)
+        return None
     os.makedirs(repository, exist_ok=True)
     farmed = G.farm(tables, repository)
     sys.path.insert(0, os.path.abspath(t["source"]))
@@ -84,6 +115,10 @@ def build_here(tree: str, organism: str, snapshot: int, tables: str) -> dict:
     if built is None:
         raise SystemExit(f"the build left no graph file of {organism} in {repository}")
     target = os.path.join(out, os.path.basename(built))
+    reason = foreign_graph(target if os.path.exists(target) else None, built)
+    if reason:  # a file that appeared during the build: still never described by this build's record
+        keep(reason, keep_existing)
+        return None
     if not os.path.exists(target):
         try:
             os.link(built, target)
@@ -116,6 +151,8 @@ def main(argv=None):
     ap.add_argument("--submit", action="store_true", help="one job per organism through the configured runner")
     ap.add_argument("--mem", type=int, default=None, help="GB of each job (default: graphs.common.MEMORY_GB)")
     ap.add_argument("--time", default=None, help="wall time of each job (default: graphs.common.TIME)")
+    ap.add_argument("--keep-existing", action="store_true", help="where the tree's folder holds a graph file that is not "
+                    "this build's, keep it, record nothing and exit 0 (default: exit 1)")
     ap.add_argument("--here", action="store_true", help=argparse.SUPPRESS)  # the job itself, in the tree's Python
     a = ap.parse_args(argv)
     organisms = CFG.ORGANISMS if a.organisms == "all" else a.organisms.split(",")
@@ -123,8 +160,11 @@ def main(argv=None):
     for org in organisms:
         tables = a.tables.format(organism=org) if a.tables else G.default_tables(org)
         args = f"--tree {a.tree} --organisms {org} --snapshot {a.snapshot} --tables {os.path.abspath(tables)} --here"
+        args += " --keep-existing" if a.keep_existing else ""
         if a.here:
-            r = build_here(a.tree, org, a.snapshot, tables)
+            r = build_here(a.tree, org, a.snapshot, tables, a.keep_existing)
+            if r is None:
+                continue
             print(f"{org}: {r['graph_file']} content {r['content_digest']} {r['build_s']} s {r['peak_GB']} GB; "
                   f"linked tables changed: {len(r['linked_tables_changed'])}")
             cfg = CFG.get()

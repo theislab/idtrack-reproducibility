@@ -247,8 +247,8 @@ def plan(tree, previous=None, reference=None, organisms=None, tables=None, snaps
         note = ""
         graph_dir = os.path.realpath(G.out_dir(tree, o))
         if os.path.exists(t["graphs"][o]) and not os.path.exists(os.path.join(G.out_dir(tree, o), "build.json")):
-            note = ("the configured graph exists without a build record: graph-build keeps that file and records the "
-                    "digest of the graph it builds beside it")
+            note = ("the configured graph exists without a build record: graph-build refuses to replace it or to record "
+                    "it (the step fails; docs/iterate.md, \"A tree that is stored already\")")
         elif not os.path.realpath(t["graphs"][o]).startswith(graph_dir + os.sep):
             note = f"the configured graph lies outside {G.out_dir(tree, o)}, where graph-build writes"
         steps.append(Step(build, "graph_build", module("idtrack_reproducibility.graphs.build", args), o,

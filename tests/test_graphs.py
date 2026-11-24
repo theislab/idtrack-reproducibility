@@ -179,3 +179,79 @@ def test_verify_is_the_trees_own_command_or_not_available(tmp_path):
     good = J.verify_here(sys.executable, str(tree), "good.npz", str(tmp_path))
     assert good["status"] == "holds" and good["output"] == [f"verify good.npz --repository {tmp_path}"]
     assert J.verify_here(sys.executable, str(tree), "bad.npz", None)["status"] == "fails"
+
+
+FAKE_IDTRACK = '''import os
+
+
+class _Record:
+    content_digest = "digest-of-the-new-build"
+
+
+class _Graph:
+    record = _Record()
+
+
+class API:
+    graph = _Graph()
+
+    @classmethod
+    def build(cls, organism, snapshot, repository):
+        name = f"graph_{organism}_assembly111_min56_max{snapshot}.npz"
+        with open(os.path.join(repository, name), "wb") as fh:
+            fh.write(b"the new build")
+        also = os.environ.get("FAKE_IDTRACK_ALSO_WRITE")
+        if also:  # another process puts a graph file into the tree's folder meanwhile
+            with open(os.path.join(also, name), "wb") as fh:
+                fh.write(b"someone else's graph")
+        return cls()
+'''
+
+
+@pytest.fixture
+def fake_tree(data_root, tmp_path, monkeypatch):
+    """A configured tree `t` whose idtrack is a stand-in that builds a small file (no idtrack, no tables)."""
+    from idtrack_reproducibility import config as CFG
+    src = tmp_path / "tree"
+    touch(src / "idtrack" / "__init__.py", FAKE_IDTRACK)
+    touch(src / "idtrack" / "api.py", "")
+    os.makedirs(tmp_path / "tables")
+    cfg = tmp_path / "idtrack-repro.toml"
+    cfg.write_text(f'[trees.t]\ncommit = "abc"\nsource = "{src}"\npython = "{sys.executable}"\n')
+    monkeypatch.setenv("IDTRACK_REPRO_CONFIG", str(cfg))
+    monkeypatch.setattr(sys, "path", list(sys.path))
+    monkeypatch.delitem(sys.modules, "idtrack", raising=False)
+    CFG.reset()
+    yield data_root / "graphs" / "t" / "sus_scrofa", str(tmp_path / "tables")
+    sys.modules.pop("idtrack", None)
+
+
+def test_a_build_records_the_file_it_wrote_and_a_resubmission_records_it_again(fake_tree):
+    out, tables = fake_tree
+    r = GB.build_here("t", "sus_scrofa", 115, tables)
+    graph = out / "graph_sus_scrofa_assembly111_min56_max115.npz"
+    assert graph.read_bytes() == b"the new build" and r["content_digest"] == "digest-of-the-new-build"
+    assert json.load(open(out / "build.json"))["graph_file_sha256"] == GB.sha256(str(graph))
+    sys.modules.pop("idtrack", None)
+    assert GB.build_here("t", "sus_scrofa", 115, tables)["graph_file_sha256"] == GB.sha256(str(graph))
+
+
+def test_an_existing_graph_that_is_not_the_builds_is_never_described_by_its_record(fake_tree):
+    out, tables = fake_tree
+    graph = out / "graph_sus_scrofa_assembly111_min56_max115.npz"
+    touch(graph, "a graph made elsewhere")
+    with pytest.raises(SystemExit, match="not this build's graph.*--keep-existing"):
+        GB.build_here("t", "sus_scrofa", 115, tables)
+    assert graph.read_text() == "a graph made elsewhere" and not (out / "build.json").exists()
+    assert GB.build_here("t", "sus_scrofa", 115, tables, keep_existing=True) is None
+    assert graph.read_text() == "a graph made elsewhere" and not (out / "build.json").exists()
+
+
+def test_a_graph_file_that_appears_during_the_build_is_not_recorded_either(fake_tree, monkeypatch):
+    out, tables = fake_tree
+    os.makedirs(out)
+    monkeypatch.setenv("FAKE_IDTRACK_ALSO_WRITE", str(out))
+    with pytest.raises(SystemExit, match="not this build's graph"):
+        GB.build_here("t", "sus_scrofa", 115, tables)
+    assert (out / "graph_sus_scrofa_assembly111_min56_max115.npz").read_bytes() == b"someone else's graph"
+    assert not (out / "build.json").exists()
