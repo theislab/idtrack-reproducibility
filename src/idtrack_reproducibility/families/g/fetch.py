@@ -105,7 +105,7 @@ def record_pass(store, **kw):
 
 def ask(store, client, reqs, log):
     done_by = {}
-    n = 0
+    n = failed = 0
     for r in reqs:
         ep = r.get("endpoint")
         if ep not in done_by:
@@ -116,6 +116,13 @@ def ask(store, client, reqs, log):
         n += 1
         if not row.get("error"):
             done_by[ep].update(row.get("qids") or [])
+            failed = 0
+        else:
+            failed += 1
+            if failed >= 2:  # a server that failed two requests after their retries: the rest waits for the next pass
+                log(f"{store.tool} {store.organism}: two requests failed after their retries ({row['error']}); the "
+                    f"remaining requests of this release are left for the next pass")
+                break
         if n % 200 == 0:
             store.compile()
             log(f"{store.tool} {store.organism}: {n} requests")
@@ -159,27 +166,34 @@ def pass_tool(tool_name, organism, lines, client, log=print, releases=None):
             fl = vs.body(frow).decode(errors="replace")
             filters = {x.split("\t")[0] for x in fl.splitlines() if x.strip()}
             version = str(rel)
-            store = K.RawStore.of(tool.name, version, organism)
-            reqs = tool.requests(qs, organism, rel, filters)
+            build = lambda xs: tool.requests(xs, organism, rel, filters)  # noqa: E731
         elif tool_name == "gprofiler":
             base = T.GPROFILER if rel == tool.current else tool.instances[rel]
             # an archived instance has no version call of its own (its data_versions answers 404): its version is
             # the name of its address in the archive list stored with the pass
             version = cur if rel == tool.current else base.rstrip("/").rsplit("/", 1)[-1]
-            store = K.RawStore.of(tool.name, version, organism)
-            reqs = tool.requests(qs, organism, base)
+            build = lambda xs: tool.requests(xs, organism, base)  # noqa: E731
         else:
             rows, vs = ask_versions(tool, organism, client, pass_id, tool.version_calls(organism))
             version = version_of(tool, rows, vs)
-            store = K.RawStore.of(tool.name, version, organism)
-            reqs = None if tool_name in ("hgnc", "uniprot") else tool.requests(qs, organism)
-        if tool_name == "hgnc":
-            n = ask_hgnc(store, client, tool, qs, log)
-        elif tool_name == "uniprot":
-            n = ask_uniprot(store, client, qs, organism, log)
-        else:
-            n = ask(store, client, reqs, log)
+            build = (lambda xs: tool.requests(xs, organism)) if tool_name not in ("hgnc", "uniprot") else None
+        store = K.RawStore.of(tool.name, version, organism)
+        n = 0
+        for form in T.FORMS:  # the line as it stands, and the careful user's reading (docs/families/g.md)
+            fl = T.in_form(qs, form)
+            if not fl:
+                continue
+            if tool_name == "hgnc":
+                n += ask_hgnc(store, client, tool, fl, log, form)
+            elif tool_name == "uniprot":
+                n += ask_uniprot(store, client, fl, organism, log, form)
+            else:
+                reqs = build(fl)
+                for r in reqs:
+                    r["endpoint"] = f"{r['endpoint']}@{form}"
+                n += ask(store, client, reqs, log)
         record_pass(store, pass_id=pass_id, release=rel, version=version, lines=len(qs), requests_asked=n,
+                    lines_best_differs=len(T.in_form(qs, "best")),
                     started=pass_id, finished=K.now(), seconds=round(time.time() - t0, 1),
                     host_group=GROUP[tool_name], host_interval=K.HOSTS[GROUP[tool_name]].interval)
         out[rel] = (version, n, len(qs))
@@ -187,13 +201,15 @@ def pass_tool(tool_name, organism, lines, client, log=print, releases=None):
     return out
 
 
-def ask_hgnc(store, client, tool, qs, log):
+def ask_hgnc(store, client, tool, qs, log, form):
     """HGNC: per line, its fields in order (an approved symbol, then a previous, then an alias symbol, as HGNC's
     multi-symbol checker reads a term), until one finds a record."""
     n = 0
     for q in qs:
         for field in tool.chain(q):
-            row = client.fetch(store, **tool.request(q, field))
+            r = tool.request(q, field)
+            r["endpoint"] = f"{r['endpoint']}@{form}"
+            row = client.fetch(store, **r)
             n += 1
             if row.get("error"):
                 break
@@ -209,26 +225,26 @@ def ask_hgnc(store, client, tool, qs, log):
     return n
 
 
-def ask_uniprot(store, client, qs, organism, log, poll=5, max_polls=720):
+def ask_uniprot(store, client, qs, organism, log, form, poll=5, max_polls=720):
     """UniProt's ID mapping: one job of every accession (at most 100,000), polled until it is finished, then its
     results streamed; every response stored."""
     ids = sorted({q["id"] for q in qs})
     qids = [q["qid"] for q in qs]
-    if store.answered("idmapping/stream") >= set(qids):
+    if store.answered(f"idmapping/stream@{form}") >= set(qids):
         return 0
     run = client.fetch(store, "POST", f"{T.UNIPROT}/idmapping/run", data={"from": "UniProtKB_AC-ID", "to": "Ensembl",
-                       "ids": ",".join(ids)}, qids=qids, endpoint="idmapping/run")
+                       "ids": ",".join(ids)}, qids=qids, endpoint=f"idmapping/run@{form}")
     job = json.loads(store.body(run))["jobId"]
     for i in range(max_polls):
         st = client.fetch(store, "GET", f"{T.UNIPROT}/idmapping/status/{job}", allow_redirects=False, salt=str(i),
-                          endpoint="idmapping/status")
+                          endpoint=f"idmapping/status@{form}")
         body = json.loads(store.body(st)) if st.get("file") else {}
         if st["http_status"] in (200, 303) and (body.get("jobStatus") == "FINISHED" or "results" in body
                                                 or st["http_status"] == 303):
             break
         time.sleep(poll)
     client.fetch(store, "GET", f"{T.UNIPROT}/idmapping/stream/{job}", params={"format": "json"}, qids=qids,
-                 endpoint="idmapping/stream")
+                 endpoint=f"idmapping/stream@{form}")
     store.compile()
     return i + 3
 

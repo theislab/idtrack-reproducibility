@@ -267,21 +267,92 @@ def bridgedb(store, lines, organism):
                     m[f[0]] = [y[3:] for y in f[2].split(",") if y.startswith("En:")]
             cache[r["request_id"]] = m
         sys_ = T.TOOLS["bridgedb"].system(q, organism)
-        key = q["id"].split(".")[0] if sys_ in ("En", "Q") else q["id"]
+        key = q["id"]
         got = cache[r["request_id"]].get(key, [])
         out[q["qid"]] = Answer("answer", got, "found" if got else "not_found", _share(r), endpoint=r["endpoint"])
     return out
 
 
-def answers(tool, organism, version, lines, release=None):
-    """{qid: Answer} of one tool's stored responses (one version and organism) for the lines."""
-    store = K.RawStore.of(tool, version, organism)
+class FormView:
+    """A store's rows of one form of the input (endpoints `<endpoint>@<form>`), with the form's suffix taken off, so
+    that the adapters read them by their endpoints."""
+
+    def __init__(self, store, form):
+        self.folder, self.tool, self.version, self.organism = store.folder, store.tool, store.version, store.organism
+        self._store = store
+        self.rows = {}
+        for k, r in store.rows.items():
+            if r["endpoint"].endswith("@" + form):
+                self.rows[k] = dict(r, endpoint=r["endpoint"][: -len(form) - 1])
+
+    def body(self, row):
+        return self._store.body(row)
+
+
+def gget(store, lines):
+    """gget info: an id that its result holds as a gene is its own answer (the gene at Ensembl's current release)."""
+    out = {}
+    by = _by_qid(_rows(store, "info"))
+    cache = {}
+    for q in lines:
+        r = by.get(q["qid"])
+        if r is None:
+            continue
+        if r.get("error"):
+            out[q["qid"]] = Answer("error", error=r["error"], seconds=_share(r), endpoint="info")
+            continue
+        if r["request_id"] not in cache:
+            doc = json.loads(store.body(r)) or {}
+            cache[r["request_id"]] = {C.base_id(k): v for k, v in doc.items()} if isinstance(doc, dict) else {}
+        hit = cache[r["request_id"]].get(C.base_id(q["id"]))
+        ok = isinstance(hit, dict) and str(hit.get("object_type", "Gene")).lower() == "gene"
+        out[q["qid"]] = Answer("answer", [C.base_id(q["id"])] if ok else [], "found" if ok else "not_found",
+                               _share(r), endpoint="info")
+    return out
+
+
+def calls(store, lines, organism=None, release=None):
+    """A local tool's stored calls (`calls` responses: one JSON line per line asked, `result` its Ensembl genes);
+    with `release`, the ids of Ensembl's other annotations of the species left out (as for MyGene.info)."""
+    import gzip as _gz
+    out = {}
+    ref = reference_genes(organism, release) if release else None
+    for r in sorted(_rows(store, "calls"), key=lambda r: r["asked_at"] or ""):
+        body = store.body(r)
+        if body[:2] == b"\x1f\x8b":
+            body = _gz.decompress(body)
+        per = (r.get("seconds") or 0.0) / max(1, len(r.get("qids") or []))
+        for x in body.decode().splitlines():
+            c = json.loads(x)
+            allg = {C.base_id(g) for g in c.get("result") or []}
+            got = {g for g in allg if ref is None or g in ref}
+            st = "found" if got else ("other_annotation_only" if allg else "not_found")
+            out[c["qid"]] = Answer("answer", got, st, c.get("seconds", per), endpoint="calls")
+    want = {q["qid"] for q in lines}
+    return {k: v for k, v in out.items() if k in want}
+
+
+def answers(tool, organism, version, lines, release=None, form="best"):
+    """{qid: Answer} of one tool's stored responses (one version and organism) for the lines, in one form of the
+    input (`best`: the lines whose value changes are read from the `best` requests, the others from the `stated`)."""
+    if form == "best":
+        changed = T.in_form(lines, "best")
+        ids = {q["qid"] for q in changed}
+        out = _answers(tool, organism, version, T.in_form([q for q in lines if q["qid"] not in ids], "stated"),
+                       release, "stated")
+        out.update(_answers(tool, organism, version, changed, release, "best"))
+        return out
+    return _answers(tool, organism, version, T.in_form(lines, "stated"), release, "stated")
+
+
+def _answers(tool, organism, version, lines, release, form):
+    store = FormView(K.RawStore.of("ensembl_rest" if tool == "ensembl_rest_lookup" else tool, version, organism), form)
     if tool == "ensembl_rest":
         out = rest(store, [q for q in lines if q["task"] in ("a", "b")], "archive/id")
         out.update(rest(store, [q for q in lines if q["task"] in ("c", "d", "e")], "xrefs/symbol"))
         return out
     if tool == "ensembl_rest_lookup":
-        return rest(K.RawStore.of("ensembl_rest", version, organism), lines, "lookup/symbol")
+        return rest(store, lines, "lookup/symbol")
     if tool == "biomart":
         return biomart(store, lines, organism)
     if tool == "gprofiler":
@@ -294,6 +365,12 @@ def answers(tool, organism, version, lines, release=None):
         return uniprot(store, lines, organism, release or 116)
     if tool == "bridgedb":
         return bridgedb(store, lines, organism)
+    if tool == "gget":
+        return gget(store, lines)
+    if tool in ("pyensembl", "orgdb", "limma", "hgnchelper", "seurat", "ensdb"):
+        return calls(store, lines)
+    if tool == "ncbi_files":
+        return calls(store, lines, organism, release or 116)
     raise ValueError(tool)
 
 

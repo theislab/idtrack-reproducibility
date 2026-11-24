@@ -250,6 +250,9 @@ def main(argv=None):
     ap.add_argument("--draft", default=None, help="write the drawn lines to this folder instead of publishing them")
     a = ap.parse_args(argv)
     for gfam in a.families.split(","):
+        if not a.draft and f"g_{gfam}_v1" in L.set_names("g", a.organism):
+            print(a.organism, f"g_{gfam}_v1", "published already")
+            continue
         lines, extra = draw(gfam, a.organism)
         if not lines:
             print(f"{a.organism} {gfam}: no source set")

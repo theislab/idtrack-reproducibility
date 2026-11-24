@@ -1,0 +1,15 @@
+# gget for family G (docs/families/g.md): `gget info` asked for Ensembl ids (its Ensembl REST lookup), in its own
+# environment because its dependencies are many; the package's own Parquet and JSON needs as g_py.yml.
+#   mamba env create -p <prefix> -f environments/g_gget.yml
+name: idtrack-g-gget
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.18
+  - numpy=2.5.4
+  - pandas=3.1.1
+  - pyarrow=26.0.1
+  - requests=2.34.2
+  - pip
+  - pip:
+      - gget==0.30.8

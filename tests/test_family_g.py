@@ -139,7 +139,7 @@ def test_biomart_reads_rows_by_the_filter_value_and_needs_its_success_line(tmp_p
     st = store_with(tmp_path, "biomart", [("martservice:external_gene_name", ["q1"], good, 200),
                                           ("martservice:external_gene_name", ["q2"], b"Gene stable ID\tGene name\nE\tX\n", 200),
                                           ("martservice:ensembl_gene_id", ["q3"], ids, 200)])
-    out = A.biomart(st, [line("q1", "TP53", "c"), line("q2", "X", "c"), line("q3", "ENSSSCG00000000007.3", "b")], "sus_scrofa")
+    out = A.biomart(st, [line("q1", "TP53", "c"), line("q2", "X", "c"), line("q3", "ENSSSCG00000000007", "b")], "sus_scrofa")
     assert out["q1"].got == ["ENSSSCG00000000001", "ENSSSCG00000000002"]  # the mart's filter matches without case
     assert out["q2"].outcome == "error"  # no [success]: the response may be cut
     assert out["q3"].got == ["ENSSSCG00000000007"]
@@ -256,3 +256,33 @@ def test_a_g_line_is_judged_at_the_gene():
     assert g["cmp"] == "base" and g["expect"] == ["ENSSSCG00000000002"] and g["task"] == "a"
     assert g["source_cmp"] == "versioned" and g["stratum"] == "g_a1_a1" and g["support"] == {"ENSSSCG00000000002": 2}
     assert GS.task_of(dict(src, from_release=115), "a") == "b"
+
+
+def test_the_scorer_keeps_a_line_a_tool_cannot_pose_as_not_supported():
+    from idtrack_reproducibility.families import scorer as S
+    ln = dict(qid="q", id="X", kind="k", rule="set", cmp="base", expect=["G1"], strategy="both", to_release=115)
+    ans = dict(outcome="not_supported", got=[], error="the tool has no data for the organism")
+    assert S.score_line(ln, "all", ans, None) == ("not_supported", "the tool has no data for the organism")
+
+
+def test_the_best_reading_removes_a_version_a_tool_does_not_take():
+    assert T.value(line("q", "ENSSSCG00000000007.3", "b"), "best") == "ENSSSCG00000000007"
+    assert T.value(line("q", "ENSSSCG00000000007.3", "b"), "stated") == "ENSSSCG00000000007.3"
+    assert T.value(line("q", "NM_001001258.1", "e"), "best") == "NM_001001258"
+    assert T.value(line("q", "A0A024BTL2.45", "e"), "best") == "A0A024BTL2"
+    assert T.value(line("q", "ABC.1", "c"), "best") == "ABC.1"  # a name is asked as it stands
+    assert T.value(line("q", "A5GFW5-2", "e"), "best") == "A5GFW5-2"  # an isoform is not a version
+    ls = [line("q1", "ENSSSCG00000000007.3", "b"), line("q2", "ENSSSCG00000000008", "b")]
+    assert [q["qid"] for q in T.in_form(ls, "best")] == ["q1"] and len(T.in_form(ls, "stated")) == 2
+
+
+def test_each_form_is_read_from_its_own_requests(tmp_path, monkeypatch):
+    st = store_with(tmp_path, "gprofiler", [
+        ("convert@stated", ["q1", "q2"], {"result": [{"incoming": "ENSSSCG00000000007.3", "converted": "None"},
+                                                     {"incoming": "ENSSSCG00000000008", "converted": "ENSSSCG00000000008"}]}, 200),
+        ("convert@best", ["q1"], {"result": [{"incoming": "ENSSSCG00000000007", "converted": "ENSSSCG00000000007"}]}, 200)])
+    monkeypatch.setattr(K.RawStore, "of", classmethod(lambda cls, tool, version, organism: st))
+    ls = [line("q1", "ENSSSCG00000000007.3", "b"), line("q2", "ENSSSCG00000000008", "b")]
+    best, stated = A.answers("gprofiler", "sus_scrofa", "v", ls, form="best"), A.answers("gprofiler", "sus_scrofa", "v", ls, form="stated")
+    assert best["q1"].got == ["ENSSSCG00000000007"] and stated["q1"].got == []
+    assert best["q2"].got == stated["q2"].got == ["ENSSSCG00000000008"]  # an unversioned line shares the stated request

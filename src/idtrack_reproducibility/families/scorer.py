@@ -48,6 +48,8 @@ The rules (docs/harness.md "Scoring rules" and the corrected judge; docs/methods
   "with": <qid>, "with_view": <view>} compares its answer with another line's (scored after all parts); `or_error`
   and `open` (with `open_within`) apply to it first, as to every line.
 
+- `not_supported` (an answer's outcome; family G): a tool that cannot pose the line is `not_supported`, with its reason.
+
 Outcomes: right, wrong, undetermined, timeout, error, expected_error (and not_supported for other tools). Rate =
 (right + expected_error) / (right + expected_error + wrong + error); undetermined and timeout apart.
 """
@@ -163,6 +165,8 @@ def _score_line(line, view, ans, places):
     if ans is None:
         return "missing", "not run"
     o = ans["outcome"]
+    if o == "not_supported":  # another tool that cannot pose the line (family G): outside the rate
+        return "not_supported", ans.get("error") or "the subject cannot pose this line"
     oe = or_error_outcome(line, ans)
     if oe:
         return oe

@@ -47,6 +47,36 @@ def source_kind(line):
     return {"a": "ensembl", "b": "symbol", "astar": "ensembl"}.get(src) or ("ensembl" if line.get("kind") == "d1_id" else "symbol")
 
 
+# An identifier with its version: an Ensembl stable id, a RefSeq accession or a UniProt accession, then `.<n>`.
+VERSIONED = re.compile(r"^((?:ENS[A-Z]*[GTPE]\d{11})|(?:[A-Z]{2}_\d+)|(?:[OPQ]\d[A-Z\d]{3}\d)|"
+                       r"(?:[A-NR-Z]\d(?:[A-Z][A-Z\d]{2}\d){1,2}))\.\d+$")
+FORMS = ("best", "stated")
+
+
+def value(line, form):
+    """What a tool is asked for a line in a form of the input (docs/families/g.md, "Two readings of the input"):
+    `stated`, the line's input exactly as it stands; `best`, the reading a careful user gives a tool that takes no
+    versions (none of the tools asked documents versioned input): an identifier's version removed (tasks a, b, e;
+    names are asked as they stand)."""
+    v = line["id"]
+    if form == "best" and line.get("task") in ("a", "b", "e"):
+        m = VERSIONED.match(v)
+        if m:
+            return m.group(1)
+    return v
+
+
+def in_form(lines, form):
+    """The lines as a tool is asked them in a form: copies whose `id` is the value asked; for `best`, only the lines
+    whose value differs from the stated one (the others share the stated requests)."""
+    out = []
+    for q in lines:
+        v = value(q, form)
+        if form == "stated" or v != q["id"]:
+            out.append(dict(q, id=v, stated_id=q["id"]))
+    return out
+
+
 def chunks(xs, n):
     for i in range(0, len(xs), n):
         yield xs[i: i + n]
@@ -130,7 +160,7 @@ def biomart_filter(line):
     t = line["task"]
     v = line["id"]
     if t in ("a", "b"):
-        return "ensembl_gene_id", v.split(".")[0]  # versions stripped, as BioMart's filter takes stable ids
+        return "ensembl_gene_id", v
     if t == "c":
         return "external_gene_name", v
     if t == "d":
@@ -140,7 +170,7 @@ def biomart_filter(line):
     if k == "refseq":
         for pre, f in BIOMART_REFSEQ:
             if v.startswith(pre):
-                return f, v.split(".")[0]
+                return f, v
         return None, "a RefSeq identifier of no prefix BioMart filters on"
     if k == "uniprot":
         return "uniprot", v
@@ -282,7 +312,7 @@ class Hgnc(Tool):
         return ""
 
     def request(self, line, field):
-        v = line["id"].split(".")[0] if field == "refseq_accession" else line["id"]
+        v = line["id"]
         return dict(method="GET", url=f"{HGNC}/fetch/{field}/{urllib.parse.quote(v, safe='')}",
                     headers={"Accept": "application/json"}, qids=[line["qid"]], endpoint=f"fetch/{field}")
 
@@ -330,7 +360,7 @@ class BridgeDb(Tool):
         out = []
         for sys_, qs in sorted(groups.items()):
             for b in chunks(qs, 100):
-                ids = [q["id"].split(".")[0] if sys_ in ("En", "Q") else q["id"] for q in b]
+                ids = [q["id"] for q in b]
                 out.append(dict(method="POST", url=f"{BRIDGEDB}/{o}/xrefsBatch/{sys_}", params={"dataSource": "En"},
                                 data="\n".join(ids), headers={"Content-Type": "text/plain"}, ext="txt",
                                 qids=[q["qid"] for q in b], endpoint=f"xrefsBatch/{sys_}"))
