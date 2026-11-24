@@ -381,3 +381,33 @@ def test_a_string_without_a_release_is_read_where_the_records_hold_it_last(monke
 def types_ns(**kw):
     import types
     return types.SimpleNamespace(**kw)
+
+
+def test_a_revision_is_published_from_its_dry_run_as_found(tmp_path, monkeypatch):
+    """`--publish-from`: the lines a dry run wrote are published as it found them (the revision, its decided lines
+    and the new lines), and refused once a set of the family was published after the file."""
+    import gzip
+    import json
+    from idtrack_reproducibility.families.b import revise_b as RB
+    f = tmp_path / "dry.jsonl.gz"
+    recs = [dict(set="b6", qid="q1", fields=["expect"], new=dict(qid="q1", expect=["G2.1"])),
+            dict(set="b6", qid="q2", fields=["excluded"], new=dict(qid="q2", excluded="no longer asked")),
+            dict(set="b6_r1_dec", qid="q1", fields=["expect"], new=dict(qid="q1", expect=["G3.1"])),
+            dict(set="b5_v2", qid="q9", fields=["new"], new=dict(qid="q9"))]
+    with gzip.open(f, "wt") as fo:
+        for r in recs:
+            fo.write(json.dumps(r) + "\n")
+    mans = {"b6_v1": dict(seq=1, published="2026-01-01T00:00:00")}
+    monkeypatch.setattr(RB, "family_sets", lambda org, S: sorted(m for m in mans if m.startswith(S)))
+    monkeypatch.setattr(RB.L, "manifest", lambda fam, org, s: mans[s])
+    got = {}
+    monkeypatch.setattr(RB.L, "publish", lambda fam, org, name, lines, *a, **k: got.setdefault(name, (lines, k)))
+    monkeypatch.setattr(RB.L, "sha256", lambda p: "x")
+    RB.publish_from("sus_scrofa", "b6", "r1", "why", str(f))
+    assert [ln["qid"] for ln in got["b6_r1"][0]] == ["q1", "q2"] and got["b6_r1"][1]["manifest_extra"]["excluded"] == 1
+    assert [ln["expect"] for ln in got["b6_r1_dec"][0]] == [["G3.1"]] and "b5_v2" not in got
+    mans["b6_rules9"] = dict(seq=2, published="2999-01-01T00:00:00")
+    got.clear()
+    import pytest
+    with pytest.raises(SystemExit):
+        RB.publish_from("sus_scrofa", "b6", "r2", "why", str(f))

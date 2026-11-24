@@ -14,7 +14,9 @@ For each set family S (`b1`, ...):
   again without it. A line whose regenerated base is its published base but whose replayed line is not its published
   line is a correction the replay does not reproduce: then nothing is published (`replay mismatches` in the log).
   With `--dry --lines-to <file>` every changed line is written beside its published line, with the fields that
-  differ (a change of a field that asks, `QUESTION`, is a new question: a stored answer does not answer it);
+  differ (a change of a field that asks, `QUESTION`, is a new question: a stored answer does not answer it), and
+  `--publish-from <that file>` publishes the revision as the dry run found it, without regenerating (refused when a
+  set of S was published after the file was written);
 - `S_<name>_dec` (B6, B7): the lines the `decided` judge must read after `S_<name>` (sets in order: `S_v1`, `S_dec`,
   `S_<name>`, `S_<name>_dec`): every qid whose decided line (its regenerated `_dec` line, else its regenerated line)
   differs from what that order gives;
@@ -68,6 +70,7 @@ held<k>` puts back, as `S_<name>`, the lines of `S_held<k>` it had revised befor
 import argparse
 import collections
 import copy
+import datetime
 import functools
 import gzip
 import hashlib
@@ -326,6 +329,11 @@ def revise(cx, S, name, why, dry, rd):
     for q in sorted(gone):
         changed.append(tag(dict(old_lines[q], excluded=f"no longer asked: {why}"), name, why))
     summarise(org, S, changed, old_lines, set(mismatch), gone, new)
+    if LINES_TO and dry and new:
+        with gzip.open(LINES_TO, "at") as fo:
+            for ln in new:
+                fo.write(json.dumps(dict(set=f"{S}_v2", qid=ln["qid"], kind=ln.get("kind"), stratum=ln.get("stratum"),
+                                         fields=["new"], old=None, new=ln), sort_keys=True, default=str) + "\n")
     if mismatch:
         raise SystemExit(f"{org} {S}: {len(mismatch):,} lines whose regenerated base is the published one but whose "
                          "replayed corrections are not the published line: a correction the replay does not reproduce; "
@@ -376,6 +384,42 @@ def revise(cx, S, name, why, dry, rd):
         if out:
             L.publish(FAMILY, org, f"{S}_{name}_dec", out, f"{S}: revision {name} under the decided judge: {why}", __file__,
                       revises=fam + ([f"{S}_{name}"] if changed else []), judge=f"b_{name}_dec", dry=dry)
+
+
+def publish_from(org, S, name, why, path):
+    """Publish set family S's revision from the lines a dry run of it wrote (`--dry --lines-to`), instead of
+    regenerating them: `S_<name>` (the changed and no longer asked lines), `S_<name>_dec` and `S_v2` as the dry run
+    found them. Refused when a set of S was published after the file was written (its lines would be stale)."""
+    fam = family_sets(org, S)
+    if f"{S}_{name}" in fam:
+        log(org, S, f"{S}_{name} published before: skipped")
+        return
+    written = datetime.datetime.fromtimestamp(os.path.getmtime(path)).isoformat(timespec="seconds")
+    later = [s for s in fam if L.manifest(FAMILY, org, s).get("published", "") > written]
+    if later:
+        raise SystemExit(f"{org} {S}: {later} published after {path} was written; run the revision again")
+    by = collections.defaultdict(list)
+    for x in gzip.open(path, "rt"):
+        r = json.loads(x)
+        if r["set"] in (S, f"{S}_{name}_dec", f"{S}_v2"):
+            by[r["set"]].append(r)
+    now_sets = [s for s in fam if "_dec" not in s]
+    changed = [r["new"] for r in by[S]]
+    gone = sum(1 for r in by[S] if r["fields"] == ["excluded"])
+    log(org, S, f"from {path}: changed {len(changed) - gone:,}; no longer asked {gone:,}; decided {len(by[f'{S}_{name}_dec']):,}; "
+        f"new {len(by[f'{S}_v2']):,}")
+    if changed:
+        L.publish(FAMILY, org, f"{S}_{name}", changed, f"{S}: revision {name}: {why}", __file__, revises=now_sets,
+                  judge=f"b_{name}", manifest_extra=dict(revision=name, why=why, changed=len(changed) - gone, excluded=gone,
+                                                         replayed=[s for s, _, _ in chain(org, S)],
+                                                         from_dry_run=dict(file=os.path.basename(path), sha256=L.sha256(path))))
+    if by[f"{S}_v2"]:
+        L.publish(FAMILY, org, f"{S}_v2", [r["new"] for r in by[f"{S}_v2"]], f"{S}: lines asked for the first time "
+                  f"({name}: {why})", __file__, judge=f"b_{name}")
+    if by[f"{S}_{name}_dec"]:
+        fam = family_sets(org, S)
+        L.publish(FAMILY, org, f"{S}_{name}_dec", [r["new"] for r in by[f"{S}_{name}_dec"]],
+                  f"{S}: revision {name} under the decided judge: {why}", __file__, revises=fam, judge=f"b_{name}_dec")
 
 
 def summarise(org, S, changed, old_lines, mismatch, gone, new):
@@ -728,6 +772,8 @@ def main():
     ap.add_argument("--undo", default=None)
     ap.add_argument("--lines-to", default=None, help="with --dry: write the revision lines here (a regeneration "
                                                       "revision: each beside its published line)")
+    ap.add_argument("--publish-from", default=None, help="publish a regeneration revision from the lines file of its dry "
+                                                          "run (`--lines-to`) instead of regenerating")
     a = ap.parse_args()
     global LINES_TO
     LINES_TO = a.lines_to
@@ -747,6 +793,10 @@ def main():
     if not a.why:
         ap.error("--why is required without --rules")
     sets = a.sets.split(",")
+    if a.publish_from:
+        for S in sets:
+            publish_from(a.organism, S, a.name, a.why, a.publish_from)
+        return
     # B9 reads its own truth (gen_b9): the context of the other sets (the history, BioMart) only where they are asked
     cx = G2.Ctx(a.organism) if set(sets) - {"b9"} else types.SimpleNamespace(org=a.organism, nb=types.SimpleNamespace(_walk={}))
     rd = Readers(a.organism, nb=getattr(cx, "nb", None) if set(sets) - {"b9"} else None)
