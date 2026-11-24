@@ -8,8 +8,8 @@ What is built:
 
 - the fetcher of Ensembl's cross-references and of each database's own files (`fetch_c`), the truth readers (`truth_c`: the graph's scope, Ensembl's cross-references, the authorities), the generator of the parts c1 to c7 (`gen_c`), the check of the truth against Ensembl's other publications (`check_truth_c`), the authority measure (`authority_c`), the selection of the wrong answers to explain (`explain_qids`), the plugin of the common classifier (`causes_c`) and the corrections of the judge as revision sets (`revise_c`);
 - the truth of all five organisms, each file in `SOURCES.tsv` (files of no single organism in `<truth>/_shared/SOURCES.tsv`): extracts of the cross-references of every release of each window from Ensembl's MySQL dumps (`core_xref/<release>.tsv.gz`: human, mouse and rhesus 48 to 116, pig 56 to 116, cynomolgus 91 to 116), Ensembl's FTP `tsv/` tables of 87 to 116, NCBI's `gene2ensembl`, `gene2refseq` and `gene_history`, RefSeq release 238 (catalog, accessions to gene ids, removed records), UniProt 2026_04 (`idmapping_selected`, `sec_ac`, `delac_sp`, `delac_tr`, Swiss-Prot isoforms), RFAM's family list, RNAcentral release 28 (its Ensembl and miRBase mappings), miRBase 23.1 (`hairpin.fa`, `mature.fa`, the genome files of human, mouse and rhesus; pig's and cynomolgus's do not answer), CCDS (human, mouse);
-- the check of the core reading against BioMart and the FTP `tsv/` tables for cynomolgus, pig and rhesus (`<families>/c/truth_check/<organism>.tsv`);
-- the published sets: c1 to c7 of cynomolgus, pig and rhesus; c1 and c2 of mouse and human, with their revision for the releases added to the truth (mouse 89, human 112) and the corrections of the judge ([the sets](#the-sets)).
+- the check of the core reading against BioMart and the FTP `tsv/` tables for all five organisms (`<families>/c/truth_check/<organism>.tsv`);
+- the published sets: c1 to c7 of all five organisms; mouse's and human's c1 and c2 with their revision for the releases added to the truth (mouse 89, human 112); the corrections of the judge ([the sets](#the-sets)), mouse's and human's c3 to c7 given every correction the other organisms' sets received, in their order.
 
 What was run and scored, on the reference tree `d4c2dda` and its graphs:
 
@@ -22,7 +22,7 @@ What was run and scored, on the reference tree `d4c2dda` and its graphs:
 
 What is not built:
 
-- c3 to c7 of mouse and human, and their runs; the check of the truth for mouse and human, and the family's panel ([Measurement design](../methods.md#measurement-design)); C's modest selection is built (`panels/<organism>/modest_v1`, [the modest set](../modest.md)).
+- the family's panel ([Measurement design](../methods.md#measurement-design)); C's modest selection is built (`panels/<organism>/modest_v1`, [the modest set](../modest.md)), from mouse's and human's c1 and c2 only (their c3 to c7 were published after it, 2026-11-24).
 
 Mouse's and human's `c1_v1` and `c2_v1` were published before the extracts of mouse release 89 and human release 112 existed (human 112's folder holds a GRCh37 database beside the release's own, mouse 89's dumps are `.txt.gz.bz2`); `gen_c --revise-from` published the lines a generation reading every release changes (2026-11-20; the explanations in words, `note` and `q2`, are no part of the comparison: `gen_c.WORDING`): mouse `c1_r1_new` 21,109 new lines at 89, `c2_r1` 4,777 (lines retired after 88 now read where last held, at 89) and `c2_r1_new` 309,356; human `c1_r1` 543 and `c1_r1_new` 27,648 at 112, `c2_r1` 8,368 (1,071 at 112; 7,297 lines of the sampled version strata left out, `excluded`, because the sample drawn from the population with 112 is another) and `c2_r1_new` 653,136.
 
@@ -66,11 +66,11 @@ Lines per set and organism (manifests `<families>/c/queries/<organism>/<set>.man
 | --- | ---: | ---: | ---: | ---: | ---: |
 | `c1_v1` | 621,490 | 897,178 | 937,388 | 622,485 | 400,893 |
 | `c2_v1` | 7,018,312 | 10,994,278 | 15,841,952 | 7,112,048 | 3,814,412 |
-| `c3_v1` | 3,336,924 | – | – | 2,609,067 | 2,381,019 |
-| `c4_v1` | 26,707 | – | – | 31,398 | 24,215 |
-| `c5_v1` | 144,871 | – | – | 15,373 | 751 |
-| `c6_v1` | 11,196,372 | – | – | 11,598,840 | 8,523,060 |
-| `c7_v1` | 3,774,963 | – | – | 3,790,394 | 2,091,539 |
+| `c3_v1` | 3,336,924 | 3,329,080 | 5,173,660 | 2,609,067 | 2,381,019 |
+| `c4_v1` | 26,707 | 42,089 | 110,044 | 31,398 | 24,215 |
+| `c5_v1` | 144,871 | 3,241,096 | 3,537,931 | 15,373 | 751 |
+| `c6_v1` | 11,196,372 | 23,564,132 | 27,919,669 | 11,598,840 | 8,523,060 |
+| `c7_v1` | 3,774,963 | 5,842,959 | 8,096,205 | 3,790,394 | 2,091,539 |
 
 ## Truth
 
@@ -80,7 +80,7 @@ Nothing of idtrack (`truth_c`):
 - **The graph's scope** (`Scope`): which of the graph's databases the reference tree's externals configuration includes at which release (by the assembly of the release's GTF) and from which object form, read from the configured `d4c2dda` checkout (`idtrack/default_config/<organism>_externals_modified.yml`), with `d4c2dda`'s naming (an accession under its `db_name`, a label under its `db_display_name`). It says what a graph holds, not what is right: a value Ensembl has that the configuration leaves out is asked all the same (`*_not_held`, rule `safe`).
 - **The history to the target**: family A's `GenA` (A*'s strict walk with living ids is `expect`, rule [`id_lives_on`](../rules.md#id_lives_on); the broad walk with ids brought back is `broad`, rule [`resurrection`](../rules.md#resurrection); copies on patches apart, rule [`judge_copies_apart`](../rules.md#judge_copies_apart); the locus rule with places mapped across assemblies). A value of several genes: the union of their walks; `open` when none of them has a successor, `partial` counted when some have none.
 - **Each database's own file** (`Authority`, beside the truth, never the judge): NCBI's `gene2ensembl`, `gene2refseq`, `gene_history`; RefSeq's catalog; UniProt's `idmapping_selected`, secondary and deleted accessions, isoforms; RFAM's family list; RNAcentral's mappings; miRBase's genome and sequence files (mirbase.org serves them wrapped in HTML; they are kept as served and unwrapped by `truth_c.mirbase_text`); CCDS's sequence table; VGNC's gene sets. A line carries the database's genes as `auth` (`none` where the database attaches no gene).
-- **The check** (`check_truth_c`): BioMart agrees with the core reading at every archive release and database read, except release 75's Swiss-Prot table, which holds entry names where the core holds accessions (pig 566, rhesus 171 values); the FTP `tsv/` tables agree with it except at one release per organism (cynomolgus and rhesus 112, pig 105), where they lack values the core holds and pig's holds 217 RefSeq peptides the core does not (`<families>/c/truth_check/<organism>.tsv`). The core is what the graph reads, so it is the truth.
+- **The check** (`check_truth_c`): BioMart agrees with the core reading at every archive release and database read, except release 75's Swiss-Prot table, which holds entry names where the core holds accessions (pig 566, rhesus 171, mouse 15,301, human 19,095 values); the FTP `tsv/` tables agree with it except at one release per organism (cynomolgus and rhesus 112, pig 105, mouse 103), where they lack values the core holds and pig's holds 217 RefSeq peptides the core does not, and mouse's 103 gives 2 NCBI ids one gene where the core gives two; human's NCBI ids of 87 to 116 (675 to 1,348 values per release, BioMart's tables of 105, 110, 115 and 116 alike) differ from the core reading only by the LRG records the core lists beside the Ensembl gene, which no GTF holds and the truth leaves out (`<families>/c/truth_check/<organism>.tsv`). The core is what the graph reads, so it is the truth.
 
 ## Rules
 

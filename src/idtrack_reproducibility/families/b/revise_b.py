@@ -320,7 +320,7 @@ def revise(cx, S, name, why, dry, rd):
             if old is None:
                 new.append(ln)
                 continue
-            if digest(ln) != old[0] or old[1]:
+            if digest(ln) != old[0]:  # `canon` holds whether a line is excluded: a line excluded again is no change
                 if not old[1] and base.get(q, (None,))[0] == bdig[q]:
                     mismatch.append(q)  # the regenerated base is the published one, the replay is not the published line
                 changed.append(tag(ln, name, why))
@@ -401,7 +401,7 @@ def publish_from(org, S, name, why, path):
     by = collections.defaultdict(list)
     for x in gzip.open(path, "rt"):
         r = json.loads(x)
-        if r["set"] in (S, f"{S}_{name}_dec", f"{S}_v2"):
+        if r["set"] in (S, f"{S}_{name}_dec", f"{S}_v2") and r["fields"]:  # a line excluded again is no change
             by[r["set"]].append(r)
     now_sets = [s for s in fam if "_dec" not in s]
     changed = [r["new"] for r in by[S]]
