@@ -426,3 +426,19 @@ def test_b2_moved_from_is_split_by_whether_the_old_genes_history_ends(tmp_path):
     assert parts["history continues"]["units_wrong"] == {"A"}
     assert parts["history ends"]["n"] == 2 and parts["history ends"]["undetermined"] == 1
     assert RB.split_b2(str(tmp_path), {}) and RB.split_b2(str(tmp_path / "outcomes"), {}) == []
+
+
+def test_b8_answers_expecting_a_havana_id_as_mgi_symbol_are_their_own_limitation(tmp_path):
+    import json
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from idtrack_reproducibility.families.b import limits_b as LB
+    (tmp_path / "outcomes").mkdir()
+    pq.write_table(pa.table({"stratum": ["b8_core_xref"] * 3 + ["b1_atR_unique"], "unit": ["G1", "G2", "G3", "N"],
+                             "outcome": ["wrong", "wrong", "right", "wrong"],
+                             "expected": ["OTTMUSG00000000990", "Sept4", "OTTMUSG00000000991", "OTTMUSG00000000992"]}),
+                   tmp_path / "outcomes" / "part_0_of_1.parquet")
+    (tmp_path / "run.json").write_text(json.dumps({"organism": "mus_musculus", "commit": "cabfd9a"}))
+    (tmp_path / "report.tsv").write_text("stratum\tview\tn\nb8_core_xref\t*\t3\n")
+    (row,) = LB.havana_rows(str(tmp_path), str(tmp_path))
+    assert row["limitation"] == "L-mgi-havana-symbols" and row["answers"] == 1 and row["of_answers"] == 3
