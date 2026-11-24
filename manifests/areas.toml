@@ -104,6 +104,17 @@ rules = [
 ]
 
 [[area]]
+name = "families/g"
+folders = ["families/g/queries", "families/g/likeforlike", "families/g/raw", "families/g/runs", "families/g/report"]
+exclude = ['/_cache/', '\.tmp$', '\.part$', '\.log$']
+rebuild = "generate: python -m idtrack_reproducibility.families.g.score / report (from the stored responses)"
+rules = [
+  ['/queries/', "generate: python -m idtrack_reproducibility.families.g.sets (seeded; a published set is fixed)"],
+  ['/likeforlike/', "generate: python -m idtrack_reproducibility.families.g.likeforlike (from the truth store)"],
+  ['/raw/', "none: a tool's response on the date asked (kept as fetched; a later pass answers for a later service)"],
+]
+
+[[area]]
 name = "graphs"
 folders = ["graphs"]
 exclude = ['/\.', '\.tmp$', '\.log$', '^graphs/[^/]+/[^/]+/build/', '^graphs/[^/]+/[^/]+/logs/']
