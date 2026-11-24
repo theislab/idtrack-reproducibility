@@ -1,5 +1,7 @@
 # idtrack-reproducibility
 
+[![tests](https://github.com/theislab/idtrack-reproducibility/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/theislab/idtrack-reproducibility/actions/workflows/tests.yml) [![version](https://img.shields.io/github/v/tag/theislab/idtrack-reproducibility?label=version&sort=semver)](https://github.com/theislab/idtrack-reproducibility/tags) [![idtrack on PyPI](https://img.shields.io/pypi/v/idtrack.svg?label=idtrack)](https://pypi.org/project/idtrack/) [![idtrack's documentation](https://img.shields.io/readthedocs/idtrack/stable.svg?label=idtrack%20docs)](https://idtrack.readthedocs.io/en/stable/)
+
 Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the benchmarks that measure its accuracy, robustness and speed against independent truth, and the results a manuscript cites. Every expected answer is read from Ensembl's own files or from the authorities (HGNC, MGI, VGNC, NCBI, UniProt, ...), never from idtrack. The repository will grow with other material for the manuscript.
 
 ## What is here
