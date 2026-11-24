@@ -28,16 +28,18 @@ The revision `r1` (published 2026-11-24, judge `b_r1`; `revise_b --name r1`): ev
 
 | set | pig | mouse | human | rhesus | cynomolgus |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `b1_r1` | 12,396 | MOUSE_B1 | HUMAN_B1 | 14,229 | 3,087 |
-| `b4_r1` | 4 | MOUSE_B4 | HUMAN_B4 | 4 | – |
-| `b5_r1` | 1,180 | MOUSE_B5 | HUMAN_B5 | 1,780 | 864 |
-| `b5_v2` (new lines) | 144,286 | MOUSE_B5V2 | HUMAN_B5V2 | 68,590 | – |
-| `b6_r1` | 1,248 | MOUSE_B6 | HUMAN_B6 | 183 | 211 |
-| `b6_r1_dec` | 291 | MOUSE_B6D | HUMAN_B6D | 33 | 43 |
-| `b7_r1` | 67 | MOUSE_B7 | HUMAN_B7 | 15 | 21 |
-| `b8_r1` | 600 | MOUSE_B8 | HUMAN_B8 | 25 | 45 |
+| `b1_r1` | 12,396 | 28,924 | HUMAN_B1 | 14,229 | 3,087 |
+| `b4_r1` | 4 | 6,978 | HUMAN_B4 | 4 | – |
+| `b5_r1` | 1,180 | 2,129 | HUMAN_B5 | 1,780 | 864 |
+| `b5_v2` (new lines) | 144,286 | 285,934 | HUMAN_B5V2 | 68,590 | – |
+| `b6_r1` | 1,248 | 3,517 | HUMAN_B6 | 183 | 211 |
+| `b6_r1_dec` | 291 | 554 | HUMAN_B6D | 33 | 43 |
+| `b7_r1` | 67 | 64 | HUMAN_B7 | 15 | 21 |
+| `b7_r1_dec` | – | 1 | HUMAN_B7D | – | – |
+| `b8_r1` | 600 | – | HUMAN_B8 | 25 | 45 |
+| `b8_v2` (new lines) | – | 52,386 | HUMAN_B8V2 | – | – |
 
-No revision changes a question: every changed line keeps its query; `b7_r1` leaves out the suffix forms that Ensembl's synonyms of 115 now hold as strings of their own (`excluded`: pig 1, cynomolgus 3). The stored answers of `d4c2dda` (cynomolgus, rhesus, mouse's 25 shards) answer every revised line; `b5_v2`'s lines were never asked.
+No revision changes a question: every changed line keeps its query; `b7_r1` leaves out the suffix forms that Ensembl's synonyms of 115 now hold as strings of their own (`excluded`: pig 1, cynomolgus 3), and `b1_r1` mouse's 6 names no longer asked; `b8_v2` holds mouse's genes of release 89, which version 1 read through the reach. The stored answers of `d4c2dda` (cynomolgus, rhesus, mouse's 25 shards) answer every revised line; `b5_v2`'s lines were never asked.
 
 What is not built: the runs of pig, mouse and human, the `decided` scorings, the explained paths and causes of the wrong answers, the family's limitations map and its rows of the known-limitations table, the authority measure (`report_b`, written, not run), and the family's panel ([Measurement design](../methods.md#measurement-design)).
 
