@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idtrack-reproducibility"
-version = "0.1.0"
+version = "0.1.2"
 description = "Benchmarks of idtrack against independent truth: the accuracy harness, the benchmark families, the regression corpus, the weakness hunts and the performance measurements."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -18,8 +18,9 @@ dependencies = [
 
 [project.optional-dependencies]
 # The idtrack the benchmarks measure by default (the installed package; other trees are configured in
-# idtrack-repro.toml, see README "Trees"). Pinned to a commit of github.com/theislab/idtrack.
-idtrack = ["idtrack[harmonize] @ git+https://github.com/theislab/idtrack@71690abe044f19afcc97f146d5e6c35cf4873962"]
+# idtrack-repro.toml, see README "Trees"). Pinned to the tag of this repository's version on
+# github.com/theislab/idtrack (README "Installing", the version).
+idtrack = ["idtrack[harmonize] @ git+https://github.com/theislab/idtrack@v0.1.2"]
 # pytest, and what family F's tests build and read count matrices with (the harmonizer's own requirements).
 test = ["pytest>=8", "scipy>=1.14", "h5py>=3.12", "anndata>=0.13"]
 
