@@ -182,14 +182,17 @@ def score_subject(subject, organism, form, tree="main"):
         import pyarrow as pa
         import pyarrow.parquet as pq
         tabs, found = idtrack_rows(organism, tree)
-        if not tabs:
-            return None
         d = os.path.join(run, "answers")
-        os.makedirs(d, exist_ok=True)
-        for old in glob.glob(os.path.join(d, "*.parquet")):
-            os.remove(old)
-        pq.write_table(pa.concat_tables(tabs, promote_options="default"), os.path.join(d, "shard_0_of_1.0.parquet"))
-        subj = dict(kind="tree", name=tree, version=tree, asked_at=None, endpoint=";".join(found))
+        if tabs:
+            os.makedirs(d, exist_ok=True)
+            for old in glob.glob(os.path.join(d, "families_*.parquet")):
+                os.remove(old)
+            pq.write_table(pa.concat_tables(tabs, promote_options="default"),
+                           os.path.join(d, "families_0_of_1.0.parquet"))
+        elif not glob.glob(os.path.join(d, "load_*.json")):
+            return None  # neither the families' runs of the tree nor the runner's answers on G's sets
+        # the runner's own answers on G's sets (`runner --family g`, for lines no family run holds) stay beside them
+        subj = dict(kind="tree", name=tree, version=tree, asked_at=None, endpoint=";".join(found) or "runner on G's sets")
     else:
         rows, used, dates = answer_rows(subject, organism, form)
         if not used:

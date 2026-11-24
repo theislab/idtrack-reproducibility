@@ -286,3 +286,23 @@ def test_each_form_is_read_from_its_own_requests(tmp_path, monkeypatch):
     best, stated = A.answers("gprofiler", "sus_scrofa", "v", ls, form="best"), A.answers("gprofiler", "sus_scrofa", "v", ls, form="stated")
     assert best["q1"].got == ["ENSSSCG00000000007"] and stated["q1"].got == []
     assert best["q2"].got == stated["q2"].got == ["ENSSSCG00000000008"]  # an unversioned line shares the stated request
+
+
+def test_a_line_of_another_release_is_kept_only_by_the_rule_of_equal_truth():
+    import pandas as pd
+    from idtrack_reproducibility.families.g import report as GR
+    o = pd.DataFrame(dict(qid=["q1", "q2", "q3", "q4"], release=[116, 116, 115, None]))
+    lines = {"q1": dict(to_release=115), "q2": dict(to_release=115), "q3": dict(to_release=115), "q4": dict(to_release=115)}
+    lf = {116: {"q1": (True, "equal"), "q2": (False, "a gene of the truth is not the same at 116: G")}}
+    kept, why = GR.kept_mask(o, lines, lf)
+    assert kept == [True, False, True, True] and why[1] == "a gene of the truth is not the same at 116"
+
+
+def test_each_subject_is_posed_by_its_own_rule():
+    from idtrack_reproducibility.families.g import score as GSc
+    sym = line("q", "TP53", "c")
+    assert GSc.posable("ensembl_rest_lookup", line("q", "ENS", "b"), "homo_sapiens")[0] is None
+    assert GSc.posable("gget", line("q", "ENSG00000000003", "b", from_release=115), "homo_sapiens") == (116, "")
+    assert GSc.posable("orgdb", sym, "sus_scrofa")[0] is None  # org.Ss.eg.db has no Ensembl genes
+    assert GSc.posable("ensdb", sym, "sus_scrofa") == (113, "")
+    assert GSc.tier_of("seurat") == "web" and GSc.tier_of("pyensembl") == "local"

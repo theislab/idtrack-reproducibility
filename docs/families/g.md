@@ -4,7 +4,7 @@ The tools people use for the questions idtrack answers, asked the same lines and
 
 ## State
 
-Design and pilot (2026-11-24). The comparison sets are drawn (not yet published); every tool below was asked at most 100 lines per organism (the pilot, [below](#the-pilot)); the full passes wait for the design's confirmation. No result is registered yet.
+The comparison sets are published (`g_<family>_v1`, 2026-11-24) and the rule of equal truth is computed for releases 116, 114, 113 and 111; the passes of 2026-11-24 are being asked (one per service, one date per service). The pilot below was asked before the sets were published, at most 100 lines per tool and organism; its responses are kept with the others (endpoints without a form) and are not read by the adapters.
 
 ## What it measures
 
@@ -138,13 +138,20 @@ None yet.
 ## Reproducing from scratch
 
 ```
-# the environments
+# the environments (Python with pyensembl; R with Bioconductor's packages; gget)
 mamba env create -p <prefix>/idtrack_g_py -f environments/g_py.yml
 mamba env create -p <prefix>/idtrack_g_r -f environments/g_r.yml
-# the comparison sets (published once), the rule of equal truth
+mamba env create -p <prefix>/idtrack_g_gget -f environments/g_gget.yml
+# the synonyms of 116 for the rule of equal truth (family B's fetcher), the sets (published once), the rule
+python -m idtrack_reproducibility.families.b.fetch_b synonyms --releases 116
 python -m idtrack_reproducibility.families.g.sets --organism <o>
-python -m idtrack_reproducibility.families.g.likeforlike --organism <o> --releases 116,114,111,113
-# one pass per tool (one job per host), the local tools
-python -m idtrack_reproducibility.families.g.fetch --tool <tool> --organisms all
-python -m idtrack_reproducibility.families.g.local --tool pyensembl --organisms all
+python -m idtrack_reproducibility.families.g.likeforlike --organism <o> --releases 116,114,113,111
+# one pass per host (one job per host; a pass resumes by request id), the local tools
+python -m idtrack_reproducibility.families.g.fetch --tool <ensembl_rest|biomart|gprofiler|mygene|hgnc|uniprot|bridgedb> --organisms all
+<idtrack_g_gget>/bin/python -m idtrack_reproducibility.families.g.local --tool gget --organisms all --tier web
+python -m idtrack_reproducibility.families.g.local --tool <pyensembl|ncbi_files> --organisms all
+python -m idtrack_reproducibility.families.g.local --tool <orgdb|limma|hgnchelper|ensdb|seurat> --organisms all --rscript <idtrack_g_r>/bin/Rscript --workdir <folder>
+# the answers from the stored responses, the scoring, the tables
+python -m idtrack_reproducibility.families.g.score --subjects all --organisms all --tree main
+python -m idtrack_reproducibility.families.g.report
 ```
