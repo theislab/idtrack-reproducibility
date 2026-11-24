@@ -685,14 +685,18 @@ def main():
     sets = a.sets.split(",") if a.sets else None
     names = L.resolve_sets(FAMILY, org, sets, "revised")
     # the latest line of a qid: a revision set's line replaces the base set's (sets in the order of their seq)
-    latest, base_sets = {}, []
+    latest, base_sets, revision_sets = {}, [], []
     for n in L.resolve_sets(FAMILY, org, None, "revised"):
         if L.manifest(FAMILY, org, n).get("revises"):
+            revision_sets.append(n)
             for r in L.iter_set(L._set_file(L.query_dir(FAMILY, org), n)):
                 latest[r["qid"]] = r
         elif n in names:
             base_sets.append(n)
     names = base_sets
+    # the sets this revision revises: the base sets read and the revision sets published on them (every qid of the
+    # revision is published in one of them; naming only these keeps the check's qids to the sets read)
+    revises = [n for n in L.resolve_sets(FAMILY, org, None, "revised") if n in set(base_sets) | set(revision_sets)]
     ctx, out = {}, []
     d = L.query_dir(FAMILY, org)
     for n in names:
@@ -720,7 +724,7 @@ def main():
                 fo.write(C.dumps(r) + "\n")
     doc = CORRECTIONS[a.correction].__doc__ or ""
     man = L.publish(FAMILY, org, a.set, out, f"revision `{a.correction}` (revise_c.py docstring)", ME,
-                    revises=L.resolve_sets(FAMILY, org, None, "revised"), judge="c-" + a.correction, sources=["core_xref/<release>.tsv.gz", "gtf/genes_<release>.tsv.gz"],
+                    revises=revises, judge="c-" + a.correction, sources=["core_xref/<release>.tsv.gz", "gtf/genes_<release>.tsv.gz"],
                     manifest_extra=dict(correction=a.correction, revision=doc.strip() or a.correction), dry=a.dry_run, log=log)
     log("published", {k: v for k, v in (man or {}).items() if k != "counts"})
 
