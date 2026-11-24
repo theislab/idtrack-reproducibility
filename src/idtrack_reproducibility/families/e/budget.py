@@ -162,6 +162,7 @@ def main():
     ap.add_argument("--graph", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--from", dest="sources", action="append", default=[], help="<family>=<run folder of that family>")
+    ap.add_argument("--mem", type=int, default=16, help="GB of the submitted job (a mouse or human run on main took more than 16)")
     a = ap.parse_args()
     a.out, a.clone, a.graph = (os.path.abspath(x) for x in (a.out, a.clone, a.graph))
     if C.generation(a.clone) != "convert":
@@ -175,7 +176,7 @@ def main():
     print(jobs.submit(f"e6_{a.organism}", jobs.module(C.python_for(a.clone), "idtrack_reproducibility.families.e.budget",
                                                       f"run --organism {a.organism} --clone {a.clone} --graph {a.graph} "
                                                       f"--out {a.out} {src}"),
-                      logs, cpus=2, mem_gb=16, time="12:00:00"))
+                      logs, cpus=2, mem_gb=a.mem, time="12:00:00"))
 
 
 if __name__ == "__main__":
