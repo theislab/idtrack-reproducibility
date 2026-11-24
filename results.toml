@@ -757,6 +757,9 @@ folder = "families/e/runs/main/{organism}"
 scope = "exhaustive"
 scored = ["scores_now/run.json", "scores_decided/run.json"]
 generator = "family e run_e; family e score_e; family e causes_e; family e budget / det / relations_e / harm_e (e6, e7, e8, harm); E9 not run on main (docs/families/e.md)"
-files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "now_causes_summary.tsv" = "scores_now/causes_summary.tsv", "decided_causes_summary.tsv" = "scores_decided/causes_summary.tsv", "e_summary.tsv" = "e_summary.tsv", "e6_report.tsv" = "e6_report.tsv", "e7_report.tsv" = "e7_report.tsv", "e8_report.tsv" = "e8_report.tsv", "compare_vs_d4c2dda_now.tsv" = "compare_vs_d4c2dda_now.tsv", "compare_vs_d4c2dda_decided.tsv" = "compare_vs_d4c2dda_decided.tsv", "harm_report.tsv" = "harm/report.tsv" }
+files = { "now_report.tsv" = "scores_now/report.tsv", "decided_report.tsv" = "scores_decided/report.tsv", "now_causes_summary.tsv" = "scores_now/causes_summary.tsv", "decided_causes_summary.tsv" = "scores_decided/causes_summary.tsv", "e_summary.tsv" = "e_summary.tsv", "e6_report.tsv" = "e6_report.tsv", "e7_report.tsv" = "e7_report.tsv", "e8_report.tsv" = "e8_report.tsv", "harm_report.tsv" = "harm/report.tsv" }
 optional = ["harm_report.tsv", "now_causes_summary.tsv", "decided_causes_summary.tsv"]
+# the comparisons with d4c2dda stay in the run folders (compare_vs_d4c2dda_<judge>.tsv): they quote the answers'
+# message texts, which main's release words as the rounds' notes did (release 0.1.2 rewords them); their counts are in
+# docs/families/e.md
 index = { "now_report.tsv" = "report" }

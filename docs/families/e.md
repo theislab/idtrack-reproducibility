@@ -151,7 +151,7 @@ Runs `<families>/e/runs/main/<organism>/`: E1 to E5 and E8's static lines under 
 | e [decided] | rhesus | 3,120,153 | 2,918,092 | 164 | 201,897 | 0.99994 (0.99993–0.99995) | 0.97017 |
 | e [decided] | cynomolgus | 1,514,358 | 1,420,920 | 37 | 93,401 | 0.99997 (0.99996–0.99998) | 0.94558 |
 
-Against `d4c2dda`: under `decided` no answer went from right to wrong or error in any organism; under `now`, right to error pig 1,143, mouse 1,147, human 1,153, rhesus 1,140, cynomolgus 1,097 (the refusals above). Every answer of the modest set's lines is identical to `r2`'s stored answers.
+Against `d4c2dda`: under `decided` no answer went from right to wrong or error in any organism; under `now`, right to error pig 1,143, mouse 1,147, human 1,153, rhesus 1,140, cynomolgus 1,097 (the refusals above). The comparisons stay in the run folders (`<families>/e/runs/main/<organism>/compare_vs_d4c2dda_<judge>.tsv`), not in `results/`: they quote the answers' messages, which `cabfd9a` words with the rounds' internal notes and release 0.1.2 rewords. Every answer of the modest set's lines is identical to `r2`'s stored answers.
 
 
 

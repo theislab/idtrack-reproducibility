@@ -305,12 +305,12 @@ def test_support_of_a_shared_name_counts_name_sources_not_synonyms(tmp_path, mon
 
 
 def test_a_revision_ignores_wording_and_what_was_read():
-    """A regenerated line whose truth is the published one in other words (a decision's number become a rule's
-    name, the reach become the synonyms read) is no revision; another truth is."""
+    """A regenerated line whose truth is the published one in other words (another wording of the judge's note, the
+    reach become the synonyms read) is no revision; another truth is."""
     from idtrack_reproducibility.families.b import revise_b as RB
     line = dict(qid="b1|GA|2|2", kind="b1_name_at_release", id="GA", from_release=2, to_release=2, expect=["G1.1"],
-                rule="set", cmp="versioned", strategy="both", note="place mapped (decision 78)",
-                name_src="core_xref+synonyms_reach", open="the truth's tables do not fix it (decision 1)")
+                rule="set", cmp="versioned", strategy="both", note="place mapped (judge 78)",
+                name_src="core_xref+synonyms_reach", open="the truth's tables do not fix it (an older wording)")
     same = dict(line, note="place mapped (the corrected judge)", name_src="core_xref+synonyms",
                 open="the truth's tables do not fix it (rule `start_release`)")
     assert RB.canon(line) == RB.canon(same)
