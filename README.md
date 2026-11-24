@@ -14,6 +14,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 | C, external identifiers | NCBI gene, RefSeq, UniProt and other databases' identifiers to genes and back, at every release, against Ensembl's and the databases' own tables (built; scored on pig, rhesus, cynomolgus) | [docs/families/c.md](docs/families/c.md) | `families.c` |
 | D, real-world inputs | an atlas project's feature lists, source inference, marker lists, mixed lists, judged by locus | [docs/families/d.md](docs/families/d.md) | `families.d` |
 | E, robustness | missing values, malformed strings, types, other organisms' ids, arguments, budgets, determinism and concurrency, metamorphic relations, the web layer | [docs/families/e.md](docs/families/e.md) | `families.e` |
+| F, harmonization | count matrices brought to one release by the harmonizer: synthetic datasets with a known truth (F1): each feature's gene, count conservation, the matrices and metadata (`obs`, `obsm`, `uns`, layers), the order of datasets and features, the result cache | [docs/families/f.md](docs/families/f.md) | `families.f` |
 | H, performance | build, load, memory, per-call latency, batch scaling, harmonization | [docs/families/h.md](docs/families/h.md) | `families.h` |
 | the regression corpus | whether an answer changed between two idtrack trees (no truth) | [docs/corpus.md](docs/corpus.md) | `idtrack_reproducibility.corpus` |
 | the weakness hunts | findings of the hunts (inputs, history, regions; the attack on idtrack's next version), with runnable reproducers | [docs/hunts.md](docs/hunts.md) | `idtrack_reproducibility.hunts` |
@@ -21,7 +22,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 
 Every benchmark keeps one row per query line, view and subject (a tree or another tool): [the record](docs/records.md) (its columns, how to load it, a worked example). How the move into this package was verified (the stored scorings scored again, line by line) is [docs/verification.md](docs/verification.md). A measurement of any tree in a few hours is the [modest set](docs/modest.md).
 
-The design of the whole programme (principles, needs, coverage, the families F and G still to come, intervals, known limitations, the comparison with other tools) is [docs/methods.md](docs/methods.md). The rules of idtrack and of the judge that the benchmarks cite by name are in [docs/rules.md](docs/rules.md).
+The design of the whole programme (principles, needs, coverage, family G still to come and the parts of F not built, intervals, known limitations, the comparison with other tools) is [docs/methods.md](docs/methods.md). The rules of idtrack and of the judge that the benchmarks cite by name are in [docs/rules.md](docs/rules.md).
 
 ## Layout
 
@@ -96,7 +97,7 @@ One TOML file and environment variables; nothing is a path of a particular machi
 | an iteration of a tree, in one command | `idtrack-repro iterate <tree> [--dry]`: graph-build, graph-judge against the previous iteration, the modest set (or the families' panels), its comparisons with the previous iteration and the reference, the corpus, one report (`<iterations>/<tree>/iterate_report.md`), as one resumable plan of jobs; called again, it continues; `--complete` records a complete run ([docs/iterate.md](docs/iterate.md)) |
 | checks | `idtrack-repro check` |
 
-Each benchmark's document says how to reproduce it from an empty data root ("Reproducing from scratch"): [harness](docs/harness.md), [F0](docs/families/f0.md#reproducing-from-scratch), [A*](docs/families/astar.md#reproducing-from-scratch), [A](docs/families/a.md#reproducing-from-scratch), [B](docs/families/b.md#reproducing-from-scratch), [C](docs/families/c.md#reproducing-from-scratch), [D](docs/families/d.md#reproducing-from-scratch), [E](docs/families/e.md#reproducing-from-scratch), [H](docs/families/h.md#reproducing-from-scratch), [the corpus](docs/corpus.md), [the hunts](docs/hunts.md#reproducing).
+Each benchmark's document says how to reproduce it from an empty data root ("Reproducing from scratch"): [harness](docs/harness.md), [F0](docs/families/f0.md#reproducing-from-scratch), [A*](docs/families/astar.md#reproducing-from-scratch), [A](docs/families/a.md#reproducing-from-scratch), [B](docs/families/b.md#reproducing-from-scratch), [C](docs/families/c.md#reproducing-from-scratch), [D](docs/families/d.md#reproducing-from-scratch), [E](docs/families/e.md#reproducing-from-scratch), [F](docs/families/f.md#reproducing-from-scratch), [H](docs/families/h.md#reproducing-from-scratch), [the corpus](docs/corpus.md), [the hunts](docs/hunts.md#reproducing).
 
 ## Results
 

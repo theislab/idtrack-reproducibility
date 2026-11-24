@@ -160,6 +160,19 @@ rules = [
 ]
 
 [[area]]
+name = "families/f"
+folders = ["families/f"]
+exclude = ['/logs/', '/repo/', '\.tmp$', '\.part$', '\.log$']
+rebuild = "generate: idtrack-repro family f score_f (from the run's answers and outputs); explain and causes on the tree (docs/families/f.md)"
+rules = [
+  ['/queries/', "generate: idtrack-repro family f gen_f, truth_f --symbol-judge (seeded; a published set is fixed)"],
+  ['/datasets/', "generate: idtrack-repro family f gen_f (seeded; the files of a published set are fixed)"],
+  ['/runs/[^/]+/[^/]+/(gene|symbol)/', "run: idtrack-repro family f run_f on the tree and its graphs (the harmonizer's environment; the same answers and outputs, other seconds)"],
+  ['/(load|input_check|run_f)\.json$|/shuffle_datasets/', "run: idtrack-repro family f run_f on the tree"],
+  ['/explain_[a-z]+\.jsonl\.gz$', "run: idtrack-repro explain on the tree"],
+]
+
+[[area]]
 name = "families/d"
 folders = ["families/d"]
 exclude = ['/logs/', '/repo/', '/tmp/', '\.tmp$', '\.part$', '\.log$', '_smoke', '^families/d/inputs/atlas/']

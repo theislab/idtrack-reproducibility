@@ -320,6 +320,22 @@ index = { "report.tsv" = "report" }
 optional = ["causes_summary.tsv"]
 
 
+# ---------------- F: harmonization (F1, synthetic datasets with a known truth; docs/families/f.md) ----------------
+# The final tree `main` (idtrack cabfd9a) on r2's graphs; two scorings, the harmonizer's two configurations (`gene`:
+# final_database "ensembl_gene"; `symbol`: the organism's default final database); the matrix, metadata, order and
+# cache checks are summary rows (f_checks.tsv: every check with its items, those that hold and those that do not).
+[[run]]
+family = "f"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
+graphs = "r2"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
+folder = "families/f/runs/main/{organism}"
+scored = ["scores_gene/run.json", "scores_symbol/run.json"]
+generator = "idtrack-repro family f run_f; idtrack-repro family f score_f; idtrack-repro explain and causes --plugin f/causes_f.py on each scoring"
+files = { "gene_report.tsv" = "scores_gene/report.tsv", "symbol_report.tsv" = "scores_symbol/report.tsv", "gene_causes_summary.tsv" = "scores_gene/causes_summary.tsv", "symbol_causes_summary.tsv" = "scores_symbol/causes_summary.tsv", "f_assign.tsv" = "f_assign.tsv", "f_counts.tsv" = "f_counts.tsv", "f_checks.tsv" = "f_checks.tsv" }
+index = { "gene_report.tsv" = "report" }
+
 # ---------------- the modest set on the tree `r1` (docs/modest.md): the harness's sets whole (scope exhaustive),
 # each family's modest selection (scope modest: up to 500 sampled lines per stratum) ----------------
 [[run]]
