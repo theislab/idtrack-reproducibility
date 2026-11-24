@@ -403,7 +403,7 @@ class GenC:
         def ccds_auth(v):
             gs = set()
             tx = self.tx_gene(T)
-            for t in set(A.ccds_tx.get(v, ())) | set(A.ccds_tx.get(v.split(".")[0], ())):
+            for t in ccds_transcripts(A.ccds_tx, v):
                 if t in tx:
                     gs.add(tx[t])
             return gs
@@ -560,6 +560,12 @@ def truth_hash(row):
     if r.get("extra"):
         r["extra"] = C.dumps({k: v for k, v in json.loads(r["extra"]).items() if k not in WORDING})
     return hash(C.dumps(r))
+
+
+def ccds_transcripts(ccds_tx, v):
+    """The transcripts CCDS's sequence table gives a CCDS accession, written with its version or without
+    (`CCDS11118.1`, `CCDS11118`); none for an accession the table does not hold."""
+    return set(ccds_tx.get(v, ())) | set(ccds_tx.get(v.split(".")[0], ()))
 
 
 def main():

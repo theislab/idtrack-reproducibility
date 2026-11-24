@@ -154,3 +154,33 @@ def test_an_outcome_limitation_can_name_the_judge_s_reason_or_the_answer_s_statu
     bad.write_text("limitation\tgroup\ttitle\twhat\tuser_action\tfixed_by\trule\tclass\tstrata\twhen\nL\tg\tt\tw\tu\tf\tr\ta\t.\tmatch:x\n")
     with pytest.raises(SystemExit):
         LO.load_map(str(bad))
+
+
+def test_a_revision_of_sets_beyond_a_string_arrays_limit_is_published(tmp_path, monkeypatch):
+    """`publish(revises=...)` checks that every qid of a revision set is published in a set it revises. An organism's
+    sets can hold more qid text than one pyarrow `string` array (32-bit offsets, 2 GiB: human C's 61 million qids
+    overflowed it when the check joined every revised set's qids). The limit is lowered here to 40 bytes for `string`
+    arrays joined from chunks, as pyarrow raises it; the check must hold the revised sets' qids set by set, in
+    `large_string`, and still refuse a qid published nowhere. Fails on the joined `string` check."""
+    import pyarrow as pa
+    real = pa.chunked_array
+
+    class Joined:
+        def __init__(self, arrays):
+            self.c = real(arrays)
+
+        def combine_chunks(self):
+            if self.c.type == pa.string() and sum(len(x.as_py()) for x in self.c) > 40:
+                raise pa.ArrowInvalid("offset overflow while concatenating arrays")
+            return self.c.combine_chunks()
+    monkeypatch.setattr(pa, "chunked_array", lambda arrays, *a, **k: Joined(arrays))
+    monkeypatch.setattr(L, "query_dir", lambda family, organism: str(tmp_path / family / organism))
+
+    def line(q):
+        return dict(qid=q, family="x", stratum="s", kind="k", id=q, expect=[])
+    for s in ("x1_v1", "x2_v1"):
+        L.publish("x", "o", s, [line(f"{s}|qid{i}") for i in range(6)], "base", __file__)
+    L.publish("x", "o", "x_r1", [line("x1_v1|qid1"), line("x2_v1|qid5")], "revision", __file__, revises=["x1_v1", "x2_v1"])
+    assert L.manifest("x", "o", "x_r1")["n"] == 2
+    with pytest.raises(SystemExit, match="new"):
+        L.publish("x", "o", "x_r2", [line("x1_v1|qid1"), line("nowhere")], "revision", __file__, revises=["x1_v1", "x2_v1"])

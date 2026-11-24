@@ -308,13 +308,14 @@ def frame(lines):
 # ---------------- publishing ----------------
 
 def _qid_column(path, parquet=None):
-    """The qids of a set file (a pyarrow array)."""
+    """The qids of a set file: one pyarrow array of `large_string` (64-bit offsets: a `string` array holds at most
+    2 GiB of text, which a set of tens of millions of qids passes)."""
     import pyarrow as pa
     import pyarrow.parquet as pq
     if parquet or (parquet is None and path.endswith(".parquet")):
-        return pq.read_table(path, columns=["qid"]).column("qid").combine_chunks()
+        return pq.read_table(path, columns=["qid"]).column("qid").cast(pa.large_string()).combine_chunks()
     with gzip.open(path, "rt") as fh:
-        return pa.array([json.loads(x)["qid"] for x in fh], type=pa.string())
+        return pa.array([json.loads(x)["qid"] for x in fh], type=pa.large_string())
 
 
 def publish(family, organism, name, lines, description, generator, revises=None, judge=None, sources=None,
@@ -380,8 +381,12 @@ def publish(family, organism, name, lines, description, generator, revises=None,
             dup = vc.field("values").filter(pc.greater(vc.field("counts"), 1))
             raise SystemExit(f"qid twice in {name}: {len(dup)} qids, e.g. {dup[:3].to_pylist()}")
         if revises:
-            earlier = pa.chunked_array([_qid_column(_set_file(d, s)) for s in revises]).combine_chunks()
-            new = qids.filter(pc.invert(pc.is_in(qids, value_set=earlier)))
+            # set by set: the qids of every revised set together (an organism's whole family) are never held at once
+            new = qids
+            for s in revises:
+                if not len(new):
+                    break
+                new = new.filter(pc.invert(pc.is_in(new, value_set=_qid_column(_set_file(d, s)))))
             if len(new):
                 raise SystemExit(f"a revision set holds only published qids; {len(new)} are new, e.g. {new[:3].to_pylist()}")
     except BaseException:

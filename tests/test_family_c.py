@@ -483,3 +483,13 @@ def test_a_value_held_now_through_a_continued_database_is_read_where_it_is_held(
     assert [r["qid"] for r in out] == ["c4_rfam_acc_not_held|RF00605|-|115"]
     assert out[0]["rule"] == "set" and out[0]["read_at"] == 57 and out[0]["expect"] == ["ENSSSCG00000028053.2"]
     assert out[0]["revised_by"] == ["database_continuity"]
+
+
+def test_a_ccds_accession_without_transcripts_has_no_authority():
+    """CCDS's sequence table, keyed by accession (`truth_c.Authority.ccds_tx`, a defaultdict of sets): an accession
+    it does not hold, with or without its version, gives no transcript (the c5 generation once joined two empty
+    tuples with `|`)."""
+    tx = collections.defaultdict(set, {"CCDS11118": {"ENST1"}, "CCDS11118.1": {"ENST2"}})
+    assert GC.ccds_transcripts(tx, "CCDS11118.1") == {"ENST1", "ENST2"}
+    assert GC.ccds_transcripts(tx, "CCDS11118") == {"ENST1"}
+    assert GC.ccds_transcripts({}, "CCDS9.2") == set()
