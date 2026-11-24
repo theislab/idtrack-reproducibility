@@ -100,6 +100,8 @@ SUMMARIES = [
     ("e7", "family E's determinism and concurrency", "every difference (`e7_differences.jsonl.gz`)",
      "the agreeing calls, counted (`e7_report.tsv`)"),
     ("e9", "family E's web layer", "every difference (`differences.jsonl`)", "the agreeing requests, counted (`report.tsv`)"),
+    ("f_checks", "family F's checks of the matrices, metadata, order and result cache",
+     "every violation (`f_violations.jsonl.gz`)", "the items of each check, counted (`f_checks.tsv`)"),
 ]
 OUTCOMES = ("right", "wrong", "undetermined", "timeout", "error", "expected_error", "not_supported", "missing", "unjudged")
 # The index of another tool's raw responses (family G): one row per request, beside the files that hold the responses

@@ -8,13 +8,15 @@ and their union `results/limitations/limitations.tsv` (the common columns, `limi
 The builders: the harness's sets (`f0` runs; F0's map of the residual causes), `astar` (`limitations_astar`), `a`
 (`limits_a`: the causes with A's map plus the undetermined answers by reason; A0's summaries with `--a0`), `e`
 (`limits_e`, judge `now`: what users get from the tree), `c` (F0's builder with C's map), `d` (`limits_d`); and
-`outcomes` for a registry entry that says `limits = "outcomes"` (`limits_outcomes`: the class of a wrong answer read
+`f` (`limits_f`: F's causes with its map, the undetermined answers by reason and the checks that do not
+hold, from each run's scorings `scores_gene` and `scores_symbol`); and `outcomes` for a registry entry that says `limits = "outcomes"` (`limits_outcomes`: the class of a wrong answer read
 from its stratum and the answer, with the family's `limitations_map_outcomes.tsv`; the scored folders of the entry's
 `scored`), for sets whose wrong answers need no cause classification.
 """
 import argparse
 import csv
 import datetime
+import glob
 import os
 import subprocess
 import sys
@@ -33,6 +35,7 @@ BUILDERS = {
     "c": ("c", "{py} -m idtrack_reproducibility.families.limitations --family c --scored {runs} --map "
                "{src}/idtrack_reproducibility/families/c/limitations_map_c.tsv --out {out}"),
     "d": ("d", "{py} -m idtrack_reproducibility.families.d.limits_d --out {out} {runs}"),
+    "f": ("f", "{py} -m idtrack_reproducibility.families.f.limits_f --out {out} {runs}"),
     "outcomes": ("{family}", "{py} -m idtrack_reproducibility.families.limits_outcomes --family {family} --map "
                              "{src}/idtrack_reproducibility/families/{family}/limitations_map_outcomes.tsv --out {out} {runs}"),
 }
@@ -67,6 +70,7 @@ def main(argv=None):
             runs = [r for r in runs if os.path.exists(os.path.join(r, "run.json"))]
         runs = [r for r in runs if fam == "outcomes" or os.path.exists(os.path.join(r, "causes.tsv.gz")) or
                 os.path.exists(os.path.join(r, "scores_now", "causes.tsv.gz")) or
+                (fam == "f" and glob.glob(os.path.join(r, "scores_*", "causes.tsv.gz"))) or
                 (fam == "a0" and os.path.exists(os.path.join(r, "summary.tsv")))]  # a run whose answers were classified
         if not runs or out in seen:
             continue
@@ -85,7 +89,10 @@ def main(argv=None):
         srcs = []
         for r in runs:
             for f in ("causes.tsv.gz", "scores_now/causes.tsv.gz", "report.tsv", "scores_now/report.tsv",
-                      "undetermined.tsv.gz", "e_summary.tsv", "summary.tsv") + (("run.json",) if fam == "outcomes" else ()):
+                      "undetermined.tsv.gz", "e_summary.tsv", "summary.tsv") + (("run.json",) if fam == "outcomes" else ()) + \
+                    (tuple(f"scores_{c}/{x}" for c in ("gene", "symbol") for x in ("causes.tsv.gz", "report.tsv",
+                                                                                  "undetermined.tsv.gz")) + ("f_checks.tsv",)
+                     if fam == "f" else ()):
                 p = os.path.join(r, f)
                 if os.path.exists(p):
                     srcs.append(p)

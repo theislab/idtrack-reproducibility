@@ -155,6 +155,7 @@ The answers the scorer reads are made from these files by the tool's adapter, ne
 | A0 (graph fidelity) | every mismatch that is not right (`<check>.tsv.gz`) | the matches, counted per class (`summary.tsv`) |
 | E7 (determinism, concurrency) | every difference (`e7_differences.jsonl.gz`) | the agreeing calls, counted (`e7_report.tsv`) |
 | E9 (the web layer) | every difference (`differences.jsonl`) | the agreeing requests, counted (`report.tsv`) |
+| F's checks (matrices, metadata, order, result cache) | every violation (`f_violations.jsonl.gz`); F's assignments are rows of the common scorer, one per feature, dataset and configuration (`scores_gene/`, `scores_symbol/`) | the items of each check, counted (`f_checks.tsv`) |
 | hunts | every reproducer's call with the recorded and the observed answer (`reproduce/<tree>/all_all_<organism>.json`; `records.load_hunts`) | – |
 | the modest set | its parts are scored folders of the record (`<out>/<organism>/<part>/`); its hunts as above | `compare.tsv` (the verdict per part) |
 | tree comparisons (`compare`) | every moved answer (`--moved`) | the per-stratum table |

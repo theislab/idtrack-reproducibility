@@ -267,7 +267,7 @@ The wrong assignments are idtrack's conversions, which the harmonizer passes on 
 
 ## Known limitations
 
-F's rows of the known-limitations table come from its causes (`limitations_map_f.tsv`), from the judge's reasons of the undetermined assignments and from the checks of the matrices, metadata, order and cache that do not hold (none on `main`; `limits_f.py`). They are stored in `<families>/f/limitations/limitations_main.tsv` and become F's rows of `results/limitations/limitations.tsv` once F's builder is registered in `known_limitations.BUILDERS`. Answers per organism:
+F's rows of the known-limitations table come from its causes (`limitations_map_f.tsv`), from the judge's reasons of the undetermined assignments and from the checks of the matrices, metadata, order and cache that do not hold (none on `main`; `limits_f.py`). They are stored in `<families>/f/limitations/limitations_main.tsv`; F's builder is registered in `known_limitations.BUILDERS` (`f`), so they become F's rows of `results/limitations/limitations.tsv` when the table is generated. Answers per organism:
 
 | limitation | configuration | what | class | until | pig | mouse | human | rhesus | cynomolgus |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -298,6 +298,8 @@ F's rows of the known-limitations table come from its causes (`limitations_map_f
 | `T-made-unique-taken` | `gene` | a made-unique form that is a name of its own (not idtrack's) | e | the truth: the set's revision `copies_taken` | 2 | 4 | 85 | 1 | 4 |
 | `T-made-unique-taken` | `symbol` | a made-unique form that is a name of its own (not idtrack's) | e | the truth: the set's revision `copies_taken` | 2 | 4 | 85 | 1 | 4 |
 
+Beside these, `L-harmonize-cache-reuse` (group performance; one row per organism and configuration, from `cache.json`): constructing the harmonizer again over its valid result cache takes 0.60 to 0.92 of the time of converting every feature (the row's `share`; pig 0.90 and 0.92, mouse 0.76 and 0.85, human 0.63 and 0.69, rhesus 0.60 and 0.62, cynomolgus 0.61 and 0.65), the cost idtrack's documentation states (usage, "Known Costs of This Version"); keep the harmonizer, or the merged AnnData written to a file, rather than constructing it again.
+
 What a user of the harmonizer should know, from these rows and the design: a feature of a name several genes carry is converted to its best-ranked genes only (`L-harmonize-best-view`), and under the default final database to those of them with an id there (`L-harmonize-tie-final-db`); a merge with `merge="flag"` keeps no feature for a gene that several inputs name, or that no input names (the documented rule: a dataset holding a gene's versioned and unversioned id keeps both as merge partners, and its partner named like the gene's id becomes `unconverted:<id>` in a merge with other datasets); made-unique copies are summed into, or kept beside, the gene of the feature they copy (`L-harmonize-copies`); a feature answered with an LRG record is named by it (`L-lrg-as-gene`); reading the result cache is barely faster than converting again. What F does not measure: real matrices (F2), scale (F3), `keep_unconverted=False`, `from_database_by_dataset`, final databases other than the Ensembl genes and the default, and features of other forms (external accessions, transcripts).
 
 ## Reproducing from scratch
@@ -309,4 +311,4 @@ From an empty data root, with the configuration naming the tree and its graphs:
 3. **Run**: `run_f` on the tree, one job per organism.
 4. **Score**: `score_f`; `explain` and `causes` with F's plugin on each scoring.
 5. **Limitations**: `limits_f --out <tsv> <run folders>`.
-6. **Results**: `idtrack-repro results` writes `results/f/<tree>/<organism>/` from the runs registered in `results.toml`.
+6. **Results**: `idtrack-repro known-limitations --only f` writes F's rows of `results/limitations/limitations.tsv` (F's builder, `limits_f`, over the registered runs), then `idtrack-repro results --only f` writes `results/f/<tree>/<organism>/` from the runs registered in `results.toml`, with their rows of the index and the provenance.

@@ -148,7 +148,7 @@ def test_the_export_is_partitioned_typed_indexed_and_read_back(data_root):
     doc = json.load(open(out / "schema.json"))
     assert doc["record_version"] == R.RECORD_VERSION
     assert [(c["name"], c["type"]) for c in doc["columns"]] == [(c, t) for c, t, *_ in R.SCHEMA]
-    assert {s["part"] for s in doc["kept_as_summaries"]} == {"a0", "e7", "e9"}
+    assert {s["part"] for s in doc["kept_as_summaries"]} == {"a0", "e7", "e9", "f_checks"}
     tsv = (out / "index.tsv").read_text().splitlines()
     assert tsv[0].split("\t") == R.INDEX_COLS and len(tsv) == 3
     back = R.load(export=str(out))

@@ -3,7 +3,8 @@ from the causes; F's map `limitations_map_f.tsv`), rows for the assignments the 
 reason (undetermined.tsv.gz of each scoring), and rows for the checks of the matrices, metadata, order and cache that
 do not hold (`f_checks.tsv` of the run: each such check a class of outputs the harmonizer does not give as its
 documentation says; the `truth_*` checks are left out, as an output that differs from the truth's on decided features
-is a wrong assignment, which the causes count). Every number comes from the runs; nothing typed by hand.
+is a wrong assignment, which the causes count), and a row of the cost of reading the result cache (`cache.json`: the
+constructor again over its valid cache against the first conversion; idtrack's documented cost). Every number comes from the runs; nothing typed by hand.
 
 Usage: limits_f.py --out <tsv> <run folder or scored folder> ...   (a run folder: its scorings `scores_<config>`)
 """
@@ -99,6 +100,21 @@ def rows_for(scored):
     for lim, (n, units, strata) in sorted(agg.items(), key=lambda kv: -kv[1][0]):
         out.append(_row(lim, org, n, len(units), sum(totals[s] for s in strata), ",".join(sorted(strata)), LIM.where(scored),
                         info, "e", "undetermined", f"f: undetermined.tsv.gz of {LIM.where(scored)}"))
+    cache = os.path.join(os.path.dirname(scored), cfg, "cache.json")
+    if os.path.exists(cache):  # the cost of reading the result cache, as measured (idtrack's documented cost)
+        c = json.load(open(cache))
+        again, first = c["again"]["seconds"], c["again"]["construct_seconds"]
+        lim = ("L-harmonize-cache-reuse", "performance", "reading the harmonizer's result cache costs nearly a conversion",
+               f"constructing the harmonizer again over its valid result cache took {again} s against {first} s for "
+               f"converting every feature (share: the cache read's time over the conversion's), the cost idtrack's "
+               f"documentation states (usage, \"Known Costs of This Version\")",
+               "keep the harmonizer, or write the merged AnnData to a file, rather than constructing it again",
+               "none (the release's documented cost)")
+        n = len(c["headers"])
+        row = _row(lim, org, n, "", n, "cache", LIM.where(scored), info, "-", "cache_reuse",
+                   f"f: cache.json of {LIM.where(os.path.join(os.path.dirname(scored), cfg))}")
+        row["share"] = f"{again / first:.3f}" if first else ""
+        out.append(row)
     checks = os.path.join(os.path.dirname(scored), "f_checks.tsv")
     if os.path.exists(checks):
         agg = collections.defaultdict(lambda: [0, 0, set()])
