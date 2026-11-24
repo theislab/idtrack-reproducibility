@@ -496,3 +496,12 @@ def test_the_best_view_of_a_shared_name_is_a_cause_only_within_the_carriers_and_
 def test_a_string_of_the_store_takes_every_form_that_folds_like_it():
     idx = G.fold_index({"Ighv5-9-1", "Ighv5-9.1", "TP53.1"})
     assert idx["ighv5-9-1"] == {"Ighv5-9-1", "Ighv5-9.1"} and idx["tp53-1"] == {"TP53.1"}
+
+
+def test_an_lrg_record_answered_as_a_gene_is_its_own_cause():
+    from idtrack_reproducibility.families import causes as K
+    from idtrack_reproducibility.families.f import causes_f
+    r = dict(qid="q", kind="f1_symbols", stratum="f1_name_moved", variant="best,from", unit="X", reason="",
+             query=json.dumps({"id": "X", "from_release": 65, "to_release": 115}), got="LRG_70.1", expected="", broad="")
+    assert causes_f.t_lrg_record_as_gene(K.Ctx(r, None, None))
+    assert causes_f.t_lrg_record_as_gene(K.Ctx(dict(r, got=GA), None, None)) is None

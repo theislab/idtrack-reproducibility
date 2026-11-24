@@ -2,7 +2,8 @@
 from the causes; F's map `limitations_map_f.tsv`), rows for the assignments the truth leaves open, by the judge's
 reason (undetermined.tsv.gz of each scoring), and rows for the checks of the matrices, metadata, order and cache that
 do not hold (`f_checks.tsv` of the run: each such check a class of outputs the harmonizer does not give as its
-documentation says). Every number comes from the runs; nothing typed by hand.
+documentation says; the `truth_*` checks are left out, as an output that differs from the truth's on decided features
+is a wrong assignment, which the causes count). Every number comes from the runs; nothing typed by hand.
 
 Usage: limits_f.py --out <tsv> <run folder or scored folder> ...   (a run folder: its scorings `scores_<config>`)
 """
@@ -17,6 +18,7 @@ import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 from idtrack_reproducibility.families import limitations as LIM  # noqa: E402
+from idtrack_reproducibility.families.f import causes_f  # noqa: E402,F401  F's causes and their classes
 
 # (pattern on the judge's reason) -> (limitation, group, title, what, user action, fixed by)
 UND = [
@@ -38,12 +40,17 @@ UND = [
      "read the answer as a candidate at the same locus, not as Ensembl's successor", "decided: rule `bridge_same_place`")),
     (r"support_ranks_shared_name", ("L-shared-names", "names", "a name of several genes: `best` keeps the better-supported",
      "", "use the `all` view (the harmonizer reads `best`)", "none (rule `support_ranks_shared_name`: by design)")),
+    (r"^open: the form is a string of the truth store", ("T-made-unique-taken", "truth",
+     "a made-unique form that is a name of its own (not idtrack's)",
+     "a form `X.1`/`X-1` drawn as a copy of X is a string of the truth store (revision `copies_taken`): its copy's truth "
+     "does not hold", "-", "the truth: the set's revision `copies_taken`")),
+    (r"no place on the reference sequence", ("L-unplaced-copy", "history",
+     "a copy on a haplotype or patch without a place on the reference", "", "-", "")),
     (r"^open: ", ("L-open-truth", "history", "the truth leaves the line open", "", "", "")),
 ]
 
 CHECK_TITLES = {
     "plan": ("L-harmonize-plan", "a harmonized dataset that differs from its documented rules"),
-    "truth": ("L-harmonize-truth", "harmonized features that differ from the truth's on decided features"),
     "unify": ("L-harmonize-merge", "merged objects that differ from their documented rules"),
     "shuffle": ("L-harmonize-order", "a merge that changes with the order of datasets or features"),
     "cache": ("L-harmonize-cache", "a result cache that does not behave as documented"),

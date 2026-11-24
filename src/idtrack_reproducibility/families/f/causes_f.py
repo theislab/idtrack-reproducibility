@@ -10,6 +10,10 @@ batch of a dataset has:
   gives another answer, `same_answer` false): a wrong copy has X's answer, and X's own line names the cause;
 - `batch_differs_from_single` (class a, rule `batch_agrees_with_single`): any other feature whose explained single
   call gives another answer than the harmonizer's batch gave;
+- `lrg_record_as_gene` (class a, rule `lrg_copies`): the answer names an LRG record (Ensembl's `LRG_<n>` scheme) as
+  the feature's gene; LRG records follow rule `copies_apart` (reported apart, `alternative_locus_genes`), so the
+  harmonizer makes an output feature named by the record (human `IKBKG` and `ORAI1` read at 65: `LRG_70.1`,
+  `LRG_93.1`; the single call `API.convert` answers so too);
 - `best_keeps_part_of_shared_name` (class b, rule `ties`): the harmonizer reads the best view; a name several genes
   carry, judged `set_exact` (the truth wants every carrier), is answered with a non-empty part of them, or of them and
   the wider set Ensembl's history also allows (`broad`), but not with all of them (the top-ranked; the others are
@@ -51,6 +55,14 @@ def t_best_keeps_part_of_shared_name(c):
     return f"best keeps {len(c.gotb)} genes of the {len(c.expb)} carrying the name{within}"
 
 
+LRG_RECORD = __import__("re").compile(r"^LRG_\d+")  # Ensembl's identifier scheme of LRG records
+
+
+def t_lrg_record_as_gene(c):
+    lrg = sorted(x for x in c.got if LRG_RECORD.match(str(x)))
+    return f"the answer names the LRG record(s) {','.join(lrg)[:80]} as the gene" if lrg else None
+
+
 # The classifier runs as `python -m ...causes`: its tests are those of `__main__`, a module apart from the imported
 # `causes`; F's kinds and causes go into both (as family D's plugin does).
 import __main__  # noqa: E402
@@ -62,6 +74,9 @@ for mod in {id(m): m for m in (K, __main__) if hasattr(m, "register") and hasatt
                  before="rule_decided_after_tree")
     mod.register("batch_differs_from_single", "a", "rule `batch_agrees_with_single`",
                  "the harmonizer's batch answers a feature otherwise than its single call", t_batch_differs_from_single,
+                 before="rule_decided_after_tree")
+    mod.register("lrg_record_as_gene", "a", "rule `lrg_copies`",
+                 "an LRG record answered as the feature's gene (LRG records are copies reported apart)", t_lrg_record_as_gene,
                  before="rule_decided_after_tree")
     mod.register("best_keeps_part_of_shared_name", "b", "rule `ties`",
                  "the harmonizer reads `best`: of a name several genes carry it keeps the top-ranked part",
