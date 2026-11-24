@@ -1,0 +1,22 @@
+# The environment of family G (comparison with other tools; docs/families/g.md): this package's dependencies (as
+# repro.yml) with the clients of the tools asked from Python. The web services are asked through their HTTP APIs with
+# `requests` (one session per host, families/g/client.py); pyensembl is the local tool of Ensembl's GTFs of any release.
+#   mamba env create -p <prefix> -f environments/g_py.yml
+#   <prefix>/bin/python -m pip install --no-deps -e .
+name: idtrack-g-py
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.13.18
+  - numpy=2.5.4
+  - pandas=3.1.1
+  - pyarrow=26.0.1
+  - scipy=1.18.1
+  - requests=2.34.2
+  - urllib3=2.8.0
+  - pyyaml=6.0.3
+  - pytest=9.2.0
+  - setuptools=80.9.0
+  - pyensembl=2.38.0
+  - pip

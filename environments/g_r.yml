@@ -1,0 +1,21 @@
+# The R environment of family G (docs/families/g.md): the Bioconductor annotation packages and the symbol checkers
+# asked locally (org.*.eg.db with AnnotationDbi, limma's alias2Symbol, HGNChelper, ensembldb/AnnotationHub, Seurat's
+# UpdateSymbolList). The scripts that ask them write their answers as JSON (jsonlite).
+#   mamba env create -p <prefix> -f environments/g_r.yml   (built 2026-11-24 in one attempt; R 4.5.3, Bioconductor 3.22)
+name: idtrack-g-r
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.5.3
+  - r-jsonlite=2.0.0
+  - bioconductor-annotationdbi=1.72.0
+  - bioconductor-org.hs.eg.db=3.22.0
+  - bioconductor-org.mm.eg.db=3.22.0
+  - bioconductor-org.ss.eg.db=3.22.0
+  - bioconductor-org.mmu.eg.db=3.22.0
+  - bioconductor-ensembldb=2.34.0
+  - bioconductor-annotationhub=4.0.0
+  - bioconductor-limma=3.68.5
+  - r-hgnchelper=0.8.16
+  - r-seurat=5.5.1
