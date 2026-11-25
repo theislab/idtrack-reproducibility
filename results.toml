@@ -763,3 +763,206 @@ optional = ["harm_report.tsv", "now_causes_summary.tsv", "decided_causes_summary
 # message texts, which main's release words as the rounds' notes did (release 0.1.2 rewords them); their counts are in
 # docs/families/e.md
 index = { "now_report.tsv" = "report" }
+
+
+# Family G (comparison with other tools; docs/families/g.md): the scored folders of each subject and form of the input,
+# made from the store of fetched responses (`<families>/g/raw/`) by `families.g.score`, and the tables of
+# `families.g.report` (`<families>/g/report/`). Organisms where a subject has nothing stored have no folder.
+
+[[g]]
+subject = "idtrack"
+form = "stated"
+folder = "families/g/runs/idtrack/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ensembl_rest"
+form = "best"
+folder = "families/g/runs/ensembl_rest/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ensembl_rest"
+form = "stated"
+folder = "families/g/runs/ensembl_rest/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ensembl_rest_lookup"
+form = "best"
+folder = "families/g/runs/ensembl_rest_lookup/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ensembl_rest_lookup"
+form = "stated"
+folder = "families/g/runs/ensembl_rest_lookup/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "biomart"
+form = "best"
+folder = "families/g/runs/biomart/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "biomart"
+form = "stated"
+folder = "families/g/runs/biomart/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "gprofiler"
+form = "best"
+folder = "families/g/runs/gprofiler/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "gprofiler"
+form = "stated"
+folder = "families/g/runs/gprofiler/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "mygene"
+form = "best"
+folder = "families/g/runs/mygene/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "mygene"
+form = "stated"
+folder = "families/g/runs/mygene/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "hgnc"
+form = "best"
+folder = "families/g/runs/hgnc/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "hgnc"
+form = "stated"
+folder = "families/g/runs/hgnc/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "uniprot"
+form = "best"
+folder = "families/g/runs/uniprot/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "uniprot"
+form = "stated"
+folder = "families/g/runs/uniprot/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "bridgedb"
+form = "best"
+folder = "families/g/runs/bridgedb/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "bridgedb"
+form = "stated"
+folder = "families/g/runs/bridgedb/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "gget"
+form = "best"
+folder = "families/g/runs/gget/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "gget"
+form = "stated"
+folder = "families/g/runs/gget/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "seurat"
+form = "best"
+folder = "families/g/runs/seurat/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "seurat"
+form = "stated"
+folder = "families/g/runs/seurat/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "pyensembl"
+form = "best"
+folder = "families/g/runs/pyensembl/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "pyensembl"
+form = "stated"
+folder = "families/g/runs/pyensembl/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "orgdb"
+form = "best"
+folder = "families/g/runs/orgdb/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "orgdb"
+form = "stated"
+folder = "families/g/runs/orgdb/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "limma"
+form = "best"
+folder = "families/g/runs/limma/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "limma"
+form = "stated"
+folder = "families/g/runs/limma/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "hgnchelper"
+form = "best"
+folder = "families/g/runs/hgnchelper/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "hgnchelper"
+form = "stated"
+folder = "families/g/runs/hgnchelper/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ensdb"
+form = "best"
+folder = "families/g/runs/ensdb/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ensdb"
+form = "stated"
+folder = "families/g/runs/ensdb/stated/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ncbi_files"
+form = "best"
+folder = "families/g/runs/ncbi_files/best/{organism}"
+tables = "families/g/report"
+
+[[g]]
+subject = "ncbi_files"
+form = "stated"
+folder = "families/g/runs/ncbi_files/stated/{organism}"
+tables = "families/g/report"

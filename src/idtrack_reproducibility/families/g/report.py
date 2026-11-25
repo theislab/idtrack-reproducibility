@@ -6,7 +6,9 @@ Reads every scored folder `<families>/g/runs/<subject>/<form>/<organism>/` (the 
 task, the source family's fields), the rule of equal truth (`<families>/g/likeforlike/<organism>/release_<T>.parquet`)
 and the raw index (`<families>/g/raw/`), and writes into `--out` (default `<families>/g/report/`):
 
-  tool_task.tsv        subject x form x organism x task: the tier's lines, `not_supported`, posed, answered, left out
+  tool_task.tsv        subject x form x organism x task: the tier's lines, `not_supported`, posed (answered),
+                       `not_answered` (posable, no usable response stored: not answered by the service on the dates
+                       asked), left out
                        by the rule of equal truth, kept, right / wrong / undetermined / error under `all` and `best`,
                        the rate with its Wilson interval, coverage (kept lines with a gene), and idtrack's rate on the
                        same kept lines (the tree's answers, `all` and `best`)
@@ -125,6 +127,9 @@ def run(organisms, out):
                     row["not_supported"] = int((v.outcome == "not_supported").sum())
                     posed = v[v.outcome != "not_supported"]
                     row["posed"] = len(posed)
+                    # lines the tool can pose that no usable stored response answers: not answered by the service on
+                    # the dates asked (never scored, never dropped: the next pass asks them and they join the tables)
+                    row["not_answered"] = n_lines - row["not_supported"] - len(posed)
                     row["left_out"] = int((~posed.kept).sum())
                     k = posed[posed.kept]
                     row["kept"] = len(k)

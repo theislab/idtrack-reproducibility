@@ -79,6 +79,31 @@ The graphs are of release 115 (no graph of 116 is built). A tool that answers at
 
 Each table gives, per tool, task and organism, the lines kept and the lines left out with the reason. The synonyms of 116 (`core_synonyms/116.tsv.gz` of each organism: 109 rows for cynomolgus to 73,746 for human, 1.4 KB to 521 KB) were fetched for this rule by family B's fetcher (`families.b.fetch_b synonyms --releases 116`, Ensembl's core dumps over HTTPS, recorded in `SOURCES.tsv`): truth for the tools answering at 116; idtrack stays at 115. The like-for-like rows of idtrack are its answers on the same kept lines; idtrack's rate on every line is reported beside them.
 
+## The store
+
+Everything G fetched lies in the data root, in `<families>/g/raw/`, and **nothing in it is ever removed, overwritten or truncated**: fetching is slow and the services change, so the store is the comparison's evidence and every later scoring, table and manuscript figure is made from it.
+
+| where | what |
+| --- | --- |
+| `raw/<tool>/<version>/<organism>/` | each response body as it came, named by its sha256 (failed, refused and partial ones too, under their own names); `index.jsonl` (every request ever asked, one row per attempt, appended), `index.parquet` (compiled from it: the last attempt of each request, `records.load_raw`), `headers.jsonl`, `passes.jsonl` (each pass: date, release, lines, requests, the host's interval) |
+| `raw/<tool>/_versions/<organism>/` | the version calls of every pass (release, build, data versions, archive lists, BioMart's filters and attributes) |
+| `raw/pyensembl/<release>/<organism>/` | Ensembl's GTFs as downloaded (URL, size, sha256, md5, Last-Modified in the index and headers) and pyensembl's calls; `raw/pyensembl/_cache/` its index (rebuilt from the GTF) |
+| `raw/_r_work/` | the R tools' inputs and outputs of every pass (their outputs are also stored as responses) |
+| `raw/_pilot/`, `raw/_probes/` | the pilot's evaluations and the single probes of 2026-11-24 (g:Profiler's archive list and pages, UniProt's help, the gget and pybiomart packages and biomaRt's sources the design rests on) |
+| `raw/STORE.tsv`, `raw/STORE_SUMMARY.tsv` | the store's manifest (`python -m idtrack_reproducibility.families.g.store`): every file with its bytes and sha256, the requests that returned it, their endpoints and dates; per tool, version and organism the files, bytes, requests, usable requests, lines held, dates and the question sets (G's published sets with their sha256); `--check` verifies every file against the index |
+| `queries/<organism>/` | the question sets `g_<family>_v1` (published, fixed); `drafts/` the drawn sets of the design and pilot |
+| `likeforlike/<organism>/` | the rule of equal truth per release |
+| `runs/<subject>/<form>/<organism>/` | the answers made from the store and their scoring (rebuildable from the store) |
+| `report/` | the tables |
+
+**The rules of the store.** A response is written once, under its sha256, through a temporary name of its own, never over an existing file; the index and the headers are only appended to; a download streams into a part of its own, which keeps its name when the download is cut. A stored response is usable when no error is recorded and it is not a batch the service refused as a whole (`client.usable`: a status of 400 or more to a request of several lines); an unusable response stays stored, and the next pass asks its lines again under a new request. A pass asks only what the store does not hold (resume by request id and by the lines a usable response holds), so running a pass again fetches nothing that is stored.
+
+**Scoring again without fetching**: `python -m idtrack_reproducibility.families.g.score --subjects all --organisms all` and `python -m idtrack_reproducibility.families.g.report` read the store, the question sets, the truth store and the rule of equal truth only; they open no connection (`tests/test_family_g.py` refuses every socket while the adapters read; the whole scoring was run once with the network blocked, below).
+
+**A service that has not answered every line**: a line the tool can pose and no usable stored response answers is `not_answered` in `tool_task.tsv` (with the dates the service was asked, `raw/STORE_SUMMARY.tsv`), never scored and never dropped; when a later pass of the same tool fetches it (`families.g.fetch`, which asks only what the store lacks), `score` and `report` run again from the store join it to the tables, and nothing else is fetched again.
+
+**Adding a question or a tool**: a new question set is published as `g_<family>_v<n>` (or a new family's set) by `families/g/sets.py`; a pass of each tool then asks only its lines (the stored ones are read, not asked again), and the store grows. A new tool is a class in `families/g/tools.py` (its organisms, tasks, releases, version calls and requests; a local tool in `families/g/local.py`), its host with its documented rate in `client.HOSTS`, and its adapter in `families/g/adapters.py`; it is fetched once into `raw/<tool>/` and scored with the others.
+
 ## The client
 
 `families/g/client.py`: one session per host group with a pool of one connection, the interval between requests from the host's rate (above; BioMart's archive hosts are one group), a 429 or 503 waited out for its `Retry-After` (else 60 s doubling to 15 minutes, at most 6 h in all), other 5xx, time-outs and connection errors waited 30 s, 2, 8 and 30 minutes and then recorded with their error and asked again by the next pass; an archive that does not answer its version calls is left for the next pass. One pass of a host is one job, so a host is asked through one connection over all jobs.

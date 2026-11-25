@@ -1,4 +1,4 @@
-# The R tools of family G (docs/families/g.md, "The tools"), asked as their documentation says, one call per line.
+# The R tools of family G (docs/families/g.md, "The tools"), asked as their documentation says.
 #
 # Usage: Rscript r_tools.R <tool> <organism> <lines.json> <out.json>
 #   tool: orgdb | limma | hgnchelper | seurat | ensdb
@@ -6,12 +6,12 @@
 #   out.json:   {"tool": ..., "version": ..., "package_metadata": ..., "calls": [{"qid", "function", "argument",
 #                "result": [Ensembl gene ids], "symbols": [...], "error", "seconds"}, ...]}
 #
-# - orgdb: AnnotationDbi::mapIds(<org package>, keys = <id>, keytype = SYMBOL (task c), ALIAS (task d), ENTREZID,
+# - orgdb: AnnotationDbi::mapIds(<org package>, keys = <ids>, keytype = SYMBOL (task c), ALIAS (task d), ENTREZID,
 #   REFSEQ or UNIPROT (task e), column = "ENSEMBL", multiVals = "list").
-# - limma: alias2Symbol(<id>, species = <code>) (aliases and symbols to official symbols, from the org package), then
-#   the official symbols' Ensembl genes by the org package (mapIds SYMBOL -> ENSEMBL): limma gives symbols, the join is
-#   the org package's.
-# - hgnchelper (human and mouse): checkGeneSymbols(<id>, species = "human"|"mouse") with the map bundled in the
+# - limma: alias2SymbolTable(<ids>, species = <code>) (each alias or symbol to its official symbol, from the org
+#   package; the one of the lowest Entrez id where several), then the official symbols' Ensembl genes by the org
+#   package (mapIds SYMBOL -> ENSEMBL): limma gives symbols, the join is the org package's.
+# - hgnchelper (human and mouse): checkGeneSymbols(<ids>, species = "human"|"mouse") with the map bundled in the
 #   package, then the suggested symbols' Ensembl genes by the org package.
 # - seurat (human): UpdateSymbolList(<symbol>) (HGNC REST through Seurat's own code), one symbol per call with a pause
 #   of 0.4 s after it (Seurat asks HGNC two requests per symbol without a pause of its own: about 5 requests per second,
@@ -20,6 +20,7 @@
 #   (genes(edb, columns = gene_id, gene_name, entrezid)) read for the line's id (task b), name (task c) or NCBI gene
 #   id (task e), as ensembldb's GeneIdFilter, GeneNameFilter and EntrezFilter select them.
 suppressPackageStartupMessages({library(jsonlite); library(AnnotationDbi)})
+`%||%` <- function(a, b) if (is.null(a)) b else a
 args <- commandArgs(trailingOnly = TRUE)
 tool <- args[1]; organism <- args[2]; lines <- fromJSON(args[3], simplifyVector = FALSE); out <- args[4]
 pkg <- switch(organism, homo_sapiens = "org.Hs.eg.db", mus_musculus = "org.Mm.eg.db", sus_scrofa = "org.Ss.eg.db",
@@ -61,6 +62,37 @@ if (tool == "ensdb") {
 if (tool == "seurat") suppressPackageStartupMessages(library(Seurat))
 if (tool == "limma") suppressPackageStartupMessages(library(limma))
 if (tool == "hgnchelper") suppressPackageStartupMessages(library(HGNChelper))
+# The tools are asked as their vectorised calls take a list (one call per keytype or per tool), which is how they are
+# documented for many keys; Seurat, which asks HGNC per symbol, one symbol per call with its pause.
+ids <- vapply(lines, function(l) l$id, character(1))
+t_all <- Sys.time()
+lookup <- list(); fn_of <- function(l) ""
+map_list <- function(keys, keytype) {
+  keys <- unique(keys[!is.na(keys) & keys != ""])
+  if (length(keys) == 0) return(list())
+  r <- tryCatch(mapIds(db, keys = keys, keytype = keytype, column = "ENSEMBL", multiVals = "list"), error = function(e) NULL)
+  if (is.null(r)) return(list())
+  lapply(r, function(v) sort(unique(v[!is.na(v)])))
+}
+if (tool == "orgdb") {
+  kts <- vapply(lines, keytype_of, character(1))
+  for (kt in unique(kts[!is.na(kts)])) lookup[[kt]] <- map_list(ids[!is.na(kts) & kts == kt], kt)
+} else if (tool == "limma") {
+  sym <- suppressWarnings(alias2SymbolTable(ids, species = code))
+  ens <- map_list(sym, "SYMBOL")
+} else if (tool == "hgnchelper") {
+  sp <- if (organism == "homo_sapiens") "human" else "mouse"
+  ck <- suppressWarnings(checkGeneSymbols(ids, species = sp))
+  sug <- lapply(ck$Suggested.Symbol, function(s) if (is.na(s)) character(0) else trimws(strsplit(s, "///", fixed = TRUE)[[1]]))
+  ens <- map_list(unlist(sug), "SYMBOL")
+} else if (tool == "ensdb") {
+  g <- edb_genes
+  by_id <- split(g$gene_id, g$gene_id)
+  nm <- !is.na(g$gene_name) & g$gene_name != ""
+  by_name <- split(g$gene_id[nm], g$gene_name[nm])
+  ez <- lapply(g$entrezid, function(x) as.character(unlist(x)))
+  by_entrez <- split(rep(g$gene_id, lengths(ez)), unlist(ez))
+}
 calls <- vector("list", length(lines))
 for (i in seq_along(lines)) {
   l <- lines[[i]]
@@ -69,35 +101,32 @@ for (i in seq_along(lines)) {
   tryCatch({
     if (tool == "orgdb") {
       kt <- keytype_of(l); fn <- paste0("mapIds(", kt, "->ENSEMBL)")
-      v <- if (kt == "REFSEQ") sub("\\.[0-9]+$", "", l$id) else l$id
-      res <- ens_of(v, kt)
+      res <- if (is.na(kt)) character(0) else (lookup[[kt]][[l$id]] %||% character(0))
     } else if (tool == "limma") {
-      fn <- "alias2Symbol+mapIds(SYMBOL->ENSEMBL)"
-      syms <- alias2Symbol(l$id, species = code, expand.symbols = FALSE)
-      res <- ens_of(syms, "SYMBOL")
+      fn <- "alias2SymbolTable+mapIds(SYMBOL->ENSEMBL)"
+      syms <- if (is.na(sym[i])) character(0) else sym[i]
+      res <- if (length(syms)) (ens[[syms]] %||% character(0)) else character(0)
     } else if (tool == "hgnchelper") {
       fn <- "checkGeneSymbols+mapIds(SYMBOL->ENSEMBL)"
-      sp <- if (organism == "homo_sapiens") "human" else "mouse"
-      ck <- suppressWarnings(checkGeneSymbols(l$id, species = sp))
-      s <- ck$Suggested.Symbol[1]
-      syms <- if (is.na(s)) character(0) else trimws(strsplit(s, "///", fixed = TRUE)[[1]])
-      res <- ens_of(syms, "SYMBOL")
+      syms <- sug[[i]]
+      res <- sort(unique(unlist(lapply(syms, function(x) ens[[x]]))))
     } else if (tool == "seurat") {
       fn <- "UpdateSymbolList+mapIds(SYMBOL->ENSEMBL)"
       syms <- suppressWarnings(UpdateSymbolList(symbols = l$id, verbose = FALSE))
-      res <- ens_of(syms, "SYMBOL")
+      res <- unlist(map_list(syms, "SYMBOL"))
       Sys.sleep(0.4)
     } else if (tool == "ensdb") {
-      g <- edb_genes
-      if (l$task == "b") { fn <- "genes(GeneIdFilter)"; hit <- g$gene_id == l$id }
-      else if (l$task == "c") { fn <- "genes(GeneNameFilter)"; hit <- !is.na(g$gene_name) & g$gene_name == l$id }
-      else { fn <- "genes(EntrezFilter)"; hit <- vapply(g$entrezid, function(x) l$id %in% as.character(unlist(x)), logical(1)) }
-      res <- sort(unique(g$gene_id[hit]))
+      if (l$task == "b") { fn <- "genes(GeneIdFilter)"; res <- by_id[[l$id]] }
+      else if (l$task == "c") { fn <- "genes(GeneNameFilter)"; res <- by_name[[l$id]] }
+      else { fn <- "genes(EntrezFilter)"; res <- by_entrez[[l$id]] }
+      res <- sort(unique(as.character(res)))
     }
   }, error = function(e) err <<- conditionMessage(e))
-  calls[[i]] <- list(qid = l$qid, `function` = fn, argument = l$id, result = I(res), symbols = I(syms),
+  calls[[i]] <- list(qid = l$qid, `function` = fn, argument = l$id, result = I(as.character(res)), symbols = I(syms),
                      error = err, seconds = as.numeric(difftime(Sys.time(), t0, units = "secs")))
 }
+per_line <- as.numeric(difftime(Sys.time(), t_all, units = "secs")) / max(1, length(lines))
+if (tool != "seurat") for (i in seq_along(calls)) calls[[i]]$seconds <- per_line  # a vectorised call's share
 meta <- if (is.null(db)) NULL else tryCatch(as.data.frame(metadata(db)), error = function(e) NULL)
 ver <- if (is.null(db)) "" else as.character(packageVersion(pkg))
 if (tool == "seurat") ver <- paste0("Seurat ", packageVersion("Seurat"), "; ", pkg, " ", ver)
