@@ -38,8 +38,10 @@ class Answer:
 
 
 def _rows(store, endpoint=None):
-    return [r for r in store.rows.values() if endpoint is None or r["endpoint"] == endpoint
-            or (endpoint.endswith("*") and r["endpoint"].startswith(endpoint[:-1]))]
+    """The usable stored responses of an endpoint (client.usable): a failed or refused request answers nothing (its
+    lines have no answer from it, and the next pass asks them again)."""
+    return [r for r in store.rows.values() if K.usable(r) and (endpoint is None or r["endpoint"] == endpoint
+            or (endpoint.endswith("*") and r["endpoint"].startswith(endpoint[:-1])))]
 
 
 def _share(r):
@@ -91,7 +93,10 @@ def rest(store, lines, endpoint):
                 out[q["qid"]] = Answer("answer", rep, "replaced" if rep else "retired", _share(r), endpoint=endpoint)
         elif endpoint == "xrefs/symbol":
             if r["http_status"] != 200 or not isinstance(doc, list):
-                out[q["qid"]] = Answer("answer", [], f"http_{r['http_status']}", _share(r), endpoint=endpoint)
+                # the service could not answer the input (a 400 with its error, e.g. a database error on a Greek letter)
+                err = (doc or {}).get("error") if isinstance(doc, dict) else None
+                out[q["qid"]] = Answer("error", error=f"HTTP {r['http_status']}: {str(err)[:200]}", seconds=_share(r),
+                                       endpoint=endpoint)
             else:
                 got = [x["id"] for x in doc if x.get("type") == "gene"]
                 out[q["qid"]] = Answer("answer", got, "found" if got else "not_found", _share(r), endpoint=endpoint)
@@ -200,7 +205,7 @@ def mygene(store, lines, organism, release):
 def hgnc(store, lines):
     out = {}
     per = collections.defaultdict(list)
-    for r in store.rows.values():
+    for r in _rows(store):
         for x in r.get("qids") or []:
             per[x].append(r)
     for q in lines:
@@ -209,8 +214,8 @@ def hgnc(store, lines):
             continue
         got, st, secs, err = set(), "not_found", sum(_share(r) for r in rs), None
         for r in rs:
-            if r.get("error"):
-                err = r["error"]
+            if r.get("error") or r.get("http_status") != 200:
+                err = r.get("error") or f"HTTP {r.get('http_status')}: the service could not read the input"
                 break
             docs = json.loads(store.body(r)).get("response", {}).get("docs") or []
             ens = {d["ensembl_gene_id"] for d in docs if d.get("ensembl_gene_id")}

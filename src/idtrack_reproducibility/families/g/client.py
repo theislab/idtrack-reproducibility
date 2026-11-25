@@ -105,6 +105,17 @@ def retry_after(value, default):
         return default
 
 
+def usable(row):
+    """A stored response that answers its lines: no error recorded, and not a batch the service refused as a whole
+    (a status of 400 or more to a request of several lines: MyGene.info's "Too Many Hits", BioMart's 405). A single
+    line's 400 or 404 is the service's answer for that input and is kept as one. An unusable response stays stored;
+    the next pass asks its lines again under a new request."""
+    if row.get("error"):
+        return False
+    st = row.get("http_status")
+    return not (st is not None and st >= 400 and len(row.get("qids") or []) > 1)
+
+
 def raw_dir(tool, version, organism):
     return os.path.join(C.family_dir("g"), "raw", tool, str(version), organism)
 
@@ -130,13 +141,13 @@ class RawStore:
 
     def done(self, rid):
         r = self.rows.get(rid)
-        return r if r and not r.get("error") else None
+        return r if r and usable(r) else None
 
     def answered(self, endpoint):
-        """qids that a stored response of this endpoint without error holds."""
+        """qids that a usable stored response of this endpoint holds (`usable`)."""
         out = set()
         for r in self.rows.values():
-            if r["endpoint"] == endpoint and not r.get("error"):
+            if r["endpoint"] == endpoint and usable(r):
                 out.update(r.get("qids") or [])
         return out
 
@@ -146,9 +157,15 @@ class RawStore:
             name = f"{sha}.{ext}"
             path = os.path.join(self.folder, name)
             if not os.path.exists(path):
-                with open(path + ".tmp", "wb") as fh:
+                tmp = f"{path}.{os.getpid()}.{time.time_ns()}.tmp"  # one name per write: no temp is written twice
+                with open(tmp, "wb") as fh:
                     fh.write(content)
-                os.replace(path + ".tmp", path)
+                try:
+                    os.link(tmp, path)  # a new name for the bytes; fails where the response exists, never replaces it
+                except FileExistsError:
+                    pass  # the same bytes (the name is their sha256) were stored meanwhile by another write
+                # the temp name goes, never a response: its bytes are the response stored under `path`
+                os.unlink(tmp)
             row.update(bytes=len(content), sha256=sha, file=name)
         with open(self.index_path, "a") as fh:
             fh.write(json.dumps(row, sort_keys=True, default=str) + "\n")
@@ -269,7 +286,11 @@ def _session():
 
 def download(store, url, endpoint=None, qids=(), version=None, client=None, chunk=1 << 20):
     """A file of a local tool (a GTF of pyensembl's): streamed into the store under its sha256, its row with URL, size,
-    sha256 and the time; the md5 and the server's Last-Modified in the headers' line. Returns the stored row."""
+    sha256 and the time; the md5 and the server's Last-Modified in the headers' line. Returns the stored row.
+
+    Each attempt streams into a file of its own (`download_<request id>_<time>.part`); a complete file gets its
+    sha256 name as a second name (never over an existing file) and the part name goes; an interrupted or failed
+    download keeps its part under its own name and is recorded with its error (the next pass downloads again)."""
     client = client or Client()
     rid = request_id("GET", url)
     old = store.done(rid)
@@ -281,23 +302,33 @@ def download(store, url, endpoint=None, qids=(), version=None, client=None, chun
                endpoint=endpoint or url, method="GET", url=url, params={}, body=None, qids=list(qids), asked_at=now(),
                http_status=None, seconds=None, bytes=None, sha256=None, file=None, error=None)
     t0 = time.monotonic()
-    tmp = os.path.join(store.folder, f"download_{rid}.part")
-    sha, md5, n = hashlib.sha256(), hashlib.md5(), 0
-    with client.session(group).get(url, headers={"User-Agent": USER_AGENT}, stream=True, timeout=TIMEOUT) as r:
-        row["http_status"] = r.status_code
-        if r.status_code != 200:
-            row.update(error=f"HTTP {r.status_code}", seconds=round(time.monotonic() - t0, 3))
-            return store.put(row, r.content, "txt", dict(r.headers))
-        with open(tmp, "wb") as fh:
-            for b in r.iter_content(chunk):
-                fh.write(b)
-                sha.update(b)
-                md5.update(b)
-                n += len(b)
-        headers = dict(r.headers)
+    part = f"download_{rid}_{time.time_ns()}.part"
+    tmp = os.path.join(store.folder, part)
+    sha, md5, n, headers = hashlib.sha256(), hashlib.md5(), 0, {}
+    try:
+        with client.session(group).get(url, headers={"User-Agent": USER_AGENT}, stream=True, timeout=TIMEOUT) as r:
+            row["http_status"] = r.status_code
+            headers = dict(r.headers)
+            if r.status_code != 200:
+                row.update(error=f"HTTP {r.status_code}", seconds=round(time.monotonic() - t0, 3))
+                return store.put(row, r.content, "txt", headers)
+            with open(tmp, "xb") as fh:  # "x": a part is never written twice
+                for b in r.iter_content(chunk):
+                    fh.write(b)
+                    sha.update(b)
+                    md5.update(b)
+                    n += len(b)
+    except Exception as e:  # noqa: BLE001  (the part, as far as it came, stays under its own name)
+        row.update(error=f"{type(e).__name__}: {e}", seconds=round(time.monotonic() - t0, 3), bytes=n,
+                   file=part if os.path.exists(tmp) else None)
+        return store.put(row, None, "part", headers)
     ext = url.rsplit("/", 1)[-1].split(".", 1)[-1] if "." in url.rsplit("/", 1)[-1] else "bin"
     name = f"{sha.hexdigest()}.{ext}"
-    os.replace(tmp, os.path.join(store.folder, name))
+    try:
+        os.link(tmp, os.path.join(store.folder, name))  # never over an existing file
+    except FileExistsError:
+        pass  # the same bytes were stored before under their sha256
+    os.unlink(tmp)  # the part's name only: its bytes are the file stored under `name`
     headers["x-md5"] = md5.hexdigest()
     row.update(seconds=round(time.monotonic() - t0, 3), bytes=n, sha256=sha.hexdigest(), file=name)
     return store.put(row, None, ext, headers)

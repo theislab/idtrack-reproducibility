@@ -68,38 +68,30 @@ def genome(organism, release, client):
 
 def ask(g, store, lines, pass_id, form):
     """The calls of the lines in one form of the input (tools.in_form), stored as one response."""
-    out = os.path.join(store.folder, f"calls_{form}_{pass_id.replace(':', '')}.jsonl.gz")
+    name = f"calls_{form}_{pass_id.replace(':', '')}"
     done = store.answered(f"calls@{form}")
     todo = [q for q in lines if q["qid"] not in done]
     if not todo:
         return 0
     t_all = time.monotonic()
-    with gzip.open(out + ".tmp", "wt") as fh:
-        for q in todo:
-            t0 = time.monotonic()
-            if q["task"] == "b":
-                fn, arg = "gene_by_id", q["id"]
-            else:
-                fn, arg = "gene_ids_of_gene_name", q["id"]
-            try:
-                if fn == "gene_by_id":
-                    res, err = [g.gene_by_id(arg).gene_id], None
-                else:
-                    res, err = sorted(g.gene_ids_of_gene_name(arg)), None
-            except ValueError as e:  # pyensembl's documented answer for an id or name the release does not hold
-                res, err = [], f"ValueError: {e}"
-            fh.write(json.dumps(dict(qid=q["qid"], function=fn, argument=arg, result=res, error=err,
-                                     seconds=round(time.monotonic() - t0, 6))) + "\n")
-    os.replace(out + ".tmp", out)
-    with open(out, "rb") as fh:
-        content = fh.read()
-    row = dict(request_id=K.request_id("CALL", out, {"pass": pass_id}), tool="pyensembl", tool_version=store.version,
-               organism=store.organism, endpoint=f"calls@{form}", method="CALL", url=os.path.basename(out),
+    out = []
+    for q in todo:
+        t0 = time.monotonic()
+        fn = "gene_by_id" if q["task"] == "b" else "gene_ids_of_gene_name"
+        arg = q["id"]
+        try:
+            res, err = ([g.gene_by_id(arg).gene_id] if fn == "gene_by_id" else sorted(g.gene_ids_of_gene_name(arg))), None
+        except ValueError as e:  # pyensembl's documented answer for an id or name the release does not hold
+            res, err = [], f"ValueError: {e}"
+        out.append(json.dumps(dict(qid=q["qid"], function=fn, argument=arg, result=res, error=err,
+                                   seconds=round(time.monotonic() - t0, 6))) + "\n")
+    content = gzip.compress("".join(out).encode(), mtime=0)  # the calls as one response, kept under its sha256
+    row = dict(request_id=K.request_id("CALL", name, {"pass": pass_id}), tool="pyensembl", tool_version=store.version,
+               organism=store.organism, endpoint=f"calls@{form}", method="CALL", url=name,
                params={"functions": ["gene_by_id", "gene_ids_of_gene_name"]}, body=None,
                qids=[q["qid"] for q in todo], asked_at=pass_id, http_status=None,
                seconds=round(time.monotonic() - t_all, 3), bytes=None, sha256=None, file=None, error=None)
     store.put(row, content, "jsonl.gz", {})
-    os.remove(out)  # its content is in the store under its sha256
     store.compile()
     return len(todo)
 
@@ -235,8 +227,9 @@ def ask_r(tool, organism, lines, rscript, pass_id, workdir):
         fl = T.in_form(lines, form)
         if not fl:
             continue
-        inp = os.path.join(workdir, f"{tool}_{organism}_{form}.lines.json")
-        outp = os.path.join(workdir, f"{tool}_{organism}_{form}.out.json")
+        stamp = pass_id.replace(":", "")  # the files of a pass are its own: no pass writes over another's
+        inp = os.path.join(workdir, f"{tool}_{organism}_{form}_{stamp}.lines.json")
+        outp = os.path.join(workdir, f"{tool}_{organism}_{form}_{stamp}.out.json")
         json.dump([dict(qid=q["qid"], id=q["id"], task=q["task"], kind=T.source_kind(q)) for q in fl], open(inp, "w"))
         t0 = time.monotonic()
         env = dict(os.environ)
@@ -309,7 +302,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m idtrack_reproducibility.families.g.local", description=__doc__.split("\n\n")[0])
     ap.add_argument("--tool", default="pyensembl", choices=["pyensembl", "gget", "ncbi_files"] + list(R_TOOLS))
     ap.add_argument("--rscript", default="Rscript", help="the Rscript of the R environment (environments/g_r.yml)")
-    ap.add_argument("--workdir", default=".", help="where the R tools' input and output files are written")
+    ap.add_argument("--workdir", default=None, help="where the R tools' input and output files are written (default: "
+                    "<families>/g/raw/_r_work, kept with the store)")
     ap.add_argument("--organisms", default="all")
     ap.add_argument("--tier", default="local", choices=["web", "local"])
     ap.add_argument("--per-family", type=int, default=None)
@@ -323,7 +317,9 @@ def main(argv=None):
             tier = R_TOOLS[a.tool][3]
             qs = [q for q in F.g_lines(o, tier, a.per_family, a.draft) if r_posable(a.tool, q, o)[0] is not None]
             if qs:
-                print(f"{a.tool} {o}: {len(qs)} lines, {ask_r(a.tool, o, qs, a.rscript, K.now(), a.workdir)} answered", flush=True)
+                wd = a.workdir or os.path.join(C.family_dir("g"), "raw", "_r_work")
+                os.makedirs(wd, exist_ok=True)
+                print(f"{a.tool} {o}: {len(qs)} lines, {ask_r(a.tool, o, qs, a.rscript, K.now(), wd)} answered", flush=True)
             continue
         if a.tool == "ncbi_files":
             qs = [q for q in F.g_lines(o, a.tier, a.per_family, a.draft) if ncbi_posable(q, o)[0] is not None]

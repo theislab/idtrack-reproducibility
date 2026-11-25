@@ -13,6 +13,7 @@ with the reason.
 """
 import json
 import re
+import shlex
 import urllib.parse
 from xml.sax.saxutils import quoteattr
 
@@ -281,9 +282,12 @@ class MyGene(Tool):
         for sc, qs in sorted(groups.items()):
             for b in chunks(qs, 1000):
                 terms = sorted({q["id"] for q in b})
+                # the service splits `q` at commas and white space as a shell would: a term with a space or a quote
+                # is quoted (shlex), so that it stays one term; hits per term: at most 50 (terms x size <= 100,000)
                 out.append(dict(method="POST", url=f"{MYGENE}/query",
-                                data={"q": ",".join(terms), "scopes": sc, "species": str(TAXID[organism]),
-                                      "fields": "ensembl.gene,symbol,taxid", "size": "100", "dotfield": "true"},
+                                data={"q": ",".join(shlex.quote(t) if re.search(r"[\s'\"\\]", t) else t for t in terms),
+                                      "scopes": sc, "species": str(TAXID[organism]),
+                                      "fields": "ensembl.gene,symbol,taxid", "size": "50", "dotfield": "true"},
                                 qids=[q["qid"] for q in b], endpoint=f"query:{sc}"))
         return out
 

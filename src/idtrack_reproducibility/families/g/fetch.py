@@ -18,6 +18,7 @@ import gzip
 import json
 import os
 import time
+import urllib.parse
 
 from idtrack_reproducibility import config as CFG
 from idtrack_reproducibility.families import lines as L
@@ -25,6 +26,9 @@ from idtrack_reproducibility.families.g import client as K
 from idtrack_reproducibility.families.g import tools as T
 
 G_FAMILIES = ("a1", "astar", "b", "c", "d1")
+# Hosts that failed a request after its retries in this pass (an archive of BioMart that answers 500): the rest of
+# the pass leaves their lines for the next pass instead of waiting out every request again.
+FAILED_HOSTS = set()
 GROUP = {"ensembl_rest": "ensembl_rest", "biomart": "ensembl_biomart", "gprofiler": "gprofiler", "mygene": "mygene",
          "hgnc": "hgnc", "uniprot": "uniprot", "bridgedb": "bridgedb"}
 
@@ -119,9 +123,11 @@ def ask(store, client, reqs, log):
             failed = 0
         else:
             failed += 1
-            if failed >= 2:  # a server that failed two requests after their retries: the rest waits for the next pass
-                log(f"{store.tool} {store.organism}: two requests failed after their retries ({row['error']}); the "
-                    f"remaining requests of this release are left for the next pass")
+            host = urllib.parse.urlparse(r["url"]).hostname
+            if failed >= 1:  # a server that failed a request after its retries: the rest waits for the next pass
+                FAILED_HOSTS.add(host)
+                log(f"{store.tool} {store.organism}: a request to {host} failed after its retries ({row['error']}); "
+                    f"the host's remaining requests of this pass are left for the next pass")
                 break
         if n % 200 == 0:
             store.compile()
@@ -156,7 +162,20 @@ def pass_tool(tool_name, organism, lines, client, log=print, releases=None):
             continue
         t0 = time.time()
         if tool_name == "biomart":
-            rows, vs = ask_versions(tool, organism, client, pass_id, tool.version_calls(organism, rel))
+            host = urllib.parse.urlparse(tool.instances[rel]).hostname
+            if host in FAILED_HOSTS:
+                log(f"biomart {organism} release {rel}: {host} failed earlier in this pass; its {len(qs)} lines are "
+                    f"left for the next pass")
+                out[rel] = (None, 0, len(qs))
+                continue
+            rows, vs = ask_versions(tool, organism, client, pass_id, tool.version_calls(organism, rel)[:1])
+            if rows[0].get("error") or not rows[0].get("file"):
+                FAILED_HOSTS.add(host)
+                log(f"biomart {organism} release {rel}: the archive did not answer its registry ({rows[0].get('error')});"
+                    f" its {len(qs)} lines are left for the next pass")
+                out[rel] = (None, 0, len(qs))
+                continue
+            rows += ask_versions(tool, organism, client, pass_id, tool.version_calls(organism, rel)[1:])[0]
             frow = [r for r in rows if r["endpoint"] == "filters"][0]
             if frow.get("error") or not frow.get("file"):
                 log(f"biomart {organism} release {rel}: the archive did not answer its version calls "
@@ -226,27 +245,40 @@ def ask_hgnc(store, client, tool, qs, log, form):
 
 
 def ask_uniprot(store, client, qs, organism, log, form, poll=5, max_polls=720):
-    """UniProt's ID mapping: one job of every accession (at most 100,000), polled until it is finished, then its
-    results streamed; every response stored."""
+    """UniProt's ID mapping: one job of every accession (at most 100,000), polled until it is finished or failed,
+    then its results streamed; every response stored. A job that failed (`jobStatus` ERROR) or whose results did not
+    come is asked again by a new job at the next pass (its request salted by the attempt)."""
     ids = sorted({q["id"] for q in qs})
     qids = [q["qid"] for q in qs]
     if store.answered(f"idmapping/stream@{form}") >= set(qids):
         return 0
+    attempt = sum(1 for r in store.rows.values() if r["endpoint"] == f"idmapping/run@{form}")
     run = client.fetch(store, "POST", f"{T.UNIPROT}/idmapping/run", data={"from": "UniProtKB_AC-ID", "to": "Ensembl",
-                       "ids": ",".join(ids)}, qids=qids, endpoint=f"idmapping/run@{form}")
+                       "ids": ",".join(ids)}, qids=qids, endpoint=f"idmapping/run@{form}",
+                       salt=str(attempt) if attempt else None)
+    if not run.get("file") or run.get("error"):
+        return 1
     job = json.loads(store.body(run))["jobId"]
+    n, status = 1, None
     for i in range(max_polls):
-        st = client.fetch(store, "GET", f"{T.UNIPROT}/idmapping/status/{job}", allow_redirects=False, salt=str(i),
-                          endpoint=f"idmapping/status@{form}")
+        st = client.fetch(store, "GET", f"{T.UNIPROT}/idmapping/status/{job}", allow_redirects=False,
+                          salt=f"{attempt}:{i}", endpoint=f"idmapping/status@{form}")
+        n += 1
         body = json.loads(store.body(st)) if st.get("file") else {}
-        if st["http_status"] in (200, 303) and (body.get("jobStatus") == "FINISHED" or "results" in body
-                                                or st["http_status"] == 303):
+        status = body.get("jobStatus")
+        if status == "FINISHED" or "results" in body or st["http_status"] == 303:
+            status = "FINISHED"
             break
+        if status == "ERROR":
+            log(f"uniprot {organism}: job {job} failed ({str(body.get('errors'))[:200]}); asked again at the next pass")
+            return n
         time.sleep(poll)
-    client.fetch(store, "GET", f"{T.UNIPROT}/idmapping/stream/{job}", params={"format": "json"}, qids=qids,
-                 endpoint=f"idmapping/stream@{form}")
+    if status == "FINISHED":
+        client.fetch(store, "GET", f"{T.UNIPROT}/idmapping/stream/{job}", params={"format": "json"}, qids=qids,
+                     endpoint=f"idmapping/stream@{form}")
+        n += 1
     store.compile()
-    return i + 3
+    return n
 
 
 def main(argv=None):

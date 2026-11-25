@@ -306,3 +306,78 @@ def test_each_subject_is_posed_by_its_own_rule():
     assert GSc.posable("orgdb", sym, "sus_scrofa")[0] is None  # org.Ss.eg.db has no Ensembl genes
     assert GSc.posable("ensdb", sym, "sus_scrofa") == (113, "")
     assert GSc.tier_of("seurat") == "web" and GSc.tier_of("pyensembl") == "local"
+
+
+def stored_files(folder):
+    import os
+    return {f: open(os.path.join(folder, f), "rb").read() for f in os.listdir(folder)
+            if f not in ("index.parquet",) and not f.endswith(".tmp")}
+
+
+def test_failed_refused_and_retried_requests_keep_every_stored_response(tmp_path):
+    """Every response stays stored as it came, failed and refused ones too, across retries and later passes; a later
+    pass only adds (the store's files before are all there after, byte for byte; index.jsonl only grows)."""
+    folder = str(tmp_path / "store")
+    script = [FakeResponse(500, b"server error 1")] * (len(K.RETRY_WAITS) + 1) + \
+        [FakeResponse(429, b"refused", {"Retry-After": "1"}), FakeResponse(400, b'{"error":"Too Many Hits"}'),
+         FakeResponse(200, b'[{"query":"A"}]'), FakeResponse(200, b'[{"query":"B"}]')]
+    c, sess, clock = client_with(script)
+    st = K.RawStore(folder, "mygene", "v", "sus_scrofa")
+    a = c.fetch(st, "POST", "https://mygene.info/v3/query", data={"q": "A,B"}, qids=["q1", "q2"], endpoint="query@best")
+    assert a["error"] == "HTTP 500"
+    before = stored_files(folder)
+    # the next pass asks the same request again (an error is not an answer): refused, then a 400 of the whole batch
+    st2 = K.RawStore(folder, "mygene", "v", "sus_scrofa")
+    b = c.fetch(st2, "POST", "https://mygene.info/v3/query", data={"q": "A,B"}, qids=["q1", "q2"], endpoint="query@best")
+    assert b["http_status"] == 400 and not K.usable(b) and st2.answered("query@best") == set()
+    after = stored_files(folder)
+    assert all(after.get(f) == v or f in ("index.jsonl", "headers.jsonl") for f, v in before.items())
+    assert after["index.jsonl"].startswith(before["index.jsonl"])  # the index only grows
+    # a pass of other batches answers the lines; the refused batch's response is still stored
+    for q, t in (("q1", "A"), ("q2", "B")):
+        c.fetch(st2, "POST", "https://mygene.info/v3/query", data={"q": t}, qids=[q], endpoint="query@best")
+    final = stored_files(folder)
+    assert set(after) <= set(final) and all(final[f] == v or f in ("index.jsonl", "headers.jsonl") for f, v in after.items())
+    assert st2.answered("query@best") == {"q1", "q2"}
+    bodies = {final[r["file"]] for r in (json.loads(x) for x in final["index.jsonl"].decode().splitlines()) if r.get("file")}
+    assert {b"server error 1", b'{"error":"Too Many Hits"}', b'[{"query":"A"}]'} <= bodies
+
+
+def test_an_interrupted_download_keeps_its_part(tmp_path):
+    class Stream:
+        status_code, headers = 200, {"Last-Modified": "x"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def iter_content(self, n):
+            yield b"partial bytes"
+            raise ConnectionError("cut")
+
+    class Sess:
+        def get(self, *a, **k):
+            return Stream()
+
+    c = K.Client(session_factory=Sess, sleep=lambda s: None)
+    st = K.RawStore(str(tmp_path), "pyensembl", "115", "sus_scrofa")
+    row = K.download(st, "https://ftp.ensembl.org/pub/x.gtf.gz", client=c)
+    assert row["error"].startswith("ConnectionError") and row["file"].endswith(".part")
+    assert open(tmp_path / row["file"], "rb").read() == b"partial bytes"
+
+
+def test_scoring_reads_the_store_with_the_network_off(tmp_path, monkeypatch):
+    """The adapters read stored responses only: with every socket refused, the answers come from the store."""
+    import socket
+
+    def refuse(*a, **k):
+        raise OSError("network off")
+    monkeypatch.setattr(socket.socket, "connect", refuse)
+    monkeypatch.setattr(socket, "create_connection", refuse)
+    st = store_with(tmp_path, "gprofiler", [("convert@stated", ["q1"], {"result": [
+        {"incoming": "TP53", "converted": "ENSSSCG00000000009"}]}, 200)])
+    monkeypatch.setattr(K.RawStore, "of", classmethod(lambda cls, tool, version, organism: st))
+    out = A.answers("gprofiler", "sus_scrofa", "v", [line("q1", "TP53", "c")], form="stated")
+    assert out["q1"].got == ["ENSSSCG00000000009"]
