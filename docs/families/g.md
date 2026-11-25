@@ -152,7 +152,11 @@ The web lines of the full pass (per organism 50,000 lines; the macaques 40,000) 
 
 ## Results
 
-None yet.
+The passes of 2026-11-24 and 2026-11-25 (one date per service; the dates, versions and endpoints of every response in `raw/STORE_SUMMARY.tsv`), scored from the store with the network off. The tables are `<families>/g/report/`: `tool_task.tsv` (per subject, reading of the input, organism and task: the tier's lines, `not_supported`, posed, `not_answered`, left out by the rule of equal truth, kept, right, wrong, undetermined, error under `all` and `best`, the rate with its Wilson interval, coverage, and idtrack's rate on the same kept lines), `not_supported.tsv` (the reasons), `forms.tsv` (per tool the posed lines whose two readings differ and how many change their outcome), `by_distance.tsv`, `speed.tsv`, `failures.tsv` and `disagreements.tsv` with `disagreement_classes.tsv` (every disagreement with idtrack classed by the two verdicts of the common scorer: idtrack wrong, the tool wrong, both wrong, the truth cannot decide; a seeded sample of at most 200 per subject, task and organism stratified by the outcome pair is marked for reading).
+
+What the tables say in one line each (form `best`, view `all`, the kept lines): only Ensembl REST (`archive/id`) and idtrack pose task a (old ids to their gene), 47 to 50 % of the web lines; on them REST is right on 76 to 100 % of the lines per organism (idtrack 98 to 100 % on the same lines; cynomolgus 100 % for both); on symbols (task c), aliases (d) and external identifiers (e) every tool's rate is below idtrack's on the same kept lines in every organism, but BioMart's 60 symbol and 243 identifier lines of mouse fetched so far (both right) (`tool_task.tsv`). The rule of equal truth leaves out at most 2 % of a tool's posed lines (NCBI's files 2.6 %, BridgeDb at 111 4.3 %).
+
+**BioMart** was asked while its archives answered HTTP 500 for hours (2026-11-24 and 25: `jul2023` (110) and `jan2024` (111) did not answer their version calls): its pig lines are fetched and scored; of mouse's, human's, rhesus's and cynomolgus's posable lines most are `not_answered` (not answered by the service on these dates, counted per organism and task in `tool_task.tsv`, never scored as wrong). Its fetch resumes from the store; a later pass adds only the missing lines, and `score --subjects biomart` and `report` join them to the tables without anything else being fetched again.
 
 ## Known limitations
 
