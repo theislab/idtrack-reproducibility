@@ -51,11 +51,14 @@ if (tool == "ensdb") {
                   macaca_mulatta = "Macaca mulatta", macaca_fascicularis = "Macaca fascicularis")
   ah <- AnnotationHub(ask = FALSE)
   q <- query(ah, c("EnsDb", latin, "113"))
-  q <- q[q$species == latin & grepl("Ensembl 113 EnsDb", q$title, fixed = TRUE)]
+  # the reference assembly's EnsDb (the hub also holds EnsDbs of a species' other assemblies, e.g. pig's breeds)
+  assembly <- switch(organism, homo_sapiens = "GRCh38", mus_musculus = "GRCm39", sus_scrofa = "Sscrofa11.1",
+                     macaca_mulatta = "Mmul_10", macaca_fascicularis = "Macaca_fascicularis_6.0")
+  q <- q[q$species == latin & grepl("Ensembl 113 EnsDb", q$title, fixed = TRUE) & q$genome == assembly]
   if (length(q) < 1) stop("no EnsDb of Ensembl 113 for ", latin)
   id <- names(q)[1]
   edb <- ah[[id]]
-  ensdb_record <- list(ah_id = id, title = q$title[1], file = unname(AnnotationHub::cache(ah[id])),
+  ensdb_record <- list(ah_id = id, title = q$title[1], genome = q$genome[1], file = unname(AnnotationHub::cache(ah[id])),
                        rdatadateadded = as.character(q$rdatadateadded[1]), metadata = as.data.frame(metadata(edb)))
   edb_genes <- as.data.frame(genes(edb, columns = c("gene_id", "gene_name", "entrezid"), return.type = "data.frame"))
 }

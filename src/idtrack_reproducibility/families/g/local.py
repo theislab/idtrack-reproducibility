@@ -253,7 +253,7 @@ def ask_r(tool, organism, lines, rscript, pass_id, workdir):
     return n
 
 
-GGET_BATCH = 1000
+GGET_BATCH = 200  # batches of 1,000 were answered 500 and 504 by Ensembl REST (2026-11-24)
 
 
 def gget_posable(line, organism):
@@ -266,7 +266,7 @@ def gget_posable(line, organism):
 
 def ask_gget(organism, lines, client, pass_id):
     """`gget info` (Ensembl REST's lookup through gget's own code, without its NCBI, UniProt and PDB parts) for the
-    lines' ids, 1,000 per call at Ensembl REST's interval (the same host as the REST pass: one process asks it); each
+    lines' ids, 200 per call at Ensembl REST's interval (the same host as the REST pass: one process asks it); each
     call's result (`json=True`) stored as the tool returned it."""
     import importlib.metadata as md
     import gget

@@ -51,7 +51,10 @@ def versions_by_release(subject, organism):
     folder's name for pyensembl)."""
     out = {}
     tool = raw_tool(subject)
+    keep = ensdb_reference(organism) if tool == "ensdb" else None
     for v in A.raw_versions(tool, organism):
+        if keep is not None and v.rsplit("__", 1)[-1] not in keep:
+            continue  # an EnsDb of another assembly of the species (pig's breeds), not the reference's
         d = os.path.join(C.family_dir("g"), "raw", tool, v, organism)
         rels = set()
         p = os.path.join(d, "passes.jsonl")
@@ -64,6 +67,19 @@ def versions_by_release(subject, organism):
         for r in rels:
             out.setdefault(r, []).append(v)
     return out
+
+
+REFERENCE_ASSEMBLY = {"homo_sapiens": "GRCh38", "mus_musculus": "GRCm39", "sus_scrofa": "Sscrofa11.1",
+                      "macaca_mulatta": "Mmul_10", "macaca_fascicularis": "Macaca_fascicularis_6.0"}
+
+
+def ensdb_reference(organism):
+    """The AnnotationHub ids of the organism's reference-assembly EnsDb, from the hub's records stored with the
+    store (`raw/ensdb/_versions/records_113_*.json`: id, genome, title, species)."""
+    files = sorted(glob.glob(os.path.join(C.family_dir("g"), "raw", "ensdb", "_versions", "records_113_*.json")))
+    if not files:
+        return None
+    return {r["ah_id"] for r in json.load(open(files[-1])) if r["genome"] == REFERENCE_ASSEMBLY[organism]}
 
 
 def posable(subject, line, organism, gprofiler_archives=None):
