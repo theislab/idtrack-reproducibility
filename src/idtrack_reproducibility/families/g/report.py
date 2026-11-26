@@ -1,6 +1,7 @@
 """The tables of family G from its scored folders (docs/families/g.md, "Tables").
 
 Usage: python -m idtrack_reproducibility.families.g.report [--organisms ...] [--out <folder>]
+       python -m idtrack_reproducibility.families.g.report --publish   (after `report` and `reading`: PUBLISHED below)
 
 Reads every scored folder `<families>/g/runs/<subject>/<form>/<organism>/` (the record's rows), G's lines (tier,
 task, the source family's fields), the rule of equal truth (`<families>/g/likeforlike/<organism>/release_<T>.parquet`)
@@ -247,11 +248,127 @@ def run(organisms, out):
     return {k: len(v) for k, v in tabs.items()}
 
 
+# The tables published in the repository (results/g/main/all/: the tables a manuscript cites, one row per subject,
+# task, class or organism) and the per-line tables that stay in the data root (`<families>/g/report/`, listed in the
+# family's data manifest): every disagreement (`disagreements.tsv`, about 1 million lines) and every sampled line read
+# (`reading.tsv`), as the other families keep their per-line tables (wrong.tsv.gz, causes.tsv.gz) in their runs.
+PUBLISHED = ("tool_task", "not_supported", "by_distance", "forms", "speed", "failures", "disagreement_classes",
+             "reading_classes", "reading_summary")
+PER_LINE = ("disagreements", "reading")
+PUBLISH_DIR = os.path.join("results", "g", "main", "all")
+GENERATOR = "python -m idtrack_reproducibility.families.g.report --publish"
+
+
+def publish(root):
+    """The published tables (PUBLISHED) copied from `<families>/g/report/` into `results/g/main/all/`, each with its
+    `.provenance` (sources: the table in the data root, every registered scored folder's run.json, the store's summary),
+    and the document's tables written from them (`write_doc`)."""
+    import datetime
+    import shutil
+    from idtrack_reproducibility import results as RES
+    data = CFG.get().root
+    rep = os.path.join(C.family_dir("g"), "report")
+    out = os.path.join(root, PUBLISH_DIR)
+    os.makedirs(out, exist_ok=True)
+    runs = [os.path.join(f, "run.json") for e, _, f in RES.registered_runs(root, data) if e["family"] == "g"]
+    runs = [p for p in runs if os.path.exists(p)]
+    store = os.path.join(C.family_dir("g"), "raw", "STORE_SUMMARY.tsv")
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    common = [(os.path.relpath(p, data), RES.sha256(p)) for p in runs + [store]]
+    for name in PUBLISHED:
+        src = os.path.join(rep, f"{name}.tsv")
+        dst = os.path.join(out, f"{name}.tsv")
+        shutil.copyfile(src, dst + ".tmp")
+        os.replace(dst + ".tmp", dst)
+        rel = os.path.relpath(dst, root)
+        prov = [dict(file=rel, sha256="", generated_by=GENERATOR, source=s, source_sha256=h, generated_at=now)
+                for s, h in [(os.path.relpath(src, data), RES.sha256(src))] + common]
+        RES.write_tsv(dst + ".provenance", RES.PROV_COLS, prov)
+    write_doc(root)
+    return len(PUBLISHED)
+
+
+ORGANISMS = ("sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis")
+ORGANISM_NAMES = {"sus_scrofa": "pig", "mus_musculus": "mouse", "homo_sapiens": "human", "macaca_mulatta": "rhesus",
+                  "macaca_fascicularis": "cynomolgus"}
+SUBJECT_NAMES = {"ensembl_rest": "Ensembl REST", "ensembl_rest_lookup": "Ensembl REST `lookup/symbol`",
+                 "biomart": "BioMart", "gprofiler": "g:Profiler", "mygene": "MyGene.info", "hgnc": "HGNC",
+                 "uniprot": "UniProt", "bridgedb": "BridgeDb", "pyensembl": "pyensembl", "orgdb": "org.\\*.eg.db",
+                 "ensdb": "EnsDb 113", "seurat": "Seurat", "gget": "gget", "limma": "limma", "hgnchelper": "HGNChelper",
+                 "ncbi_files": "NCBI's files"}
+GROUPS = ("truly wrong", "right under another reading", "not a question the tool claims", "the service failed")
+
+
+def _pct(x):
+    return "–" if x in (None, "", "nan") or x != x else f"{100 * float(x):.0f}"
+
+
+def doc_tables(root):
+    """{block: Markdown table} of the document's tables, from the published tables (`results/g/main/all/`): `rates`
+    (each tool's rate and idtrack's on the same kept lines, form best, view all, with the kept lines) and `reading`
+    (the reading's groups per tool and task, weighted shares)."""
+    import pandas as pd
+    d = os.path.join(root, PUBLISH_DIR)
+    tt = pd.read_csv(os.path.join(d, "tool_task.tsv"), sep="\t")
+    tt = tt[tt.form == "best"]
+    lines = ["| tool | task | " + " | ".join(ORGANISM_NAMES[o] for o in ORGANISMS) + " |",
+             "| --- | --- | " + " | ".join("---" for _ in ORGANISMS) + " |"]
+    for (s, t), g in tt.groupby(["subject", "task"]):
+        if g.rate_all.isna().all():
+            continue
+        cells = []
+        for o in ORGANISMS:
+            r = g[g.organism == o]
+            if not len(r) or r.rate_all.isna().iloc[0] or r.kept.iloc[0] == 0:
+                cells.append("–")
+                continue
+            r = r.iloc[0]
+            cells.append(f"{_pct(r.rate_all)} / {_pct(r.idtrack_rate_all)} ({int(r.kept):,})")
+        lines.append(f"| {SUBJECT_NAMES.get(s, s)} | {t} | " + " | ".join(cells) + " |")
+    out = {"rates": "\n".join(lines)}
+    rs = pd.read_csv(os.path.join(d, "reading_summary.tsv"), sep="\t")
+    lines = ["| tool | task | tool wrong, read | " + " | ".join(GROUPS) + " | idtrack wrong, read | of them a known limitation |",
+             "| --- | --- | --- | " + " | ".join("---" for _ in GROUPS) + " | --- | --- |"]
+    for _, r in rs.iterrows():
+        lines.append(f"| {SUBJECT_NAMES.get(r.subject, r.subject)} | {r.task} | {int(r.tool_wrong_sampled):,} | "
+                     + " | ".join(_pct(r[g]) for g in GROUPS)
+                     + f" | {int(r.idtrack_wrong_sampled):,} | {_pct(r.idtrack_known_limitation)} |")
+    out["reading"] = "\n".join(lines)
+    return out
+
+
+DOC = os.path.join("docs", "families", "g.md")
+
+
+def doc_block(text, name):
+    """The text between the document's markers of a table (`<!-- table g:<name> -->` ... `<!-- /table -->`)."""
+    start = f"<!-- table g:{name} -->\n"
+    i = text.index(start) + len(start)
+    return i, text.index("\n<!-- /table -->", i)
+
+
+def write_doc(root):
+    """The document's tables (between their markers) written from the published tables."""
+    p = os.path.join(root, DOC)
+    text = open(p).read()
+    for name, table in doc_tables(root).items():
+        i, j = doc_block(text, name)
+        text = text[:i] + table + text[j:]
+    open(p + ".tmp", "w").write(text)
+    os.replace(p + ".tmp", p)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m idtrack_reproducibility.families.g.report", description=__doc__.split("\n\n")[0])
     ap.add_argument("--organisms", default="all")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--publish", action="store_true", help="publish the tables in results/g/ and write the document's "
+                    "tables from them (after `report` and `reading`)")
     a = ap.parse_args(argv)
+    if a.publish:
+        from idtrack_reproducibility.check import ROOT
+        print(publish(ROOT), "tables published")
+        return
     orgs = CFG.ORGANISMS if a.organisms == "all" else a.organisms.split(",")
     print(run(orgs, a.out or os.path.join(C.family_dir("g"), "report")))
 

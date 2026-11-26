@@ -154,10 +154,11 @@ The web lines of the full pass (per organism 50,000 lines; the macaques 40,000) 
 
 ## Results
 
-The passes of 2026-11-24 and 2026-11-25 (one date per service; the dates, versions and endpoints of every response in `raw/STORE_SUMMARY.tsv`), scored from the store with the network off. The tables are `<families>/g/report/`: `tool_task.tsv` (per subject, reading of the input, organism and task: the tier's lines, the lines their source family withdrew (`excluded`), `not_supported`, posed, `not_answered`, left out by the rule of equal truth, kept, right, wrong, undetermined, error under `all` and `best`, the rate with its Wilson interval, coverage, and idtrack's rate on the same kept lines), `not_supported.tsv` (the reasons), `forms.tsv` (per tool the posed lines whose two readings differ and how many change their outcome), `by_distance.tsv`, `speed.tsv`, `failures.tsv`, `disagreements.tsv` with `disagreement_classes.tsv` (every disagreement with idtrack classed by the two verdicts of the common scorer: idtrack wrong, the tool wrong, both wrong, the truth cannot decide; a seeded sample of at most 200 per subject, task and organism stratified by the outcome pair is marked for reading) and the reading's `reading.tsv`, `reading_classes.tsv`, `reading_summary.tsv` (below).
+The passes of 2026-11-24 and 2026-11-25 (one date per service; the dates, versions and endpoints of every response in `raw/STORE_SUMMARY.tsv`), scored from the store with the network off. The tables are made in `<families>/g/report/`; the summary tables are published in this repository, in [`results/g/main/all/`](../../results/g/main/all/) with their provenance (each names its table in the data root, every registered scored folder's `run.json` and the store's summary: `report --publish`), and the per-line tables (`disagreements.tsv`, about a million lines, and `reading.tsv`, every sampled line read) stay in the data root, listed in the family's data manifest (`manifests/families/g.tsv.gz`), as the other families keep their per-line tables in their runs. The tables: `tool_task.tsv` (per subject, reading of the input, organism and task: the tier's lines, the lines their source family withdrew (`excluded`), `not_supported`, posed, `not_answered`, left out by the rule of equal truth, kept, right, wrong, undetermined, error under `all` and `best`, the rate with its Wilson interval, coverage, and idtrack's rate on the same kept lines), `not_supported.tsv` (the reasons), `forms.tsv` (per tool the posed lines whose two readings differ and how many change their outcome), `by_distance.tsv`, `speed.tsv`, `failures.tsv`, `disagreements.tsv` with `disagreement_classes.tsv` (every disagreement with idtrack classed by the two verdicts of the common scorer: idtrack wrong, the tool wrong, both wrong, the truth cannot decide; a seeded sample of at most 200 per subject, task and organism stratified by the outcome pair is marked for reading) and the reading's `reading.tsv`, `reading_classes.tsv`, `reading_summary.tsv` (below).
 
 The rate of each tool and idtrack's rate on the same kept lines, in per cent, with the kept lines (form `best`, view `all`; a dash where the tool cannot pose the task for the organism):
 
+<!-- table g:rates -->
 | tool | task | pig | mouse | human | rhesus | cynomolgus |
 | --- | --- | --- | --- | --- | --- | --- |
 | BioMart | b | 100 / 100 (1,173) | 100 / 100 (1,721) | 100 / 100 (1,478) | 100 / 100 (1,506) | 100 / 100 (2,228) |
@@ -204,6 +205,7 @@ The rate of each tool and idtrack's rate on the same kept lines, in per cent, wi
 | Seurat | c | – | – | 59 / 98 (8,891) | – | – |
 | Seurat | d | – | – | 38 / 99 (3,025) | – | – |
 | UniProt | e | 65 / 100 (3,831) | 48 / 100 (4,226) | 74 / 100 (4,314) | 78 / 100 (3,641) | 75 / 100 (3,812) |
+<!-- /table -->
 
 Only Ensembl REST (`archive/id`) and idtrack pose task a (an old Ensembl id to its gene at 115), 44 to 50 % of the web lines. On symbols (task c), aliases (d) and external identifiers (e) no tool's rate reaches idtrack's on the same kept lines in any organism; on Ensembl ids of 115 (task b) most tools and idtrack are right on every line. The rule of equal truth leaves out at most 4.3 % of a tool's posed lines (BridgeDb at 111; NCBI's files 2.7 %, every other tool 2 % or less). What a tool's wrong lines are is read below: most are questions the tool does not claim to answer, and the rates are not a ranking of the tools' quality on the questions they claim.
 
@@ -219,6 +221,7 @@ A line where **idtrack is wrong** is classed by its cause in the families' runs 
 
 Per tool and task: the sampled lines where the tool is wrong (every organism together) and the weighted shares of the four groups, in per cent; the sampled lines where idtrack is wrong and the weighted share of them that a known limitation states:
 
+<!-- table g:reading -->
 | tool | task | tool wrong, read | truly wrong | right under another reading | not a question the tool claims | the service failed | idtrack wrong, read | of them a known limitation |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | BioMart | c | 311 | 16 | 18 | 66 | 0 | 110 | 83 |
@@ -260,6 +263,7 @@ Per tool and task: the sampled lines where the tool is wrong (every organism tog
 | Seurat | c | 37 | 32 | 24 | 43 | 0 | 36 | 83 |
 | Seurat | d | 134 | 93 | 3 | 4 | 0 | 0 | – |
 | UniProt | e | 771 | 7 | 3 | 90 | 0 | 2 | 100 |
+<!-- /table -->
 
 The rules that keep the comparison fair, each with the reading's measured reason, applied from the stored responses alone (nothing fetched again):
 
@@ -278,7 +282,7 @@ What each tool is not built for (the group "not a question the tool claims", nev
 - **NCBI's files and MyGene.info for pig** link NCBI's genes to Ensembl's annotations of other pig breeds (`ENSSSCG002...`), not to the reference assembly's genes: such a line has no answer of the reference ("another annotation's genes only").
 - **g:Profiler, BridgeDb and MyGene.info on Ensembl ids** (task b) know only the genes of their own databases: an Ensembl gene of the release without an entry there has no answer (their sampled wrong lines of task b are all such misses, "truly wrong").
 
-idtrack's wrong lines (the last two columns): most are a known limitation (bridges where Ensembl's history ends, `L-bridges`; Ensembl's history carrying a gene to another place, `L-history-vs-place`; names from other sources, `L-other-name-sources`; a symbol in another case that is another gene's synonym, or a string held only in another case, `L-case-synonym`; values of another database, `L-other-database-values`; a string that stands for a missing value, refused, `L-missing-values`). The others are new causes, each a row of the maintainers' backlog with a reproducer: the truth's copies on patches or haplotypes in the answer (human NCBI aliases of B5: idtrack answers the primary assembly's gene and reports the copies apart, as its rule of copies apart says, while B5's line lists them in its answer; 51 sampled lines), a gene where the truth names none (names read at an old release whose genes the truth carries to nothing at 115, B1 and B2; 74), and another gene (53: 15 mouse names that only patch genes carry at their own release, 85 to 88, answered with one copy while the truth's copy is reported apart; the rest scattered over B1, B4, B5, B7 and C1).
+idtrack's wrong lines (the last two columns): most are a known limitation (bridges where Ensembl's history ends, `L-bridges`; Ensembl's history carrying a gene to another place, `L-history-vs-place`; names from other sources, `L-other-name-sources`; a symbol in another case that is another gene's synonym, or a string held only in another case, `L-case-synonym`; values of another database, `L-other-database-values`; a string that stands for a missing value, refused, `L-missing-values`). Every class of them is a row of the known-limitations table (`results/limitations/limitations.tsv`, family `g`: its size in G's sample per organism; `families/g/limits_g.py`). The others are new causes, each a row of that table by G's map (`families/g/limitations_map_g.tsv`: `L-alias-copies-in-answer`, `L-old-name-truth-none`, `L-patch-only-name`, `L-g-unread`) and of the maintainers' backlog with a reproducer: the truth's copies on patches or haplotypes in the answer (human NCBI aliases of B5: idtrack answers the primary assembly's gene and reports the copies apart, as its rule of copies apart says, while B5's line lists them in its answer; 51 sampled lines), a gene where the truth names none (names read at an old release whose genes the truth carries to nothing at 115, B1 and B2; 74), and another gene (53: 15 mouse names that only patch genes carry at their own release, 85 to 88, answered with one copy while the truth's copy is reported apart; the rest scattered over B1, B4, B5, B7 and C1).
 
 ## Known limitations
 
@@ -313,4 +317,9 @@ python -m idtrack_reproducibility.families.g.score --subjects all --organisms al
 python -m idtrack_reproducibility.families.g.report
 python -m idtrack_reproducibility.families.g.reading
 python -m idtrack_reproducibility.families.g.store
+# the published tables and this document's tables written from them; G's rows of the known-limitations table;
+# the results' provenance
+python -m idtrack_reproducibility.families.g.report --publish
+idtrack-repro known-limitations --only g
+idtrack-repro results --only g,limitations
 ```

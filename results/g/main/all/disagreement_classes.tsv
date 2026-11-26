@@ -1,0 +1,371 @@
+subject	organism	task	cls	lines	sampled
+biomart	homo_sapiens	c	idtrack wrong	40	37
+biomart	homo_sapiens	c	the tool wrong	1970	38
+biomart	homo_sapiens	c	the truth cannot decide	647	125
+biomart	homo_sapiens	d	the tool wrong	216	92
+biomart	homo_sapiens	d	the truth cannot decide	213	108
+biomart	homo_sapiens	e	idtrack wrong	6	6
+biomart	homo_sapiens	e	the tool wrong	2756	148
+biomart	homo_sapiens	e	the truth cannot decide	46	46
+biomart	macaca_fascicularis	c	the tool wrong	674	93
+biomart	macaca_fascicularis	c	the truth cannot decide	107	107
+biomart	macaca_fascicularis	d	idtrack wrong	11	11
+biomart	macaca_fascicularis	d	the tool wrong	871	173
+biomart	macaca_fascicularis	d	the truth cannot decide	16	16
+biomart	macaca_fascicularis	e	the tool wrong	2409	114
+biomart	macaca_fascicularis	e	the truth cannot decide	86	86
+biomart	macaca_mulatta	c	the tool wrong	589	83
+biomart	macaca_mulatta	c	the truth cannot decide	117	117
+biomart	macaca_mulatta	d	idtrack wrong	7	7
+biomart	macaca_mulatta	d	the tool wrong	598	153
+biomart	macaca_mulatta	d	the truth cannot decide	40	40
+biomart	macaca_mulatta	e	the tool wrong	2533	96
+biomart	macaca_mulatta	e	the truth cannot decide	197	104
+biomart	mus_musculus	c	idtrack wrong	46	43
+biomart	mus_musculus	c	the tool wrong	917	44
+biomart	mus_musculus	c	the truth cannot decide	487	113
+biomart	mus_musculus	d	idtrack wrong	1	1
+biomart	mus_musculus	d	the tool wrong	346	176
+biomart	mus_musculus	d	the truth cannot decide	23	23
+biomart	mus_musculus	e	idtrack wrong	13	13
+biomart	mus_musculus	e	the tool wrong	2619	121
+biomart	mus_musculus	e	the truth cannot decide	66	66
+biomart	sus_scrofa	c	idtrack wrong	30	30
+biomart	sus_scrofa	c	the tool wrong	607	53
+biomart	sus_scrofa	c	the truth cannot decide	163	117
+biomart	sus_scrofa	d	idtrack wrong	9	9
+biomart	sus_scrofa	d	the tool wrong	778	167
+biomart	sus_scrofa	d	the truth cannot decide	24	24
+biomart	sus_scrofa	e	the tool wrong	2673	99
+biomart	sus_scrofa	e	the truth cannot decide	245	101
+bridgedb	homo_sapiens	b	the tool wrong	119	119
+bridgedb	homo_sapiens	c	idtrack wrong	32	32
+bridgedb	homo_sapiens	c	the tool wrong	1978	45
+bridgedb	homo_sapiens	c	the truth cannot decide	186	123
+bridgedb	homo_sapiens	e	idtrack wrong	6	6
+bridgedb	homo_sapiens	e	the tool wrong	2463	148
+bridgedb	homo_sapiens	e	the truth cannot decide	46	46
+bridgedb	macaca_mulatta	b	the tool wrong	15	15
+bridgedb	macaca_mulatta	e	the tool wrong	2624	96
+bridgedb	macaca_mulatta	e	the truth cannot decide	214	104
+bridgedb	mus_musculus	e	idtrack wrong	13	13
+bridgedb	mus_musculus	e	the tool wrong	2641	120
+bridgedb	mus_musculus	e	the truth cannot decide	67	67
+bridgedb	sus_scrofa	b	the tool wrong	81	81
+bridgedb	sus_scrofa	e	the tool wrong	2249	99
+bridgedb	sus_scrofa	e	the truth cannot decide	244	101
+ensdb	homo_sapiens	c	idtrack wrong	368	33
+ensdb	homo_sapiens	c	the tool wrong	22707	34
+ensdb	homo_sapiens	c	the truth cannot decide	5897	133
+ensdb	homo_sapiens	e	idtrack wrong	66	66
+ensdb	homo_sapiens	e	the tool wrong	5492	67
+ensdb	homo_sapiens	e	the truth cannot decide	333	67
+ensdb	macaca_fascicularis	c	the tool wrong	4013	50
+ensdb	macaca_fascicularis	c	the truth cannot decide	1221	150
+ensdb	macaca_fascicularis	e	the tool wrong	2479	100
+ensdb	macaca_fascicularis	e	the truth cannot decide	152	100
+ensdb	macaca_mulatta	c	idtrack wrong	15	15
+ensdb	macaca_mulatta	c	the tool wrong	9966	44
+ensdb	macaca_mulatta	c	the truth cannot decide	1909	141
+ensdb	macaca_mulatta	e	the tool wrong	2787	100
+ensdb	macaca_mulatta	e	the truth cannot decide	535	100
+ensdb	mus_musculus	c	idtrack wrong	325	33
+ensdb	mus_musculus	c	the tool wrong	18973	34
+ensdb	mus_musculus	c	the truth cannot decide	3945	133
+ensdb	mus_musculus	e	idtrack wrong	68	66
+ensdb	mus_musculus	e	the tool wrong	5282	67
+ensdb	mus_musculus	e	the truth cannot decide	388	67
+ensdb	sus_scrofa	c	idtrack wrong	81	33
+ensdb	sus_scrofa	c	the tool wrong	6886	34
+ensdb	sus_scrofa	c	the truth cannot decide	2012	133
+ensdb	sus_scrofa	e	the tool wrong	2078	96
+ensdb	sus_scrofa	e	the truth cannot decide	564	104
+ensembl_rest	homo_sapiens	a	idtrack wrong	127	39
+ensembl_rest	homo_sapiens	a	the tool wrong	1113	39
+ensembl_rest	homo_sapiens	a	the truth cannot decide	1634	122
+ensembl_rest	homo_sapiens	c	idtrack wrong	26	26
+ensembl_rest	homo_sapiens	c	the tool wrong	2182	61
+ensembl_rest	homo_sapiens	c	the truth cannot decide	645	113
+ensembl_rest	homo_sapiens	d	idtrack wrong	1	1
+ensembl_rest	homo_sapiens	d	the tool wrong	360	87
+ensembl_rest	homo_sapiens	d	the truth cannot decide	214	112
+ensembl_rest	homo_sapiens	e	idtrack wrong	7	7
+ensembl_rest	homo_sapiens	e	the tool wrong	3048	98
+ensembl_rest	homo_sapiens	e	the truth cannot decide	95	95
+ensembl_rest	macaca_fascicularis	a	the truth cannot decide	255	200
+ensembl_rest	macaca_fascicularis	c	the tool wrong	365	117
+ensembl_rest	macaca_fascicularis	c	the truth cannot decide	88	83
+ensembl_rest	macaca_fascicularis	d	idtrack wrong	11	11
+ensembl_rest	macaca_fascicularis	d	the tool wrong	726	172
+ensembl_rest	macaca_fascicularis	d	the truth cannot decide	17	17
+ensembl_rest	macaca_fascicularis	e	the tool wrong	2307	115
+ensembl_rest	macaca_fascicularis	e	the truth cannot decide	85	85
+ensembl_rest	macaca_mulatta	a	the tool wrong	3189	67
+ensembl_rest	macaca_mulatta	a	the truth cannot decide	1314	133
+ensembl_rest	macaca_mulatta	c	the tool wrong	327	105
+ensembl_rest	macaca_mulatta	c	the truth cannot decide	115	95
+ensembl_rest	macaca_mulatta	d	idtrack wrong	7	7
+ensembl_rest	macaca_mulatta	d	the tool wrong	444	158
+ensembl_rest	macaca_mulatta	d	the truth cannot decide	35	35
+ensembl_rest	macaca_mulatta	e	the tool wrong	2602	96
+ensembl_rest	macaca_mulatta	e	the truth cannot decide	214	104
+ensembl_rest	mus_musculus	a	idtrack wrong	79	46
+ensembl_rest	mus_musculus	a	the tool wrong	1490	46
+ensembl_rest	mus_musculus	a	the truth cannot decide	1606	108
+ensembl_rest	mus_musculus	c	idtrack wrong	44	31
+ensembl_rest	mus_musculus	c	the tool wrong	656	62
+ensembl_rest	mus_musculus	c	the truth cannot decide	366	107
+ensembl_rest	mus_musculus	d	idtrack wrong	1	1
+ensembl_rest	mus_musculus	d	the tool wrong	316	170
+ensembl_rest	mus_musculus	d	the truth cannot decide	29	29
+ensembl_rest	mus_musculus	e	idtrack wrong	13	13
+ensembl_rest	mus_musculus	e	the tool wrong	2637	121
+ensembl_rest	mus_musculus	e	the truth cannot decide	66	66
+ensembl_rest	sus_scrofa	a	idtrack wrong	11	11
+ensembl_rest	sus_scrofa	a	the tool wrong	4681	55
+ensembl_rest	sus_scrofa	a	the truth cannot decide	1821	134
+ensembl_rest	sus_scrofa	c	idtrack wrong	19	19
+ensembl_rest	sus_scrofa	c	the tool wrong	383	88
+ensembl_rest	sus_scrofa	c	the truth cannot decide	116	93
+ensembl_rest	sus_scrofa	d	idtrack wrong	9	9
+ensembl_rest	sus_scrofa	d	the tool wrong	491	159
+ensembl_rest	sus_scrofa	d	the truth cannot decide	32	32
+ensembl_rest	sus_scrofa	e	the tool wrong	2572	99
+ensembl_rest	sus_scrofa	e	the truth cannot decide	245	101
+ensembl_rest_lookup	homo_sapiens	c	idtrack wrong	41	41
+ensembl_rest_lookup	homo_sapiens	c	the tool wrong	2239	45
+ensembl_rest_lookup	homo_sapiens	c	the truth cannot decide	191	114
+ensembl_rest_lookup	homo_sapiens	d	idtrack wrong	1	1
+ensembl_rest_lookup	homo_sapiens	d	the tool wrong	2554	166
+ensembl_rest_lookup	homo_sapiens	d	the truth cannot decide	33	33
+ensembl_rest_lookup	macaca_fascicularis	c	the tool wrong	1023	95
+ensembl_rest_lookup	macaca_fascicularis	c	the truth cannot decide	105	105
+ensembl_rest_lookup	macaca_fascicularis	d	idtrack wrong	11	11
+ensembl_rest_lookup	macaca_fascicularis	d	the tool wrong	900	173
+ensembl_rest_lookup	macaca_fascicularis	d	the truth cannot decide	16	16
+ensembl_rest_lookup	macaca_mulatta	c	the tool wrong	604	76
+ensembl_rest_lookup	macaca_mulatta	c	the truth cannot decide	124	124
+ensembl_rest_lookup	macaca_mulatta	d	idtrack wrong	7	7
+ensembl_rest_lookup	macaca_mulatta	d	the tool wrong	2135	178
+ensembl_rest_lookup	macaca_mulatta	d	the truth cannot decide	15	15
+ensembl_rest_lookup	mus_musculus	c	idtrack wrong	51	42
+ensembl_rest_lookup	mus_musculus	c	the tool wrong	1212	43
+ensembl_rest_lookup	mus_musculus	c	the truth cannot decide	487	115
+ensembl_rest_lookup	mus_musculus	d	idtrack wrong	1	1
+ensembl_rest_lookup	mus_musculus	d	the tool wrong	2630	173
+ensembl_rest_lookup	mus_musculus	d	the truth cannot decide	26	26
+ensembl_rest_lookup	sus_scrofa	c	idtrack wrong	28	28
+ensembl_rest_lookup	sus_scrofa	c	the tool wrong	621	54
+ensembl_rest_lookup	sus_scrofa	c	the truth cannot decide	163	118
+ensembl_rest_lookup	sus_scrofa	d	idtrack wrong	9	9
+ensembl_rest_lookup	sus_scrofa	d	the tool wrong	2141	163
+ensembl_rest_lookup	sus_scrofa	d	the truth cannot decide	28	28
+gprofiler	homo_sapiens	b	the tool wrong	142	142
+gprofiler	homo_sapiens	c	idtrack wrong	32	32
+gprofiler	homo_sapiens	c	the tool wrong	2209	45
+gprofiler	homo_sapiens	c	the truth cannot decide	176	123
+gprofiler	homo_sapiens	d	idtrack wrong	1	1
+gprofiler	homo_sapiens	d	the tool wrong	2982	166
+gprofiler	homo_sapiens	d	the truth cannot decide	33	33
+gprofiler	homo_sapiens	e	idtrack wrong	7	7
+gprofiler	homo_sapiens	e	the tool wrong	2733	145
+gprofiler	homo_sapiens	e	the truth cannot decide	48	48
+gprofiler	macaca_fascicularis	c	the tool wrong	560	119
+gprofiler	macaca_fascicularis	c	the truth cannot decide	81	81
+gprofiler	macaca_fascicularis	d	idtrack wrong	11	11
+gprofiler	macaca_fascicularis	d	the tool wrong	1180	173
+gprofiler	macaca_fascicularis	d	the truth cannot decide	16	16
+gprofiler	macaca_fascicularis	e	the tool wrong	2341	114
+gprofiler	macaca_fascicularis	e	the truth cannot decide	86	86
+gprofiler	macaca_mulatta	c	the tool wrong	568	87
+gprofiler	macaca_mulatta	c	the truth cannot decide	113	113
+gprofiler	macaca_mulatta	d	idtrack wrong	7	7
+gprofiler	macaca_mulatta	d	the tool wrong	2679	179
+gprofiler	macaca_mulatta	d	the truth cannot decide	14	14
+gprofiler	macaca_mulatta	e	the tool wrong	2599	96
+gprofiler	macaca_mulatta	e	the truth cannot decide	214	104
+gprofiler	mus_musculus	c	idtrack wrong	44	43
+gprofiler	mus_musculus	c	the tool wrong	913	44
+gprofiler	mus_musculus	c	the truth cannot decide	359	113
+gprofiler	mus_musculus	d	idtrack wrong	1	1
+gprofiler	mus_musculus	d	the tool wrong	3093	174
+gprofiler	mus_musculus	d	the truth cannot decide	25	25
+gprofiler	mus_musculus	e	idtrack wrong	13	13
+gprofiler	mus_musculus	e	the tool wrong	2611	119
+gprofiler	mus_musculus	e	the truth cannot decide	68	68
+gprofiler	sus_scrofa	c	idtrack wrong	19	19
+gprofiler	sus_scrofa	c	the tool wrong	515	68
+gprofiler	sus_scrofa	c	the truth cannot decide	115	113
+gprofiler	sus_scrofa	d	idtrack wrong	9	9
+gprofiler	sus_scrofa	d	the tool wrong	2453	165
+gprofiler	sus_scrofa	d	the truth cannot decide	26	26
+gprofiler	sus_scrofa	e	the tool wrong	2546	99
+gprofiler	sus_scrofa	e	the truth cannot decide	245	101
+hgnc	homo_sapiens	c	idtrack wrong	38	38
+hgnc	homo_sapiens	c	the tool wrong	1985	46
+hgnc	homo_sapiens	c	the truth cannot decide	192	116
+hgnc	homo_sapiens	d	the tool wrong	203	177
+hgnc	homo_sapiens	d	the truth cannot decide	23	23
+hgnc	homo_sapiens	e	idtrack wrong	6	6
+hgnc	homo_sapiens	e	the tool wrong	4665	148
+hgnc	homo_sapiens	e	the truth cannot decide	46	46
+hgnchelper	homo_sapiens	c	idtrack wrong	785	33
+hgnchelper	homo_sapiens	c	the tool wrong	24128	34
+hgnchelper	homo_sapiens	c	the truth cannot decide	5013	133
+hgnchelper	homo_sapiens	d	idtrack wrong	8	8
+hgnchelper	homo_sapiens	d	the tool wrong	5018	45
+hgnchelper	homo_sapiens	d	the truth cannot decide	1738	147
+hgnchelper	mus_musculus	c	idtrack wrong	521	33
+hgnchelper	mus_musculus	c	the tool wrong	21602	34
+hgnchelper	mus_musculus	c	the truth cannot decide	4814	133
+hgnchelper	mus_musculus	d	idtrack wrong	18	18
+hgnchelper	mus_musculus	d	the tool wrong	23680	57
+hgnchelper	mus_musculus	d	the truth cannot decide	291	125
+limma	homo_sapiens	c	idtrack wrong	800	33
+limma	homo_sapiens	c	the tool wrong	24061	34
+limma	homo_sapiens	c	the truth cannot decide	5015	133
+limma	homo_sapiens	d	idtrack wrong	70	37
+limma	homo_sapiens	d	the tool wrong	9650	38
+limma	homo_sapiens	d	the truth cannot decide	1387	125
+limma	mus_musculus	c	idtrack wrong	433	33
+limma	mus_musculus	c	the tool wrong	27998	34
+limma	mus_musculus	c	the truth cannot decide	4467	133
+limma	mus_musculus	d	idtrack wrong	9	9
+limma	mus_musculus	d	the tool wrong	7114	60
+limma	mus_musculus	d	the truth cannot decide	239	131
+mygene	homo_sapiens	c	idtrack wrong	46	36
+mygene	homo_sapiens	c	the tool wrong	1925	37
+mygene	homo_sapiens	c	the truth cannot decide	621	127
+mygene	homo_sapiens	d	idtrack wrong	8	8
+mygene	homo_sapiens	d	the tool wrong	697	86
+mygene	homo_sapiens	d	the truth cannot decide	148	106
+mygene	homo_sapiens	e	idtrack wrong	3	3
+mygene	homo_sapiens	e	the tool wrong	2848	101
+mygene	homo_sapiens	e	the truth cannot decide	96	96
+mygene	macaca_fascicularis	c	the tool wrong	1136	122
+mygene	macaca_fascicularis	c	the truth cannot decide	78	78
+mygene	macaca_fascicularis	d	the tool wrong	360	184
+mygene	macaca_fascicularis	d	the truth cannot decide	16	16
+mygene	macaca_fascicularis	e	the tool wrong	3290	117
+mygene	macaca_fascicularis	e	the truth cannot decide	83	83
+mygene	macaca_mulatta	b	the tool wrong	17	17
+mygene	macaca_mulatta	c	the tool wrong	745	73
+mygene	macaca_mulatta	c	the truth cannot decide	127	127
+mygene	macaca_mulatta	d	idtrack wrong	1	1
+mygene	macaca_mulatta	d	the tool wrong	231	193
+mygene	macaca_mulatta	d	the truth cannot decide	6	6
+mygene	macaca_mulatta	e	the tool wrong	3893	88
+mygene	macaca_mulatta	e	the truth cannot decide	223	112
+mygene	mus_musculus	c	idtrack wrong	45	43
+mygene	mus_musculus	c	the tool wrong	973	43
+mygene	mus_musculus	c	the truth cannot decide	480	114
+mygene	mus_musculus	d	idtrack wrong	1	1
+mygene	mus_musculus	d	the tool wrong	624	169
+mygene	mus_musculus	d	the truth cannot decide	30	30
+mygene	mus_musculus	e	idtrack wrong	12	12
+mygene	mus_musculus	e	the tool wrong	2630	127
+mygene	mus_musculus	e	the truth cannot decide	61	61
+mygene	sus_scrofa	b	the tool wrong	25	25
+mygene	sus_scrofa	c	idtrack wrong	20	20
+mygene	sus_scrofa	c	the tool wrong	664	55
+mygene	sus_scrofa	c	the truth cannot decide	171	125
+mygene	sus_scrofa	d	idtrack wrong	2	2
+mygene	sus_scrofa	d	the tool wrong	178	178
+mygene	sus_scrofa	d	the truth cannot decide	16	16
+mygene	sus_scrofa	e	the tool wrong	3985	80
+mygene	sus_scrofa	e	the truth cannot decide	234	120
+ncbi_files	homo_sapiens	c	idtrack wrong	707	33
+ncbi_files	homo_sapiens	c	the tool wrong	24257	34
+ncbi_files	homo_sapiens	c	the truth cannot decide	2188	133
+ncbi_files	homo_sapiens	d	idtrack wrong	10	10
+ncbi_files	homo_sapiens	d	the tool wrong	8913	47
+ncbi_files	homo_sapiens	d	the truth cannot decide	252	143
+ncbi_files	homo_sapiens	e	idtrack wrong	36	36
+ncbi_files	homo_sapiens	e	the tool wrong	11810	50
+ncbi_files	homo_sapiens	e	the truth cannot decide	410	114
+ncbi_files	macaca_fascicularis	c	the tool wrong	23500	66
+ncbi_files	macaca_fascicularis	c	the truth cannot decide	9558	134
+ncbi_files	macaca_fascicularis	d	idtrack wrong	9	9
+ncbi_files	macaca_fascicularis	d	the tool wrong	1727	136
+ncbi_files	macaca_fascicularis	d	the truth cannot decide	55	55
+ncbi_files	macaca_fascicularis	e	the tool wrong	15908	99
+ncbi_files	macaca_fascicularis	e	the truth cannot decide	305	101
+ncbi_files	macaca_mulatta	c	idtrack wrong	7	7
+ncbi_files	macaca_mulatta	c	the tool wrong	13720	44
+ncbi_files	macaca_mulatta	c	the truth cannot decide	3109	149
+ncbi_files	macaca_mulatta	d	both wrong	1	1
+ncbi_files	macaca_mulatta	d	idtrack wrong	18	18
+ncbi_files	macaca_mulatta	d	the tool wrong	1374	105
+ncbi_files	macaca_mulatta	d	the truth cannot decide	76	76
+ncbi_files	macaca_mulatta	e	the tool wrong	15934	67
+ncbi_files	macaca_mulatta	e	the truth cannot decide	1564	133
+ncbi_files	mus_musculus	c	idtrack wrong	443	33
+ncbi_files	mus_musculus	c	the tool wrong	31495	34
+ncbi_files	mus_musculus	c	the truth cannot decide	4937	133
+ncbi_files	mus_musculus	d	idtrack wrong	10	10
+ncbi_files	mus_musculus	d	the tool wrong	6331	59
+ncbi_files	mus_musculus	d	the truth cannot decide	236	131
+ncbi_files	mus_musculus	e	idtrack wrong	51	43
+ncbi_files	mus_musculus	e	the tool wrong	13182	43
+ncbi_files	mus_musculus	e	the truth cannot decide	425	114
+ncbi_files	sus_scrofa	c	idtrack wrong	106	48
+ncbi_files	sus_scrofa	c	the tool wrong	56909	48
+ncbi_files	sus_scrofa	c	the truth cannot decide	9318	104
+ncbi_files	sus_scrofa	d	idtrack wrong	48	48
+ncbi_files	sus_scrofa	d	the tool wrong	9130	73
+ncbi_files	sus_scrofa	d	the truth cannot decide	177	79
+ncbi_files	sus_scrofa	e	the tool wrong	25865	95
+ncbi_files	sus_scrofa	e	the truth cannot decide	1519	105
+orgdb	homo_sapiens	c	idtrack wrong	678	33
+orgdb	homo_sapiens	c	the tool wrong	25451	34
+orgdb	homo_sapiens	c	the truth cannot decide	4874	133
+orgdb	homo_sapiens	d	idtrack wrong	73	37
+orgdb	homo_sapiens	d	the tool wrong	9403	38
+orgdb	homo_sapiens	d	the truth cannot decide	1542	125
+orgdb	homo_sapiens	e	idtrack wrong	76	48
+orgdb	homo_sapiens	e	the tool wrong	32846	49
+orgdb	homo_sapiens	e	the truth cannot decide	713	103
+orgdb	macaca_mulatta	c	idtrack wrong	1	1
+orgdb	macaca_mulatta	c	the tool wrong	14604	44
+orgdb	macaca_mulatta	c	the truth cannot decide	2230	155
+orgdb	macaca_mulatta	e	the tool wrong	21713	67
+orgdb	macaca_mulatta	e	the truth cannot decide	2178	133
+orgdb	mus_musculus	c	idtrack wrong	443	33
+orgdb	mus_musculus	c	the tool wrong	31307	34
+orgdb	mus_musculus	c	the truth cannot decide	4825	133
+orgdb	mus_musculus	d	idtrack wrong	9	9
+orgdb	mus_musculus	d	the tool wrong	7075	51
+orgdb	mus_musculus	d	the truth cannot decide	278	140
+orgdb	mus_musculus	e	idtrack wrong	74	54
+orgdb	mus_musculus	e	the tool wrong	26522	54
+orgdb	mus_musculus	e	the truth cannot decide	728	92
+pyensembl	homo_sapiens	c	idtrack wrong	501	33
+pyensembl	homo_sapiens	c	the tool wrong	23766	34
+pyensembl	homo_sapiens	c	the truth cannot decide	6448	133
+pyensembl	macaca_fascicularis	c	the tool wrong	3946	53
+pyensembl	macaca_fascicularis	c	the truth cannot decide	1164	147
+pyensembl	macaca_mulatta	c	idtrack wrong	27	27
+pyensembl	macaca_mulatta	c	the tool wrong	9708	41
+pyensembl	macaca_mulatta	c	the truth cannot decide	1889	132
+pyensembl	mus_musculus	c	idtrack wrong	1438	33
+pyensembl	mus_musculus	c	the tool wrong	19344	34
+pyensembl	mus_musculus	c	the truth cannot decide	4201	133
+pyensembl	sus_scrofa	c	idtrack wrong	95	35
+pyensembl	sus_scrofa	c	the tool wrong	7457	35
+pyensembl	sus_scrofa	c	the truth cannot decide	2113	130
+seurat	homo_sapiens	c	idtrack wrong	63	36
+seurat	homo_sapiens	c	the tool wrong	2718	37
+seurat	homo_sapiens	c	the truth cannot decide	480	127
+seurat	homo_sapiens	d	the tool wrong	1644	134
+seurat	homo_sapiens	d	the truth cannot decide	66	66
+uniprot	homo_sapiens	e	the tool wrong	1114	185
+uniprot	homo_sapiens	e	the truth cannot decide	15	15
+uniprot	macaca_fascicularis	e	the tool wrong	942	151
+uniprot	macaca_fascicularis	e	the truth cannot decide	49	49
+uniprot	macaca_mulatta	e	the tool wrong	788	128
+uniprot	macaca_mulatta	e	the truth cannot decide	72	72
+uniprot	mus_musculus	e	idtrack wrong	2	2
+uniprot	mus_musculus	e	the tool wrong	2198	167
+uniprot	mus_musculus	e	the truth cannot decide	31	31
+uniprot	sus_scrofa	e	the tool wrong	1356	140
+uniprot	sus_scrofa	e	the truth cannot decide	60	60

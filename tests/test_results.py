@@ -104,3 +104,108 @@ def test_regenerating_replaces(tmp_path, data_root):
     open(os.path.join(old, "report.tsv"), "w").write("an earlier tree's table\n")
     RES.collect(repo)
     assert not os.path.exists(os.path.join(old, "report.tsv"))
+
+
+def make_comparison(tmp_path, data_root):
+    """A family that compares subjects: the tree's own run and another tool's (`subject`), one organism each."""
+    repo = tmp_path / "repo"
+    (repo / "results").mkdir(parents=True)
+    (repo / "results.toml").write_text(
+        '[[run]]\nfamily = "y"\ntree = "t1"\ncommit = "c0ffee"\nform = "stated"\norganisms = ["sus_scrofa"]\n'
+        'folder = "families/y/runs/tree/{organism}"\nfiles = {}\n'
+        '[[run]]\nfamily = "y"\ntree = "t1"\ncommit = "c0ffee"\nsubject = "tool1"\nform = "best"\norganisms = ["sus_scrofa"]\n'
+        'folder = "families/y/runs/tool1/{organism}"\nfiles = {}\n')
+    runs = {}
+    for name, subject, form in (("tree", None, "stated"), ("tool1", "tool1", "best")):
+        run = data_root / "families" / "y" / "runs" / name / "sus_scrofa"
+        run.mkdir(parents=True)
+        write_outcomes(run, 2)
+        info = dict(record_version=1, n_rows=2, family="y", organism="sus_scrofa", key="k1", y=dict(form=form))
+        if subject:
+            info["subject"] = dict(kind="tool", name=subject)
+        json.dump(info, open(run / "run.json", "w"))
+        runs[name] = run
+    return str(repo), runs
+
+
+def test_a_registered_run_is_of_its_subject_and_reading(tmp_path, data_root):
+    repo, runs = make_comparison(tmp_path, data_root)
+    problems = []
+    RES.subjects_behind(repo, str(data_root), problems)
+    assert problems == []
+    info = json.load(open(runs["tool1"] / "run.json"))
+    json.dump(dict(info, subject=dict(kind="tool", name="tool2"), y=dict(form="stated")), open(runs["tool1"] / "run.json", "w"))
+    info = json.load(open(runs["tree"] / "run.json"))
+    json.dump(dict(info, subject=dict(kind="tool", name="tool1")), open(runs["tree"] / "run.json", "w"))
+    RES.subjects_behind(repo, str(data_root), problems)
+    assert sorted(p[2] for p in problems) == [
+        "the folder's reading of the input is stated, the registry's best",
+        "the folder's subject is tool1, the registry's the tree",
+        "the folder's subject is tool2, the registry's tool1"]
+
+
+def test_a_comparison_of_subjects_is_judged_by_todays_judge(tmp_path, data_root, monkeypatch):
+    repo, runs = make_comparison(tmp_path, data_root)
+    monkeypatch.setattr(RES, "judged_today", lambda info: "k1")
+    problems = []
+    RES.judges_behind(repo, str(data_root), problems)
+    assert problems == []
+    monkeypatch.setattr(RES, "judged_today", lambda info: "k2")  # the judge or the truth changed since the scoring
+    RES.judges_behind(repo, str(data_root), problems)
+    assert len(problems) == 2 and all("scored under another judge" in p[2] for p in problems)
+    # a family of one subject records the judge it was scored with: not held to today's here (rescore brings it)
+    problems = []
+    open(os.path.join(repo, "results.toml"), "w").write(open(os.path.join(repo, "results.toml")).read()
+                                                        .replace('subject = "tool1"\n', ""))
+    RES.judges_behind(repo, str(data_root), problems)
+    assert problems == []
+
+
+def test_a_familys_generated_tables_are_made_from_its_registered_runs(tmp_path, data_root):
+    repo, runs = make_comparison(tmp_path, data_root)
+    with open(os.path.join(repo, "results.toml"), "a") as fo:
+        fo.write('[[generated]]\nfamily = "y"\ngenerated_by = "make y"\nfiles = ["results/y/all/*.tsv"]\n')
+    os.makedirs(os.path.join(repo, "results", "y", "all"))
+    t = os.path.join(repo, "results", "y", "all", "table.tsv")
+    open(t, "w").write("a\n1\n")
+    srcs = [os.path.relpath(runs[n] / "run.json", data_root) for n in ("tree", "tool1")]
+    RES.write_tsv(t + ".provenance", RES.PROV_COLS, [dict(file="results/y/all/table.tsv", source=s) for s in srcs])
+    problems = []
+    RES.tables_behind(repo, str(data_root), problems)
+    assert problems == []
+    RES.write_tsv(t + ".provenance", RES.PROV_COLS, [dict(file="results/y/all/table.tsv", source=srcs[0])])
+    RES.tables_behind(repo, str(data_root), problems)
+    assert [p[2] for p in problems] == [f"not made from the registered run {srcs[1]}"]
+
+
+def test_a_store_of_fetched_responses_matches_its_manifest(tmp_path, data_root):
+    import gzip
+    repo, runs = make_comparison(tmp_path, data_root)
+    with open(os.path.join(repo, "results.toml"), "a") as fo:
+        fo.write('[[store]]\nfamily = "y"\nfolder = "families/y/raw"\nmanifest = "families/y/raw/STORE.tsv"\n')
+    os.makedirs(os.path.join(repo, "manifests", "families"))
+    open(os.path.join(repo, "manifests", "areas.toml"), "w").write(
+        '[[area]]\nname = "families/y"\nfolders = ["families/y/raw"]\nexclude = [\'\\.log$\']\n')
+    raw = data_root / "families" / "y" / "raw"
+    (raw / "t" / "v" / "sus_scrofa").mkdir(parents=True)
+    (raw / "t" / "v" / "sus_scrofa" / "aa.json").write_text("{}")
+    (raw / "_r_work").mkdir()
+    (raw / "_r_work" / "call.log").write_text("log\n")  # a file the data manifest's area leaves out
+    (raw / "STORE.tsv").write_text("area\ttool\tversion\torganism\tfile\tbytes\tsha256\n"
+                                   "store\tt\tv\tsus_scrofa\taa.json\t2\th1\n_r_work\t\t\t\t_r_work/call.log\t4\th2\n")
+    with gzip.open(os.path.join(repo, "manifests", "families", "y.tsv.gz"), "wt") as fo:
+        fo.write("path\tbytes\tsha256\nfamilies/y/raw/t/v/sus_scrofa/aa.json\t2\th1\n")
+    problems = []
+    RES.stores_behind(repo, str(data_root), problems)
+    assert problems == []
+    with gzip.open(os.path.join(repo, "manifests", "families", "y.tsv.gz"), "wt") as fo:
+        fo.write("path\tbytes\tsha256\nfamilies/y/raw/t/v/sus_scrofa/aa.json\t2\th9\n")
+    RES.stores_behind(repo, str(data_root), problems)
+    assert [p[2] for p in problems] == ["the store's manifest and the data manifest differ in size or sha256"]
+    problems = []
+    (raw / "_r_work" / "call.log").write_text("a longer log\n")
+    with gzip.open(os.path.join(repo, "manifests", "families", "y.tsv.gz"), "wt") as fo:
+        fo.write("path\tbytes\tsha256\n")
+    RES.stores_behind(repo, str(data_root), problems)
+    assert sorted(p[0:2] for p in problems) == [("results", "families/y/raw/_r_work/call.log"),
+                                                ("results", "families/y/raw/t/v/sus_scrofa/aa.json")]

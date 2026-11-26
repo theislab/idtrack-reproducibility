@@ -9,7 +9,8 @@ The builders: the harness's sets (`f0` runs; F0's map of the residual causes), `
 (`limits_a`: the causes with A's map plus the undetermined answers by reason; A0's summaries with `--a0`), `e`
 (`limits_e`, judge `now`: what users get from the tree), `c` (F0's builder with C's map), `d` (`limits_d`); and
 `f` (`limits_f`: F's causes with its map, the undetermined answers by reason and the checks that do not
-hold, from each run's scorings `scores_gene` and `scores_symbol`); `b` (`limits_b`: B's map of the wrong answers'
+hold, from each run's scorings `scores_gene` and `scores_symbol`); `g` (`limits_g`: idtrack's wrong lines of G's read
+sample, by known limitation and G's map of new causes; another tool's runs have no rows); `b` (`limits_b`: B's map of the wrong answers'
 classes and B2's names whose old gene ended, from `scores_now` and `report_b.tsv`); and `outcomes` for a registry entry that says `limits = "outcomes"` (`limits_outcomes`: the class of a wrong answer read
 from its stratum and the answer, with the family's `limitations_map_outcomes.tsv`; the scored folders of the entry's
 `scored`), for sets whose wrong answers need no cause classification.
@@ -38,6 +39,7 @@ BUILDERS = {
     "d": ("d", "{py} -m idtrack_reproducibility.families.d.limits_d --out {out} {runs}"),
     "f": ("f", "{py} -m idtrack_reproducibility.families.f.limits_f --out {out} {runs}"),
     "b": ("b", "{py} -m idtrack_reproducibility.families.b.limits_b --out {out} {runs}"),
+    "g": ("g", "{py} -m idtrack_reproducibility.families.g.limits_g --out {out} {runs}"),
     "outcomes": ("{family}", "{py} -m idtrack_reproducibility.families.limits_outcomes --family {family} --map "
                              "{src}/idtrack_reproducibility/families/{family}/limitations_map_outcomes.tsv --out {out} {runs}"),
 }
@@ -56,6 +58,8 @@ def main(argv=None):
     now = datetime.datetime.now().isoformat(timespec="seconds")
     for e in reg.get("run", []):
         fam = e["family"]
+        if e.get("subject"):
+            continue  # another tool's runs (family G): the table states idtrack's limitations, read from idtrack's runs
         if fam == "a" and "/a0/" in e["folder"]:
             fam = "a0"  # A0, graph fidelity: its own builder over its summaries
         elif "/runs/" not in e["folder"] and not (e["folder"].startswith("modest/") and e.get("limits")):
@@ -73,7 +77,9 @@ def main(argv=None):
         runs = [r for r in runs if fam == "outcomes" or os.path.exists(os.path.join(r, "causes.tsv.gz")) or
                 os.path.exists(os.path.join(r, "scores_now", "causes.tsv.gz")) or
                 (fam == "f" and glob.glob(os.path.join(r, "scores_*", "causes.tsv.gz"))) or
-                (fam == "a0" and os.path.exists(os.path.join(r, "summary.tsv")))]  # a run whose answers were classified
+                (fam == "a0" and os.path.exists(os.path.join(r, "summary.tsv"))) or
+                (fam == "g" and os.path.exists(os.path.join(r, "run.json")))]  # a run whose answers were classified
+        # (G: its answers are classified by the reading of its sample, report/reading.tsv, a source below)
         if not runs or out in seen:
             continue
         seen.add(out)
@@ -91,13 +97,15 @@ def main(argv=None):
         srcs = []
         for r in runs:
             for f in ("causes.tsv.gz", "scores_now/causes.tsv.gz", "report.tsv", "scores_now/report.tsv",
-                      "undetermined.tsv.gz", "e_summary.tsv", "summary.tsv") + (("run.json",) if fam == "outcomes" else ()) + \
+                      "undetermined.tsv.gz", "e_summary.tsv", "summary.tsv") + (("run.json",) if fam in ("outcomes", "g") else ()) + \
                     (tuple(f"scores_{c}/{x}" for c in ("gene", "symbol") for x in ("causes.tsv.gz", "report.tsv",
                                                                                   "undetermined.tsv.gz")) + ("f_checks.tsv",)
                      if fam == "f" else ()):
                 p = os.path.join(r, f)
                 if os.path.exists(p):
                     srcs.append(p)
+        if fam == "g":
+            srcs.append(os.path.join(data, "families", "g", "report", "reading.tsv"))
         prov = [dict(file=os.path.relpath(out, ROOT), sha256="", generated_by=cmd.replace(sys.executable, "python")
                      .replace(data + os.sep, "<data>/").replace(CFG.SRC + os.sep, "").replace(ROOT + os.sep, ""), source=os.path.relpath(p, data), source_sha256=RES.sha256(p),
                      scored_at="", commit=e["commit"], graph_digest="", generated_at=now) for p in srcs]

@@ -211,6 +211,118 @@ def rows_behind(root, data, problems):
                                      f"{RECORD_VERSION}: score it again (idtrack-repro rescore)"))
 
 
+def registered_runs(root, data):
+    """[(entry, organism, scored folder)] of every run the registry names (each scored folder of an entry's `scored`)."""
+    out = []
+    for e in registry(root).get("run", []):
+        for org in e["organisms"]:
+            base = os.path.join(data, e["folder"].format(organism=org))
+            out += [(e, org, os.path.dirname(os.path.join(base, rj))) for rj in e.get("scored") or ["run.json"]]
+    return out
+
+
+def subjects_behind(root, data, problems):
+    """A registered run's scored folders are of the entry's subject and reading: run.json names the entry's `subject`
+    (an entry without one is a tree's own run, whose run.json names no subject; docs/records.md, "Another tool") and,
+    where the entry names a `form`, the family's block of run.json records that form."""
+    for e, org, folder in registered_runs(root, data):
+        p = os.path.join(folder, "run.json")
+        if not os.path.exists(p):
+            continue  # reported by rows_behind
+        info = json.load(open(p))
+        rel = os.path.relpath(folder, data)
+        named = (info.get("subject") or {}).get("name")
+        if named != e.get("subject"):
+            problems.append(("results", rel, f"the folder's subject is {named or 'the tree'}, the registry's "
+                             f"{e.get('subject') or 'the tree'}"))
+        if e.get("form") and (info.get(e["family"]) or {}).get("form") != e["form"]:
+            problems.append(("results", rel, f"the folder's reading of the input is "
+                             f"{(info.get(e['family']) or {}).get('form')}, the registry's {e['form']}"))
+
+
+def judged_today(info):
+    """The scoring key the common scorer gives a scored folder's selection today (`scorer.scoring_key`: its sets with
+    the revisions published since, the record version and the code of the judge), or None where run.json records no
+    key (a scoring made before keys were recorded)."""
+    import types
+    from .families import scorer as SC
+    if not info.get("key"):
+        return None
+    a = types.SimpleNamespace(family=info["family"], organism=info["organism"], judge=info.get("judge"),
+                              sets=list((info.get("sets") or {}).keys()), within=info.get("within"),
+                              strata=info.get("strata"), kinds=info.get("kinds"), limit=info.get("limit"),
+                              parts=info.get("parts"))
+    return SC.scoring_key(a)
+
+
+def judges_behind(root, data, problems):
+    """A family whose registered runs compare subjects (entries with `subject`) is a comparison under one judge:
+    every scored folder of the family holds the scoring key the scorer gives it today, so that every subject is
+    judged by today's judge on today's truth (a family of one subject records the judge it was scored with, and
+    `rescore` brings it to today's)."""
+    runs = registered_runs(root, data)
+    compared = {e["family"] for e, _, _ in runs if e.get("subject")}
+    for e, org, folder in runs:
+        p = os.path.join(folder, "run.json")
+        if e["family"] not in compared or not os.path.exists(p):
+            continue
+        info = json.load(open(p))
+        now = judged_today(info)
+        if now != info.get("key"):
+            problems.append(("results", os.path.relpath(folder, data), "scored under another judge or truth than "
+                             "today's (its scoring key is not the scorer's today): score it again"))
+
+
+def tables_behind(root, data, problems):
+    """A family's generated tables are made from its registered runs: each generated file of a family with runs names
+    every registered scored folder (its run.json) among the sources of its provenance."""
+    reg = registry(root)
+    runs = registered_runs(root, data)
+    for e in reg.get("generated", []):
+        want = {os.path.relpath(os.path.join(f, "run.json"), data) for g, _, f in runs if g["family"] == e["family"]}
+        if not want:
+            continue
+        for rel in e["files"]:
+            for p in sorted(glob.glob(os.path.join(root, rel))) if "*" in rel else [os.path.join(root, rel)]:
+                if not os.path.exists(p + ".provenance"):
+                    problems.append(("results", os.path.relpath(p, root), "no provenance of its sources"))
+                    continue
+                have = {r["source"] for r in read_tsv(p + ".provenance")}
+                for w in sorted(want - have)[:3]:
+                    problems.append(("results", os.path.relpath(p, root), f"not made from the registered run {w}"))
+
+
+def stores_behind(root, data, problems):
+    """A family's store of fetched responses (a `store` entry) matches its manifest: every file the store's manifest
+    lists (`manifest`, written by the family's store command) is in the family's data manifest with the same size and
+    sha256 (the data manifest is checked against the data root by the manifests' check), or, where the data manifest's
+    area leaves such a file out, is in the data root with its size."""
+    import re
+    from . import manifests as M
+    stores = registry(root).get("store", [])
+    areas = {a["name"]: a for a in M.areas(root)} if stores else {}
+    for s in stores:
+        mp = os.path.join(data, s["manifest"])
+        name = f"families/{s['family']}"
+        dm = [p for p in (os.path.join(root, "manifests", name + x) for x in (".tsv.gz", ".tsv")) if os.path.exists(p)]
+        if not os.path.exists(mp) or not dm:
+            problems.append(("results", s["manifest"], "the store's manifest or the family's data manifest is missing"))
+            continue
+        have = {r["path"]: r for r in M.read_manifest(dm[0])}
+        exclude = [re.compile(x) for x in (areas.get(name) or {}).get("exclude", [])]
+        for r in read_tsv(mp):
+            sub = os.path.join(r["tool"], r["version"], r["organism"], r["file"]) if r["area"] == "store" else r["file"]
+            path = os.path.join(s["folder"], sub)
+            m = have.get(path)
+            if m is None:
+                if any(x.search(path) for x in exclude) and os.path.exists(os.path.join(data, path)) and \
+                        os.path.getsize(os.path.join(data, path)) == int(r["bytes"]):
+                    continue
+                problems.append(("results", path, "in the store's manifest, not in the family's data manifest"))
+            elif m["bytes"] != r["bytes"] or m["sha256"] != r["sha256"]:
+                problems.append(("results", path, "the store's manifest and the data manifest differ in size or sha256"))
+
+
 def check(root, problems, skipped):
     """The results' checks of `idtrack-repro check` (see check.py)."""
     res = os.path.join(root, "results")
@@ -237,6 +349,10 @@ def check(root, problems, skipped):
         skipped.append(f"results staleness: no data root at {data}")
         return
     rows_behind(root, data, problems)
+    subjects_behind(root, data, problems)
+    judges_behind(root, data, problems)
+    tables_behind(root, data, problems)
+    stores_behind(root, data, problems)
     for rel, r in prov.items():
         if not r.get("source"):
             continue

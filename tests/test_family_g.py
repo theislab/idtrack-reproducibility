@@ -3,6 +3,7 @@ responses, the rule of equal truth on an invented history, the sampling's alloca
 No network, no data root beyond a temporary one."""
 import collections
 import json
+import os
 
 import pytest
 
@@ -449,3 +450,48 @@ def test_an_idtrack_wrong_line_no_limitation_states_is_read_by_what_idtrack_did(
     assert RD.idtrack_class(ln(expect=["ENSG00000000001", "ENSG00000000002"]), ["ENSG00000000001.3"], at)[0].startswith("the truth's copies on patches")
     assert RD.idtrack_class(ln(expect=["ENSG00000000002"]), ["ENSG00000000003.1"], at)[0] == "a name on patches answered with another patch's gene"
     assert RD.idtrack_class(ln(expect=["ENSG00000000002"]), ["ENSG00000000001.1"], at) == ("another gene", None)
+
+
+def test_the_documents_tables_are_the_published_tables():
+    # docs/families/g.md's tables are written from results/g/main/all/ by `report --publish` (report.write_doc)
+    from idtrack_reproducibility.check import ROOT
+    from idtrack_reproducibility.families.g import report as REP
+    text = open(os.path.join(ROOT, REP.DOC)).read()
+    for name, table in REP.doc_tables(ROOT).items():
+        i, j = REP.doc_block(text, name)
+        assert text[i:j] == table, f"the document's table {name} is not the published one: run `report --publish`"
+
+
+def test_the_published_tables_are_the_summaries_and_the_per_line_tables_stay_in_the_data_root():
+    from idtrack_reproducibility.check import ROOT
+    from idtrack_reproducibility.families.g import report as REP
+    have = {f[:-4] for f in os.listdir(os.path.join(ROOT, REP.PUBLISH_DIR)) if f.endswith(".tsv")}
+    assert have == set(REP.PUBLISHED) and not have & set(REP.PER_LINE)
+
+
+def test_idtracks_wrong_lines_of_the_sample_become_rows_of_the_limitations_table(tmp_path):
+    import csv as _csv
+    import json as _json
+    from idtrack_reproducibility.families.g import limits_g as LG
+    run = tmp_path / "run"
+    run.mkdir()
+    _json.dump(dict(organism="sus_scrofa", commit="cabfd9a880c0", graph_digests=["d1"]), open(run / "run.json", "w"))
+    rows = [  # side, qid, class, stratum (a line read for two tools counts once)
+        ("idtrack", "b1|X|60|115", "L-bridges: external_bridge", "g_b_b1_to115_shared"),
+        ("idtrack", "b1|X|60|115", "L-bridges: external_bridge", "g_b_b1_to115_shared"),
+        ("idtrack", "b1|Y|60|115", "new: a gene where the truth names none (unexplained in the families' runs)",
+         "g_b_b1_to115_shared"),
+        ("idtrack", "b1|Z|85|85", "new: another gene (no cause in the families' runs)", "g_b_b1_atr_patchonly"),
+        ("idtrack", "b7|W", "new: another gene (no cause in the families' runs)", "g_b_b7_date"),
+        ("tool", "b1|V|60|115", "truly wrong", "g_b_b1_to115_shared")]
+    p = tmp_path / "reading.tsv"
+    with open(p, "w", newline="") as fo:
+        w = _csv.writer(fo, delimiter="\t")
+        w.writerow(["organism", "qid", "side", "cls", "stratum"])
+        for side, qid, cls, st in rows:
+            w.writerow(["sus_scrofa", qid, side, cls, st])
+    out = {r["limitation"]: r for r in LG.rows(str(p), [str(run)], texts={"L-bridges": dict(title="bridges")})}
+    assert set(out) == {"L-bridges", "L-old-name-truth-none", "L-patch-only-name", "L-g-unread"}
+    assert out["L-bridges"]["answers"] == 1 and out["L-bridges"]["of_answers"] == 4 and out["L-bridges"]["share"] == "0.25000"
+    assert out["L-bridges"]["title"] == "bridges" and out["L-patch-only-name"]["family"] == "g"
+    assert out["L-old-name-truth-none"]["cause"] == "a gene where the truth names none"

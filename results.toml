@@ -6,7 +6,11 @@
 # family's panel; docs/methods.md, "Measurement design") or `sets` (every line of the sets named in `sets`, the family's
 # others not asked on that tree). `limits` names the builder of the run's rows of the known-limitations table where it
 # is not the family's own (known_limitations.py). `rows` says what a run keeps where it has no rows of the
-# record (docs/records.md, "Checks").
+# record (docs/records.md, "Checks"). `subject` names another tool whose runs the entry registers (family G; an entry
+# without it is the tree's own run) and `form` the reading of the input; the check holds a family with such entries,
+# a comparison of subjects, to one judge, today's. `[[generated]]` names tables a command of the package writes into
+# results/ with their provenance; `[[store]]` a family's store of fetched responses, whose manifest the check holds
+# against the family's data manifest.
 
 # The content digests of the graphs each tree was run on (as idtrack computes them; the runs record them).
 [graphs.d4c2dda]
@@ -765,204 +769,382 @@ optional = ["harm_report.tsv", "now_causes_summary.tsv", "decided_causes_summary
 index = { "now_report.tsv" = "report" }
 
 
-# Family G (comparison with other tools; docs/families/g.md): the scored folders of each subject and form of the input,
-# made from the store of fetched responses (`<families>/g/raw/`) by `families.g.score`, and the tables of
-# `families.g.report` (`<families>/g/report/`). Organisms where a subject has nothing stored have no folder.
+# Family G (comparison with other tools; docs/families/g.md): one entry per subject and form of the input, its scored
+# folders made from the store of fetched responses (`<families>/g/raw/`) by `families.g.score` (idtrack's own entry,
+# without `subject`, is the tree main on G's lines). `subject` names the tool the folders' run.json records and `form`
+# the reading of the input (`best` or `stated`); the check holds every entry of a family that compares subjects to
+# today's judge (results.py, "Checks"). G's tables are written by its own generator into results/g/ (below, the
+# `generated` entry) and its store's manifest is checked against the data manifest (the `store` entry). An organism
+# where a subject has nothing stored has no folder.
 
-[[g]]
-subject = "idtrack"
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/idtrack/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ensembl_rest"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ensembl_rest/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ensembl_rest"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ensembl_rest/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ensembl_rest_lookup"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ensembl_rest_lookup/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ensembl_rest_lookup"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ensembl_rest_lookup/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "biomart"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/biomart/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "biomart"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/biomart/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "gprofiler"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/gprofiler/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "gprofiler"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/gprofiler/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "mygene"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/mygene/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "mygene"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/mygene/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "hgnc"
 form = "best"
+organisms = ["homo_sapiens"]
 folder = "families/g/runs/hgnc/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "hgnc"
 form = "stated"
+organisms = ["homo_sapiens"]
 folder = "families/g/runs/hgnc/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "uniprot"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/uniprot/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "uniprot"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/uniprot/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "bridgedb"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta"]
 folder = "families/g/runs/bridgedb/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "bridgedb"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta"]
 folder = "families/g/runs/bridgedb/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "gget"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/gget/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "gget"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/gget/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "seurat"
 form = "best"
+organisms = ["homo_sapiens"]
 folder = "families/g/runs/seurat/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "seurat"
 form = "stated"
+organisms = ["homo_sapiens"]
 folder = "families/g/runs/seurat/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "pyensembl"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/pyensembl/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "pyensembl"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/pyensembl/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "orgdb"
 form = "best"
+organisms = ["mus_musculus", "homo_sapiens", "macaca_mulatta"]
 folder = "families/g/runs/orgdb/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "orgdb"
 form = "stated"
+organisms = ["mus_musculus", "homo_sapiens", "macaca_mulatta"]
 folder = "families/g/runs/orgdb/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "limma"
 form = "best"
+organisms = ["mus_musculus", "homo_sapiens"]
 folder = "families/g/runs/limma/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "limma"
 form = "stated"
+organisms = ["mus_musculus", "homo_sapiens"]
 folder = "families/g/runs/limma/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "hgnchelper"
 form = "best"
+organisms = ["mus_musculus", "homo_sapiens"]
 folder = "families/g/runs/hgnchelper/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "hgnchelper"
 form = "stated"
+organisms = ["mus_musculus", "homo_sapiens"]
 folder = "families/g/runs/hgnchelper/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ensdb"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ensdb/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ensdb"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ensdb/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ncbi_files"
 form = "best"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ncbi_files/best/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
 
-[[g]]
+[[run]]
+family = "g"
+tree = "main"
+commit = "cabfd9a880c0ea3531b420533e4e82d8ac8db9a1"
 subject = "ncbi_files"
 form = "stated"
+organisms = ["sus_scrofa", "mus_musculus", "homo_sapiens", "macaca_mulatta", "macaca_fascicularis"]
 folder = "families/g/runs/ncbi_files/stated/{organism}"
-tables = "families/g/report"
+generator = "python -m idtrack_reproducibility.families.g.score"
+files = {}
+
+[[generated]]
+family = "g"
+generated_by = "python -m idtrack_reproducibility.families.g.report --publish"
+files = ["results/g/main/all/*.tsv"]
+
+[[store]]
+family = "g"
+folder = "families/g/raw"
+manifest = "families/g/raw/STORE.tsv"
