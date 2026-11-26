@@ -473,25 +473,40 @@ def test_idtracks_wrong_lines_of_the_sample_become_rows_of_the_limitations_table
     import csv as _csv
     import json as _json
     from idtrack_reproducibility.families.g import limits_g as LG
-    run = tmp_path / "run"
-    run.mkdir()
-    _json.dump(dict(organism="sus_scrofa", commit="cabfd9a880c0", graph_digests=["d1"]), open(run / "run.json", "w"))
-    rows = [  # side, qid, class, stratum (a line read for two tools counts once)
-        ("idtrack", "b1|X|60|115", "L-bridges: external_bridge", "g_b_b1_to115_shared"),
-        ("idtrack", "b1|X|60|115", "L-bridges: external_bridge", "g_b_b1_to115_shared"),
-        ("idtrack", "b1|Y|60|115", "new: a gene where the truth names none (unexplained in the families' runs)",
+    for org in ("sus_scrofa", "homo_sapiens"):
+        run = tmp_path / org
+        run.mkdir()
+        _json.dump(dict(organism=org, commit="cabfd9a880c0", graph_digests=["d1"]), open(run / "run.json", "w"))
+    new = "new: another gene (unexplained in the families' runs)"
+    rows = [  # organism, side, qid, class, stratum (a line read for two tools counts once)
+        ("sus_scrofa", "idtrack", "b1|X|60|115", "L-bridges: external_bridge", "g_b_b1_to115_shared"),
+        ("sus_scrofa", "idtrack", "b1|X|60|115", "L-bridges: external_bridge", "g_b_b1_to115_shared"),
+        ("sus_scrofa", "idtrack", "b1|Y|60|115", "new: a gene where the truth names none (unexplained in the families' runs)",
          "g_b_b1_to115_shared"),
-        ("idtrack", "b1|Z|85|85", "new: another gene (no cause in the families' runs)", "g_b_b1_atr_patchonly"),
-        ("idtrack", "b7|W", "new: another gene (no cause in the families' runs)", "g_b_b7_date"),
-        ("tool", "b1|V|60|115", "truly wrong", "g_b_b1_to115_shared")]
+        ("sus_scrofa", "idtrack", "b1|Z|85|85", new, "g_b_b1_atr_patchonly"),
+        ("sus_scrofa", "idtrack", "b1|M|76|76", new, "g_b_b1_atr_shared"),
+        ("homo_sapiens", "idtrack", "b1|H|70|70", new, "g_b_b1_atr_shared"),
+        ("homo_sapiens", "idtrack", "b7|W", new, "g_b_b7_date"),
+        ("sus_scrofa", "idtrack", "b7|V", new, "g_b_b7_date"),
+        ("homo_sapiens", "idtrack", "d1|s|symbol|T|75", new, "g_d1_d1_symbol_cross_dominant"),
+        ("sus_scrofa", "tool", "b1|V|60|115", "truly wrong", "g_b_b1_to115_shared")]
     p = tmp_path / "reading.tsv"
     with open(p, "w", newline="") as fo:
         w = _csv.writer(fo, delimiter="\t")
         w.writerow(["organism", "qid", "side", "cls", "stratum"])
-        for side, qid, cls, st in rows:
-            w.writerow(["sus_scrofa", qid, side, cls, st])
-    out = {r["limitation"]: r for r in LG.rows(str(p), [str(run)], texts={"L-bridges": dict(title="bridges")})}
-    assert set(out) == {"L-bridges", "L-old-name-truth-none", "L-patch-only-name", "L-g-unread"}
-    assert out["L-bridges"]["answers"] == 1 and out["L-bridges"]["of_answers"] == 4 and out["L-bridges"]["share"] == "0.25000"
-    assert out["L-bridges"]["title"] == "bridges" and out["L-patch-only-name"]["family"] == "g"
-    assert out["L-old-name-truth-none"]["cause"] == "a gene where the truth names none"
+        for org, side, qid, cls, st in rows:
+            w.writerow([org, qid, side, cls, st])
+    texts = {"L-bridges": dict(title="bridges"), "L-history-vs-place": dict(title="history to another place", what="D's")}
+    got = LG.rows(str(p), [str(tmp_path / o) for o in ("sus_scrofa", "homo_sapiens")], texts=texts)
+    out = {(r["limitation"], r["organism"]): r for r in got}
+    assert set(out) == {("L-bridges", "sus_scrofa"), ("L-old-name-bridge", "sus_scrofa"), ("T-copy-display-name", "sus_scrofa"),
+                        ("L-mirna-host-name", "sus_scrofa"), ("L-copy-name-other-gene", "homo_sapiens"),
+                        ("L-bare-numbers", "homo_sapiens"), ("UNMAPPED", "sus_scrofa"), ("L-history-vs-place", "homo_sapiens")}
+    b = out[("L-bridges", "sus_scrofa")]
+    assert b["answers"] == 1 and b["of_answers"] == 5 and b["share"] == "0.20000" and b["title"] == "bridges"
+    assert out[("T-copy-display-name", "sus_scrofa")]["family"] == "g" and out[("T-copy-display-name", "sus_scrofa")]["group"] == "truth"
+    assert out[("L-old-name-bridge", "sus_scrofa")]["cause"] == "a gene where the truth names none"
+    # a row of G's map with empty texts takes the known limitation's texts; a line no row maps stays UNMAPPED
+    assert out[("L-history-vs-place", "homo_sapiens")]["title"] == "history to another place"
+    assert out[("L-history-vs-place", "homo_sapiens")]["what"] == "D's"
+    assert out[("UNMAPPED", "sus_scrofa")]["title"] == "UNMAPPED"

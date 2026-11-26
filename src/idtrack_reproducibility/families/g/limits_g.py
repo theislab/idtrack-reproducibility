@@ -8,9 +8,11 @@ G's reading name) or a new cause (`new: <class> (...)`). One row per limitation 
 lines where idtrack is wrong in that class (each line once, whichever tool it disagreed with), `units` their inputs,
 `of_answers` every sampled line where idtrack is wrong in that organism, `share` the one over the other: a measured
 size in G's sample, not in G's every line. A new cause becomes the row of G's map (`limitations_map_g.tsv`: the
-first row whose `strata` matches the line's stratum and whose `when` is the reading's class, `*` any class), stated
-as what it is today (cause read or not read, with its backlog row). The texts of a known limitation are its
-families' (F0's map, the families' maps, else another family's row of the table); the scored folders give the run,
+first row whose `strata` matches the line's stratum, whose `organisms` matches its organism (empty: every organism)
+and whose `when` is the reading's class, `*` any class), stated as what its reading found, with its backlog row; a
+line that no row maps is `UNMAPPED` (to be read and mapped, never left so). The texts of a known limitation are its
+families' (F0's map, the families' maps, else another family's row of the table), where G's map leaves them empty
+(a new cause that the reading finds to be a known limitation, mapped by its stratum); the scored folders give the run,
 commit and graph digest.
 """
 import argparse
@@ -34,6 +36,7 @@ def read_map(path=MAP):
         rows = list(csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE))
     for r in rows:
         r["rx"] = re.compile(r["strata"])
+        r["orx"] = re.compile(r.get("organisms") or ".*")
     return rows
 
 
@@ -54,15 +57,15 @@ def known_texts():
     return out
 
 
-def classify(cls, stratum, gmap):
+def classify(cls, stratum, gmap, organism=""):
     """(limitation, cause) of a sampled idtrack-wrong line's class: a known limitation as the reading names it, a new
-    cause by G's map."""
+    cause by G's map (the line's stratum, organism and class)."""
     if cls.startswith("L-") or (":" in cls and not cls.startswith("new: ")):
         lid, _, cause = cls.partition(": ")
         return lid, cause
     k = re.sub(r" \([^()]*in the families' runs\)$", "", cls[len("new: "):] if cls.startswith("new: ") else cls)
     for r in gmap:
-        if r["rx"].search(stratum or "") and r["when"] in (k, "*"):
+        if r["rx"].search(stratum or "") and r["orx"].fullmatch(organism or "") and r["when"] in (k, "*"):
             return r["limitation"], k
     return "UNMAPPED", k
 
@@ -85,14 +88,15 @@ def rows(reading, scored, gmap=None, texts=None):
     of = collections.Counter(r["organism"] for r in lines)
     agg = collections.defaultdict(lambda: [set(), set(), set()])
     for r in lines:
-        lid, cause = classify(r["cls"], r["stratum"], gmap)
+        lid, cause = classify(r["cls"], r["stratum"], gmap, r["organism"])
         a = agg[(lid, r["organism"], cause)]
         a[0].add(r["qid"])
         a[1].add(r["qid"].split("|")[1] if "|" in r["qid"] else r["qid"])
         a[2].add(r["stratum"])
     out = []
     for (lid, org, cause), (qids, units, strata) in sorted(agg.items()):
-        t = by_map.get(lid) or texts.get(lid) or dict(title="UNMAPPED")
+        m, k = by_map.get(lid, {}), texts.get(lid, {})
+        t = {f: m.get(f) or k.get(f, "") for f in TEXTS} if m or k else dict(title="UNMAPPED")
         d, j = info.get(org, ("", {}))
         commit = (j.get("commit") or "cabfd9a")[:12]
         out.append(dict(limitation=lid, group=t.get("group", ""), title=t.get("title", ""), what=t.get("what", ""),
