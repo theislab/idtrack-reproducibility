@@ -4,7 +4,7 @@ The tools people use for the questions idtrack answers, asked the same lines and
 
 ## State
 
-The comparison sets are published (`g_<family>_v1`, 2026-11-24) and the rule of equal truth is computed for releases 116, 114, 113 and 111; the passes of 2026-11-24 are being asked (one per service, one date per service). The pilot below was asked before the sets were published, at most 100 lines per tool and organism; its responses are kept with the others (endpoints without a form) and are not read by the adapters.
+The comparison sets are published (`g_<family>_v1`, 2026-11-24, with their revision sets `g_b_r1`, `g_b_r2`, `g_c_r1`) and the rule of equal truth is computed for releases 116, 114, 113 and 111; every service was asked in one pass (2026-11-24 and 25; BioMart's archives answered only in part, below), every subject scored from the store with the network off, and the disagreements with idtrack read (below). The pilot below was asked before the sets were published, at most 100 lines per tool and organism; its responses are kept with the others (endpoints without a form); a pass that would ask a request the pilot asked reads the pilot's response instead (the same request, the same day).
 
 ## What it measures
 
@@ -60,6 +60,8 @@ Per organism and family, seeded samples of the families' published lines (the la
 | `g_c_v1` | C1, C2, C3 | the strata | 10,000 / 100,000 each |
 | `g_d1_v1` | D1 | the strata | pig 10,000 / 58,735; mouse, human 10,000 / 100,000; no D1 for the macaques |
 
+The lines are those of the judge users get (the families' `scores_now`): a decided judge's revision set (`<set>_dec`, decisions not built yet) is not G's source. `g_b_v1` holds B7 lines drawn from `b7_dec`; the revision set `g_b_r1` of each organism (pig 202, mouse 255, human 303, rhesus 201, cynomolgus 172 lines; `sets.py --revise-judge`) holds those qids' lines of the judge users get, and is their truth. A source family's revision set published after G's draw is joined the same way (`sets.py --revise-sources`: the lines whose source line changed its truth, as the source's current line): `g_b_r2` (pig 3,253, mouse 1,807, human 5,496, rhesus 2,829, cynomolgus 1,119 lines: B's revision sets of 2026-11-24 and 25) and `g_c_r1` (mouse 4,754, human 7,794: C's UniProt lines' revisions), so that G judges by the families' current truth.
+
 A G line is the source line with `family = g`, `stratum = g_<family>_<source stratum>`, `source_family`, `source_set`, `source_stratum`, `source_cmp`, `tier`, `task`, and its genes compared without versions (`cmp = base`; `expect`, `broad`, `open_within`, `apart` and `support`'s keys without versions): most tools name genes without versions, so every subject, idtrack too, is judged at the gene. Nothing of the truth is computed by G: the truth is the families'.
 
 ### Two readings of the input
@@ -112,7 +114,7 @@ Everything G fetched lies in the data root, in `<families>/g/raw/`, and **nothin
 
 ## From responses to answers
 
-One adapter per tool reads its stored responses only (`families/g/adapters.py`) and writes the runner's answers (`<families>/g/runs/<tool>/<version>/<organism>/answers/`, `runner.answer_schema()`): the genes the tool named for the line without versions, the tool's own status (`current`, `replaced`, `retired`, `found`, `not_found`, `other_annotation_only`), `error` where its response failed, the line's share of its request's seconds; a line the tool cannot pose is written with outcome `not_supported` and its reason, which the scorer keeps (`not_supported`, outside the rate). Ensembl REST: a current id is its own answer, a retired one its `possible_replacement` ids. BioMart: the genes of the rows whose filter value is the line's (without case, as the filter matches); a response without `[success]` is an error. g:Profiler: the `converted` ENSG ids of the line's `incoming`. MyGene.info and UniProt: the genes of every hit, without the ids of Ensembl's other annotations of the species (pig's breed assemblies: ids absent from Ensembl's GTF of the tool's release, read from that GTF). HGNC: the `ensembl_gene_id` of the first field of the chain that found a record. BridgeDb: the `En:` ids. The scorer is the common one (`families/scorer.py`), on G's sets, with `run.json` naming the subject (`kind = tool`, `name`, `version`, `asked_at`, `endpoint`). idtrack's rows on the same lines are the families' answers of the tree measured (`families/<family>/runs/<tree>/<organism>/answers/`, read only), scored on G's lines; lines no family run holds are asked through the adapter on the tree and its graphs.
+One adapter per tool reads its stored responses only (`families/g/adapters.py`) and writes the runner's answers (`<families>/g/runs/<tool>/<version>/<organism>/answers/`, `runner.answer_schema()`): the genes the tool named for the line without versions, the tool's own status (`current`, `replaced`, `retired`, `found`, `not_found`, `other_annotation_only`), `error` where its response failed, the line's share of its request's seconds; a line the tool cannot pose is never sent to the judge: G writes its row of the record with outcome `not_supported` and the reason (`score.not_supported_rows`, `outcomes/part_not_supported_of_1.parquet`), outside the rate; the common scorer is used unchanged. A request is asked once (its id is the hash of its method, URL, parameters and body): a request of one line (Ensembl REST's `xrefs/symbol`, HGNC's `fetch`) answers every line that asks the same string, and the pilot's response every line of the pass that asks the pilot's request (`adapters.stored_answer`). A line its source family withdrew (`excluded` in a revision set) is scored by no subject, as the families do, and counted apart (`excluded` in `tool_task.tsv`). Ensembl REST: a current id is its own answer, a retired one its `possible_replacement` ids. BioMart: the genes of the rows whose filter value is the line's (without case, as the filter matches); a response without `[success]` is an error. g:Profiler: the `converted` ENSG ids of the line's `incoming`. MyGene.info and UniProt: the genes of every hit (for an Ensembl id looked up in MyGene.info, the id itself where a hit lists it: a hit is an NCBI gene that may list several Ensembl genes), without the ids of Ensembl's other annotations of the species (pig's breed assemblies: ids absent from Ensembl's GTF of the tool's release, read from that GTF). HGNC: the `ensembl_gene_id` of the first field of the chain that found a record. BridgeDb: the `En:` ids. The scorer is the common one (`families/scorer.py`), on G's sets, with `run.json` naming the subject (`kind = tool`, `name`, `version`, `asked_at`, `endpoint`). idtrack's rows on the same lines are the families' answers of the tree measured (`families/<family>/runs/<tree>/<organism>/answers/`, read only), scored on G's lines; lines no family run holds are asked through the adapter on the tree and its graphs.
 
 ## The pilot
 
@@ -131,7 +133,7 @@ Per tool and organism: lines posed of the pilot's lines (pig, mouse, human 100; 
 | UniProt (116) | 4 / 0 / 2:2:0 | 8 / 0 / 5:3:0 | 9 / 0 / 7:2:0 | 8 / 0 / 5:3:0 | 3 / 0 / 0:3:0 |
 | BridgeDb (111) | 22 / 1 / 10:10:1 | 24 / 0 / 17:7:0 | 37 / 3 / 21:10:3 | 16 / 0 / 9:7:0 | – |
 
-BioMart's lines at archives 105 to 114 were still being asked when this was written (1 to 3 per organism). The local tools: pyensembl answered 93 lines at 115 (each GTF fetched in about 1 s, indexed in about a minute); org.\*.eg.db, limma and HGNChelper answered the human, mouse and rhesus pilot lines (33 to 42 per organism) in 5 to 23 s per tool and organism.
+BioMart's pilot lines at archives 105 to 114 (1 to 3 per organism) are not in the table. The local tools: pyensembl answered 93 lines at 115 (each GTF fetched in about 1 s, indexed in about a minute); org.\*.eg.db, limma and HGNChelper answered the human, mouse and rhesus pilot lines (33 to 42 per organism) in 5 to 23 s per tool and organism.
 
 Seconds per request in the pilot (the raw index): Ensembl REST `archive/id` 1.55 s per 47 ids, `lookup/symbol` 5.8 s per 20 symbols (so its batches are 200), `xrefs/symbol` 0.39 s; BioMart at 115 0.09 s per query of 5 values; g:Profiler 0.34 s per 12 terms; MyGene.info 0.19 s per 7 terms; HGNC 0.05 s; UniProt 0.03 s per call (a job finishes within 15 s); BridgeDb 0.03 s per call. Every response was HTTP 200 but BioMart's archives that answered 500 (below). Ensembl REST's `archive/id` leaves out an id given with a version (7 of 53 ids of the mouse pilot): the tool's behaviour, measured as it is.
 
@@ -152,17 +154,140 @@ The web lines of the full pass (per organism 50,000 lines; the macaques 40,000) 
 
 ## Results
 
-The passes of 2026-11-24 and 2026-11-25 (one date per service; the dates, versions and endpoints of every response in `raw/STORE_SUMMARY.tsv`), scored from the store with the network off. The tables are `<families>/g/report/`: `tool_task.tsv` (per subject, reading of the input, organism and task: the tier's lines, `not_supported`, posed, `not_answered`, left out by the rule of equal truth, kept, right, wrong, undetermined, error under `all` and `best`, the rate with its Wilson interval, coverage, and idtrack's rate on the same kept lines), `not_supported.tsv` (the reasons), `forms.tsv` (per tool the posed lines whose two readings differ and how many change their outcome), `by_distance.tsv`, `speed.tsv`, `failures.tsv` and `disagreements.tsv` with `disagreement_classes.tsv` (every disagreement with idtrack classed by the two verdicts of the common scorer: idtrack wrong, the tool wrong, both wrong, the truth cannot decide; a seeded sample of at most 200 per subject, task and organism stratified by the outcome pair is marked for reading).
+The passes of 2026-11-24 and 2026-11-25 (one date per service; the dates, versions and endpoints of every response in `raw/STORE_SUMMARY.tsv`), scored from the store with the network off. The tables are `<families>/g/report/`: `tool_task.tsv` (per subject, reading of the input, organism and task: the tier's lines, the lines their source family withdrew (`excluded`), `not_supported`, posed, `not_answered`, left out by the rule of equal truth, kept, right, wrong, undetermined, error under `all` and `best`, the rate with its Wilson interval, coverage, and idtrack's rate on the same kept lines), `not_supported.tsv` (the reasons), `forms.tsv` (per tool the posed lines whose two readings differ and how many change their outcome), `by_distance.tsv`, `speed.tsv`, `failures.tsv`, `disagreements.tsv` with `disagreement_classes.tsv` (every disagreement with idtrack classed by the two verdicts of the common scorer: idtrack wrong, the tool wrong, both wrong, the truth cannot decide; a seeded sample of at most 200 per subject, task and organism stratified by the outcome pair is marked for reading) and the reading's `reading.tsv`, `reading_classes.tsv`, `reading_summary.tsv` (below).
 
-What the tables say in one line each (form `best`, view `all`, the kept lines): only Ensembl REST (`archive/id`) and idtrack pose task a (old ids to their gene), 47 to 50 % of the web lines; on them REST is right on 76 to 100 % of the lines per organism (idtrack 98 to 100 % on the same lines; cynomolgus 100 % for both); on symbols (task c), aliases (d) and external identifiers (e) every tool's rate is below idtrack's on the same kept lines in every organism, but BioMart's 60 symbol and 243 identifier lines of mouse fetched so far (both right) (`tool_task.tsv`). The rule of equal truth leaves out at most 2 % of a tool's posed lines (NCBI's files 2.6 %, BridgeDb at 111 4.3 %).
+The rate of each tool and idtrack's rate on the same kept lines, in per cent, with the kept lines (form `best`, view `all`; a dash where the tool cannot pose the task for the organism):
 
-**BioMart** was asked while its archives answered HTTP 500 for hours (2026-11-24 and 25: `jul2023` (110) and `jan2024` (111) did not answer their version calls): its pig lines are fetched and scored; of mouse's, human's, rhesus's and cynomolgus's posable lines most are `not_answered` (not answered by the service on these dates, counted per organism and task in `tool_task.tsv`, never scored as wrong). Its fetch resumes from the store; a later pass adds only the missing lines, and `score --subjects biomart` and `report` join them to the tables without anything else being fetched again.
+| tool | task | pig | mouse | human | rhesus | cynomolgus |
+| --- | --- | --- | --- | --- | --- | --- |
+| BioMart | b | 100 / 100 (1,173) | 100 / 100 (1,721) | 100 / 100 (1,478) | 100 / 100 (1,506) | 100 / 100 (2,228) |
+| BioMart | c | 91 / 99 (10,124) | 87 / 98 (9,876) | 68 / 98 (8,952) | 87 / 100 (5,412) | 88 / 100 (6,677) |
+| BioMart | d | 73 / 100 (2,951) | 90 / 100 (3,383) | 91 / 99 (3,041) | 76 / 100 (2,478) | 35 / 99 (1,350) |
+| BioMart | e | 70 / 100 (8,908) | 70 / 100 (8,879) | 66 / 100 (8,045) | 70 / 100 (8,444) | 72 / 100 (8,476) |
+| BridgeDb | b | 93 / 100 (1,172) | 100 / 100 (1,499) | 91 / 100 (1,285) | 99 / 100 (1,506) | – |
+| BridgeDb | c | – | – | 70 / 98 (8,607) | – | – |
+| BridgeDb | e | 71 / 100 (7,796) | 67 / 100 (7,936) | 68 / 100 (7,626) | 68 / 100 (8,294) | – |
+| EnsDb 113 | b | 100 / 100 (8,595) | 100 / 100 (13,216) | 100 / 100 (13,921) | 100 / 100 (9,863) | 100 / 100 (13,124) |
+| EnsDb 113 | c | 89 / 100 (80,068) | 74 / 98 (84,766) | 62 / 97 (86,952) | 82 / 100 (68,852) | 94 / 100 (73,354) |
+| EnsDb 113 | e | 81 / 100 (11,215) | 60 / 99 (13,580) | 58 / 99 (13,342) | 77 / 100 (11,994) | 76 / 100 (10,442) |
+| Ensembl REST | a | 76 / 98 (24,171) | 92 / 99 (23,259) | 94 / 98 (24,503) | 82 / 100 (18,494) | 100 / 100 (17,772) |
+| Ensembl REST | b | 100 / 100 (1,173) | 100 / 100 (1,721) | 100 / 100 (1,478) | 100 / 100 (1,506) | 100 / 100 (2,228) |
+| Ensembl REST | c | 93 / 98 (9,783) | 90 / 98 (9,677) | 64 / 98 (8,847) | 92 / 100 (5,054) | 93 / 100 (6,320) |
+| Ensembl REST | d | 79 / 100 (2,374) | 90 / 100 (3,116) | 85 / 99 (3,011) | 82 / 100 (2,438) | 45 / 99 (1,323) |
+| Ensembl REST | e | 68 / 100 (8,200) | 69 / 100 (8,432) | 60 / 100 (7,779) | 69 / 100 (8,298) | 69 / 100 (7,389) |
+| Ensembl REST `lookup/symbol` | c | 90 / 98 (9,783) | 83 / 98 (9,677) | 67 / 98 (8,847) | 86 / 100 (5,054) | 81 / 100 (6,320) |
+| Ensembl REST `lookup/symbol` | d | 10 / 100 (2,374) | 15 / 100 (3,116) | 6 / 99 (3,011) | 12 / 100 (2,438) | 32 / 99 (1,323) |
+| gget | b | 100 / 100 (1,173) | 100 / 100 (1,721) | 100 / 100 (1,478) | 100 / 100 (1,506) | 100 / 100 (2,228) |
+| g:Profiler | b | 100 / 100 (1,173) | 100 / 100 (1,721) | 90 / 100 (1,478) | 100 / 100 (1,506) | 100 / 100 (2,228) |
+| g:Profiler | c | 92 / 99 (10,274) | 87 / 98 (9,848) | 69 / 98 (9,365) | 88 / 100 (5,659) | 92 / 100 (7,772) |
+| g:Profiler | d | 17 / 100 (2,964) | 15 / 100 (3,654) | 8 / 100 (3,530) | 16 / 100 (3,192) | 27 / 99 (1,618) |
+| g:Profiler | e | 73 / 100 (9,482) | 73 / 100 (9,642) | 69 / 100 (8,941) | 73 / 100 (9,588) | 74 / 100 (9,084) |
+| HGNC | c | – | – | 71 / 98 (8,847) | – | – |
+| HGNC | d | – | – | 92 / 99 (3,011) | – | – |
+| HGNC | e | – | – | 40 / 100 (7,779) | – | – |
+| HGNChelper | c | – | 72 / 99 (88,435) | 61 / 97 (87,412) | – | – |
+| HGNChelper | d | – | 32 / 100 (35,349) | 82 / 100 (33,844) | – | – |
+| limma | c | – | 64 / 99 (88,435) | 62 / 97 (87,412) | – | – |
+| limma | d | – | 80 / 100 (35,349) | 67 / 100 (33,844) | – | – |
+| MyGene.info | b | 98 / 100 (1,173) | 100 / 100 (1,721) | 100 / 100 (1,478) | 99 / 100 (1,506) | 100 / 100 (2,228) |
+| MyGene.info | c | 90 / 98 (9,811) | 86 / 98 (9,715) | 69 / 98 (8,891) | 83 / 100 (5,081) | 80 / 100 (6,342) |
+| MyGene.info | d | 92 / 100 (2,385) | 80 / 100 (3,130) | 73 / 99 (3,024) | 90 / 100 (2,442) | 72 / 99 (1,325) |
+| MyGene.info | e | 51 / 100 (8,200) | 69 / 100 (8,432) | 63 / 100 (7,779) | 53 / 100 (8,298) | 55 / 100 (7,389) |
+| NCBI's files | c | 23 / 100 (78,091) | 60 / 99 (88,164) | 63 / 97 (87,141) | 74 / 100 (64,161) | 67 / 100 (71,826) |
+| NCBI's files | d | 10 / 99 (10,130) | 82 / 100 (35,287) | 71 / 100 (33,715) | 78 / 99 (6,588) | 49 / 99 (3,434) |
+| NCBI's files | e | 40 / 100 (43,657) | 67 / 100 (40,655) | 63 / 100 (32,748) | 64 / 100 (44,196) | 57 / 100 (37,098) |
+| org.\*.eg.db | c | – | 60 / 99 (88,435) | 59 / 97 (87,412) | 74 / 100 (68,983) | – |
+| org.\*.eg.db | d | – | 80 / 100 (35,349) | 68 / 100 (33,844) | – | – |
+| org.\*.eg.db | e | – | 68 / 100 (83,657) | 57 / 100 (77,681) | 73 / 100 (82,129) | – |
+| pyensembl | b | 100 / 100 (8,595) | 100 / 100 (13,223) | 100 / 100 (13,934) | 100 / 100 (9,863) | 100 / 100 (13,124) |
+| pyensembl | c | 90 / 100 (92,841) | 78 / 98 (102,278) | 68 / 98 (103,226) | 86 / 100 (81,506) | 95 / 100 (83,390) |
+| Seurat | c | – | – | 59 / 98 (8,891) | – | – |
+| Seurat | d | – | – | 38 / 99 (3,025) | – | – |
+| UniProt | e | 65 / 100 (3,831) | 48 / 100 (4,226) | 74 / 100 (4,314) | 78 / 100 (3,641) | 75 / 100 (3,812) |
+
+Only Ensembl REST (`archive/id`) and idtrack pose task a (an old Ensembl id to its gene at 115), 44 to 50 % of the web lines. On symbols (task c), aliases (d) and external identifiers (e) no tool's rate reaches idtrack's on the same kept lines in any organism; on Ensembl ids of 115 (task b) most tools and idtrack are right on every line. The rule of equal truth leaves out at most 4.3 % of a tool's posed lines (BridgeDb at 111; NCBI's files 2.7 %, every other tool 2 % or less). What a tool's wrong lines are is read below: most are questions the tool does not claim to answer, and the rates are not a ranking of the tools' quality on the questions they claim.
+
+**BioMart** was asked while some of its archives answered HTTP 500 for hours (2026-11-24 and 25: `dec2021` (105) and `oct2022` to `may2024` (108 to 112)): its lines at 115 and at the archives that answered are scored; the lines of the archives that did not answer are `not_answered` (not answered by the service on these dates, never scored as wrong): pig 34 (c), 263 (d), 247 (e); mouse 40, 275, 306; human 61, 507, 457; rhesus 84, 717, 558; cynomolgus 363, 351, 458. A later pass of the same fetch asks only these and `score --subjects biomart`, `report` and `reading` join them to the tables without anything else being fetched again.
+
+## The reading of the disagreements
+
+Every disagreement with idtrack is listed (`disagreements.tsv`), and a seeded sample of at most 200 per subject, task and organism, stratified by the pair of outcomes, is read from the store, the truth store and the families' runs with the network off (`families/g/reading.py`; `reading.tsv` one row per sampled line and side, `reading_classes.tsv` the classes with three examples each, `reading_summary.tsv` the groups). A sampled line carries the weight of its sampling cell (the cell's lines over its sampled lines), so that the shares below estimate the shares among all of a subject's disagreements of that task, every organism together.
+
+A line where **the tool is wrong** is classed by what the tool did, read at the release it answers at: the service could not read the input (an error answer); the tool named only genes of another Ensembl annotation of the species (NCBI's and MyGene.info's pig genes on breed assemblies); an id that is no gene of the tool's release (a retired id, another annotation's); a gene on a patch or haplotype; a part of the truth's genes (right under the view `best`); the authority's gene (HGNC, MGI, VGNC, NCBI, UniProt name it for the input; the truth reads Ensembl's tables); a reading of another release (the line asks a name, id or accession as an earlier release read it, and the tool reads today's tables); another gene the string names at the tool's release (a shared name, a synonym, a cross-reference); a successor Ensembl's history allows (the wide walk); a synonym a tool that reads display names only does not read (Ensembl REST's `lookup/symbol`); no answer where Ensembl's tables of the tool's release name the truth's gene by the input; no answer where they do not; truly wrong (another current gene by none of these readings). The classes fall in four groups: **truly wrong** (another current gene, or no answer where Ensembl's tables name the truth's gene), **right under another reading** (another annotation, another release's id, a patch copy, a part of the truth, the authority's gene, another gene the string names, a successor of the wide walk), **not a question the tool claims** (a reading of another release, a synonym a display-name lookup does not read, no answer where Ensembl's tables do not name the gene either), **the service failed**.
+
+A line where **idtrack is wrong** is classed by its cause in the families' runs and that cause's row of the known-limitations table (`results/limitations/limitations.tsv`; a cause's row in any family, the source family's map of its wrong answers' classes), else by what idtrack did against Ensembl's tables of the release the line asks to: a string that stands for a missing value, refused (`L-missing-values`); a symbol in another case that is another gene's synonym, or a string no Ensembl table of any release holds, answered (the graph holds Ensembl's strings only: a string held in another case; `L-case-synonym`); else a new cause (`new: ...`), each a row of the maintainers' backlog with its reproducer.
+
+Per tool and task: the sampled lines where the tool is wrong (every organism together) and the weighted shares of the four groups, in per cent; the sampled lines where idtrack is wrong and the weighted share of them that a known limitation states:
+
+| tool | task | tool wrong, read | truly wrong | right under another reading | not a question the tool claims | the service failed | idtrack wrong, read | of them a known limitation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BioMart | c | 311 | 16 | 18 | 66 | 0 | 110 | 83 |
+| BioMart | d | 761 | 21 | 6 | 74 | 0 | 28 | 100 |
+| BioMart | e | 578 | 0 | 15 | 85 | 0 | 19 | 100 |
+| BridgeDb | b | 215 | 100 | 0 | 0 | 0 | 0 | – |
+| BridgeDb | c | 45 | 4 | 22 | 73 | 0 | 32 | 72 |
+| BridgeDb | e | 463 | 3 | 13 | 84 | 0 | 19 | 100 |
+| EnsDb 113 | c | 196 | 29 | 19 | 53 | 0 | 114 | 80 |
+| EnsDb 113 | e | 430 | 0 | 0 | 100 | 0 | 132 | 97 |
+| Ensembl REST | a | 207 | 1 | 99 | 0 | 0 | 96 | 100 |
+| Ensembl REST | c | 433 | 0 | 42 | 53 | 5 | 76 | 87 |
+| Ensembl REST | d | 746 | 0 | 14 | 86 | 0 | 29 | 97 |
+| Ensembl REST | e | 529 | 2 | 17 | 82 | 0 | 20 | 95 |
+| Ensembl REST `lookup/symbol` | c | 313 | 13 | 43 | 44 | 0 | 111 | 85 |
+| Ensembl REST `lookup/symbol` | d | 853 | 5 | 0 | 95 | 0 | 29 | 100 |
+| g:Profiler | b | 142 | 100 | 0 | 0 | 0 | 0 | – |
+| g:Profiler | c | 363 | 17 | 23 | 60 | 0 | 94 | 85 |
+| g:Profiler | d | 857 | 84 | 0 | 16 | 0 | 29 | 100 |
+| g:Profiler | e | 573 | 1 | 14 | 85 | 0 | 20 | 95 |
+| HGNC | c | 46 | 0 | 28 | 72 | 0 | 38 | 76 |
+| HGNC | d | 177 | 3 | 38 | 59 | 0 | 0 | – |
+| HGNC | e | 148 | 32 | 1 | 67 | 0 | 6 | 100 |
+| HGNChelper | c | 68 | 44 | 18 | 38 | 0 | 66 | 94 |
+| HGNChelper | d | 102 | 81 | 7 | 12 | 0 | 26 | 81 |
+| limma | c | 68 | 51 | 7 | 41 | 0 | 66 | 98 |
+| limma | d | 98 | 70 | 20 | 10 | 0 | 46 | 19 |
+| MyGene.info | b | 42 | 100 | 0 | 0 | 0 | 0 | – |
+| MyGene.info | c | 330 | 41 | 25 | 33 | 0 | 99 | 87 |
+| MyGene.info | d | 810 | 58 | 24 | 19 | 0 | 12 | 33 |
+| MyGene.info | e | 513 | 15 | 14 | 71 | 0 | 15 | 100 |
+| NCBI's files | c | 226 | 44 | 37 | 19 | 0 | 121 | 75 |
+| NCBI's files | d | 421 | 50 | 41 | 9 | 0 | 96 | 94 |
+| NCBI's files | e | 354 | 22 | 32 | 46 | 0 | 79 | 99 |
+| org.\*.eg.db | c | 112 | 60 | 12 | 29 | 0 | 67 | 85 |
+| org.\*.eg.db | d | 89 | 89 | 5 | 7 | 0 | 46 | 18 |
+| org.\*.eg.db | e | 170 | 9 | 11 | 80 | 0 | 102 | 98 |
+| pyensembl | c | 197 | 34 | 20 | 46 | 0 | 128 | 60 |
+| Seurat | c | 37 | 32 | 24 | 43 | 0 | 36 | 83 |
+| Seurat | d | 134 | 93 | 3 | 4 | 0 | 0 | – |
+| UniProt | e | 771 | 7 | 3 | 90 | 0 | 2 | 100 |
+
+The rules that keep the comparison fair, each with the reading's measured reason, applied from the stored responses alone (nothing fetched again):
+
+- **The lines G judges by** are the families' current lines: a line drawn from a decided judge's revision set (`*_dec`) is replaced by the line of the judge users get (`g_b_r1`), and a line whose source family revised its truth after G's sets were drawn by the source's current line (`g_b_r2`: B's revisions; `g_c_r1`: C's revision of its UniProt lines; the sampled lines where idtrack was wrong on C's UniProt versions were all such lines).
+- **MyGene.info's answer to an Ensembl id** (task b) is the id itself where a hit lists it: a hit is an NCBI gene that may list several Ensembl genes.
+- **A request is asked once** and answers every line that asks it: Ensembl REST's `xrefs/symbol` and HGNC's `fetch` are one request per string, and a stored request names only the line it was first asked for (pig's symbols: 1,561 of 11,440 web lines ask a string asked for another line, or by the pilot).
+- **Lines their source family withdrew** (`excluded`: 6,217, of them 6,193 human RefSeq lines of C2) are scored by no subject and counted apart.
+- **A line read at 115** and kept by the rule of equal truth reads alike at the tool's release: it is never "a reading of another release".
+
+What each tool is not built for (the group "not a question the tool claims", never a fault of the tool):
+
+- **Ensembl REST `archive/id`** (task a) names an id's possible replacements at the release that retired it, one step of Ensembl's history; it does not follow them on to the current release. Its sampled wrong lines are almost all such steps: replacements Ensembl retired later, ids that are no gene of 116 ("right under another reading"). A user who asks it again for each replacement walks the history by hand.
+- **Ensembl REST `xrefs/symbol`, BioMart, g:Profiler, MyGene.info, HGNC, UniProt, BridgeDb, EnsDb, pyensembl, org.\*.eg.db** read a name, synonym or accession as their one release (or today) reads it. A line that asks a string as an earlier release read it (B1, B4 and B5 names read at their source release, NCBI gene ids and UniProt accessions retired since, RefSeq versions no longer current) asks for history these tools do not claim: such lines are the column "not a question the tool claims" above (from 7 % of org.\*.eg.db's sampled wrong aliases to all of EnsDb's identifiers). Where a tool does claim a kind of history it is asked it and judged on it: NCBI's `gene_history` for discontinued GeneIDs (NCBI's files; MyGene.info's `retired` scope), HGNC's previous symbols and aliases, UniProt's secondary accessions.
+- **Ensembl REST `lookup/symbol`** reads display names only, never synonyms: a synonym it does not read is 77 % of its wrong lines on task d (weighted), which is why its rate there is low.
+- **Ensembl REST `xrefs/symbol`** cannot read a string with a Greek letter (B7: its database answers HTTP 400 with a collation error), "the service failed".
+- **NCBI's files and MyGene.info for pig** link NCBI's genes to Ensembl's annotations of other pig breeds (`ENSSSCG002...`), not to the reference assembly's genes: such a line has no answer of the reference ("another annotation's genes only").
+- **g:Profiler, BridgeDb and MyGene.info on Ensembl ids** (task b) know only the genes of their own databases: an Ensembl gene of the release without an entry there has no answer (their sampled wrong lines of task b are all such misses, "truly wrong").
+
+idtrack's wrong lines (the last two columns): most are a known limitation (bridges where Ensembl's history ends, `L-bridges`; Ensembl's history carrying a gene to another place, `L-history-vs-place`; names from other sources, `L-other-name-sources`; a symbol in another case that is another gene's synonym, or a string held only in another case, `L-case-synonym`; values of another database, `L-other-database-values`; a string that stands for a missing value, refused, `L-missing-values`). The others are new causes, each a row of the maintainers' backlog with a reproducer: the truth's copies on patches or haplotypes in the answer (human NCBI aliases of B5: idtrack answers the primary assembly's gene and reports the copies apart, as its rule of copies apart says, while B5's line lists them in its answer; 51 sampled lines), a gene where the truth names none (names read at an old release whose genes the truth carries to nothing at 115, B1 and B2; 74), and another gene (53: 15 mouse names that only patch genes carry at their own release, 85 to 88, answered with one copy while the truth's copy is reported apart; the rest scattered over B1, B4, B5, B7 and C1).
 
 ## Known limitations
 
 - A tool that answers at another release than the graphs is compared on the lines of equal truth only; the lines left out are counted, not judged.
 - The services change on their own rhythm: a pass is one date per service (no second pass).
 - NCBI's and the org packages' Ensembl ids come from NCBI's comparison with an Ensembl release the files do not name; they are judged at the release stated above.
+- BioMart's archives of 105 and 108 to 112 did not answer on the dates asked: their lines are `not_answered`, counted per organism and task, until a later pass fetches them.
+- The reading classes a seeded sample (at most 200 lines per subject, task and organism) by rules over Ensembl's tables of the tool's release; its shares are estimates weighted back to every disagreement, and a class is what the tables show, not a statement of the tool's intent.
+- The truth judges every subject by Ensembl's tables of 115 (or of the tool's release by the rule of equal truth): a tool built on another source (NCBI, HGNC, UniProt) is right by that source where the classes say so ("the authority's gene", "another annotation's genes only") and still counted wrong in the rate.
 
 ## Reproducing from scratch
 
@@ -180,7 +305,12 @@ python -m idtrack_reproducibility.families.g.fetch --tool <ensembl_rest|biomart|
 <idtrack_g_gget>/bin/python -m idtrack_reproducibility.families.g.local --tool gget --organisms all --tier web
 python -m idtrack_reproducibility.families.g.local --tool <pyensembl|ncbi_files> --organisms all
 python -m idtrack_reproducibility.families.g.local --tool <orgdb|limma|hgnchelper|ensdb|seurat> --organisms all --rscript <idtrack_g_r>/bin/Rscript --workdir <folder>
-# the answers from the stored responses, the scoring, the tables
+# the revision sets: lines drawn from a decided judge's set, and lines whose source family revised its truth later
+python -m idtrack_reproducibility.families.g.sets --organism <o> --revise-judge
+python -m idtrack_reproducibility.families.g.sets --organism <o> --revise-sources
+# the answers from the stored responses, the scoring, the tables, the reading, the store's manifest (no network)
 python -m idtrack_reproducibility.families.g.score --subjects all --organisms all --tree main
 python -m idtrack_reproducibility.families.g.report
+python -m idtrack_reproducibility.families.g.reading
+python -m idtrack_reproducibility.families.g.store
 ```

@@ -6,7 +6,8 @@ Reads every scored folder `<families>/g/runs/<subject>/<form>/<organism>/` (the 
 task, the source family's fields), the rule of equal truth (`<families>/g/likeforlike/<organism>/release_<T>.parquet`)
 and the raw index (`<families>/g/raw/`), and writes into `--out` (default `<families>/g/report/`):
 
-  tool_task.tsv        subject x form x organism x task: the tier's lines, `not_supported`, posed (answered),
+  tool_task.tsv        subject x form x organism x task: the tier's lines (without the lines their source family
+                       withdrew, `excluded`, counted apart), `not_supported`, posed (answered),
                        `not_answered` (posable, no usable response stored: not answered by the service on the dates
                        asked), left out
                        by the rule of equal truth, kept, right / wrong / undetermined / error under `all` and `best`,
@@ -117,11 +118,13 @@ def run(organisms, out):
             o["kept"], o["left_out"] = kept_mask(o, lines, lf)
             if form == "best":
                 per_subject[subj] = o
-            tier_lines = [q for q in lines.values() if tier == "local" or q.get("tier") == "web"]
-            for task in sorted({q["task"] for q in tier_lines}):
+            tier_all = [q for q in lines.values() if tier == "local" or q.get("tier") == "web"]
+            tier_lines = [q for q in tier_all if not q.get("excluded")]  # withdrawn by the source family: never scored
+            for task in sorted({q["task"] for q in tier_all}):
                 n_lines = sum(1 for q in tier_lines if q["task"] == task)
                 sub = o[(o.task == task)]
-                row = dict(subject=subj, form=form, organism=org, task=task, tier=tier, lines=n_lines)
+                row = dict(subject=subj, form=form, organism=org, task=task, tier=tier, lines=n_lines,
+                           excluded=sum(1 for q in tier_all if q["task"] == task and q.get("excluded")))
                 for view in ("all", "best"):
                     v = sub[sub.view == view]
                     row["not_supported"] = int((v.outcome == "not_supported").sum())

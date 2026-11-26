@@ -12,7 +12,8 @@ response as the tool's documentation describes it; nothing is corrected by hand:
 - BioMart: the `ensembl_gene_id` of the rows whose filter value is the line's value (compared without case, as the
   mart's filter matches); a response without its `[success]` line is an error.
 - g:Profiler: the `converted` ENSG ids of the line's `incoming` value (not `N/A` or `None`, its marks of no conversion).
-- MyGene.info: the `ensembl.gene` ids of every hit of the line's term; the ids of Ensembl's other annotations of the
+- MyGene.info: the `ensembl.gene` ids of every hit of the line's term (for an Ensembl id looked up, the id itself where
+  a hit lists it: a hit is an NCBI gene that may list several Ensembl genes); the ids of Ensembl's other annotations of the
   same species (pig's breed assemblies: ids absent from Ensembl's GTF of the tool's release) are not the organism's
   reference genes and are left out, read from that GTF.
 - HGNC: the `ensembl_gene_id` of the documents of the first field of the line's chain that found one.
@@ -57,6 +58,19 @@ def _by_qid(rows):
     return out
 
 
+def stored_answer(store, req):
+    """The usable stored response of exactly this request (`client.request_id`), whichever line or pass asked it: a
+    request of one line (Ensembl REST's `xrefs/symbol`, HGNC's `fetch`) is asked once for every line with the same
+    value, and its row names the line it was first asked for (a later line, or a pass after the pilot, finds it stored
+    and asks nothing). The row's endpoint without its form."""
+    full = getattr(store, "_store", store)
+    body = req.get("json_body") if req.get("json_body") is not None else req.get("data")
+    r = full.rows.get(K.request_id(req["method"], req["url"], req.get("params"), body))
+    if r is None or not K.usable(r):
+        return None
+    return dict(r, endpoint=r["endpoint"].split("@", 1)[0])
+
+
 _REFERENCE = {}
 
 
@@ -74,6 +88,9 @@ def rest(store, lines, endpoint):
     cache = {}
     for q in lines:
         r = by.get(q["qid"])
+        if r is None and endpoint == "xrefs/symbol":  # the same string asked for another line (one request per string)
+            r = stored_answer(store, [x for x in T.TOOLS["ensembl_rest"].requests([q], store.organism)
+                                      if x["endpoint"] == endpoint][0])
         if r is None:
             continue
         if r.get("error"):
@@ -197,6 +214,10 @@ def mygene(store, lines, organism, release):
             cache[r["request_id"]] = m
         allg = cache[r["request_id"]].get(q["id"], set())
         got = {g for g in allg if g in ref}
+        if q["task"] == "b":
+            # an Ensembl id looked up (scope ensembl.gene): the hit is an NCBI gene that may list several Ensembl genes;
+            # the answer to "is this id a gene of the release" is the id itself where a hit lists it
+            got = {C.base_id(q["id"])} & {C.base_id(g) for g in got}
         st = "found" if got else ("other_annotation_only" if allg else "not_found")
         out[q["qid"]] = Answer("answer", got, st, _share(r), endpoint=r["endpoint"])
     return out
@@ -208,8 +229,11 @@ def hgnc(store, lines):
     for r in _rows(store):
         for x in r.get("qids") or []:
             per[x].append(r)
+    tool = T.TOOLS["hgnc"]
     for q in lines:
         rs = sorted(per.get(q["qid"], []), key=lambda r: r["asked_at"] or "")
+        if not rs and tool.chain(q):  # the same value asked for another line: its requests, field by field
+            rs = [x for x in (stored_answer(store, tool.request(q, f)) for f in tool.chain(q)) if x is not None]
         if not rs:
             continue
         got, st, secs, err = set(), "not_found", sum(_share(r) for r in rs), None

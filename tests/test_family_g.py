@@ -258,11 +258,18 @@ def test_a_g_line_is_judged_at_the_gene():
     assert GS.task_of(dict(src, from_release=115), "a") == "b"
 
 
-def test_the_scorer_keeps_a_line_a_tool_cannot_pose_as_not_supported():
-    from idtrack_reproducibility.families import scorer as S
-    ln = dict(qid="q", id="X", kind="k", rule="set", cmp="base", expect=["G1"], strategy="both", to_release=115)
-    ans = dict(outcome="not_supported", got=[], error="the tool has no data for the organism")
-    assert S.score_line(ln, "all", ans, None) == ("not_supported", "the tool has no data for the organism")
+def test_a_line_a_tool_cannot_pose_is_never_judged_and_keeps_its_reason(tmp_path):
+    import os
+    import pyarrow.parquet as pq
+    from idtrack_reproducibility.families.g import score as GSc
+    os.makedirs(tmp_path / "outcomes")
+    q = dict(line("q1", "TP53", "c"), kind="b1_x", stratum="g_b_b1_x", strategy="both", family="g", rule="set")
+    n = GSc.not_supported_rows(str(tmp_path), [(q, "hgnc has no data for sus_scrofa")])
+    t = pq.read_table(tmp_path / "outcomes" / GSc.NOT_SUPPORTED_PART).to_pylist()
+    assert n == 2 and {r["view"] for r in t} == {"best", "all"}
+    assert all(r["outcome"] == "not_supported" and r["reason"] == "hgnc has no data for sus_scrofa" for r in t)
+    # the common scorer's partitions and G's part are read together by the reports (one partition: `_of_1`)
+    assert GSc.NOT_SUPPORTED_PART.endswith("_of_1.parquet")
 
 
 def test_the_best_reading_removes_a_version_a_tool_does_not_take():
@@ -381,3 +388,64 @@ def test_scoring_reads_the_store_with_the_network_off(tmp_path, monkeypatch):
     monkeypatch.setattr(K.RawStore, "of", classmethod(lambda cls, tool, version, organism: st))
     out = A.answers("gprofiler", "sus_scrofa", "v", [line("q1", "TP53", "c")], form="stated")
     assert out["q1"].got == ["ENSSSCG00000000009"]
+
+
+def test_a_sampled_wrong_answer_is_read_by_what_the_tool_did():
+    from idtrack_reproducibility.families.g import reading as RD
+    at = RD.At.__new__(RD.At)
+    at.rel = 116
+    at.gtf = {"G1": {"region": "primary"}, "G2": {"region": "primary"}, "G3": {"region": "patch"}}
+    at.names = release({"abc": {"G2"}})
+    ln = lambda **k: dict(line("q", "ABC", "c", expect=["G1"]), **k)  # noqa: E731
+    assert RD.tool_class(ln(), [], "error", at, None)[0] == "the service could not read the input"
+    assert RD.tool_class(ln(), ["G9"], "wrong", at, None)[0] == "not a gene of the release"
+    assert RD.tool_class(ln(), ["G3"], "wrong", at, None)[0] == "a gene on a patch"
+    assert RD.tool_class(ln(expect=["G1", "G2"]), ["G1"], "wrong", at, None)[0] == "a part of the truth's genes"
+    assert RD.tool_class(ln(authority=["G2"]), ["G2"], "wrong", at, None)[0] == "the authority's gene"
+    assert RD.tool_class(ln(from_release=90), ["G2"], "wrong", at, None)[0] == "a reading of another release"
+    assert RD.tool_class(ln(), ["G2"], "wrong", at, None)[0] == "another gene the string names"
+    assert RD.tool_class(ln(id="XYZ"), ["G2"], "wrong", at, None)[0] == "truly wrong"
+    # a line read at the target (115) is kept by the rule of equal truth: it reads alike at the tool's release
+    assert RD.tool_class(ln(from_release=115, to_release=115), ["G2"], "wrong", at, None)[0] == "another gene the string names"
+    assert RD.tool_class(ln(id="XYZ"), [], "wrong", at, None)[0] == "no answer, not in Ensembl's tables"
+    assert RD.tool_class(ln(), [], "wrong", at, None)[0] == "no answer, not in Ensembl's tables"
+    assert RD.tool_class(ln(), [], "wrong", at, None, "other_annotation_only")[0] == "another annotation's genes only"
+    at.names = release({"abc": {"G2"}}, synonyms={"abc": {"G1"}})
+    assert RD.tool_class(ln(), [], "wrong", at, None)[0] == "no answer"  # a tool that reads synonyms missed it
+    assert RD.tool_class(ln(), [], "wrong", at, None, synonyms=False)[0] == "a synonym, which the tool does not read"
+    assert set(RD.GROUPS.values()) == {"truly wrong", "right under another reading", "not a question the tool claims",
+                                       "the service failed"}
+
+
+def test_a_request_asked_once_answers_every_line_that_asks_it(tmp_path, monkeypatch):
+    # Ensembl REST's xrefs/symbol is one request per string: the second line with the same string (or a pass after the
+    # pilot asked it) finds it stored and asks nothing; the stored row names only the first line
+    st = K.RawStore(str(tmp_path / "ensembl_rest"), "ensembl_rest", "116", "sus_scrofa")
+    q1, q2 = line("q1", "TBX21", "c"), line("q2", "TBX21", "c", from_release=98)
+    req = [x for x in T.TOOLS["ensembl_rest"].requests([q1], "sus_scrofa") if x["endpoint"] == "xrefs/symbol"][0]
+    rid = K.request_id(req["method"], req["url"], req.get("params"), None)
+    st.put(dict(request_id=rid, tool="ensembl_rest", tool_version="116", organism="sus_scrofa", endpoint="xrefs/symbol@stated",
+                method="GET", url=req["url"], params=req["params"], body=None, qids=["q1"], asked_at="2026-11-24T00:00:00",
+                http_status=200, seconds=1.0, bytes=None, sha256=None, file=None, error=None),
+           json.dumps([{"type": "gene", "id": "ENSSSCG00000000001"}]).encode(), "json", {})
+    monkeypatch.setattr(K.RawStore, "of", classmethod(lambda cls, tool, version, organism: st))
+    out = A.answers("ensembl_rest", "sus_scrofa", "116", [q1, q2], form="stated")
+    assert out["q1"].got == out["q2"].got == ["ENSSSCG00000000001"]
+
+
+def test_an_idtrack_wrong_line_no_limitation_states_is_read_by_what_idtrack_did():
+    from idtrack_reproducibility.families.g import reading as RD
+    at = RD.At.__new__(RD.At)
+    at.rel = 115
+    at.gtf = {"ENSG00000000001": {"region": "primary"}, "ENSG00000000002": {"region": "patch"}, "ENSG00000000003": {"region": "patch"}}
+    at.names = release({"abc": {"ENSG00000000001"}})
+    ln = lambda **k: dict(line("q", "abc", "d"), **k)  # noqa: E731
+    note = "no Ensembl table of any release holds the string"
+    assert RD.idtrack_class(ln(note=note), ["ENSG00000000001.3"], at) == (
+        "a string Ensembl's tables hold only in another case, read as that name", "L-case-synonym")
+    assert RD.idtrack_class(ln(), ["ENSG00000000001.3"], at) == ("a gene where the truth names none", None)
+    assert RD.idtrack_class(ln(expect=["ENSG00000000002"]), ["ENSG00000000001.3"], at, "synonym:case")[1] == "L-case-synonym"
+    assert RD.idtrack_class(ln(), [], at, None, "error: MissingValueError: 'NAT'")[1] == "L-missing-values"
+    assert RD.idtrack_class(ln(expect=["ENSG00000000001", "ENSG00000000002"]), ["ENSG00000000001.3"], at)[0].startswith("the truth's copies on patches")
+    assert RD.idtrack_class(ln(expect=["ENSG00000000002"]), ["ENSG00000000003.1"], at)[0] == "a name on patches answered with another patch's gene"
+    assert RD.idtrack_class(ln(expect=["ENSG00000000002"]), ["ENSG00000000001.1"], at) == ("another gene", None)

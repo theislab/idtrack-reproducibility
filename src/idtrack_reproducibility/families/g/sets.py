@@ -51,9 +51,16 @@ FAMILIES = {
 }
 
 
+def decided(family, organism, name):
+    """A revision set of the judge following decisions not built yet (`<set>_dec`, `<set>_r<n>_dec`): another judge,
+    which the families score apart (`scores_decided`); G's lines are the judge users get (`scores_now`)."""
+    return name.endswith("_dec")
+
+
 def revision_closure(family, organism, bases):
-    """The base sets that exist and every set that revises one of them (transitively), in publication order."""
-    names = L.set_names(family, organism)
+    """The base sets that exist and every set that revises one of them (transitively), in publication order; the
+    decided judge's revision sets left out (`decided`)."""
+    names = [n for n in L.set_names(family, organism) if not decided(family, organism, n)]
     keep = [b for b in bases if b in names]
     changed = True
     while changed:
@@ -243,12 +250,92 @@ def draw(gfam, organism):
     return out, dict(seed=SEED, n_web=len(web), n_local=len(local), allocation=alloc, source_family=src, source_sets=shas)
 
 
+def revise_judge(organism, dry=False):
+    """The revision set `g_<family>_r1` of the lines whose source line was a decided judge's (published before
+    `revision_closure` left those sets out): each such qid's line of the judge users get, as a G line of the same tier;
+    returns {set: lines}."""
+    out = {}
+    for gfam, (src, bases, prefixes) in FAMILIES.items():
+        name = f"g_{gfam}_v1"
+        if name not in L.set_names("g", organism):
+            continue
+        bad = {}
+        for q in L.iter_set(L._set_file(L.query_dir("g", organism), name)):
+            if decided(src, organism, q.get("source_set") or ""):
+                bad[q["qid"]] = q["tier"]
+        if not bad:
+            continue
+        now = L.load_qids(src, organism, bad, sets=revision_closure(src, organism, bases))
+        lines = [to_g(now[q], gfam, src, bad[q]) for q in sorted(bad)]
+        rname = f"g_{gfam}_r1"
+        out[rname] = len(lines)
+        if dry or rname in L.set_names("g", organism):
+            continue
+        L.publish("g", organism, rname, lines,
+                  f"family G's lines of {name} whose source line was a decided judge's revision set (`*_dec`): the "
+                  f"line of the judge users get (the families' `scores_now`)", generator=__file__, revises=[name],
+                  sources=[f"{src}/{s} sha256 {L.manifest(src, organism, s)['sha256']}"
+                           for s in revision_closure(src, organism, bases)])
+    return out
+
+
+TRUTH_FIELDS = ("expect", "broad", "rule", "open", "open_within", "apart", "support", "spellings", "excluded",
+                "expect_error", "or_error", "names_read_at", "locus", "locus_mapped")
+
+
+def revise_from_sources(organism, dry=False):
+    """The revision set `g_<family>_r<n>` of the lines whose source line has been revised since G drew it (a
+    revision set of the source family published after G's sets): each such qid's current line of the source family
+    (the judge users get), as a G line of the same tier; {set: lines}."""
+    out = {}
+    for gfam, (src, bases, prefixes) in FAMILIES.items():
+        names = L.set_names("g", organism)
+        if f"g_{gfam}_v1" not in names:
+            continue
+        mine = {}
+        for n in [x for x in names if x == f"g_{gfam}_v1" or x.startswith(f"g_{gfam}_r")]:
+            for q in L.iter_set(L._set_file(L.query_dir("g", organism), n)):
+                mine[q["qid"]] = q
+        now = L.load_qids(src, organism, mine, sets=revision_closure(src, organism, bases))
+        changed = []
+        for qid, g in mine.items():
+            c = now.get(qid)
+            if c is None:
+                continue
+            new = to_g(c, gfam, src, g["tier"])
+            if any(new.get(k) != g.get(k) for k in TRUTH_FIELDS):
+                changed.append(new)
+        if not changed:
+            continue
+        k = 1 + max([int(x.rsplit("_r", 1)[1]) for x in names if x.startswith(f"g_{gfam}_r")] or [0])
+        rname = f"g_{gfam}_r{k}"
+        out[rname] = len(changed)
+        if dry:
+            continue
+        L.publish("g", organism, rname, sorted(changed, key=lambda q: q["qid"]),
+                  f"family G's lines whose source line the source family revised after G's sets were drawn: the "
+                  f"source's current line (the judge users get)", generator=__file__,
+                  revises=[x for x in names if x == f"g_{gfam}_v1" or x.startswith(f"g_{gfam}_r")],
+                  sources=[f"{src}/{s} sha256 {L.manifest(src, organism, s)['sha256']}"
+                           for s in revision_closure(src, organism, bases)])
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m idtrack_reproducibility.families.g.sets", description=__doc__.split("\n\n")[0])
     ap.add_argument("--organism", required=True)
     ap.add_argument("--families", default=",".join(FAMILIES))
     ap.add_argument("--draft", default=None, help="write the drawn lines to this folder instead of publishing them")
+    ap.add_argument("--revise-judge", action="store_true", help="publish g_<family>_r1 (revise_judge) and stop")
+    ap.add_argument("--revise-sources", action="store_true", help="publish g_<family>_r<n> (revise_from_sources)")
+    ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
+    if a.revise_judge:
+        print(a.organism, revise_judge(a.organism, a.dry_run))
+        return
+    if a.revise_sources:
+        print(a.organism, revise_from_sources(a.organism, a.dry_run))
+        return
     for gfam in a.families.split(","):
         if not a.draft and f"g_{gfam}_v1" in L.set_names("g", a.organism):
             print(a.organism, f"g_{gfam}_v1", "published already")

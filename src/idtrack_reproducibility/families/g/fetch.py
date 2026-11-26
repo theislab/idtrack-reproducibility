@@ -45,9 +45,14 @@ def g_lines(organism, tier="web", per_family=None, draft=None):
             with gzip.open(p, "rt") as fh:
                 xs = [json.loads(x) for x in fh]
         else:
-            if name not in L.set_names("g", organism):
+            names = L.set_names("g", organism)
+            if name not in names:
                 continue
             xs = list(L.iter_set(L._set_file(L.query_dir("g", organism), name)))
+            # a revision set of the family (g_<family>_r<n>) replaces its lines: the line of the latest set is the truth
+            for r in [n for n in names if n.startswith(f"g_{gfam}_r")]:
+                rev = {q["qid"]: q for q in L.iter_set(L._set_file(L.query_dir("g", organism), r))}
+                xs = [rev.get(q["qid"], q) for q in xs]
         xs = [q for q in xs if tier == "local" or q.get("tier") == "web"]
         out += xs[:per_family] if per_family else xs
     return out

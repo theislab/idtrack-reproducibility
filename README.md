@@ -17,7 +17,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 | D, real-world inputs | an atlas project's feature lists, source inference, marker lists, mixed lists, judged by locus | [docs/families/d.md](docs/families/d.md) | `families.d` |
 | E, robustness | missing values, malformed strings, types, other organisms' ids, arguments, budgets, determinism and concurrency, metamorphic relations, the web layer | [docs/families/e.md](docs/families/e.md) | `families.e` |
 | F, harmonization | count matrices brought to one release by the harmonizer: synthetic datasets with a known truth (F1): each feature's gene, count conservation, the matrices and metadata (`obs`, `obsm`, `uns`, layers), the order of datasets and features, the result cache | [docs/families/f.md](docs/families/f.md) | `families.f` |
-| G, other tools | the tools people use for the same questions (Ensembl REST, BioMart, g:Profiler, MyGene.info, HGNC, UniProt, BridgeDb, pyensembl, Bioconductor's annotation packages, ...) asked the same lines, judged by the same truth and scorer (design and pilot) | [docs/families/g.md](docs/families/g.md) | `families.g` |
+| G, other tools | the tools people use for the same questions (Ensembl REST, BioMart, g:Profiler, MyGene.info, HGNC, UniProt, BridgeDb, pyensembl, Bioconductor's annotation packages, ...) asked the same lines, judged by the same truth and scorer from their stored responses, every disagreement with idtrack sampled and read | [docs/families/g.md](docs/families/g.md) | `families.g` |
 | H, performance | build, load, memory, per-call latency, batch scaling, harmonization | [docs/families/h.md](docs/families/h.md) | `families.h` |
 | the regression corpus | whether an answer changed between two idtrack trees (no truth) | [docs/corpus.md](docs/corpus.md) | `idtrack_reproducibility.corpus` |
 | the weakness hunts | findings of the hunts (inputs, history, regions; the attack on idtrack's next version), with runnable reproducers | [docs/hunts.md](docs/hunts.md) | `idtrack_reproducibility.hunts` |
@@ -25,7 +25,7 @@ Reproducibility material for [idtrack](https://github.com/theislab/idtrack): the
 
 Every benchmark keeps one row per query line, view and subject (a tree or another tool): [the record](docs/records.md) (its columns, how to load it, a worked example). How the move into this package was verified (the stored scorings scored again, line by line) is [docs/verification.md](docs/verification.md). A measurement of any tree in a few hours is the [modest set](docs/modest.md).
 
-The design of the whole programme (principles, needs, coverage, family G still to come and the parts of F not built, intervals, known limitations, the comparison with other tools) is [docs/methods.md](docs/methods.md). The rules of idtrack and of the judge that the benchmarks cite by name are in [docs/rules.md](docs/rules.md).
+The design of the whole programme (principles, needs, coverage, the parts of F not built, intervals, known limitations, the comparison with other tools) is [docs/methods.md](docs/methods.md). The rules of idtrack and of the judge that the benchmarks cite by name are in [docs/rules.md](docs/rules.md).
 
 ## Layout
 

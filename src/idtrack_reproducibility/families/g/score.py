@@ -5,10 +5,11 @@ Usage: python -m idtrack_reproducibility.families.g.score --subjects <s,...|all>
                                                          [--forms best,stated] [--tree <tree>]
 
 Per subject, form of the input and organism: the answers (`<families>/g/runs/<subject>/<form>/<organism>/answers/
-shard_0_of_1.0.parquet`, the runner's schema): for a line the tool cannot pose, outcome `not_supported` with the
-reason; for a line it was asked, its adapter's answer (adapters.py) under both views (a tool gives one set: `best`
+shard_0_of_1.0.parquet`, the runner's schema) of the lines it was asked, its adapter's answer (adapters.py) under both views (a tool gives one set: `best`
 judges it as a part of the truth, `all` as the whole); a line asked of no stored response has no answer (`missing`).
-The scorer (`families/scorer.py`) writes the record's rows beside them, and `run.json` names the subject (`kind =
+The scorer (`families/scorer.py`, unchanged) writes the record's rows of those; a line the tool cannot pose is never
+sent to it: G writes its rows with outcome `not_supported` and the reason (`not_supported_rows`), and `run.json` names
+the subject (`kind =
 tool`, `name`, `version`, `asked_at`, `endpoint`). The subject `idtrack` is the tree's answers to the same lines from
 the families' own runs (`<families>/<source family>/runs/<tree>/<organism>/answers/`, read only; the lines' qids are
 the families'), scored on G's lines like every tool.
@@ -109,18 +110,18 @@ def tier_of(subject):
 
 def answer_rows(subject, organism, form):
     """(rows of the runner's answer schema, the versions read, the asking dates) of one subject, form and organism."""
-    lines = F.g_lines(organism, tier_of(subject))
+    # a line its source family withdrew (`excluded`) is scored by no one (the common scorer leaves it out)
+    lines = [q for q in F.g_lines(organism, tier_of(subject)) if not q.get("excluded")]
     vb = versions_by_release(subject, organism)
     archives = None
     if subject == "gprofiler":
         archives = {int(v[1: v.index("_")]): v for v in A.raw_versions("gprofiler", organism)
                     if v.startswith("e") and v.count("_") == 2}  # the archives (the current one has a fourth part)
-    by_rel, rows = {}, []
+    by_rel, rows, unposed = {}, [], []
     for q in lines:
         rel, why = posable(subject, q, organism, archives)
         if rel is None:
-            for view in ("best", "all"):
-                rows.append(dict(qid=q["qid"], view=view, outcome="not_supported", got=[], error=why, seconds=None, calls=0))
+            unposed.append((q, why))  # never sent to the judge: G sets its outcome (not_supported_rows)
         else:
             by_rel.setdefault(rel, []).append(q)
     used, dates = set(), set()
@@ -140,7 +141,30 @@ def answer_rows(subject, organism, form):
                 rows.append(dict(qid=q["qid"], view=view, outcome=a.outcome, got=list(a.got), status=a.status,
                                  error=a.error, seconds=a.seconds, calls=1, from_release=None,
                                  flags=json.dumps({"release": rel, "form": form})))
-    return rows, sorted(used), sorted(dates)
+    return rows, sorted(used), sorted(dates), unposed
+
+
+NOT_SUPPORTED_PART = "part_not_supported_of_1.parquet"
+
+
+def not_supported_rows(run, unposed):
+    """The record's rows of the lines a tool cannot pose (outcome `not_supported`, the reason why), written by G
+    beside the common scorer's partition (`outcomes/part_not_supported_of_1.parquet`): such a line is never asked
+    and never judged; the scorer's own code is used for the rows' columns only (`scorer._row`, `scorer.out_schema`)."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from idtrack_reproducibility.families import lines as L
+    from idtrack_reproducibility.families import scorer as S
+    out = []
+    for q, why in unposed:
+        for view in L.views(q):
+            base = dict(qid=q["qid"], view=view, family=q.get("family") or "g", stratum=L.stratum_of(q), kind=q["kind"],
+                        variant=L.variant(q, view), unit=L.unit_of(q), set=q.get("set"), rule=L.judged_by(q))
+            out.append(S._row(base, q, "not_supported", why, [], None, 0, {}))
+    path = os.path.join(run, "outcomes", NOT_SUPPORTED_PART)
+    pq.write_table(pa.Table.from_pylist(out, schema=S.out_schema()), path + ".tmp", compression="zstd")
+    os.replace(path + ".tmp", path)
+    return len(out)
 
 
 def idtrack_rows(organism, tree):
@@ -210,7 +234,7 @@ def score_subject(subject, organism, form, tree="main"):
         # the runner's own answers on G's sets (`runner --family g`, for lines no family run holds) stay beside them
         subj = dict(kind="tree", name=tree, version=tree, asked_at=None, endpoint=";".join(found) or "runner on G's sets")
     else:
-        rows, used, dates = answer_rows(subject, organism, form)
+        rows, used, dates, unposed = answer_rows(subject, organism, form)
         if not used:
             return None
         write_answers(run, rows)
@@ -221,9 +245,15 @@ def score_subject(subject, organism, form, tree="main"):
     info = json.load(open(p))
     if subject != "idtrack":
         info["subject"] = subj
+        n = not_supported_rows(run, unposed)
+        info["n_rows"] = info.get("n_rows", 0) + n
+        info["n_not_supported"] = n
     info["g"] = dict(form=form, tier=tier_of(subject) if subject != "idtrack" else "local", tree=tree if subject == "idtrack" else None,
                      sources=subj["endpoint"] if subject == "idtrack" else None)
     json.dump(info, open(p, "w"), indent=1)
+    if subject != "idtrack":
+        from idtrack_reproducibility.families import report as REP
+        REP.write(run, "g", organism)  # the common report with the not_supported rows
     return run
 
 
