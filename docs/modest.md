@@ -31,7 +31,7 @@ A tree's run is a folder `<out>` (the `--out` of `modest run`, [Commands](#comma
 | C | 32,052 | 8,000 | 7,625 | 27,333 | 23,505 | 98,515 | 0 |
 | D | 12,859 | 16,560 | 21,528 | 4,500 | 4,500 | 59,947 | 0 |
 | E (`modest_v2`) | 57,864 | 61,280 | 60,164 | 57,096 | 54,740 | 291,144 | 38 |
-| hunt reproducers | | | | | | 34 findings | |
+| hunt reproducers | | | | | | every finding of the hunts' table (29 in the runs of `d4c2dda`, `71690ab` and `next`, 34 in those of `r1`, `r1b` and `r2`; 51 from 2026-11-27) | |
 | **total** | | | | | | **3,587,243 lines** | |
 
 `modest_v2` of B and E (2026-11-21; one job, 5 minutes) adds the strata of the sets published for the attack on idtrack's next version: B9's `b9_*` (pig 8,792 lines in 19 strata, mouse 10,314 in 27, human 10,789 in 28, rhesus 10,142 in 24, cynomolgus 3,000 in 6) and E8's `e8_batch_*` and `e8_onerelease_*` (pig 6,838, mouse 8,177, human 8,379, rhesus 6,133, cynomolgus 4,543 lines in 10 or 11 strata, their reference lines among them); every qid of `modest_v1` is in it (the sample is a hash of the qid). A relation line is judged against the line it names, so a selection now holds that line too (reason `relation`: E pig 3,269, mouse 4,031, human 4,169, rhesus 2,973, cynomolgus 2,533, for E8's earlier pairs as well; in `modest_v1` a sampled pair whose partner was not sampled had no outcome). A line of `e8_batch` names a whole-release list, converted once per list and arguments: the E part converts up to every list of the organism twice (68 lists of up to 77,000 names in human and mouse).

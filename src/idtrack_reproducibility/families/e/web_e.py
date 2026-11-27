@@ -1,7 +1,7 @@
 """E9 the web layer: idtrack-web's api, served from local graphs, against the package's own answers, and its limits.
 
 Usage: web_e.py --out <run folder> [--n 10000] [--organisms a,b]    (idtrack-web's api environment, `uv sync --locked`
-       in its api/, SETUP.md section 4; its idtrack is the commit it pins: 71690ab)
+       in its api/, SETUP.md section 4; its idtrack is the one its lock file pins: 71690ab when E9 ran)
 
 No container runs on this cluster: the api is served as its SETUP.md section 8 runs it locally (`idtrack-web serve`:
 gunicorn, two forked workers, a directory store of links to the graphs made by `idtrack-web publish --link`), on

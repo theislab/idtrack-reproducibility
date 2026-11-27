@@ -77,6 +77,14 @@ def test_status_match_and_copies_apart():
     assert R.compare(dict(apart_any=False), obs) != []
 
 
+def test_apart_compares_the_ids_reported_apart():
+    obs = dict(status="converted", got=["G1.1"], apart=["LRG_7.1"])
+    assert R.compare(dict(apart=["LRG_7.1"]), obs) == []
+    assert R.compare(dict(apart=["G1.1"]), obs) != []  # the answer itself set apart is another answer
+    assert R.compare(dict(apart=[]), dict(status="converted", got=["G1.1"])) == []
+    assert R.compare(dict(apart=["C.1", "B.1"]), dict(got=[], apart=["B.1", "C.1"])) == []  # a set, not an order
+
+
 def test_an_error_where_an_answer_was_recorded_is_a_change():
     obs = dict(outcome="error", error_type="ValueError", error="ValueError: x", got=[])
     assert R.compare(dict(got=[]), obs) != []  # the same ids (none), but the call raised

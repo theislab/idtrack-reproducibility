@@ -1,5 +1,5 @@
-"""Survey of rosetta's per-feature tables of its 33 authors' matrices (read only):
-rosetta_storage/scratch/data_discovery_to_unification/r3_build_matrix_locus_dev/out/m02/<dataset>.tsv.gz.
+"""Survey of rosetta's per-feature tables of its 33 authors' matrices (read only): `<dataset>.tsv.gz` in the folder the
+configuration names `[sources] rosetta_m02` (the copies family D read, `<families>/d/inputs/atlas/m02/`).
 Per dataset and source: species (by the ids it reached), features, the kinds of features (route), source release,
 same assembly, counts. Usage: survey_m02.py <out tsv>"""
 import sys

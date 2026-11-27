@@ -7,9 +7,10 @@ Usage:
   python -m idtrack_reproducibility.hunts.reproduce <angle|all> <id|all> --submit [--tree d4c2dda,71690ab] [--out d]
                                                    one job per organism (jobs.submit), each tree in turn
 
-Each finding of the hunts (angles `inputs`, `history`, `regions`, and `attack`: the audit by attack of idtrack's next
-version, recorded on the tree `next`) has here the calls the hunt made, the answer the
-truth expects with the truth's source, and the answer the hunt recorded. A call is
+Each finding of the hunts (angles `inputs`, `history`, `regions`; `attack`: the audit by attack of idtrack's next
+version, its first round recorded on the tree `next` (AT-1 to AT-5), its second on `r1b` (AT-6 to AT-11); `readings`:
+the readings of the benchmarks' wrong answers on the tree `main`, recorded there) has here the calls the hunt made, the
+answer the truth expects with the truth's source, and the answer the hunt recorded. A call is
 
 - `convert`: one conversion asked through the families' adapter (`families.adapter`, as widened by family E's
   `families.e.adapter_e`), so that `d4c2dda`'s api (`convert_identifier`) and `71690ab`'s (`convert`) are read
@@ -25,7 +26,7 @@ truth expects with the truth's source, and the answer the hunt recorded. A call 
 The recorded answer is a set of fields, each compared with the answer got (`compare`): `outcome`, `status`, `match`,
 `error_type` (equal), `got` (the same ids), `got_base` (the same stable ids, versions aside, where the hunt named no
 version), `got_has` (these ids among those got), `n_got` (as many ids), `apart_any` (copies reported apart, or not),
-`present` (a truth fact). A finding holds when every call answers as recorded.
+`apart` (the same ids reported apart), `present` (a truth fact). A finding holds when every call answers as recorded.
 
 A run loads the configured tree's graph of each organism its calls need (`config`: `[trees.<tree>]` source, python
 and graphs; the process restarts itself in the tree's Python with `PYTHONHASHSEED=0`; one graph at a time), makes
@@ -45,9 +46,10 @@ import time
 from idtrack_reproducibility import config as CFG
 from idtrack_reproducibility.harness import harness_lib as H
 
-ANGLES = ("inputs", "history", "regions", "attack")
+ANGLES = ("inputs", "history", "regions", "attack", "readings")
 HS, MM, SS, MMU, MFA = "homo_sapiens", "mus_musculus", "sus_scrofa", "macaca_mulatta", "macaca_fascicularis"
-FIELDS = ("outcome", "status", "match", "error_type", "got", "got_base", "got_has", "n_got", "apart_any", "present")
+FIELDS = ("outcome", "status", "match", "error_type", "got", "got_base", "got_has", "n_got", "apart_any", "apart",
+          "present")
 ENS_VERSIONED = re.compile(rf"^({H.STABLE_ID_FORM})\.\d+$")
 
 
@@ -414,6 +416,174 @@ FINDINGS = [
                   "at Y:49.39 Mb without successor; the answer is another copy of an ampliconic family at Y:78.84 Mb)",
                   "Ensembl's stable_id_event; assembly_exception of release 83; GTFs", from_release=83, to_release=84),
          ]),
+    # ---- attack, second round: idtrack `next` 8e4fbb5 (the tree r1b) with its graphs ----
+    dict(angle="attack", id="AT-6", title="RefSeq's mRNA accessions of the early releases, filed as RefSeq_dna, are "
+         "not held at their release", calls=[
+             conv(SS, "NM_001003663", dict(got_base=["ENSSSCG00000011404"]), "ENSSSCG00000011403",
+                  "Ensembl's core database of release 63: RefSeq_dna NM_001003663.1 on ENSSSCG00000011403 (RefSeq_mRNA "
+                  "at 64 to 67)", from_release=63, to_release=63),
+             conv(MMU, "NM_001032813.1", dict(got_base=["ENSMMUG00000030028"]), "ENSMMUG00000023684",
+                  "Ensembl's core databases of releases 48 to 63: RefSeq_dna NM_001032813 version 1 on ENSMMUG00000023684",
+                  from_release=48, to_release=48),
+             conv(MMU, "XM_001081968", dict(status="not_found", got_base=[]), "ENSMMUG00000002585",
+                  "Ensembl's core databases of releases 55 to 62: RefSeq_dna_predicted XM_001081968 on ENSMMUG00000002585",
+                  from_release=60, to_release=60),
+             conv(HS, "NM_006695.3", dict(status="unknown_version", got_base=[]), "ENSG00000108309",
+                  "Ensembl's core database of release 48: RefSeq_dna NM_006695 version 3 on ENSG00000108309",
+                  from_release=48, to_release=48),
+             conv(MM, "NM_178704.2", dict(status="unknown_version", got_base=[]), "ENSMUSG00000043671",
+                  "Ensembl's core database of release 48: RefSeq_dna NM_178704 version 2 on ENSMUSG00000043671",
+                  from_release=48, to_release=48),
+         ]),
+    dict(angle="attack", id="AT-7", title="converted to a symbol database, an identifier answers another gene's symbol "
+         "when its own gene has none there", calls=[
+             conv(SS, "PSME1", dict(got_base=["ENSSSCG00000002006"]), "ENSSSCG00000002006 (its display name, NCBI's "
+                  "symbol)", "Ensembl's core database of release 115 (display cross-reference)", to_release=115),
+             conv(SS, "PSME1", dict(status="converted", got=["DCAF11"]), "no VGNC symbol (ENSSSCG00000002006 has none at "
+                  "115): no_target with that gene, not DCAF11, the symbol of ENSSSCG00000002008",
+                  "Ensembl's core database of release 115 (VGNC and display cross-references)", to_release=115,
+                  final_database="VGNC Symbol"),
+             conv(SS, "SAAL1", dict(status="converted", got=["TPH1"]), "no VGNC symbol (SAAL1 is the display name of "
+                  "ENSSSCG00000035393, which has none at 115)", "Ensembl's core database of release 115", to_release=115,
+                  final_database="VGNC Symbol"),
+             conv(SS, "ATP6V1G1", dict(status="converted", got=["TMEM268"]), "no VGNC symbol (ATP6V1G1 is "
+                  "ENSSSCG00000053522, which has none at 115)", "Ensembl's core database of release 115", to_release=115,
+                  final_database="VGNC Symbol"),
+             conv(HS, "U2AF1L5", dict(status="converted", got=["U2AF1"]), "the HGNC symbol of ENSG00000275895 (the "
+                  "gene U2AF1L5 is), or no_target with that gene", "Ensembl's core databases of releases 82 and 115",
+                  from_release=82, to_release=115, final_database="HGNC Symbol"),
+         ]),
+    dict(angle="attack", id="AT-8", title="the display-name term ranks a gene whose display name is the string in "
+         "another letter case", calls=[
+             conv(MM, "Foxl1", dict(got_base=["ENSMUSG00000097084"]), "ENSMUSG00000043867 (MGI's Foxl1, its display "
+                  "name; ENSMUSG00000097084 displays FOXL1 from UniProt)", "Ensembl's core database of release 70 "
+                  "(display cross-references)", from_release=70, to_release=70),
+             conv(MM, "Lhb", dict(got_base=["ENSMUSG00000100916"]), "ENSMUSG00000038194 (MGI's Lhb, its display name)",
+                  "Ensembl's core database of release 76 (display cross-references)", from_release=76, to_release=76),
+             conv(MM, "Trpc2", dict(got_base=["ENSMUSG00000100254"]), "ENSMUSG00000070425 (MGI's Trpc2, its display "
+                  "name)", "Ensembl's core database of release 76 (display cross-references)", from_release=76,
+                  to_release=76),
+             conv(HS, "C2orf15", dict(got_base=["ENSG00000273045"]), "ENSG00000241962 (HGNC's C2orf15, its display "
+                  "name; ENSG00000273045 displays C2ORF15)", "Ensembl's core database of release 76 (display "
+                  "cross-references)", from_release=76, to_release=76),
+         ]),
+    dict(angle="attack", id="AT-9", title="a version above every version of an accession Ensembl no longer attaches "
+         "is answered", calls=[
+             conv(SS, "XM_005662123.4", dict(status="converted", match="version_newer_than_graph"), "nothing "
+                  "(unknown_version: version 1 only, attached at 78 to 82, never after)", "Ensembl's core databases of "
+                  "releases 78 to 115 (RefSeq, accession and version)", to_release=115),
+             conv(SS, "ENSSSCG00000000001.9", dict(status="unknown_version", got_base=[]), "nothing (unknown_version: "
+                  "retired at 90 with versions 1 and 2), the same form of an Ensembl id, for comparison",
+                  "Ensembl's stable_id_event", to_release=115),
+         ]),
+    dict(angle="attack", id="AT-10", title="an LRG record's transcript and translation ids answer the record, not the "
+         "gene it describes", calls=[
+             conv(HS, "LRG_321", dict(got_base=["ENSG00000141510"]), "ENSG00000141510 (TP53, the gene the record "
+                  "describes)", "LRG; Ensembl's core database of release 115 (ENS_LRG_gene)", to_release=115),
+             conv(HS, "LRG_321t1", dict(got_base=["LRG_321"]), "ENSG00000141510, the record apart",
+                  "LRG; Ensembl's core database of release 115 (ENS_LRG_transcript)", to_release=115),
+             conv(HS, "LRG_321p1", dict(got_base=["LRG_321"]), "ENSG00000141510, the record apart",
+                  "LRG; Ensembl's core database of release 115", to_release=115),
+             conv(HS, "LRG_7_g1", dict(got_base=["LRG_7_g1"]), "ENSG00000141837 (CACNA1A)",
+                  "Ensembl's core database of release 58 (ENS_LRG_gene)", from_release=58, to_release=58),
+             conv_many(HS, ["LRG_321t1", "LRG_321t1-1"], 1, dict(match="copy:exact"), "the item read as `convert` "
+                       "reads it (match exact): LRG_321t1-1 is an Ensembl transcript id of the graph",
+                       "Ensembl's core database of release 115"),
+         ]),
+    dict(angle="attack", id="AT-11", title="mouse Havana gene ids that MGI once gave as symbols are not found with "
+         "their version", calls=[
+             conv(MM, "OTTMUSG00000003802", dict(got_base=["ENSMUSG00000069588"]), "ENSMUSG00000069588",
+                  "Ensembl's core database of release 80 (Vega_gene)", from_release=80, to_release=80),
+             conv(MM, "OTTMUSG00000003802.1", dict(status="not_found", got_base=[]), "ENSMUSG00000069588 (Vega gene "
+                  "version 1 at 76 to 102)", "Ensembl's core database of release 80 (Vega_gene, version 1)",
+                  from_release=80, to_release=80),
+             conv(MM, "OTTMUSG00000006163.4", dict(status="not_found", got_base=[]), "ENSMUSG00000069476",
+                  "Ensembl's core database of release 83 (Vega_gene, version 4)", from_release=83, to_release=83),
+         ]),
+    # ---- readings of the benchmarks' wrong answers on the tree main (the answers of release 0.1.2) ----
+    dict(angle="readings", id="RD-1", title="an LRG record's gene id of the GRCh37 releases lists its answer among the "
+         "copies", calls=[
+             conv(HS, "LRG_7_g1", dict(status="converted", match="lrg:exact", got_base=["ENSG00000141837"], apart=["ENSG00000141837.24"]), "ENSG00000141837 (CACNA1A) with the record LRG_7 listed apart, as "
+                  "`LRG_7` answers", "LRG; Ensembl's core databases of releases 58 to 75 (ENS_LRG_gene)",
+                  to_release=115),
+             conv(HS, "LRG_7", dict(status="converted", match="lrg:exact", got_base=["ENSG00000141837"], apart=["LRG_7.1"]), "ENSG00000141837 with the record LRG_7 listed apart",
+                  "LRG; Ensembl's core database of release 115", to_release=115),
+         ]),
+    dict(angle="readings", id="RD-2", title="a transcript or gene without a successor in Ensembl's history, carried "
+         "back to an early release, is bridged to another gene", calls=[
+             conv(HS, "ENST00000403893", dict(status="converted", got_base=["ENSG00000182945"]), "ENSG00000206032 (the gene of Ensembl's history)",
+                  "Ensembl's stable_id_event (A*'s truth)", from_release=50, to_release=52),
+             conv(HS, "ENSG00000269359", dict(status="converted", got_base=["ENSG00000217926"]), "nothing (no predecessor in Ensembl's history; the query's "
+                  "place mapped GRCh37 -> NCBI36 holds no answered gene)", "Ensembl's stable_id_event; the chain "
+                  "GRCh37 -> NCBI36", to_release=52),
+             conv(HS, "ENST00000595290", dict(status="converted", got_base=["ENSG00000147380"]), "nothing, or ENSG00000166160 at the transcript's place",
+                  "Ensembl's stable_id_event; the chain GRCh37 -> NCBI36", from_release=70, to_release=48),
+         ]),
+    dict(angle="readings", id="RD-3", title="MGI symbols that were Havana ids at mouse 48 to 54 are filed as Havana "
+         "ids", calls=[
+             conv(MM, "ENSMUSG00000018925", dict(status="no_target", got=[]), "OTTMUSG00000000990 (the MGI Symbol label of MGI:3650286 at "
+                  "52; MGI lists it as a withdrawn symbol of the gene)", "Ensembl's core database of release 52; MGI's "
+                  "list of withdrawn symbols", from_release=52, to_release=52, final_database="MGI Symbol"),
+             conv(MM, "OTTMUSG00000000990", dict(status="converted", got_base=["ENSMUSG00000018925"]), "ENSMUSG00000018925", "Ensembl's core database of release "
+                  "52", from_release=52, to_release=52),
+         ]),
+    dict(angle="readings", id="RD-4", title="an alias's copies on patches and haplotypes are reported apart, the "
+         "truth's alias lines expect them in the answer", calls=[
+             conv(HS, "1A1", dict(status="converted", match="synonym:exact", got_base=["ENSG00000164175"], apart=["ENSG00000281919.2"]), "ENSG00000164175 and ENSG00000281919 (the truth's line; idtrack lists the "
+                  "patch copy apart)", "NCBI gene_info aliases; Ensembl's GTF of release 115", to_release=115),
+             conv(HS, "ABC17", dict(status="converted", match="synonym:exact", got_base=["ENSG00000168394"], n_got=1, apart_any=True), "ENSG00000168394 and its haplotype copies (the truth's line)",
+                  "NCBI gene_info aliases; Ensembl's GTF of release 115", to_release=115),
+         ]),
+    dict(angle="readings", id="RD-5", title="a name read at an old release whose genes Ensembl's history ends is "
+         "answered through a bridge", calls=[
+             conv(MMU, "KLHL24", dict(status="converted", got_base=["ENSMMUG00000008070"]), "nothing (Ensembl's history gives the name's gene at 66 no successor at "
+                  "115)", "Ensembl's GTF of release 66; stable_id_event", from_release=66, to_release=115),
+             conv(SS, "AKR1C3", dict(status="converted", got_base=["ENSSSCG00000062058"]), "nothing (as above, across Sscrofa10.2 -> 11.1)",
+                  "Ensembl's GTF of release 72; stable_id_event", from_release=72, to_release=115),
+             conv(HS, "AC002523.1", dict(status="converted", got_base=["ENSG00000293395"]), "nothing", "Ensembl's GTF of release 75; stable_id_event",
+                  from_release=75, to_release=115),
+             conv(MM, "7SK", dict(status="tie", got_base=["ENSMUSG00000117084", "ENSMUSG00000117737"]), "nothing", "Ensembl's GTF of release 60; stable_id_event",
+                  from_release=60, to_release=115),
+         ]),
+    dict(angle="readings", id="RD-6", title="a name only haplotype copies display, which reference genes carry as "
+         "UniProt's gene name, answers those genes", calls=[
+             conv(HS, "HLA-DRB3", dict(status="tie", got_base=["ENSG00000179344", "ENSG00000196126"], apart_any=True), "the copies that display it at 70 (ENSG00000196101, ENSG00000230463, "
+                  "ENSG00000231679)", "Ensembl's GTF and core database of release 70", from_release=70, to_release=70),
+         ]),
+    dict(angle="readings", id="RD-7", title="a miRNA name Ensembl displays for its host gene too answers the miRNA "
+         "gene alone", calls=[
+             conv(MMU, "mml-mir-126", dict(status="converted", got_base=["ENSMMUG00000032649"]), "ENSMMUG00000026981 and ENSMMUG00000032649 (both display it at 76)",
+                  "Ensembl's GTF of release 76", from_release=76, to_release=76),
+             conv(SS, "ssc-mir-451", dict(status="converted", got_base=["ENSSSCG00000019354"]), "ENSSSCG00000017776 and ENSSSCG00000019354 (both display it at 76)",
+                  "Ensembl's GTF of release 76", from_release=76, to_release=76),
+         ]),
+    dict(angle="readings", id="RD-8", title="a spreadsheet's date serial is read as a Havana number of release 51",
+         calls=[
+             conv(HS, "39326", dict(status="converted", got_base=["ENSG00000183765"]), "nothing (the serial of 2007-09-01, which a spreadsheet wrote for SEPT1 "
+                  "or SEP-1)", "the spreadsheet's date serials; Ensembl's GTF of release 115", to_release=115),
+         ]),
+    dict(angle="readings", id="RD-9", title="an NCBI gene id NCBI discontinued, kept by Ensembl as a synonym, answers "
+         "the gene of Ensembl's record", calls=[
+             conv(MM, "100041162", dict(status="tie", match="synonym:exact", got_base=["ENSMUSG00000094132", "ENSMUSG00000094825", "ENSMUSG00000096629"]), "nothing (NCBI discontinued the id)", "NCBI gene_history",
+                  to_release=115),
+         ]),
+    dict(angle="readings", id="RD-10", title="Ensembl's history carries a name's gene to another place than the "
+         "name's locus", calls=[
+             conv(HS, "TCP10", dict(status="converted", got_base=["ENSG00000203690"]), "ENSG00000290751 (the gene at the name's locus of 75, mapped to GRCh38)",
+                  "the atlas matrix's locus table (family D1); the chain GRCh37 -> GRCh38", from_release=75,
+                  to_release=115),
+         ]),
+    dict(angle="readings", id="RD-11", title="answers the truth judges wrong where its answer keys lag: not idtrack's",
+         calls=[
+             conv(MM, "CH36-169F23.3", dict(status="converted", got_base=["ENSMUSG00000100982"], apart=["ENSMUSG00000103117.1"]), "the reference gene that carries the name at the copies' place "
+                  "(the truth expects the patch copy ENSMUSG00000103117, which idtrack lists apart)",
+                  "Ensembl's GTF and core database of release 85", from_release=85, to_release=85),
+             conv(HS, "HYAL3", dict(got_base=["ENSG00000186792", "ENSG00000243477"]), "ENSG00000186792 and the gene that carries HYAL3 as UniProt's gene name "
+                  "at 71 (filed Uniprot_genename, which the truth does not read)", "Ensembl's core database of "
+                  "release 71", view="all", from_release=71, to_release=115),
+             conv(HS, "CCDS3", dict(status="converted", got_base=["ENSG00000188976"]), "the gene whose CCDS id it is at 115 (the truth reads the string at 87, "
+                  "as an NCBI alias)", "Ensembl's core database of release 115 (CCDS)", to_release=115),
+         ]),
 ]
 
 
@@ -492,6 +662,9 @@ def compare(recorded, observed):
         elif k == "apart_any":
             have = bool(observed.get("apart"))
             ok = have == want
+        elif k == "apart":
+            have = sorted(observed.get("apart") or [])
+            ok = have == sorted(want)
         elif k == "outcome":
             have = observed.get("outcome") or "answer"
             ok = have == want
@@ -719,8 +892,8 @@ def listing():
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m idtrack_reproducibility.hunts.reproduce",
                                  description=__doc__.split("\n\n")[0])
-    ap.add_argument("angle", nargs="?", help="inputs, history, regions, or all")
-    ap.add_argument("id", nargs="?", help="a finding's id (IN-1, hh-1, R1, J1, ...) or all")
+    ap.add_argument("angle", nargs="?", help="inputs, history, regions, attack, readings, or all")
+    ap.add_argument("id", nargs="?", help="a finding's id (IN-1, hh-1, R1, J1, AT-1, RD-1, ...) or all")
     ap.add_argument("--tree", default="d4c2dda", help="a configured tree (with --submit: a comma-separated list)")
     ap.add_argument("--organism", default=None, help="only the calls of this organism")
     ap.add_argument("--json", default=None, help="write the calls, answers and differences to this file")
